@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>João Jacinto — Product Designer</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   CSS VARIABLES
+   ============================================ */
+:root {
+  --bg: #EDEAEE;
+  --bg-dark: #1A1A1A;
+  --surface: #FFFFFF;
+  --text: #1A1A1A;
+  --text-secondary: #6B6B6B;
+  --text-muted: #9A9A9A;
+  --accent: #7C6CEB;
+  --accent-light: rgba(124, 108, 235, 0.12);
+  --accent-glow: rgba(124, 108, 235, 0.4);
+  --border: rgba(0,0,0,0.07);
+  --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  --container: 1140px;
+  --pad: clamp(20px, 5vw, 40px);
+  --section-gap: clamp(80px, 10vw, 120px);
+  --radius: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+.container { max-width: var(--container); margin: 0 auto; padding: 0 var(--pad); }
+
+/* ============================================
+   NAV
+   ============================================ */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 18px 0;
+  transition: all 0.3s;
+}
+.nav.scrolled {
+  background: rgba(237, 234, 238, 0.82);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 1px 0 var(--border);
+}
+.nav .container {
+  display: flex; justify-content: space-between; align-items: center;
+}
+.nav-logo {
+  font-size: 1.4rem; font-weight: 800; letter-spacing: -0.04em;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+}
+.nav-center {
+  display: flex; gap: 4px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 100px;
+  padding: 4px;
+}
+.nav-center a {
+  font-size: 0.88rem; font-weight: 500; color: var(--text-secondary);
+  padding: 8px 20px; border-radius: 100px; transition: all 0.25s;
+}
+.nav-center a:hover, .nav-center a.active {
+  background: rgba(255,255,255,0.8); color: var(--text);
+}
+.nav-right a {
+  width: 38px; height: 38px; border: 1.5px solid var(--border);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 700; transition: border-color 0.2s;
+}
+.nav-right a:hover { border-color: var(--text); }
+
+/* Mobile nav */
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
+.nav-toggle span {
+  display: block; width: 22px; height: 2px; background: var(--text);
+  position: relative; transition: all 0.3s;
+}
+.nav-toggle span::before, .nav-toggle span::after {
+  content: ''; position: absolute; width: 22px; height: 2px; background: var(--text); transition: all 0.3s;
+}
+.nav-toggle span::before { top: -6px; }
+.nav-toggle span::after { top: 6px; }
+
+.mobile-menu {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(237,234,238,0.97); backdrop-filter: blur(20px);
+  z-index: 99; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-size: 1.4rem; font-weight: 600; color: var(--text);
+  padding: 8px 24px; border-radius: 100px; transition: background 0.2s;
+}
+.mobile-menu a:hover { background: rgba(255,255,255,0.6); }
+
+/* ============================================
+   HERO
+   ============================================ */
+.hero {
+  padding-top: clamp(110px, 14vw, 150px);
+  padding-bottom: 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero-greeting {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 4px;
+}
+.hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.35rem);
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 36px;
+  min-height: 1.6em;
+}
+.hero-photo-wrapper {
+  position: relative;
+  width: clamp(220px, 30vw, 320px);
+  height: clamp(220px, 30vw, 320px);
+  margin: 0 auto 40px;
+  z-index: 2;
+}
+.hero-photo {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-glow), rgba(124,108,235,0.15));
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 80px var(--accent-glow), 0 0 160px rgba(124,108,235,0.15);
+}
+.hero-photo-placeholder {
+  width: 90%; height: 90%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #C8C0D4 0%, #9B8DB5 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; color: rgba(255,255,255,0.7);
+}
+
+/* Marquee behind photo */
+.hero-marquee {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 100%;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+.hero-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 25s linear infinite;
+}
+.hero-marquee-track span {
+  font-size: clamp(6rem, 14vw, 12rem);
+  font-weight: 800;
+  color: rgba(124, 108, 235, 0.1);
+  white-space: nowrap;
+  letter-spacing: -0.03em;
+  padding: 0 40px;
+  text-transform: uppercase;
+}
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.hero-tagline {
+  font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+  color: var(--text-secondary);
+  max-width: 580px;
+  margin: 0 auto 32px;
+  position: relative;
+  z-index: 2;
+}
+.hero-cta {
+  display: inline-flex;
+  padding: 14px 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: rgba(255,255,255,0.5);
+  transition: all 0.25s;
+  position: relative;
+  z-index: 2;
+}
+.hero-cta:hover {
+  background: var(--surface);
+  border-color: var(--text);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+/* ============================================
+   BRANDS MARQUEE
+   ============================================ */
+.brands {
+  padding: 48px 0;
+  text-align: center;
+}
+.brands-label {
+  font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 28px;
+}
+.brands-track-wrapper {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+.brands-track {
+  display: flex; align-items: center; gap: 60px;
+  width: max-content;
+  animation: brands-scroll 30s linear infinite;
+}
+.brands-track .brand {
+  font-size: 1.4rem; font-weight: 700; color: var(--text-muted);
+  white-space: nowrap; opacity: 0.45;
+  letter-spacing: -0.02em;
+}
+.brands-track .brand.talkdesk { color: #7B2EBF; opacity: 0.5; }
+.brands-track .brand.namecheap { color: #FF5C00; opacity: 0.5; }
+.brands-track .brand.streamyard { color: #2E6B4F; opacity: 0.5; }
+@keyframes brands-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ============================================
+   STATS
+   ============================================ */
+.stats {
+  padding: var(--section-gap) 0;
+}
+.stats-label {
+  font-size: 0.88rem; color: var(--text-secondary); text-align: center; margin-bottom: 52px;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+  margin-bottom: 52px;
+}
+.stat-item {}
+.stat-number {
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.stat-number .plus {
+  font-size: 0.45em;
+  color: var(--text-muted);
+  font-weight: 600;
+  vertical-align: super;
+  margin-left: 4px;
+}
+.stat-number .unit {
+  font-size: 0.45em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.stat-title {
+  font-size: 1.05rem; font-weight: 700; margin-bottom: 8px;
+}
+.stat-desc {
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;
+}
+
+/* Products launched row */
+.products-row {
+  margin-bottom: 48px;
+}
+.products-row .stat-number { margin-bottom: 4px; }
+.products-row .stat-title { margin-bottom: 16px; }
+.products-links {
+  font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7;
+}
+.products-links a {
+  color: var(--text); text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-thickness: 1px;
+  transition: color 0.2s;
+}
+.products-links a:hover { color: var(--accent); }
+
+/* LinkedIn CTA */
+.linkedin-cta {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 16px 36px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.25s;
+  margin: 0 auto;
+}
+.linkedin-cta:hover {
+  background: #6A5AD4;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(124,108,235,0.3);
+}
+.linkedin-cta .li-icon {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem; font-weight: 800;
+}
+.cta-center { text-align: center; }
+
+/* ============================================
+   TESTIMONIALS
+   ============================================ */
+.testimonials {
+  padding: var(--section-gap) 0;
+}
+.testimonials-label {
+  font-size: 0.95rem; color: var(--text-secondary); text-align: center; margin-bottom: 48px;
+}
+.testimonials-masonry {
+  columns: 3;
+  column-gap: 24px;
+}
+.testimonial-card {
+  break-inside: avoid;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 24px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.testimonial-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+.testimonial-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+}
+.testimonial-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D0CDE0, #B8B0D0);
+  flex-shrink: 0;
+}
+.testimonial-name { font-weight: 700; font-size: 0.95rem; }
+.testimonial-role { font-size: 0.78rem; color: var(--text-muted); }
+.testimonial-text {
+  font-size: 0.88rem; color: var(--text-secondary); line-height: 1.7;
+}
+
+/* ============================================
+   ABOUT PAGE — "What is my why?"
+   ============================================ */
+.about-banner {
+  padding: clamp(80px, 12vw, 130px) 0 60px;
+  overflow: hidden;
+  position: relative;
+}
+.about-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  margin-bottom: 60px;
+}
+.about-marquee-track {
+  display: flex; width: max-content;
+  animation: marquee-scroll 20s linear infinite;
+}
+.about-marquee-track span {
+  font-size: clamp(4rem, 10vw, 8rem);
+  font-weight: 800;
+  color: rgba(0,0,0,0.06);
+  white-space: nowrap;
+  letter-spacing: -0.03em;
+  padding: 0 32px;
+  text-transform: uppercase;
+}
+
+.why-section { padding: 0 0 var(--section-gap); }
+.why-section h2 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 28px;
+}
+.why-text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  max-width: 900px;
+  margin-bottom: 16px;
+}
+
+/* About me 3-col */
+.about-me { padding: 0 0 var(--section-gap); }
+.about-me h2 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+}
+.about-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px;
+}
+.about-col h3 {
+  font-size: 1.15rem; font-weight: 700; margin-bottom: 20px;
+}
+.about-col ul {
+  list-style: none;
+}
+.about-col li {
+  font-size: 0.92rem; color: var(--text-secondary); padding: 6px 0;
+}
+.about-col li a {
+  text-decoration: underline; text-underline-offset: 3px;
+  text-decoration-thickness: 1px; color: var(--text);
+}
+.about-col li a:hover { color: var(--accent); }
+
+/* Journey */
+.journey { padding: 0 0 var(--section-gap); }
+.journey h2 {
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 32px;
+}
+.journey-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 40px 60px;
+}
+.journey-grid p {
+  font-size: 0.92rem; color: var(--text-secondary); line-height: 1.8;
+}
+
+/* Tool stack */
+.tools { padding: 0 0 var(--section-gap); }
+.tools-label {
+  font-size: 0.95rem; color: var(--text-secondary); text-align: center; margin-bottom: 36px;
+}
+.tools-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.tool-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.tool-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+}
+.tool-card.has-description {
+  text-align: left;
+  border: 2px solid var(--accent-light);
+}
+.tool-icon {
+  font-size: 2.5rem; margin-bottom: 14px;
+}
+.tool-name {
+  font-weight: 700; font-size: 0.95rem;
+}
+.tool-desc {
+  font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-top: 10px;
+}
+
+/* ============================================
+   CONTACT
+   ============================================ */
+.contact {
+  background: var(--bg-dark);
+  color: #fff;
+  padding: clamp(80px, 10vw, 120px) 0;
+}
+.contact h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 40px;
+}
+.contact-row {
+  display: flex; flex-direction: column; gap: 16px;
+}
+.contact-item {
+  display: flex; align-items: center; gap: 20px;
+}
+.contact-label {
+  font-size: 0.88rem; color: rgba(255,255,255,0.4); width: 80px; flex-shrink: 0;
+}
+.contact-value a {
+  font-size: 0.95rem; color: #fff;
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px;
+  transition: color 0.2s;
+}
+.contact-value a:hover { color: var(--accent); }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  background: var(--bg-dark);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 36px 0 48px;
+}
+.footer-text {
+  font-size: 0.78rem; color: rgba(255,255,255,0.3); line-height: 1.7;
+}
+.footer-text strong { color: rgba(255,255,255,0.5); font-weight: 600; }
+
+/* ============================================
+   PAGE SWITCHING (SPA-like)
+   ============================================ */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ============================================
+   SCROLL REVEAL
+   ============================================ */
+.reveal {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+
+/* ============================================
+   RESPONSIVE — TABLET
+   ============================================ */
+@media (max-width: 900px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .testimonials-masonry { columns: 2; }
+  .about-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .journey-grid { grid-template-columns: 1fr; }
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================
+   RESPONSIVE — MOBILE
+   ============================================ */
+@media (max-width: 680px) {
+  .nav-center, .nav-right { display: none; }
+  .nav-toggle { display: block; }
+
+  .hero-greeting { font-size: 2rem; }
+
+  .stats-grid { grid-template-columns: 1fr; gap: 36px; text-align: center; }
+  .testimonials-masonry { columns: 1; }
+  .about-grid { grid-template-columns: 1fr; gap: 32px; }
+  .tools-grid { grid-template-columns: 1fr; }
+
+  .brands-track .brand { font-size: 1.1rem; }
+  .brands-track { gap: 36px; }
+
+  .contact-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .contact-label { width: auto; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ====== NAV ====== -->
+<nav class="nav" id="nav">
+  <div class="container">
+    <a href="#" class="nav-logo" onclick="switchPage('home')">J</a>
+    <div class="nav-center" id="navCenter">
+      <a href="#" class="active" data-page="home" onclick="switchPage('home')">Home</a>
+      <a href="#" data-page="about" onclick="switchPage('about')">About</a>
+      <a href="#" data-page="cases" onclick="switchPage('cases')">Case studies</a>
+      <a href="#" data-page="contact" onclick="switchPage('contact')">Contact</a>
+    </div>
+    <div class="nav-right">
+      <a href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" title="LinkedIn">in</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu" onclick="toggleMobile()">
+      <span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#" onclick="switchPage('home'); toggleMobile()">Home</a>
+  <a href="#" onclick="switchPage('about'); toggleMobile()">About</a>
+  <a href="#" onclick="switchPage('cases'); toggleMobile()">Case studies</a>
+  <a href="#" onclick="switchPage('contact'); toggleMobile()">Contact</a>
+</div>
+
+<!-- ============================================
+     PAGE: HOME
+     ============================================ -->
+<div class="page active" id="page-home">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="reveal">
+        <h1 class="hero-greeting">Hi 👋 I'm João Jacinto.</h1>
+        <p class="hero-subtitle" id="heroSubtitle">UX / UI Expert</p>
+      </div>
+      <div class="hero-photo-wrapper reveal reveal-d1">
+        <div class="hero-photo">
+          <div class="hero-photo-placeholder">Photo</div>
+        </div>
+      </div>
+      <!-- Marquee behind -->
+      <div class="hero-marquee">
+        <div class="hero-marquee-track">
+          <span>BEM-VINDO</span><span>•</span><span>WELCOME</span>
+          <span>BEM-VINDO</span><span>•</span><span>WELCOME</span>
+          <span>BEM-VINDO</span><span>•</span><span>WELCOME</span>
+        </div>
+      </div>
+      <p class="hero-tagline reveal reveal-d2">Designing digital products with startups and enterprises since 2015, with love ♥</p>
+      <div style="text-align:center; position:relative; z-index:2;" class="reveal reveal-d3">
+        <a href="#" class="hero-cta" onclick="switchPage('about')">Learn more</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRANDS -->
+  <section class="brands reveal">
+    <div class="container">
+      <p class="brands-label">I've proudly worked with:</p>
+    </div>
+    <div class="brands-track-wrapper">
+      <div class="brands-track">
+        <span class="brand namecheap">namecheap</span>
+        <span class="brand talkdesk">:talkdesk</span>
+        <span class="brand streamyard">StreamYard</span>
+        <span class="brand">hopin</span>
+        <span class="brand">Be.Ubi</span>
+        <span class="brand namecheap">namecheap</span>
+        <span class="brand talkdesk">:talkdesk</span>
+        <span class="brand streamyard">StreamYard</span>
+        <span class="brand">hopin</span>
+        <span class="brand">Be.Ubi</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats reveal">
+    <div class="container">
+      <p class="stats-label">My career in numbers so far:</p>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">10<span class="plus">+</span></div>
+          <div class="stat-title">Years of experience</div>
+          <p class="stat-desc">Working with innovative startups and established global companies</p>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">5.0<span class="unit">M</span><span class="plus">+</span></div>
+          <div class="stat-title">Users impacted</div>
+          <p class="stat-desc">I've designed products that have collectively reached over 5M users</p>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">8</div>
+          <div class="stat-title">Industries</div>
+          <p class="stat-desc">AI, streaming, e-commerce, GIS, 3D, customer support, and more</p>
+        </div>
+      </div>
+      <div class="products-row">
+        <div class="stat-number">5</div>
+        <div class="stat-title">Products launched</div>
+        <p class="products-links">
+          <a href="#">StreamYard On-Air</a>, <a href="#">Talkdesk's AI trainer</a>,
+          <a href="#">Namecheap's Eng. Platform</a>, and more
+        </p>
+      </div>
+      <div class="cta-center" style="margin-top: 48px;">
+        <a href="https://linkedin.com/in/joaofranciscojacinto/" class="linkedin-cta" target="_blank">
+          <span class="li-icon">in</span>
+          Let's connect
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials reveal">
+    <div class="container">
+      <p class="testimonials-label">What people are saying:</p>
+      <div class="testimonials-masonry">
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">Daniel Cardoso</div>
+              <div class="testimonial-role">Director of Design for AI at Talkdesk</div>
+            </div>
+          </div>
+          <p class="testimonial-text">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">Renato Duarte</div>
+              <div class="testimonial-role">Engineering Manager at Uniplaces</div>
+            </div>
+          </div>
+          <p class="testimonial-text">João has the mind of a perfectionist mixed with the right amount of creativity that every designer needs. Each UI component he drew was always well thought out, to the point that every detail had context and meaning.</p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">Bartlomiej Mucha</div>
+              <div class="testimonial-role">Staff Engineer at StreamYard</div>
+            </div>
+          </div>
+          <p class="testimonial-text">Overall, I'm very pleased with working with João. I think I might be slightly biased though, as I can see we often have very aligned way of thinking about user's experience. I always do appreciate his extensive knowledge, and a good research between different ideas/reasoning.</p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">João Costa</div>
+              <div class="testimonial-role">Sr. Product Designer at Anchorage Digital</div>
+            </div>
+          </div>
+          <p class="testimonial-text">I had the pleasure of working along side with João Jacinto in a couple of projects during our studies. I was particularly impressed by João's ability to push out the best results out of his work. He has a gift of getting people on board with ideas.</p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">Xavier Gallego</div>
+              <div class="testimonial-role">Sr. Staff Engineer at StreamYard</div>
+            </div>
+          </div>
+          <p class="testimonial-text">João's dedication to maintain high design standards and fostering the collaboration within our team is top notch. He is not afraid of sharing his thoughts and his openness to feedback from the team helped us to design best in class features.</p>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"></div>
+            <div>
+              <div class="testimonial-name">Will Brett-Atkin</div>
+              <div class="testimonial-role">Staff Product Designer at StreamYard</div>
+            </div>
+          </div>
+          <p class="testimonial-text">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div><!-- end page-home -->
+
+
+<!-- ============================================
+     PAGE: ABOUT
+     ============================================ -->
+<div class="page" id="page-about">
+
+  <!-- About Banner -->
+  <section class="about-banner">
+    <div class="about-marquee">
+      <div class="about-marquee-track">
+        <span>ABOUT ME</span><span>•</span><span>SOBRE MIM</span>
+        <span>ABOUT ME</span><span>•</span><span>SOBRE MIM</span>
+        <span>ABOUT ME</span><span>•</span><span>SOBRE MIM</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- What is my why? -->
+  <section class="why-section reveal">
+    <div class="container">
+      <h2>What is my 'why'?</h2>
+      <p class="why-text">I believe that every product designer should step into the shoes of their users, and learn from them day in and day out, to truly understand and meet their needs. By doing so, we can empower businesses to create products that genuinely resonate with their audience.</p>
+      <p class="why-text">I choose to design a world that fosters business success by educating myself and others about user-centered design and its impact on business growth, and by actively working to create products that bridge the gap between user satisfaction and business goals.</p>
+      <p class="why-text">Everyday, my enthusiasm is fueled by a strong connection to the product and its people, an in-depth immersion in its development, and a continuous learning journey from user feedback and interactions.</p>
+    </div>
+  </section>
+
+  <!-- About me 3-col -->
+  <section class="about-me reveal">
+    <div class="container">
+      <h2>About me</h2>
+      <div class="about-grid">
+        <div class="about-col">
+          <h3>I'm...</h3>
+          <ul>
+            <li>An <a href="#">Enneagram type 5</a></li>
+            <li>An <a href="#">INTJ-A</a></li>
+          </ul>
+        </div>
+        <div class="about-col">
+          <h3>Values</h3>
+          <ul>
+            <li>Awareness</li>
+            <li>Creativity</li>
+            <li>Precision</li>
+            <li>Respect</li>
+            <li>Gratitude</li>
+          </ul>
+        </div>
+        <div class="about-col">
+          <h3>Passions</h3>
+          <ul>
+            <li>Product Design</li>
+            <li>Music production, Drums</li>
+            <li>VR</li>
+            <li>Gaming</li>
+            <li>Football</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- My journey -->
+  <section class="journey reveal">
+    <div class="container">
+      <h2>My journey</h2>
+      <div class="journey-grid">
+        <p>From a young age, I've been innately drawn to creative pursuits. This passion initially led me to start designing themes for hi5 at the age of 15, where 2 of my themes attracted over 50,000 concurrent users. This early success fueled my interest in technology and design, prompting me to pursue a degree in IT engineering, where I specialized in front-end technologies.</p>
+        <p>Throughout my studies, I explored various design disciplines, including illustration, motion graphics, and service design. These experiences equipped me with a holistic understanding of what makes a product succeed across multiple user touchpoints.</p>
+        <p>However, it wasn't long before I realized my true calling lay at the intersection of technology and design. This discovery later steered me towards digital product design.</p>
+        <p>Since 2015, I've gained extensive experience as a designer at Be.Ubi, Namecheap, Talkdesk, and Hopin, spanning various industries, teams, individuals, and project requirements. These diverse experiences have shaped me into a seasoned practitioner, equipped with adaptable skills and insights.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tool Stack -->
+  <section class="tools reveal">
+    <div class="container">
+      <p class="tools-label">My product design tool stack:</p>
+      <div class="tools-grid">
+        <div class="tool-card has-description">
+          <div class="tool-icon">🎨</div>
+          <div class="tool-name">Figma</div>
+          <p class="tool-desc">My preferred platform for collaborative design. I use it to work effortlessly with team members and clients, enabling real-time feedback and design revisions.</p>
+        </div>
+        <div class="tool-card has-description">
+          <div class="tool-icon">🖥️</div>
+          <div class="tool-name">Framer</div>
+          <p class="tool-desc">Transforms my web design process. It provides a visual environment where I can create beautiful and interactive websites without the hassle of complex coding.</p>
+        </div>
+        <div class="tool-card has-description">
+          <div class="tool-icon">✨</div>
+          <div class="tool-name">Adobe Creative Cloud</div>
+          <p class="tool-desc">My all-encompassing toolkit for unlocking creative potential. Photoshop, Illustrator, and After Effects, each tailored to excel in particular design tasks.</p>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">🔶</div>
+          <div class="tool-name">HTML</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">🔷</div>
+          <div class="tool-name">CSS</div>
+        </div>
+        <div class="tool-card">
+          <div class="tool-icon">🤖</div>
+          <div class="tool-name">ChatGPT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end page-about -->
+
+
+<!-- ============================================
+     PAGE: CASE STUDIES (placeholder)
+     ============================================ -->
+<div class="page" id="page-cases">
+  <section style="padding: clamp(120px,15vw,180px) 0 var(--section-gap);">
+    <div class="container">
+      <h2 style="font-size: clamp(2rem,4vw,3rem); font-weight:800; letter-spacing:-0.03em; margin-bottom:20px;" class="reveal">Case studies</h2>
+      <p style="font-size:1rem; color:var(--text-secondary); max-width:500px;" class="reveal reveal-d1">Coming soon — João's selected case studies and project deep-dives will appear here.</p>
+    </div>
+  </section>
+</div>
+
+
+<!-- ============================================
+     PAGE: CONTACT
+     ============================================ -->
+<div class="page" id="page-contact">
+  <section class="contact" style="min-height: 60vh; display:flex; align-items:center;">
+    <div class="container">
+      <h2 class="reveal">Let's talk.</h2>
+      <div class="contact-row reveal reveal-d1">
+        <div class="contact-item">
+          <span class="contact-label">Email</span>
+          <span class="contact-value"><a href="mailto:jjacinto.mail@gmail.com">jjacinto.mail@gmail.com</a></span>
+        </div>
+        <div class="contact-item">
+          <span class="contact-label">Linkedin</span>
+          <span class="contact-value"><a href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank">linkedin.com/in/joaofranciscojacinto/</a></span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+
+<!-- ====== FOOTER (always visible) ====== -->
+<footer class="footer">
+  <div class="container">
+    <p class="footer-text"><strong>© 2024 João Jacinto</strong></p>
+    <p class="footer-text" style="margin-top:6px;">This website was custom-designed and built by João Jacinto. No templates were used.</p>
+  </div>
+</footer>
+
+
+<!-- ====== SCRIPTS ====== -->
+<script>
+// --- NAV SCROLL ---
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 30));
+
+// --- SUBTITLE ROTATION ---
+const subtitles = ['UX / UI Expert', 'Systems Thinker', 'Team Player', 'Detail-Oriented', 'Problem Solver'];
+let subIdx = 0;
+const subEl = document.getElementById('heroSubtitle');
+function rotateSubtitle() {
+  subEl.style.opacity = '0';
+  subEl.style.transform = 'translateY(8px)';
+  setTimeout(() => {
+    subIdx = (subIdx + 1) % subtitles.length;
+    subEl.textContent = subtitles[subIdx];
+    subEl.style.opacity = '1';
+    subEl.style.transform = 'translateY(0)';
+  }, 300);
+}
+subEl.style.transition = 'opacity 0.3s, transform 0.3s';
+setInterval(rotateSubtitle, 2800);
+
+// --- PAGE SWITCHING ---
+function switchPage(page) {
+  // Hide all pages
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('page-' + page);
+  if (target) target.classList.add('active');
+
+  // Update nav active state
+  document.querySelectorAll('.nav-center a').forEach(a => {
+    a.classList.toggle('active', a.dataset.page === page);
+  });
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Re-trigger reveals
+  setTimeout(() => {
+    document.querySelectorAll('.page.active .reveal').forEach(el => {
+      el.classList.remove('visible');
+      observer.observe(el);
+    });
+  }, 100);
+
+  return false;
+}
+
+// --- MOBILE MENU ---
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+
+// --- SCROLL REVEAL ---
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -30px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
