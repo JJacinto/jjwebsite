@@ -1,0 +1,53 @@
+#!/bin/bash
+# Deploy joaojacinto.com to NAS + purge Cloudflare cache
+set -e  # Exit immediately if anything fails
+
+# ─── Config ────────────────────────────────────────────
+NAS_USER="jjacinto8"
+NAS_HOST="192.168.68.66"
+NAS_PATH="/volume1/Websites/Joao-website/joao-website"
+BUILD_DIR="./dist"          # ⚠️ Change to match YOUR build output folder
+BUILD_CMD="npm run build"   # ⚠️ Change if you use astro/vite/yarn/pnpm
+# ───────────────────────────────────────────────────────
+
+# Colors for readability
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
+
+echo -e "${YELLOW}→ Building site...${NC}"
+$BUILD_CMD
+
+if [ ! -d "$BUILD_DIR" ]; then
+    echo -e "${RED}✗ Build directory '$BUILD_DIR' doesn't exist. Edit BUILD_DIR in this script.${NC}"
+    exit 1
+fi
+
+echo -e "${YELLOW}→ Syncing to NAS...${NC}"
+rsync -avz --delete \
+    --exclude='.DS_Store' \
+    --exclude='.git' \
+    "$BUILD_DIR/" \
+    "$NAS_USER@$NAS_HOST:$NAS_PATH/"
+
+echo -e "${YELLOW}→ Fixing permissions on NAS...${NC}"
+ssh "$NAS_USER@$NAS_HOST" "sudo chmod 755 $NAS_PATH && sudo chmod -R u+rw,go+r,go-w $NAS_PATH/*"
+
+if [ -n "$CF_API_TOKEN" ] && [ -n "$CF_ZONE_ID" ]; then
+    echo -e "${YELLOW}→ Purging Cloudflare cache...${NC}"
+    RESPONSE=$(curl -sX POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+        -H "Authorization: Bearer $CF_API_TOKEN" \
+        -H "Content-Type: application/json" \
+        --data '{"purge_everything":true}')
+    if echo "$RESPONSE" | grep -q '"success":true'; then
+        echo -e "${GREEN}  ✓ Cache purged${NC}"
+    else
+        echo -e "${RED}  ✗ Purge failed:${NC}"
+        echo "$RESPONSE"
+    fi
+else
+    echo -e "${YELLOW}→ Skipping cache purge (CF_API_TOKEN or CF_ZONE_ID not set)${NC}"
+fi
+
+echo -e "${GREEN}✓ Deployed → https://joaojacinto.com${NC}"
