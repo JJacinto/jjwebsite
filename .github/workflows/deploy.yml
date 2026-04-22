@@ -12,7 +12,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      # Expose Service Token to every step — cloudflared auto-reads these
       TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
     steps:
@@ -45,25 +44,19 @@ jobs:
             echo "  ProxyCommand cloudflared access ssh --hostname %h"
           } > "$HOME/.ssh/config"
           chmod 600 "$HOME/.ssh/config"
-          
-          echo "=== SSH config contents ==="
-          cat "$HOME/.ssh/config"
-          echo "=== Deploy key fingerprint ==="
-          ssh-keygen -l -f "$HOME/.ssh/deploy_key"
 
       - name: Test SSH connection
         run: |
           ssh -F "$HOME/.ssh/config" nas "echo 'SSH connection successful' && whoami && hostname"
 
-      - name: Deploy via rsync
+      - name: Deploy via tar over SSH
         run: |
-          rsync -avz --delete \
-            --rsync-path="/usr/bin/rsync" \
+          tar -cz \
             --exclude='.DS_Store' \
             --exclude='README.md' \
-            -e "ssh -F $HOME/.ssh/config" \
-            ./joao-website/ \
-            nas:/volume1/Websites/Joao-website/joao-website/
+            -C ./joao-website . \
+          | ssh -F "$HOME/.ssh/config" nas \
+            "tar -xz --overwrite -C /volume1/Websites/Joao-website/joao-website"
 
       - name: Fix permissions on NAS
         run: |
