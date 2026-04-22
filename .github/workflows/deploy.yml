@@ -58,6 +58,7 @@ jobs:
       - name: Deploy via rsync
         run: |
           rsync -avz --delete \
+            --rsync-path="/usr/bin/rsync" \
             --exclude='.DS_Store' \
             --exclude='README.md' \
             -e "ssh -F $HOME/.ssh/config" \
