@@ -1,0 +1,287 @@
+/* ============================================================
+   JJ Design System — Colors & Typography
+   João Jacinto · Personal Brand · 2025
+   ============================================================ */
+
+/* --- Fonts -------------------------------------------------- */
+/* Hanken Grotesk 900 via Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&display=swap');
+
+/* Mona Sans via GitHub CDN (not on Google Fonts)
+   Fallback: DM Sans from Google Fonts if CDN unavailable */
+@font-face {
+  font-family: 'Mona Sans';
+  src: url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400&display=swap');
+
+/* --- Base Color Tokens -------------------------------------- */
+:root {
+  /* Backgrounds */
+  --bg:              #ECEAE5;   /* warm off-white — page bg */
+  --bg-alt:          #E4E1DB;   /* slightly deeper — alternate sections */
+  --surface:         #F7F5F1;   /* cards, elevated surfaces */
+  --dark:            #1C1A17;   /* dark sections — contact, footer */
+  --dark-surface:    #262320;   /* cards on dark bg */
+
+  /* Foreground */
+  --fg1:             #1C1A17;   /* primary text */
+  --fg2:             #6B6560;   /* secondary text, descriptions */
+  --fg3:             #9B948D;   /* muted text, labels, meta */
+  --fg-inverse:      #F0EDE8;   /* text on dark backgrounds */
+
+  /* Accent — Terracotta */
+  --accent:          #3D3DB5;   /* signature color — lilac/violet */
+  --accent-dark:     #3030A0;   /* hover/pressed accent */
+  --accent-subtle:   #ECEAFF;   /* tinted bg for accent areas */
+  --accent-muted:    rgba(61, 61, 181, 0.12); /* very light accent wash */
+
+  /* Borders */
+  --border:          rgba(28, 26, 23, 0.08);   /* default dividers */
+  --border-strong:   rgba(28, 26, 23, 0.16);   /* input fields, strong dividers */
+  --border-inverse:  rgba(240, 237, 232, 0.10); /* borders on dark bg */
+
+  /* Radius */
+  --radius-sm:       8px;
+  --radius-md:       16px;
+  --radius-full:     100px;
+
+  /* Shadows */
+  --shadow-sm:       0 1px 4px rgba(0, 0, 0, 0.04);
+  --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.06);
+  --shadow-lg:       0 8px 30px rgba(0, 0, 0, 0.07);
+  --shadow-hover:    0 8px 30px rgba(0, 0, 0, 0.06);
+
+  /* Container */
+  --container:       1140px;
+  --pad:             clamp(20px, 5vw, 40px);
+  --section-gap:     clamp(80px, 10vw, 120px);
+}
+
+/* --- Dark Mode Color Overrides ------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:              #1C1A17;
+    --bg-alt:          #161411;
+    --surface:         #262320;
+    --fg1:             #F0EDE8;
+    --fg2:             #9B948D;
+    --fg3:             #6B6560;
+    --accent:          #7B7BE0;
+    --accent-dark:     #9393E8;
+    --accent-subtle:   #12123A;
+    --accent-muted:    rgba(123, 123, 224, 0.14);
+    --border:          rgba(240, 237, 232, 0.08);
+    --border-strong:   rgba(240, 237, 232, 0.16);
+  }
+}
+
+/* Force dark class override */
+.dark {
+  --bg:              #1C1A17;
+  --bg-alt:          #161411;
+  --surface:         #262320;
+  --fg1:             #F0EDE8;
+  --fg2:             #9B948D;
+  --fg3:             #6B6560;
+  --accent:          #7B7BE0;
+  --accent-dark:     #9393E8;
+  --accent-subtle:   #12123A;
+  --accent-muted:    rgba(123, 123, 224, 0.14);
+  --border:          rgba(240, 237, 232, 0.08);
+  --border-strong:   rgba(240, 237, 232, 0.16);
+}
+
+/* --- Typography Tokens -------------------------------------- */
+:root {
+  /* Families */
+  --font-display: 'Hanken Grotesk', 'DM Sans', -apple-system, sans-serif;
+  --font-body:    'Mona Sans', 'DM Sans', -apple-system, sans-serif;
+
+  /* Scale */
+  --text-display: clamp(3.5rem, 8vw, 7rem);    /* hero headline */
+  --text-h1:      clamp(2.5rem, 5vw, 4rem);    /* page titles */
+  --text-h2:      clamp(1.8rem, 3vw, 2.6rem);  /* section titles */
+  --text-h3:      1.3rem;                       /* sub-section headers */
+  --text-h4:      1.1rem;                       /* minor headers */
+  --text-body-lg: 1.1rem;                       /* lead paragraphs */
+  --text-body:    0.95rem;                      /* body copy */
+  --text-sm:      0.85rem;                      /* captions, secondary */
+  --text-label:   0.78rem;                      /* eyebrow labels */
+
+  /* Letter-spacing */
+  --tracking-display: -0.04em;
+  --tracking-h1:      -0.035em;
+  --tracking-h2:      -0.03em;
+  --tracking-h3:      -0.02em;
+  --tracking-label:    0.05em;
+
+  /* Line heights */
+  --leading-display: 1.0;
+  --leading-heading: 1.15;
+  --leading-body:    1.75;
+  --leading-tight:   1.4;
+}
+
+/* --- Semantic Type Styles ----------------------------------- */
+
+/* Display — hero/marquee */
+.text-display,
+[data-type="display"] {
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 900;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-display);
+  color: var(--fg1);
+}
+
+/* H1 */
+h1, .h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-h1);
+  font-weight: 900;
+  letter-spacing: var(--tracking-h1);
+  line-height: var(--leading-heading);
+  color: var(--fg1);
+}
+
+/* H2 */
+h2, .h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-h2);
+  font-weight: 900;
+  letter-spacing: var(--tracking-h2);
+  line-height: var(--leading-heading);
+  color: var(--fg1);
+}
+
+/* H3 */
+h3, .h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-h3);
+  font-weight: 900;
+  letter-spacing: var(--tracking-h3);
+  line-height: var(--leading-tight);
+  color: var(--fg1);
+}
+
+/* H4 */
+h4, .h4 {
+  font-family: var(--font-display);
+  font-size: var(--text-h4);
+  font-weight: 900;
+  letter-spacing: var(--tracking-h3);
+  line-height: var(--leading-tight);
+  color: var(--fg1);
+}
+
+/* Body lead */
+.body-lg, .lead {
+  font-family: var(--font-body);
+  font-size: var(--text-body-lg);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  color: var(--fg2);
+}
+
+/* Body */
+p, .body {
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  color: var(--fg2);
+}
+
+/* Small / caption */
+.text-sm, small, caption {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  line-height: var(--leading-tight);
+  color: var(--fg3);
+}
+
+/* Eyebrow label */
+.label, .eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  font-weight: 400;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+/* Code / caption block */
+code, pre, .code {
+  font-family: 'SFMono-Regular', 'Consolas', 'Liberation Mono', monospace;
+  font-size: 0.88rem;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+}
+
+pre, .code-block {
+  padding: 20px 24px;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+/* --- Utility Links ----------------------------------------- */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.underline, .prose a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.2s ease;
+}
+
+a.underline:hover, .prose a:hover {
+  color: var(--accent);
+}
+
+/* --- Scroll Reveal ----------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.08s; }
+.reveal-d2 { transition-delay: 0.16s; }
+.reveal-d3 { transition-delay: 0.24s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transition: none; opacity: 1; transform: none; }
+}
+
+/* --- Reset & Base ------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  line-height: var(--leading-body);
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+}

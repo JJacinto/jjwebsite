@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Mona Sans';src:url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');font-weight:400;font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#ECEAE5;font-family:'Mona Sans','DM Sans',sans-serif;color:#1C1A17;}
+.label{font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#9B948D;padding:18px 28px 10px;display:block;}
+.divider{border:none;border-top:1px solid rgba(28,26,23,0.08);}
+
+/* ── Nav shells ── */
+.nav         { padding:16px 28px; display:flex; justify-content:space-between; align-items:center; }
+.nav-scrolled{ padding:13px 28px; display:flex; justify-content:space-between; align-items:center;
+               background:rgba(236,234,229,0.88); backdrop-filter:blur(16px);
+               box-shadow:0 1px 0 rgba(28,26,23,0.08); }
+
+/* ── Logo ── */
+.logo-outer{
+  width:40px; height:40px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; position:relative; flex-shrink:0;
+}
+/* subtle circle — hidden at rest, fades in on hover */
+.logo-bg{
+  position:absolute; inset:0; border-radius:50%;
+  background:rgba(61,61,181,0.10);
+  opacity:0;
+  transition: opacity 0.3s ease;
+}
+.logo-outer:hover .logo-bg { opacity:1; }
+
+/* Two separate J spans */
+.logo-letters{
+  display:flex; align-items:center;
+  font-family:'Hanken Grotesk',sans-serif; font-weight:900; font-size:1.25rem;
+  letter-spacing:-0.04em;
+  position:relative; z-index:1;
+  /* no overflow:hidden — lets J2 animate freely */
+}
+/* First J — always visible, shifts to accent on hover */
+.logo-j1{
+  color:#1C1A17;
+  position:relative; z-index:1;
+  transition: color 0.3s ease;
+}
+.logo-outer:hover .logo-j1 { color:#3D3DB5; }
+
+/* Second J — lives behind J1 at rest, slides out naturally */
+.logo-j2{
+  display:inline-block;
+  color:#3D3DB5;
+  opacity:0;
+  transform: translateX(-82%);
+  transition:
+    transform 0.44s cubic-bezier(0.22,1,0.36,1),
+    opacity   0.36s cubic-bezier(0.4,0,0.2,1);
+  position:relative; z-index:0;
+}
+.logo-outer:hover .logo-j2{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* ── Pill nav ── */
+.pill-nav{
+  position:relative; display:flex;
+  background: transparent;
+  border-radius:100px; padding:4px;
+}
+/* Sliding indicator — smooth, not bouncy */
+.indicator{
+  position:absolute; top:4px; bottom:4px;
+  background: rgba(28,26,23,0.07); border-radius:100px;
+  transition:
+    left  0.32s cubic-bezier(0.25,0.46,0.45,0.94),
+    width 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
+  pointer-events:none;
+}
+.pill-nav a{
+  position:relative; z-index:1;
+  font-size:0.85rem; color:#6B6560;
+  padding:7px 18px; border-radius:100px; cursor:pointer;
+  user-select:none; white-space:nowrap;
+  /* smooth text color for hover + active states */
+  transition: color 0.18s ease, transform 0.12s ease;
+}
+/* Hover state — slightly darker text, not yet active */
+.pill-nav a:hover:not(.active){ color:#3A3330; }
+/* Active state */
+.pill-nav a.active{ color:#1C1A17; }
+/* Press: scale down like a physical button */
+.pill-nav a:active{ transform:scale(0.93); }
+
+/* ── LinkedIn badge ── */
+.li-badge{
+  width:40px; height:40px;
+  border:1.5px solid rgba(28,26,23,0.1); border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; text-decoration:none; color:#1C1A17;
+  flex-shrink:0;
+  transition:border-color 0.2s;
+}
+.li-badge:hover{ border-color:#1C1A17; }
+.li-badge svg{ width:18px; height:18px; fill:currentColor; }
+</style>
+</head>
+<body>
+
+<span class="label">Default — idle shows single J · hover to reveal JJ</span>
+<nav class="nav">
+  <div class="logo-outer" title="Hover me">
+    <div class="logo-bg"></div>
+    <div class="logo-letters">
+      <span class="logo-j1">J</span>
+      <span class="logo-j2">J</span>
+    </div>
+  </div>
+
+  <div class="pill-nav" id="nav1">
+    <div class="indicator" id="ind1"></div>
+    <a class="active" data-idx="0">Home</a>
+    <a data-idx="1">About</a>
+    <a data-idx="2">Case studies</a>
+    <a data-idx="3">Contact</a>
+  </div>
+
+  <a class="li-badge" href="#" title="LinkedIn">
+    <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+  </a>
+</nav>
+
+<hr class="divider">
+<span class="label">Scrolled (blur + shadow) · try clicking items</span>
+
+<nav class="nav-scrolled">
+  <div class="logo-outer">
+    <div class="logo-bg"></div>
+    <div class="logo-letters">
+      <span class="logo-j1">J</span>
+      <span class="logo-j2">J</span>
+    </div>
+  </div>
+
+  <div class="pill-nav" id="nav2">
+    <div class="indicator" id="ind2"></div>
+    <a data-idx="0">Home</a>
+    <a class="active" data-idx="1">About</a>
+    <a data-idx="2">Case studies</a>
+    <a data-idx="3">Contact</a>
+  </div>
+
+  <a class="li-badge" href="#" title="LinkedIn">
+    <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+  </a>
+</nav>
+
+<script>
+function initPill(navId, indId) {
+  const nav = document.getElementById(navId);
+  const ind = document.getElementById(indId);
+  const links = nav.querySelectorAll('a');
+
+  function move() {
+    const active = nav.querySelector('a.active') || links[0];
+    const nR = nav.getBoundingClientRect();
+    const aR = active.getBoundingClientRect();
+    ind.style.left  = (aR.left  - nR.left) + 'px';
+    ind.style.width = aR.width + 'px';
+  }
+
+  requestAnimationFrame(move);
+  window.addEventListener('resize', move);
+
+  links.forEach(link => {
+    link.addEventListener('click', () => {
+      links.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      move();
+    });
+  });
+}
+
+window.addEventListener('load', () => {
+  initPill('nav1', 'ind1');
+  initPill('nav2', 'ind2');
+});
+</script>
+</body>
+</html>

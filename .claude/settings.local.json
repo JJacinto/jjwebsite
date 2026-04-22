@@ -3,7 +3,10 @@
     "allow": [
       "Bash(git commit -m ' *)",
       "Bash(git checkout *)",
-      "Bash(git merge *)"
+      "Bash(git merge *)",
+      "Bash(mkdir -p \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/assets/images\")",
+      "Bash(cp \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/ds/claudedesignproj/assets/JJ.svg\" \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/assets/JJ.svg\")",
+      "Bash(cp \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/ds/claudedesignproj/assets/images/\"*.avif \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/ds/claudedesignproj/assets/images/joao-photo.webp\" \"d:/Claude/Personal website/Repository/jjwebsite/joao-website/assets/images/\")"
     ]
   }
 }

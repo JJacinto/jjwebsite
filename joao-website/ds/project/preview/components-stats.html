@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Mona Sans';src:url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');font-weight:400;font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#ECEAE5;font-family:'Mona Sans','DM Sans',sans-serif;padding:36px 32px;color:#1C1A17;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:36px;}
+
+.stat-num{
+  font-family:'Hanken Grotesk',sans-serif;font-weight:900;
+  font-size:4.8rem; /* big and ownable */
+  letter-spacing:-0.04em;line-height:1;
+  margin-bottom:10px;color:#1C1A17;
+}
+.stat-num sup{font-size:0.38em;color:#9B948D;vertical-align:super;margin-left:2px;}
+.stat-num .unit{font-size:0.38em;color:#9B948D;}
+
+.stat-title{
+  font-family:'Hanken Grotesk',sans-serif;font-weight:900;
+  font-size:1.05rem; /* larger subtitle */
+  letter-spacing:-0.02em;
+  line-height:1.25;
+  margin-bottom:8px;color:#1C1A17;
+}
+.stat-desc{
+  font-family:'Mona Sans','DM Sans',sans-serif;
+  font-size:0.8rem;color:#9B948D;line-height:1.6;
+}
+</style>
+</head>
+<body>
+<div class="grid">
+  <div>
+    <div class="stat-num">10<sup>+</sup></div>
+    <div class="stat-title">Years of experience</div>
+    <div class="stat-desc">Working with startups and global enterprises</div>
+  </div>
+  <div>
+    <div class="stat-num">5<span class="unit">.0M</span><sup>+</sup></div>
+    <div class="stat-title">Users impacted</div>
+    <div class="stat-desc">Products collectively reaching over 5M users</div>
+  </div>
+  <div>
+    <div class="stat-num">8</div>
+    <div class="stat-title">Industries</div>
+    <div class="stat-desc">AI, streaming, e-commerce, GIS, crypto, and more</div>
+  </div>
+  <div>
+    <div class="stat-num">5</div>
+    <div class="stat-title">Products launched</div>
+    <div class="stat-desc">StreamYard On-Air, Talkdesk AI trainer, and more</div>
+  </div>
+</div>
+</body>
+</html>

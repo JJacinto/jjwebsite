@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#ECEAE5;padding:28px 32px;font-family:'DM Sans',-apple-system,sans-serif;}
+.label{font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;color:#9B948D;margin-bottom:12px;}
+.row{display:flex;gap:0;margin-bottom:20px;border-radius:10px;overflow:hidden;}
+.fg-item{flex:1;padding:14px 16px;}
+.fg-name{font-size:0.7rem;color:rgba(255,255,255,0.6);margin-bottom:2px;}
+.fg-hex{font-size:0.8rem;font-weight:500;color:rgba(255,255,255,0.9);}
+.fg-name.dark{color:rgba(0,0,0,0.4);}
+.fg-hex.dark{color:rgba(0,0,0,0.7);}
+.divider{border:none;border-top:1px solid rgba(28,26,23,0.08);margin:20px 0;}
+.border-row{display:flex;gap:16px;}
+.border-item{flex:1;padding:16px;border-radius:8px;font-size:0.75rem;color:#6B6560;text-align:center;}
+</style>
+</head>
+<body>
+<div class="label">Foreground Scale — Light Mode</div>
+<div class="row">
+  <div class="fg-item" style="background:#1C1A17">
+    <div class="fg-name">fg1</div>
+    <div class="fg-hex">#1C1A17</div>
+  </div>
+  <div class="fg-item" style="background:#6B6560">
+    <div class="fg-name">fg2</div>
+    <div class="fg-hex">#6B6560</div>
+  </div>
+  <div class="fg-item" style="background:#9B948D">
+    <div class="fg-name">fg3</div>
+    <div class="fg-hex">#9B948D</div>
+  </div>
+  <div class="fg-item" style="background:#F0EDE8;border:1px solid rgba(0,0,0,0.06)">
+    <div class="fg-name dark">fg-inverse</div>
+    <div class="fg-hex dark">#F0EDE8</div>
+  </div>
+</div>
+<hr class="divider">
+<div class="label">Borders</div>
+<div class="border-row">
+  <div class="border-item" style="border:1px solid rgba(28,26,23,0.08)">border<br><span style="font-size:0.68rem;color:#9B948D">rgba(28,26,23,0.08)</span></div>
+  <div class="border-item" style="border:1px solid rgba(28,26,23,0.16)">border-strong<br><span style="font-size:0.68rem;color:#9B948D">rgba(28,26,23,0.16)</span></div>
+  <div class="border-item" style="background:#1C1A17;border:1px solid rgba(240,237,232,0.10)"><span style="color:#9B948D">border-inverse</span><br><span style="font-size:0.68rem;color:#6B6560">rgba(240,237,232,0.10)</span></div>
+</div>
+</body>
+</html>

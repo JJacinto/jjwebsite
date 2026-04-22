@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JJ Portfolio — UI Kit</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Mona Sans';src:url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');font-weight:400;font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body,#root{height:100%;}
+body{font-family:'Mona Sans','DM Sans',sans-serif;background:#ECEAE5;color:#1C1A17;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+#root{display:flex;flex-direction:column;}
+
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* Footer */
+.jj-footer{background:#1C1A17;border-top:1px solid rgba(255,255,255,0.06);padding:32px 40px;text-align:center;}
+.jj-footer p{font-family:'Mona Sans','DM Sans',sans-serif;font-size:0.75rem;color:rgba(255,255,255,0.3);line-height:1.7;}
+.jj-footer strong{color:rgba(255,255,255,0.5);}
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="tokens.js"></script>
+<script type="text/babel" src="Nav.jsx"></script>
+<script type="text/babel" src="HomePage.jsx"></script>
+<script type="text/babel" src="Pages.jsx"></script>
+<script type="text/babel" src="CaseDetail.jsx"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+function App() {
+  const [page, setPage] = React.useState(() => localStorage.getItem('jj-page') || 'home');
+
+  const navigate = (p) => {
+    setPage(p);
+    localStorage.setItem('jj-page', p);
+    document.getElementById('jj-scroll-root')?.scrollTo(0,0);
+    window.scrollTo(0,0);
+  };
+
+  const scrollRoot = { flex:1, overflowY:'auto', overflowX:'hidden' };
+
+  const renderPage = () => {
+    if (page === 'home')    return <JJHomePage setPage={navigate} />;
+    if (page === 'about')   return <JJAboutPage setPage={navigate} />;
+    if (page === 'cases')   return <JJCasesPage setPage={navigate} />;
+    if (page === 'contact') return <JJContactPage />;
+    if (page?.startsWith('case-')) return <JJCaseDetail caseId={page} setPage={navigate} />;
+    return <JJHomePage setPage={navigate} />;
+  };
+
+  return (
+    <>
+      <JJNav page={page} setPage={navigate} />
+      <div id="jj-scroll-root" style={scrollRoot}>
+        {renderPage()}
+        <footer className="jj-footer">
+          <p><strong>João Jacinto</strong> — Custom-designed and hand-coded. © 2025</p>
+        </footer>
+      </div>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

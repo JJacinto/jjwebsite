@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Mona Sans';src:url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');font-weight:400;font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#ECEAE5;font-family:'Mona Sans','DM Sans',sans-serif;padding:28px 32px;color:#1C1A17;}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+
+.card{
+  background:#F7F5F1;
+  border-radius:16px;
+  overflow:hidden;
+  cursor:pointer;
+  /* 5px border — proportional to Hanken Grotesk 900 stem weight at card title size */
+  border: 5px solid rgba(28,26,23,0.08);
+  border-radius: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  transition:
+    transform 0.28s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.28s,
+    border-color 0.38s cubic-bezier(0.4,0,0.2,1);
+}
+.card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.08);
+  border-color: rgba(61,61,181,0.28);
+}
+
+.card-img{width:100%;height:128px;object-fit:cover;display:block;}
+.card-img-ph{width:100%;height:128px;background:#ECEAFF;display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#9B948D;}
+.card-body{padding:18px;}
+.card-cat{font-size:0.7rem;color:#9B948D;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+.card-title{font-family:'Hanken Grotesk',sans-serif;font-weight:900;font-size:0.95rem;letter-spacing:-0.02em;line-height:1.3;color:#1C1A17;}
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="card">
+    <img class="card-img" src="../assets/images/case-webinar.avif" alt="Webinar"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="card-img-ph" style="display:none">Image</div>
+    <div class="card-body">
+      <div class="card-cat">Design</div>
+      <div class="card-title">Redefining webinar customization</div>
+    </div>
+  </div>
+  <div class="card">
+    <img class="card-img" src="../assets/images/case-research.avif" alt="Research"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="card-img-ph" style="display:none">Image</div>
+    <div class="card-body">
+      <div class="card-cat">Research Ops</div>
+      <div class="card-title">Understanding webinar organizers</div>
+    </div>
+  </div>
+  <div class="card">
+    <img class="card-img" src="../assets/images/case-ds.avif" alt="Design System"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <div class="card-img-ph" style="display:none">Image</div>
+    <div class="card-body">
+      <div class="card-cat">Design Leadership</div>
+      <div class="card-title">Leading and managing a design system</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
