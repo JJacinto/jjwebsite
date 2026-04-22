@@ -1,0 +1,56 @@
+name: Deploy to NAS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'joao-website/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
+        run: |
+          curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
+          sudo dpkg -i cloudflared.deb
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          cat > ~/.ssh/config << 'EOF'
+          Host nas
+            HostName ssh.joaojacinto.com
+            User jjacinto8
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${{ secrets.CF_ACCESS_CLIENT_ID }} --service-token-secret ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          EOF
+
+      - name: Deploy via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude='.DS_Store' \
+            --exclude='README.md' \
+            -e "ssh -F ~/.ssh/config" \
+            ./joao-website/ \
+            nas:/volume1/Websites/Joao-website/joao-website/
+
+      - name: Fix permissions on NAS
+        run: |
+          ssh -F ~/.ssh/config nas "sudo chmod 755 /volume1/Websites/Joao-website/joao-website && sudo chmod -R u+rw,go+r,go-w /volume1/Websites/Joao-website/joao-website/*"
+
+      - name: Purge Cloudflare cache
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CF_ZONE_ID }}/purge_cache" \
+            -H "Authorization: Bearer ${{ secrets.CF_API_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
