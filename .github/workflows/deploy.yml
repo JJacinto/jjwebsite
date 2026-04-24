@@ -54,13 +54,24 @@ jobs:
           tar -cz \
             --exclude='.DS_Store' \
             --exclude='README.md' \
+            --exclude='nginx.conf' \
+            --exclude='nginx.conf.backup' \
+            --exclude='docker-compose.yml' \
+            --exclude='docker-compose.yaml' \
+            --exclude='Makefile' \
+            --exclude='.gitignore' \
+            --exclude='old-index.html' \
+            --exclude='deploy.sh.txt' \
+            --exclude='ds' \
             -C ./joao-website . \
           | ssh -F "$HOME/.ssh/config" nas \
-            "tar -xz --overwrite -C /volume1/Websites/Joao-website/joao-website"
+            "tar -xz --overwrite -C /home/jjacinto8/sites/joaojacinto/public"
 
       - name: Fix permissions on NAS
         run: |
-          ssh -F "$HOME/.ssh/config" nas "sudo chmod 755 /volume1/Websites/Joao-website/joao-website && sudo chmod -R u+rw,go+r,go-w /volume1/Websites/Joao-website/joao-website/*"
+          ssh -F "$HOME/.ssh/config" nas "\
+            find /home/jjacinto8/sites/joaojacinto/public -type d -exec chmod 755 {} \; && \
+            find /home/jjacinto8/sites/joaojacinto/public -type f -exec chmod 644 {} \;"
 
       - name: Purge Cloudflare cache
         env:
