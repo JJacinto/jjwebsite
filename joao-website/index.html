@@ -210,6 +210,26 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 .pill-nav a.active { color: var(--fg1); }
 .pill-nav a:active { transform: scale(0.93); }
 
+/* Nav dark variant (contact page) */
+.nav.nav-dark .pill-nav a { color: rgba(240,237,232,0.45); }
+.nav.nav-dark .pill-nav a:hover:not(.active) { color: rgba(240,237,232,0.80); }
+.nav.nav-dark .pill-nav a.active { color: var(--fg-inverse); }
+.nav.nav-dark .pill-indicator { background: rgba(240,237,232,0.12); }
+.nav.nav-dark.scrolled {
+  background: rgba(20,18,16,0.88);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+.nav.nav-dark .logo-j1 { color: var(--fg-inverse); }
+.nav.nav-dark .li-badge {
+  border-color: rgba(240,237,232,0.22);
+  color: rgba(240,237,232,0.65);
+}
+.nav.nav-dark .li-badge:hover {
+  border-color: rgba(240,237,232,0.7);
+  background: rgba(240,237,232,0.10);
+  color: var(--fg-inverse);
+}
+
 /* LinkedIn badge */
 .li-badge {
   width: 40px; height: 40px;
@@ -694,27 +714,39 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
    ============================================================ */
 .contact {
   background: var(--dark);
-  min-height: calc(100vh - 64px);
+  min-height: 100vh;
+  position: relative; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   padding: 80px 40px; text-align: center;
 }
-.contact-inner { max-width: 620px; width: 100%; }
+#contact-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block; pointer-events: none;
+}
+.contact-inner { max-width: 620px; width: 100%; position: relative; z-index: 1; }
 .contact .eyebrow {
-  color: rgba(240,237,232,0.35);
+  color: rgba(240,237,232,0.30);
   margin-bottom: 24px; display: block;
 }
 .contact h1 {
   color: var(--fg-inverse);
-  font-size: clamp(2.4rem, 5vw, 3.8rem);
-  letter-spacing: -0.04em; line-height: 1.1;
-  margin-bottom: 20px;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  letter-spacing: -0.04em; line-height: 1.08;
+  margin-bottom: 14px;
 }
 .contact-subtitle {
   font-family: var(--font-display); font-weight: 900;
-  font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
   letter-spacing: -0.03em; line-height: 1.1;
-  color: rgba(240,237,232,0.35);
-  margin-bottom: 52px;
+  color: rgba(240,237,232,0.25);
+  margin-bottom: 28px;
+}
+.contact-body {
+  font-family: var(--font-body);
+  font-size: 0.9rem; color: rgba(240,237,232,0.42);
+  line-height: 1.8; margin-bottom: 44px;
+  max-width: 360px; margin-left: auto; margin-right: auto;
 }
 .contact-ctas {
   display: flex; gap: 12px;
@@ -916,6 +948,62 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   font-size: 1.15rem; letter-spacing: -0.025em;
   line-height: 1.3; color: var(--fg1);
 }
+
+/* ============================================================
+   Password Gate
+   ============================================================ */
+.pw-gate {
+  max-width: 400px;
+  margin: 80px auto;
+  text-align: center;
+  padding: 48px 40px;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+}
+.pw-gate-lock {
+  width: 56px; height: 56px;
+  background: var(--accent-subtle);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  color: var(--accent);
+}
+.pw-gate-lock svg { width: 26px; height: 26px; }
+.pw-gate .eyebrow { display: block; margin-bottom: 12px; }
+.pw-gate h2 { font-size: 1.4rem; margin-bottom: 10px; }
+.pw-gate > p { margin-bottom: 28px; font-size: 0.9rem; }
+.pw-form { display: flex; flex-direction: column; gap: 12px; align-items: stretch; }
+.pw-input {
+  width: 100%; padding: 12px 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body); font-size: 1rem;
+  background: var(--bg); color: var(--fg1);
+  outline: none; text-align: center; letter-spacing: 0.12em;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.pw-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(61,61,181,0.12);
+}
+.pw-input.pw-shake {
+  animation: pw-shake 0.38s cubic-bezier(0.36,0.07,0.19,0.97);
+  border-color: #c00;
+}
+@keyframes pw-shake {
+  0%,100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+.pw-error {
+  font-family: var(--font-body); font-size: 0.8rem;
+  color: #b00; margin: 0; min-height: 1em;
+}
+.pw-form .btn { width: 100%; justify-content: center; }
 
 /* ============================================================
    Footer
@@ -1421,19 +1509,21 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
      ============================================================ -->
 <div class="page" id="page-contact">
   <section class="contact">
+    <canvas id="contact-canvas"></canvas>
     <div class="contact-inner reveal">
-      <span class="eyebrow">Contact</span>
-      <h1>Thanks for the visit.</h1>
-      <div class="contact-subtitle">Let's chat.</div>
+      <span class="eyebrow">Say hello</span>
+      <h1>Thanks for<br>the visit.</h1>
+      <div class="contact-subtitle">Let's make something<br>great together.</div>
+      <p class="contact-body">Whether it's a product challenge, a collaboration, or just a good conversation — I'm always open to hearing from you.</p>
 
       <div class="contact-ctas">
-        <a class="btn btn-accent" href="mailto:jjacinto.mail@gmail.com">
+        <a class="btn btn-accent" id="contact-email-btn" href="mailto:jjacinto.mail@gmail.com">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Contact me</span>
+          <span>Send an email</span>
         </a>
-        <a class="btn btn-dark-outline" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
+        <a class="btn btn-dark-outline" id="contact-linkedin-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>LinkedIn</span>
+          <span>LinkedIn ↗</span>
         </a>
       </div>
 
@@ -1446,7 +1536,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
         <div class="contact-info-item" data-link onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/', '_blank')">
           <div class="contact-info-label">LinkedIn</div>
           <div class="contact-info-value">joaofranciscojacinto</div>
-          <div class="contact-info-hint">Open profile</div>
+          <div class="contact-info-hint">Open ↗</div>
         </div>
         <div class="contact-info-item">
           <div class="contact-info-label">Location</div>
@@ -1474,6 +1564,58 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 /* ============================================================
    Case study data
    ============================================================ */
+const CASE_PASSWORD = 'alohomora';
+
+function isUnlocked() {
+  return sessionStorage.getItem('jj-case-unlocked') === '1';
+}
+
+function renderPasswordGate(caseId) {
+  caseContainer.innerHTML = `
+    <div class="case-wrap">
+      <div class="container">
+        <a class="back-link" onclick="switchPage('cases')" href="#">← Back to case studies</a>
+        <div class="pw-gate reveal visible">
+          <div class="pw-gate-lock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="eyebrow">Protected</span>
+          <h2>This case study is private</h2>
+          <p>Enter the password to read this work.</p>
+          <form class="pw-form" onsubmit="submitPassword(event, '${caseId}')">
+            <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="off">
+            <p class="pw-error" id="pwError"></p>
+            <button type="submit" class="btn btn-accent">
+              <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+              <span>Unlock</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  `;
+  setTimeout(() => document.getElementById('pwInput')?.focus(), 50);
+}
+
+function submitPassword(e, caseId) {
+  e.preventDefault();
+  const input = document.getElementById('pwInput');
+  const error = document.getElementById('pwError');
+  if (input.value.trim().toLowerCase() === CASE_PASSWORD) {
+    sessionStorage.setItem('jj-case-unlocked', '1');
+    renderCasePage(caseId);
+  } else {
+    error.textContent = 'Incorrect password — try again.';
+    input.classList.add('pw-shake');
+    input.value = '';
+    input.focus();
+    input.addEventListener('animationend', () => input.classList.remove('pw-shake'), { once: true });
+  }
+}
+
 const CASES = {
   'case-webinar': {
     cat: 'Design · StreamYard',
@@ -1605,6 +1747,7 @@ const footer = document.getElementById('footer');
 function renderCasePage(id) {
   const c = CASES[id];
   if (!c) return false;
+  if (!isUnlocked()) { renderPasswordGate(id); return true; }
   const nextId = CASE_IDS[(CASE_IDS.indexOf(id) + 1) % CASE_IDS.length];
   const next = CASES[nextId];
   const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
@@ -1678,6 +1821,10 @@ function renderCasePage(id) {
 }
 
 function switchPage(page) {
+  // Stop canvas when leaving contact
+  const prevCanvas = document.getElementById('contact-canvas');
+  if (prevCanvas?._stopCanvas) { prevCanvas._stopCanvas(); prevCanvas._contactReady=false; }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
 
   const isCase = page && page.startsWith('case-');
@@ -1695,8 +1842,12 @@ function switchPage(page) {
   movePillIndicator();
 
   footer.style.display = page === 'contact' ? 'none' : '';
+  nav.classList.toggle('nav-dark', page === 'contact');
 
   window.scrollTo({ top: 0, behavior: 'auto' });
+
+  // Start constellation when entering contact
+  if (page === 'contact') requestAnimationFrame(initContactCanvas);
 
   requestAnimationFrame(() => {
     document.querySelectorAll('.page.active .reveal').forEach(el => {
@@ -1761,6 +1912,246 @@ function copyEmail(el) {
     hint.textContent = 'Copied!';
     setTimeout(() => { hint.textContent = original; }, 2000);
   });
+}
+
+/* ============================================================
+   Contact — Constellation Canvas
+   ============================================================ */
+const CONTACT_MODES = [
+  { name:'sphere',    rotSpeed: 0.00025, rotDir: 1,  lumBase:20, lumRange:18, wobble:false },
+  { name:'disc',      rotSpeed: 0.00060, rotDir: 1,  lumBase:26, lumRange:26, wobble:false },
+  { name:'scatter',   rotSpeed: 0.00008, rotDir: 1,  lumBase:13, lumRange:11, wobble:false },
+  { name:'dense',     rotSpeed: 0.00180, rotDir: 1,  lumBase:34, lumRange:38, wobble:false },
+  { name:'torus',     rotSpeed: 0.00040, rotDir: 1,  lumBase:18, lumRange:20, wobble:true  },
+  { name:'expanded',  rotSpeed: 0.00015, rotDir:-1,  lumBase:11, lumRange: 8, wobble:false },
+  { name:'elongated', rotSpeed: 0.00055, rotDir: 1,  lumBase:24, lumRange:30, wobble:false },
+];
+let _contactRAF = null;
+
+function initContactCanvas() {
+  const canvas = document.getElementById('contact-canvas');
+  if (!canvas || canvas._contactReady) return;
+  canvas._contactReady = true;
+
+  const ctx = canvas.getContext('2d');
+  let W, H, dpr;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    canvas.width  = W * dpr; canvas.height = H * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+
+  const onResize = () => { ctx.setTransform(1,0,0,1,0,0); resize(); };
+  window.addEventListener('resize', onResize);
+
+  const R = Math.min(window.innerHeight * 0.40, window.innerWidth * 0.32, 280);
+
+  const s = {
+    mouseX:-999, mouseY:-999, prevMX:0, prevMY:0,
+    velX:0, velY:0, smoothVX:0, smoothVY:0,
+    rotX:0.28, rotY:0, rotVX:0, rotVY:0.0001,
+    t:0, ripples:[], modeIdx:0,
+    hoverColorProgress:0, hoverCR:61, hoverCG:61, hoverCB:181, hoverColor:null,
+    targetRotSpeed:0.00025, currentRotSpeed:0.00025,
+    targetLumBase:20, currentLumBase:20,
+    targetLumRange:18, currentLumRange:18,
+    wobble:false,
+  };
+
+  const N = 380;
+  const pts = Array.from({ length: N }, (_, i) => {
+    const theta = Math.acos(1 - 2*(i+0.5)/N);
+    const phi   = Math.PI*(1+Math.sqrt(5))*i;
+    const jT = (Math.random()-0.5)*0.55;
+    const jP = (Math.random()-0.5)*0.9;
+    const rr = R * (0.55 + Math.random()*0.75);
+    const tt = Math.max(0.05, Math.min(Math.PI-0.05, theta+jT));
+    const ox = rr*Math.sin(tt)*Math.cos(phi+jP);
+    const oy = rr*Math.sin(tt)*Math.sin(phi+jP);
+    const oz = rr*Math.cos(tt);
+    const ta = phi % (Math.PI*2), torusR = R*0.80, tubeR = R*0.38;
+    return {
+      ox,oy,oz, sx:ox, sy:oy, sz:oz,
+      scX:(Math.random()-0.5)*R*2.4, scY:(Math.random()-0.5)*R*2.4, scZ:(Math.random()-0.5)*R*2.4,
+      toX:(torusR+tubeR*Math.cos(theta))*Math.cos(ta),
+      toY:tubeR*Math.sin(theta),
+      toZ:(torusR+tubeR*Math.cos(theta))*Math.sin(ta),
+      dotR:0.9+Math.random()*1.1,
+      twinkle:Math.random()*Math.PI*2, twinkleSpeed:0.012+Math.random()*0.022,
+      dispR:0, dispV:0,
+      lerpSpeed:0.018+Math.random()*0.018,
+      _tx:ox, _ty:oy, _tz:oz,
+    };
+  });
+
+  function getTarget(p, mode) {
+    if (mode==='disc')     return [p.ox*1.1,  p.oy*0.10, p.oz*1.1];
+    if (mode==='scatter')  return [p.scX*0.7, p.scY*0.7, p.scZ*0.7];
+    if (mode==='dense')    return [p.ox*0.38, p.oy*0.38, p.oz*0.38];
+    if (mode==='torus')    return [p.toX,     p.toY,     p.toZ];
+    if (mode==='expanded') return [p.ox*1.75, p.oy*1.75, p.oz*1.75];
+    if (mode==='elongated')return [p.ox*1.2,  p.oy*0.22, p.oz*1.2];
+    return [p.ox, p.oy, p.oz];
+  }
+
+  function triggerMode(cx2, cy2) {
+    let next;
+    do { next = Math.floor(Math.random()*CONTACT_MODES.length); }
+    while (next === s.modeIdx && CONTACT_MODES.length > 1);
+    s.modeIdx = next;
+    const m = CONTACT_MODES[next];
+    s.targetRotSpeed = m.rotSpeed * m.rotDir;
+    s.targetLumBase  = m.lumBase;
+    s.targetLumRange = m.lumRange;
+    s.wobble = m.wobble;
+    pts.forEach(p => { const [tx,ty,tz]=getTarget(p,m.name); p._tx=tx; p._ty=ty; p._tz=tz; });
+    if (cx2 !== undefined) {
+      s.ripples.push({ sx:cx2, sy:cy2, t:0 });
+      if (s.ripples.length > 3) s.ripples.shift();
+    }
+  }
+
+  const onMouseMove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    s.velX = (e.clientX-rect.left) - s.prevMX;
+    s.velY = (e.clientY-rect.top)  - s.prevMY;
+    s.prevMX = e.clientX-rect.left;
+    s.prevMY = e.clientY-rect.top;
+    s.mouseX = e.clientX-rect.left;
+    s.mouseY = e.clientY-rect.top;
+  };
+  window.addEventListener('mousemove', onMouseMove);
+
+  const onPageClick = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    triggerMode(e.clientX-rect.left, e.clientY-rect.top);
+  };
+  document.getElementById('page-contact').addEventListener('click', onPageClick);
+
+  const emailBtn = document.getElementById('contact-email-btn');
+  const linkedinBtn = document.getElementById('contact-linkedin-btn');
+  if (emailBtn) {
+    emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:61,cb:181}; triggerMode(); });
+    emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null; triggerMode(); });
+  }
+  if (linkedinBtn) {
+    linkedinBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:240,cg:237,cb:232}; triggerMode(); });
+    linkedinBtn.addEventListener('mouseleave', () => { s.hoverColor=null; triggerMode(); });
+  }
+
+  function rotXY(px,py,pz,rx,ry) {
+    const y1=py*Math.cos(rx)-pz*Math.sin(rx), z1=py*Math.sin(rx)+pz*Math.cos(rx);
+    const x2=px*Math.cos(ry)+z1*Math.sin(ry), z2=-px*Math.sin(ry)+z1*Math.cos(ry);
+    return [x2,y1,z2];
+  }
+  function project(x,y,z,cx,cy) {
+    const sc=420/(420+z); return [cx+x*sc, cy+y*sc, sc];
+  }
+
+  const RS=0.65, RW=120, RM=320, RA=7;
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    const cx=W*0.50, cy=H*0.50;
+    s.t++;
+
+    s.currentRotSpeed += (s.targetRotSpeed-s.currentRotSpeed)*0.012;
+    s.currentLumBase  += (s.targetLumBase-s.currentLumBase)*0.018;
+    s.currentLumRange += (s.targetLumRange-s.currentLumRange)*0.018;
+
+    s.smoothVX = s.smoothVX*0.94 + s.velX*0.06;
+    s.smoothVY = s.smoothVY*0.94 + s.velY*0.06;
+    s.velX*=0.8; s.velY*=0.8;
+    s.rotVX += s.smoothVX*0.0000015; s.rotVY += s.smoothVY*0.0000015;
+    s.rotVX*=0.986; s.rotVY*=0.986;
+    s.rotY += s.currentRotSpeed + s.rotVY;
+    s.rotX += s.rotVX;
+    if (s.mouseX>0) s.rotX += (((s.mouseY/Math.max(H,1))-0.5)*0.55 - s.rotX)*0.0025;
+    if (s.wobble) s.rotX += Math.sin(s.t*0.018)*0.0008;
+
+    s.ripples = s.ripples.filter(r=>r.t<RM);
+    s.ripples.forEach(r=>r.t++);
+
+    if (s.hoverColor) {
+      s.hoverColorProgress = Math.min(1, s.hoverColorProgress+0.022);
+      s.hoverCR=s.hoverColor.cr; s.hoverCG=s.hoverColor.cg; s.hoverCB=s.hoverColor.cb;
+    } else {
+      s.hoverColorProgress = Math.max(0, s.hoverColorProgress-0.018);
+    }
+
+    pts.forEach(p => {
+      p.sx += (p._tx-p.sx)*p.lerpSpeed;
+      p.sy += (p._ty-p.sy)*p.lerpSpeed;
+      p.sz += (p._tz-p.sz)*p.lerpSpeed;
+      p.dispV*=0.88; p.dispR=p.dispR*0.88+p.dispV;
+      p.twinkle+=p.twinkleSpeed;
+    });
+
+    const proj = pts.map((p,pi) => {
+      const len=Math.sqrt(p.sx*p.sx+p.sy*p.sy+p.sz*p.sz)||1;
+      const wx=p.sx+p.sx/len*p.dispR, wy=p.sy+p.sy/len*p.dispR, wz=p.sz+p.sz/len*p.dispR;
+      const [rx,ry,rz]=rotXY(wx,wy,wz,s.rotX,s.rotY);
+      const [sx2,sy2,sc]=project(rx,ry,rz,cx,cy);
+      const depth=Math.max(0,(sc-0.55)/0.9);
+      return { sx:sx2, sy:sy2, sc, depth, alpha:0.22+depth*0.52+Math.sin(p.twinkle)*0.10,
+               r:p.dotR*(0.35+depth*0.65)*sc, rz, pi };
+    });
+
+    s.ripples.forEach(rpl => {
+      const wf=rpl.t*RS, decay=Math.pow(1-rpl.t/RM,1.8);
+      proj.forEach(p => {
+        const dx=p.sx-rpl.sx, dy=p.sy-rpl.sy, dist=Math.sqrt(dx*dx+dy*dy);
+        const diff=dist-wf;
+        if (Math.abs(diff)<RW) {
+          pts[p.pi].dispV += Math.cos(diff/RW*Math.PI*0.5)*RA*decay*0.04;
+        }
+      });
+    });
+
+    if (!s.hoverColor) {
+      for (let i=0;i<proj.length;i++) for (let j=i+1;j<proj.length;j++) {
+        const dx=proj[i].sx-proj[j].sx, dy=proj[i].sy-proj[j].sy, d2=dx*dx+dy*dy;
+        if (d2<68*68) {
+          const prog=1-Math.sqrt(d2)/68, da=(proj[i].depth+proj[j].depth)*0.5;
+          ctx.beginPath(); ctx.moveTo(proj[i].sx,proj[i].sy); ctx.lineTo(proj[j].sx,proj[j].sy);
+          ctx.strokeStyle=`rgba(100,100,100,${prog*da*0.035})`; ctx.lineWidth=0.5; ctx.stroke();
+        }
+      }
+    }
+
+    [...proj].sort((a,b)=>a.rz-b.rz).forEach(p => {
+      if (p.r<0.3||p.alpha<0.03) return;
+      const lum=Math.round(s.currentLumBase+p.depth*s.currentLumRange);
+      let cr=lum, cg=lum, cb=lum;
+      if (s.hoverColorProgress>0) {
+        const hp=s.hoverColorProgress;
+        cr=Math.round(lum+(s.hoverCR-lum)*hp);
+        cg=Math.round(lum+(s.hoverCG-lum)*hp);
+        cb=Math.round(lum+(s.hoverCB-lum)*hp);
+      }
+      ctx.beginPath();
+      ctx.arc(p.sx, p.sy, Math.max(0.1,Math.min(p.r,2.6)), 0, Math.PI*2);
+      ctx.fillStyle=`rgba(${cr},${cg},${cb},${p.alpha})`;
+      ctx.fill();
+    });
+
+    const g=Math.round(s.hoverColorProgress*12);
+    canvas.style.filter = g>0 ? `drop-shadow(0 0 ${g}px rgba(${s.hoverCR},${s.hoverCG},${s.hoverCB},0.35))` : '';
+
+    _contactRAF = requestAnimationFrame(draw);
+  }
+
+  draw();
+
+  canvas._stopCanvas = () => {
+    cancelAnimationFrame(_contactRAF); _contactRAF=null;
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('mousemove', onMouseMove);
+    document.getElementById('page-contact')?.removeEventListener('click', onPageClick);
+  };
 }
 </script>
 
