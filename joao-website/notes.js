@@ -73,6 +73,7 @@
   toolbar.className = 'jjn-toolbar';
   toolbar.innerHTML = `
     <button data-act="add">+ Pin</button>
+    <button data-act="sync" title="Write notes to a local .md file so Claude Code can read them">Sync</button>
     <button data-act="toggle">Hide</button>
     <button data-act="export">Export</button>
     <button data-act="clear">Clear</button>
@@ -80,7 +81,110 @@
   `;
   document.body.appendChild(toolbar);
 
-  function save() { localStorage.setItem(KEY, JSON.stringify(notes)); render(); }
+  const IDB_NAME = 'jjn';
+  const IDB_STORE = 'handles';
+  const HANDLE_KEY = `notes-md:${location.pathname}`;
+  let syncHandle = null;
+
+  function idbOpen() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open(IDB_NAME, 1);
+      r.onupgradeneeded = () => r.result.createObjectStore(IDB_STORE);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function idbGet(k) {
+    const db = await idbOpen();
+    return new Promise(res => {
+      const r = db.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).get(k);
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => res(null);
+    });
+  }
+  async function idbSet(k, v) {
+    const db = await idbOpen();
+    return new Promise(res => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put(v, k);
+      tx.oncomplete = () => res();
+      tx.onerror = () => res();
+    });
+  }
+
+  function renderMarkdown() {
+    const head = `# Notes for ${location.pathname}\n\n_Updated ${new Date().toISOString()}_\n\n`;
+    if (!notes.length) return head + '(no notes)\n';
+    const lines = notes.map((n, i) => `${i + 1}. (${Math.round(n.x)}, ${Math.round(n.y)}) — ${n.text || '(empty)'}`);
+    return head + lines.join('\n') + '\n';
+  }
+
+  function updateSyncBtn() {
+    const btn = toolbar.querySelector('[data-act="sync"]');
+    if (syncHandle) {
+      btn.textContent = '✓ Synced';
+      btn.classList.add('is-active');
+    } else {
+      btn.textContent = 'Sync';
+      btn.classList.remove('is-active');
+    }
+  }
+
+  async function writeToFile() {
+    if (!syncHandle) return;
+    try {
+      const w = await syncHandle.createWritable();
+      await w.write(renderMarkdown());
+      await w.close();
+    } catch (err) {
+      console.warn('[notes] write failed', err);
+      syncHandle = null;
+      updateSyncBtn();
+    }
+  }
+
+  async function startSync() {
+    if (!('showSaveFilePicker' in window)) {
+      alert('File sync needs Chrome or Edge (File System Access API).');
+      return;
+    }
+    const stored = await idbGet(HANDLE_KEY);
+    if (stored) {
+      const perm = await stored.queryPermission({ mode: 'readwrite' });
+      if (perm === 'granted' || (await stored.requestPermission({ mode: 'readwrite' })) === 'granted') {
+        syncHandle = stored;
+        updateSyncBtn();
+        await writeToFile();
+        return;
+      }
+    }
+    try {
+      const h = await window.showSaveFilePicker({
+        suggestedName: 'notes.md',
+        types: [{ description: 'Markdown', accept: { 'text/markdown': ['.md'] } }],
+      });
+      await idbSet(HANDLE_KEY, h);
+      syncHandle = h;
+      updateSyncBtn();
+      await writeToFile();
+    } catch (_) {}
+  }
+
+  async function tryResumeSync() {
+    const stored = await idbGet(HANDLE_KEY);
+    if (!stored) return;
+    if ((await stored.queryPermission({ mode: 'readwrite' })) === 'granted') {
+      syncHandle = stored;
+      updateSyncBtn();
+      await writeToFile();
+    }
+  }
+
+  function save() {
+    localStorage.setItem(KEY, JSON.stringify(notes));
+    render();
+    writeToFile();
+  }
 
   function render() {
     document.querySelectorAll('.jjn-pin, .jjn-popup').forEach(n => n.remove());
@@ -154,10 +258,10 @@
     } else if (act === 'toggle') {
       const hidden = document.body.classList.toggle('jjn-hidden');
       e.target.textContent = hidden ? 'Show' : 'Hide';
+    } else if (act === 'sync') {
+      startSync();
     } else if (act === 'export') {
-      const md = notes.map((n, i) => `${i + 1}. (${Math.round(n.x)}, ${Math.round(n.y)}) — ${n.text || '(empty)'}`).join('\n');
-      const blob = `# Notes for ${location.pathname}\n\n${md || '(no notes)'}\n`;
-      navigator.clipboard.writeText(blob).then(() => {
+      navigator.clipboard.writeText(renderMarkdown()).then(() => {
         e.target.textContent = 'Copied!';
         setTimeout(() => { e.target.textContent = 'Export'; }, 1200);
       });
@@ -199,4 +303,5 @@
   }, true);
 
   render();
+  tryResumeSync();
 })();
