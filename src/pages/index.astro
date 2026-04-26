@@ -582,23 +582,41 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   gap: 12px; margin-bottom: 14px;
 }
 .testimonial-avatar {
-  width: 40px; height: 40px;
+  width: 50px; height: 50px;
   border-radius: 50%; flex-shrink: 0;
   background: linear-gradient(135deg, var(--accent-subtle), rgba(61,61,181,0.18));
   display: flex; align-items: center; justify-content: center;
   font-family: var(--font-display); font-weight: 900;
   font-size: 0.85rem; color: var(--accent);
+  overflow: hidden;
+}
+.testimonial-avatar img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
 }
 .testimonial-name {
   font-family: var(--font-display); font-weight: 900;
-  font-size: 0.88rem; letter-spacing: -0.01em;
+  font-size: 1rem; letter-spacing: -0.01em;
   color: var(--fg1);
 }
 .testimonial-role {
   font-family: var(--font-body);
-  font-size: 0.72rem; color: var(--fg3);
+  font-size: 0.72rem; color: #a2a2a2;
   margin-top: 2px;
 }
+.testimonial-li-hint {
+  position: absolute; top: 14px; right: 14px;
+  display: flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: var(--radius-full);
+  background: var(--accent); color: #fff;
+  font-family: var(--font-body); font-size: 0.68rem;
+  white-space: nowrap; pointer-events: none;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  z-index: 2;
+}
+.testimonial-li-hint svg { width: 11px; height: 11px; fill: currentColor; flex-shrink: 0; }
+.testimonial-card:hover .testimonial-li-hint { opacity: 1; transform: translateY(0); }
 .testimonial-quote {
   font-family: var(--font-body);
   font-size: 0.84rem; color: var(--fg2);
@@ -634,6 +652,17 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   box-shadow: var(--shadow-lg);
   border-color: rgba(61,61,181,0.30);
 }
+.case-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--accent-muted);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+  border-radius: inherit;
+}
+.case-card:hover::before { opacity: 1; }
 .case-card::after,
 .testimonial-card::after,
 .next-case::after {
@@ -660,8 +689,8 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   object-fit: cover; display: block;
   transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
 }
-.case-card:hover img { transform: scale(1.04); }
-.case-card-body { padding: 20px 22px 24px; }
+.case-card:hover img { transform: scale(1.08); }
+.case-card-body { padding: 20px 22px 24px; position: relative; z-index: 2; }
 .case-card-cat {
   font-family: var(--font-body);
   font-size: 0.72rem; color: var(--fg3);
@@ -1342,76 +1371,82 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
     <div class="container">
       <p class="eyebrow reveal">What people are saying</p>
       <div class="testimonials-masonry">
-        <div class="testimonial-card reveal reveal-d1">
+        <div class="testimonial-card reveal reveal-d1" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">D</div>
+            <div class="testimonial-avatar"><img src="/assets/images/Daniel.avif" alt="Daniel Cardoso"></div>
             <div>
               <div class="testimonial-name">Daniel Cardoso</div>
               <div class="testimonial-role">Director of Design for AI at Talkdesk</div>
             </div>
           </div>
           <p class="testimonial-quote">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
-          <p class="testimonial-relation">Manager at Talkdesk</p>
+          <p class="testimonial-relation">Daniel was my manager at Talkdesk</p>
         </div>
 
-        <div class="testimonial-card reveal reveal-d2">
+        <div class="testimonial-card reveal reveal-d2" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">R</div>
+            <div class="testimonial-avatar"><img src="/assets/images/Renato.avif" alt="Renato Duarte"></div>
             <div>
               <div class="testimonial-name">Renato Duarte</div>
-              <div class="testimonial-role">Engineering Manager at Uniplaces</div>
+              <div class="testimonial-role">Engineering Manager at Datacamp</div>
             </div>
           </div>
           <p class="testimonial-quote">João has the mind of a perfectionist mixed with the right amount of creativity. Each UI component he drew was always well thought out, to the point that every detail had context and meaning. He didn't stop there — on many occasions João also implemented each component himself.</p>
-          <p class="testimonial-relation">Co-worker at Be.Ubi</p>
+          <p class="testimonial-relation">Renato was my coworker at Be.Ubi</p>
         </div>
 
-        <div class="testimonial-card reveal reveal-d1">
+        <div class="testimonial-card reveal reveal-d1" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">B</div>
+            <div class="testimonial-avatar"><img src="/assets/images/Bartlomiej.avif" alt="Bartlomiej Mucha"></div>
             <div>
               <div class="testimonial-name">Bartlomiej Mucha</div>
-              <div class="testimonial-role">Staff Engineer at StreamYard</div>
+              <div class="testimonial-role">Staff Engineer</div>
             </div>
           </div>
           <p class="testimonial-quote">I always appreciate his extensive knowledge, and the research he does between different ideas and reasoning. We often have a very aligned way of thinking about user experience.</p>
-          <p class="testimonial-relation">Colleague at Hopping / StreamYard</p>
+          <p class="testimonial-relation">Bartlomiej was my coworker at StreamYard</p>
         </div>
 
-        <div class="testimonial-card reveal reveal-d2">
+        <div class="testimonial-card reveal reveal-d2" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">J</div>
+            <div class="testimonial-avatar"><img src="/assets/images/JoaoCosta.avif" alt="João Costa"></div>
             <div>
               <div class="testimonial-name">João Costa</div>
-              <div class="testimonial-role">Sr. Product Designer at Anchorage Digital</div>
+              <div class="testimonial-role">Sr. Product Designer</div>
             </div>
           </div>
           <p class="testimonial-quote">I was particularly impressed by João's ability to push out the best results out of his work. He has a gift for getting people on board with ideas — even those who were initially on completely different pages.</p>
-          <p class="testimonial-relation">Colleague at Anchorage Digital</p>
+          <p class="testimonial-relation">João was my coworker at several companies</p>
         </div>
 
-        <div class="testimonial-card reveal reveal-d1">
+        <div class="testimonial-card reveal reveal-d1" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">X</div>
+            <div class="testimonial-avatar"><img src="/assets/images/Xavier.avif" alt="Xavier Gallego"></div>
             <div>
               <div class="testimonial-name">Xavier Gallego</div>
-              <div class="testimonial-role">Sr. Staff Engineer at StreamYard</div>
+              <div class="testimonial-role">Sr. Engineer at Synthesia</div>
             </div>
           </div>
           <p class="testimonial-quote">João's dedication to maintain high design standards and foster collaboration within our team is top notch. His openness to feedback helps create an environment that greatly enhances our workflow and deliverables.</p>
-          <p class="testimonial-relation">Co-worker at Hopping / StreamYard</p>
+          <p class="testimonial-relation">Xavier was my coworker at StreamYard</p>
         </div>
 
-        <div class="testimonial-card reveal reveal-d2">
+        <div class="testimonial-card reveal reveal-d2" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
+          <div class="testimonial-li-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>View João's LinkedIn ↗</div>
           <div class="testimonial-header">
-            <div class="testimonial-avatar">W</div>
+            <div class="testimonial-avatar"><img src="/assets/images/Will.avif" alt="Will Brett-Atkin"></div>
             <div>
               <div class="testimonial-name">Will Brett-Atkin</div>
-              <div class="testimonial-role">Staff Product Designer at StreamYard</div>
+              <div class="testimonial-role">Staff Product Designer</div>
             </div>
           </div>
           <p class="testimonial-quote">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
-          <p class="testimonial-relation">Co-worker at Hopping / StreamYard</p>
+          <p class="testimonial-relation">Will was my coworker at StreamYard</p>
         </div>
       </div>
     </div>
