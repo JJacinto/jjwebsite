@@ -300,14 +300,38 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  padding-bottom: 0;
 }
 .mobile-menu.open { display: flex; }
-.mobile-menu a {
+.mobile-menu > a {
   font-family: var(--font-display); font-weight: 900;
   font-size: 1.75rem; letter-spacing: -0.03em;
   color: var(--fg1);
 }
-.mobile-menu a.active { color: var(--accent); }
+.mobile-menu > a.active { color: var(--accent); }
+.mobile-menu-secondary {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  display: flex; flex-direction: column; align-items: stretch;
+  gap: 8px; padding: 16px 32px 32px;
+  border-top: 1px solid var(--border);
+}
+.mobile-menu-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 18px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  font-family: var(--font-body); font-size: 0.9rem;
+  color: var(--fg2); cursor: pointer; text-decoration: none;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.mobile-menu-btn:hover {
+  border-color: var(--accent); color: var(--accent); background: var(--accent-muted);
+}
+.mobile-menu-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.mobile-menu-btn .icon-sun  { display: none; }
+.mobile-menu-btn .icon-moon { display: block; }
+[data-theme="dark"] .mobile-menu-btn .icon-moon { display: none; }
+[data-theme="dark"] .mobile-menu-btn .icon-sun  { display: block; }
 
 /* ============================================================
    Buttons
@@ -516,12 +540,19 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   filter: grayscale(0%);
   transform: scale(1.1);
 }
-.brands-marquee:has(a:hover) .brands-track {
-  animation-play-state: paused;
-}
 @media (prefers-reduced-motion: reduce) {
   .brands-track { animation: none; }
 }
+.brands-tooltip {
+  position: fixed; z-index: 9999; pointer-events: none;
+  padding: 6px 12px; border-radius: 8px;
+  background: var(--dark); color: var(--fg-inverse);
+  font-family: var(--font-body); font-size: 0.75rem;
+  white-space: nowrap; box-shadow: var(--shadow-md);
+  opacity: 0; transition: opacity 0.18s;
+  transform: translateY(-4px);
+}
+.brands-tooltip.visible { opacity: 1; transform: translateY(0); transition: opacity 0.18s, transform 0.18s; }
 
 /* ============================================================
    HOME — Stats
@@ -568,20 +599,21 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   break-inside: avoid;
   background: var(--surface);
   border-radius: 22px;
-  border: 9px solid rgba(28,26,23,0.08);
+  border: 6px solid var(--border);
   padding: 24px;
   margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
+  will-change: transform;
   transition:
-    transform 0.28s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
     border-color 0.38s cubic-bezier(0.4,0,0.2,1);
 }
 .testimonial-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(61,61,181,0.35);
+  border-color: rgba(61,61,181,0.30);
 }
+[data-theme="dark"] .testimonial-card:hover { border-color: rgba(112,112,238,0.35); }
 .testimonial-header {
   display: flex; align-items: center;
   gap: 12px; margin-bottom: 14px;
@@ -616,20 +648,22 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 .case-card {
   background: var(--surface);
   border-radius: 20px;
-  border: 5px solid rgba(28,26,23,0.08);
+  border: 6px solid var(--border);
   overflow: hidden;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  box-shadow: var(--shadow-sm);
+  will-change: transform;
   transition:
-    transform 0.28s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
     border-color 0.38s cubic-bezier(0.4,0,0.2,1);
 }
 .case-card:hover {
-  transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(61,61,181,0.28);
+  border-color: rgba(61,61,181,0.30);
 }
+[data-theme="dark"] .case-card:hover { border-color: rgba(112,112,238,0.35); }
+.case-card-featured img { height: 224px; }
 .case-card img {
   width: 100%; height: 180px;
   object-fit: cover; display: block;
@@ -1020,21 +1054,22 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 .next-case {
   background: var(--surface);
   border-radius: var(--radius-md);
-  border: 5px solid rgba(28,26,23,0.08);
+  border: 6px solid var(--border);
   overflow: hidden;
   cursor: pointer;
   display: grid; grid-template-columns: 1fr 2fr;
   align-items: center;
+  will-change: transform;
   transition:
-    transform 0.28s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
     border-color 0.38s cubic-bezier(0.4,0,0.2,1);
 }
 .next-case:hover {
-  transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
-  border-color: rgba(61,61,181,0.28);
+  border-color: rgba(61,61,181,0.30);
 }
+[data-theme="dark"] .next-case:hover { border-color: rgba(112,112,238,0.35); }
 .next-case img { width: 100%; height: 160px; object-fit: cover; }
 .next-case-body { padding: 28px; }
 .next-case-cat {
@@ -1154,6 +1189,8 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 @media (max-width: 680px) {
   .pill-nav { display: none; }
   .nav-toggle { display: inline-flex; }
+  .nav-right .theme-toggle,
+  .nav-right .li-badge { display: none; }
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
   .testimonials-masonry { columns: 1; }
   .may-like-grid,
@@ -1209,6 +1246,17 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   <a data-page="about" onclick="switchPage('about'); toggleMobile()">About</a>
   <a data-page="cases" onclick="switchPage('cases'); toggleMobile()">Case studies</a>
   <a data-page="contact" onclick="switchPage('contact'); toggleMobile()">Contact</a>
+  <div class="mobile-menu-secondary">
+    <button class="mobile-menu-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <span id="mobileThemeLabel">Dark mode</span>
+    </button>
+    <a class="mobile-menu-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" onclick="toggleMobile()">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+      <span>LinkedIn ↗</span>
+    </a>
+  </div>
 </div>
 
 <!-- ============================================================
@@ -1271,6 +1319,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       </div>
     </div>
   </section>
+  <div id="brandsTooltip" class="brands-tooltip" aria-hidden="true" role="tooltip"></div>
 
   <!-- STATS -->
   <section class="stats">
@@ -1586,42 +1635,42 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       </div>
     </div>
     <div class="container">
-      <div class="cases-grid">
-        <article class="case-card reveal reveal-d1" onclick="switchPage('case-webinar')">
+      <div class="cases-grid-row-2" style="margin-bottom:24px">
+        <article class="case-card case-card-featured reveal reveal-d1" onclick="switchPage('case-webinar')">
           <img src="/assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
           <div class="case-card-body">
-            <div class="case-card-cat">Design</div>
+            <div class="case-card-cat">Design · StreamYard</div>
             <div class="case-card-title">Redefining webinar customization</div>
           </div>
         </article>
-        <article class="case-card reveal reveal-d2" onclick="switchPage('case-research')">
+        <article class="case-card case-card-featured reveal reveal-d2" onclick="switchPage('case-research')">
           <img src="/assets/images/case-research.avif" alt="Research ops" loading="lazy">
           <div class="case-card-body">
-            <div class="case-card-cat">Research Ops</div>
+            <div class="case-card-cat">Research Ops · StreamYard</div>
             <div class="case-card-title">Understanding webinar organizers</div>
           </div>
         </article>
-        <article class="case-card reveal reveal-d3" onclick="switchPage('case-ds')">
+      </div>
+      <div class="cases-grid">
+        <article class="case-card reveal reveal-d1" onclick="switchPage('case-ds')">
           <img src="/assets/images/case-ds.avif" alt="Design system" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design Leadership</div>
             <div class="case-card-title">Leading and managing a design system</div>
           </div>
         </article>
-      </div>
-      <div class="cases-grid-row-2">
-        <article class="case-card reveal reveal-d1" onclick="switchPage('case-talkdesk')">
-          <img src="/assets/images/case-talkdesk.avif" alt="Talkdesk AI platform" loading="lazy">
-          <div class="case-card-body">
-            <div class="case-card-cat">Design</div>
-            <div class="case-card-title">Reshaping an AI training platform</div>
-          </div>
-        </article>
         <article class="case-card reveal reveal-d2" onclick="switchPage('case-namecheap')">
           <img src="/assets/images/case-namecheap.avif" alt="Namecheap support" loading="lazy">
           <div class="case-card-body">
-            <div class="case-card-cat">Design</div>
+            <div class="case-card-cat">Design · Namecheap</div>
             <div class="case-card-title">Designing a support chat experience</div>
+          </div>
+        </article>
+        <article class="case-card reveal reveal-d3" onclick="switchPage('case-talkdesk')">
+          <img src="/assets/images/case-talkdesk.avif" alt="Talkdesk AI platform" loading="lazy">
+          <div class="case-card-body">
+            <div class="case-card-cat">Design · Talkdesk</div>
+            <div class="case-card-title">Reshaping an AI training platform</div>
           </div>
         </article>
       </div>
@@ -1710,20 +1759,21 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 /* ============================================================
    Theme toggle
    ============================================================ */
+function syncThemeUI(t) {
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  const lbl = document.getElementById('mobileThemeLabel');
+  if (lbl) lbl.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+}
 function toggleTheme() {
   const html = document.documentElement;
   const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   html.setAttribute('data-theme', next);
   localStorage.setItem('jj-theme', next);
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  syncThemeUI(next);
 }
-// Sync aria-label to stored theme on load
 (function() {
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
-  const t = document.documentElement.getAttribute('data-theme') || 'light';
-  btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  syncThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
 })();
 
 /* ============================================================
@@ -2334,6 +2384,93 @@ function initContactCanvas() {
     document.getElementById('page-contact')?.removeEventListener('click', onPageClick);
   };
 }
+
+/* ============================================================
+   Brands marquee — smooth slow-down + tooltip
+   ============================================================ */
+(function() {
+  const marquee = document.querySelector('.brands-marquee');
+  const track   = document.querySelector('.brands-track');
+  const tip     = document.getElementById('brandsTooltip');
+  if (!marquee || !track || !tip) return;
+
+  let rampTimer, tipTimer, anim;
+
+  function getAnim() {
+    if (!anim) anim = track.getAnimations()[0];
+    return anim;
+  }
+
+  function rampRate(target, step) {
+    clearTimeout(rampTimer);
+    const a = getAnim();
+    if (!a) return;
+    const cur = a.playbackRate;
+    if (Math.abs(cur - target) < 0.005) { a.playbackRate = target; return; }
+    a.playbackRate = cur + (target - cur) * step;
+    rampTimer = setTimeout(() => rampRate(target, step), 30);
+  }
+
+  marquee.addEventListener('mouseenter', () => rampRate(0.08, 0.14));
+  marquee.addEventListener('mouseleave', () => {
+    rampRate(1, 0.18);
+    clearTimeout(tipTimer);
+    tip.classList.remove('visible');
+  });
+
+  document.querySelectorAll('.brands-track a').forEach(link => {
+    let host = '';
+    try { host = new URL(link.href).hostname.replace(/^www\./, ''); } catch(e) {}
+    if (!host) return;
+
+    link.addEventListener('mouseenter', (e) => {
+      clearTimeout(tipTimer);
+      tipTimer = setTimeout(() => {
+        tip.textContent = 'Go to ' + host;
+        tip.classList.add('visible');
+        tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
+        tip.style.top  = (e.clientY - 44) + 'px';
+      }, 2000);
+    });
+    link.addEventListener('mousemove', (e) => {
+      if (!tip.classList.contains('visible')) return;
+      tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
+      tip.style.top  = (e.clientY - 44) + 'px';
+    });
+    link.addEventListener('mouseleave', () => {
+      clearTimeout(tipTimer);
+      tip.classList.remove('visible');
+    });
+  });
+})();
+
+/* ============================================================
+   3D card tilt
+   ============================================================ */
+(function() {
+  let tiltCard = null;
+  document.addEventListener('mousemove', function(e) {
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case');
+    if (tiltCard && tiltCard !== card) {
+      tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
+      tiltCard.style.transform = '';
+      tiltCard = null;
+    }
+    if (!card) return;
+    tiltCard = card;
+    const r = card.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2);
+    const dy = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+    card.style.transition = 'box-shadow 0.28s, border-color 0.38s';
+    card.style.transform = `perspective(800px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) translateZ(8px)`;
+  });
+  document.addEventListener('mouseleave', function() {
+    if (!tiltCard) return;
+    tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
+    tiltCard.style.transform = '';
+    tiltCard = null;
+  });
+})();
 
 /* ============================================================
    Hero role rotator
