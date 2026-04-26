@@ -11,9 +11,6 @@ import '../styles/tokens.css';
 <meta name="description" content="João Jacinto — Senior Product Designer based in Aveiro, Portugal. 10+ years designing digital products with startups and enterprises.">
 <link rel="icon" type="image/svg+xml" href="/assets/JJ.svg">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-<script is:inline>
-  (function(){var t=localStorage.getItem('jj-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})();
-</script>
 <style is:global>
 @font-face {
   font-family: 'Mona Sans';
@@ -194,44 +191,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   background: rgba(240,237,232,0.10);
   color: var(--fg-inverse);
 }
-.nav.nav-dark .theme-toggle {
-  border-color: rgba(240,237,232,0.22);
-  color: rgba(240,237,232,0.65);
-}
-.nav.nav-dark .theme-toggle:hover {
-  border-color: rgba(240,237,232,0.7);
-  background: rgba(240,237,232,0.10);
-  color: var(--fg-inverse);
-}
-
-/* Dark mode nav/chrome overrides */
-[data-theme="dark"] .nav.scrolled {
-  background: rgba(24, 23, 20, 0.90);
-  box-shadow: 0 1px 0 rgba(240, 237, 232, 0.06);
-}
-[data-theme="dark"] .pill-indicator {
-  background: rgba(240, 237, 232, 0.10);
-}
-[data-theme="dark"] .pill-nav a:hover:not(.active) {
-  color: rgba(240, 237, 232, 0.75);
-}
-[data-theme="dark"] .mobile-menu {
-  background: rgba(24, 23, 20, 0.97);
-}
-[data-theme="dark"] .mobile-menu a { color: var(--fg1); }
-[data-theme="dark"] .mobile-menu a.active { color: var(--accent); }
-
-/* Contact page always has a dark canvas — restore fg-inverse so text stays light */
-[data-theme="dark"] #page-contact { --fg-inverse: #F0EDE8; }
-/* Nav-dark (contact page nav) must also keep fg-inverse light in dark mode */
-[data-theme="dark"] .nav.nav-dark   { --fg-inverse: #F0EDE8; }
-/* Preserve nav-dark's own scrolled/indicator/hover values against dark-mode overrides */
-[data-theme="dark"] .nav.nav-dark.scrolled {
-  background: rgba(20, 18, 16, 0.88);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
-}
-[data-theme="dark"] .nav.nav-dark .pill-indicator { background: rgba(240, 237, 232, 0.12); }
-[data-theme="dark"] .nav.nav-dark .pill-nav a:hover:not(.active) { color: rgba(240, 237, 232, 0.80); }
 
 /* Nav right-side group */
 .nav-right {
@@ -257,26 +216,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 }
 .li-badge svg { width: 18px; height: 18px; fill: currentColor; }
 
-/* Theme toggle */
-.theme-toggle {
-  width: 40px; height: 40px;
-  border: 1.5px solid var(--border-strong);
-  border-radius: var(--radius-sm);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--fg1);
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
-  flex-shrink: 0;
-}
-.theme-toggle:hover {
-  border-color: var(--fg1);
-  background: var(--fg1);
-  color: var(--fg-inverse);
-}
-.theme-toggle svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
-.theme-toggle .icon-sun  { display: none; }
-.theme-toggle .icon-moon { display: block; }
-[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
 
 /* Mobile toggle */
 .nav-toggle { display: none; width: 40px; height: 40px; align-items: center; justify-content: center; }
@@ -328,10 +267,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   border-color: var(--accent); color: var(--accent); background: var(--accent-muted);
 }
 .mobile-menu-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
-.mobile-menu-btn .icon-sun  { display: none; }
-.mobile-menu-btn .icon-moon { display: block; }
-[data-theme="dark"] .mobile-menu-btn .icon-moon { display: none; }
-[data-theme="dark"] .mobile-menu-btn .icon-sun  { display: block; }
 
 /* ============================================================
    Buttons
@@ -440,7 +375,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   transform: translateY(-60%);
   pointer-events: none; z-index: 1;
 }
-.hero-marquee .marquee-track { animation-duration: 40s; }
+.hero-marquee .marquee-track { animation-duration: 55s; }
 .hero-marquee span {
   font-size: clamp(6rem, 14vw, 11rem);
   color: rgba(61, 61, 181, 0.055);
@@ -454,7 +389,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 }
 .hero-role {
   font-family: var(--font-body);
-  font-size: clamp(1rem, 2vw, 1.15rem);
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
   color: var(--fg3);
   margin-bottom: 44px;
   letter-spacing: 0.01em;
@@ -478,8 +413,35 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   border-radius: 50%;
   overflow: hidden;
   margin: 0 auto 44px;
-  box-shadow: 0 0 0 1px var(--border), 0 20px 60px rgba(61,61,181,0.15);
+  border: 6px solid var(--border);
+  box-shadow: 0 20px 60px rgba(61,61,181,0.15);
+  position: relative;
+  will-change: transform;
+  transition:
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.28s,
+    border-color 0.38s cubic-bezier(0.4,0,0.2,1);
 }
+.hero-photo:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(61,61,181,0.30);
+}
+.hero-photo::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at calc(var(--tilt-mx, 50) * 1%) calc(var(--tilt-my, 50) * 1%),
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.hero-photo.tilt-active::after { opacity: 1; }
 .hero-photo img { width: 100%; height: 100%; object-fit: cover; }
 .hero-tagline {
   font-family: var(--font-body);
@@ -575,7 +537,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 .stat-num .unit { font-size: 0.38em; color: var(--fg3); }
 .stat-title {
   font-family: var(--font-display); font-weight: 900;
-  font-size: 0.95rem; letter-spacing: -0.01em;
+  font-size: var(--text-h3); letter-spacing: -0.01em;
   line-height: 1.25; margin-bottom: 8px;
   color: var(--fg1);
 }
@@ -604,6 +566,8 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   margin-bottom: 20px;
   box-shadow: var(--shadow-sm);
   will-change: transform;
+  position: relative;
+  overflow: hidden;
   transition:
     transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
@@ -613,7 +577,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   box-shadow: var(--shadow-lg);
   border-color: rgba(61,61,181,0.30);
 }
-[data-theme="dark"] .testimonial-card:hover { border-color: rgba(112,112,238,0.35); }
 .testimonial-header {
   display: flex; align-items: center;
   gap: 12px; margin-bottom: 14px;
@@ -640,6 +603,14 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   font-family: var(--font-body);
   font-size: 0.84rem; color: var(--fg2);
   line-height: 1.7;
+  margin-bottom: 10px;
+}
+.testimonial-relation {
+  font-family: var(--font-body);
+  font-size: 0.72rem; color: var(--fg3);
+  line-height: 1.5; margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
 }
 
 /* ============================================================
@@ -653,6 +624,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   cursor: pointer;
   box-shadow: var(--shadow-sm);
   will-change: transform;
+  position: relative;
   transition:
     transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
@@ -662,7 +634,26 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   box-shadow: var(--shadow-lg);
   border-color: rgba(61,61,181,0.30);
 }
-[data-theme="dark"] .case-card:hover { border-color: rgba(112,112,238,0.35); }
+.case-card::after,
+.testimonial-card::after,
+.next-case::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at calc(var(--tilt-mx, 50) * 1%) calc(var(--tilt-my, 50) * 1%),
+    rgba(255,255,255,0.12) 0%,
+    rgba(255,255,255,0.04) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.case-card.tilt-active::after,
+.testimonial-card.tilt-active::after,
+.next-case.tilt-active::after { opacity: 1; }
 .case-card-featured img { height: 224px; }
 .case-card img {
   width: 100%; height: 180px;
@@ -1060,6 +1051,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   display: grid; grid-template-columns: 1fr 2fr;
   align-items: center;
   will-change: transform;
+  position: relative;
   transition:
     transform 0.55s cubic-bezier(0.22,1,0.36,1),
     box-shadow 0.28s,
@@ -1069,7 +1061,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   box-shadow: var(--shadow-lg);
   border-color: rgba(61,61,181,0.30);
 }
-[data-theme="dark"] .next-case:hover { border-color: rgba(112,112,238,0.35); }
 .next-case img { width: 100%; height: 160px; object-fit: cover; }
 .next-case-body { padding: 28px; }
 .next-case-cat {
@@ -1189,7 +1180,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 @media (max-width: 680px) {
   .pill-nav { display: none; }
   .nav-toggle { display: inline-flex; }
-  .nav-right .theme-toggle,
   .nav-right .li-badge { display: none; }
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
   .testimonials-masonry { columns: 1; }
@@ -1227,10 +1217,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
     </div>
 
     <div class="nav-right">
-      <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" onclick="toggleTheme()">
-        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
       <a class="li-badge" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
       </a>
@@ -1247,11 +1233,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   <a data-page="cases" onclick="switchPage('cases'); toggleMobile()">Case studies</a>
   <a data-page="contact" onclick="switchPage('contact'); toggleMobile()">Contact</a>
   <div class="mobile-menu-secondary">
-    <button class="mobile-menu-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">
-      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      <span id="mobileThemeLabel">Dark mode</span>
-    </button>
     <a class="mobile-menu-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" onclick="toggleMobile()">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
       <span>LinkedIn ↗</span>
@@ -1334,7 +1315,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
         <div class="stat reveal reveal-d2">
           <div class="stat-num">5<span class="unit">.0M</span><sup>+</sup></div>
           <div class="stat-title">Users impacted</div>
-          <div class="stat-desc">Products collectively reaching over 5M users</div>
+          <div class="stat-desc">Products collectively reaching over five million users</div>
         </div>
         <div class="stat reveal reveal-d3">
           <div class="stat-num">8</div>
@@ -1370,6 +1351,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
+          <p class="testimonial-relation">Manager at Talkdesk</p>
         </div>
 
         <div class="testimonial-card reveal reveal-d2">
@@ -1381,6 +1363,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">João has the mind of a perfectionist mixed with the right amount of creativity. Each UI component he drew was always well thought out, to the point that every detail had context and meaning. He didn't stop there — on many occasions João also implemented each component himself.</p>
+          <p class="testimonial-relation">Co-worker at Be.Ubi</p>
         </div>
 
         <div class="testimonial-card reveal reveal-d1">
@@ -1392,6 +1375,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">I always appreciate his extensive knowledge, and the research he does between different ideas and reasoning. We often have a very aligned way of thinking about user experience.</p>
+          <p class="testimonial-relation">Colleague at Hopping / StreamYard</p>
         </div>
 
         <div class="testimonial-card reveal reveal-d2">
@@ -1403,6 +1387,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">I was particularly impressed by João's ability to push out the best results out of his work. He has a gift for getting people on board with ideas — even those who were initially on completely different pages.</p>
+          <p class="testimonial-relation">Colleague at Anchorage Digital</p>
         </div>
 
         <div class="testimonial-card reveal reveal-d1">
@@ -1414,6 +1399,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">João's dedication to maintain high design standards and foster collaboration within our team is top notch. His openness to feedback helps create an environment that greatly enhances our workflow and deliverables.</p>
+          <p class="testimonial-relation">Co-worker at Hopping / StreamYard</p>
         </div>
 
         <div class="testimonial-card reveal reveal-d2">
@@ -1425,6 +1411,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             </div>
           </div>
           <p class="testimonial-quote">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
+          <p class="testimonial-relation">Co-worker at Hopping / StreamYard</p>
         </div>
       </div>
     </div>
@@ -1737,6 +1724,10 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
             <div class="contact-card-value">Aveiro, Portugal</div>
             <div class="contact-card-sub">UTC+0/+1</div>
           </div>
+          <a class="contact-card-action" href="https://www.google.com/maps/@40.6405,-8.6538,13z" target="_blank" rel="noopener noreferrer" aria-label="View Aveiro on Google Maps">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Map</span>
+          </a>
         </div>
       </div>
     </div>
@@ -1756,25 +1747,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 </footer>
 
 <script is:inline>
-/* ============================================================
-   Theme toggle
-   ============================================================ */
-function syncThemeUI(t) {
-  const btn = document.getElementById('themeToggle');
-  if (btn) btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-  const lbl = document.getElementById('mobileThemeLabel');
-  if (lbl) lbl.textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
-}
-function toggleTheme() {
-  const html = document.documentElement;
-  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('jj-theme', next);
-  syncThemeUI(next);
-}
-(function() {
-  syncThemeUI(document.documentElement.getAttribute('data-theme') || 'light');
-})();
 
 /* ============================================================
    Case study data
@@ -2449,11 +2421,16 @@ function initContactCanvas() {
    ============================================================ */
 (function() {
   let tiltCard = null;
+  const TILT_DEG = 4;
+  const TILT_Z = 6;
   document.addEventListener('mousemove', function(e) {
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case');
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo');
     if (tiltCard && tiltCard !== card) {
       tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
       tiltCard.style.transform = '';
+      tiltCard.style.removeProperty('--tilt-mx');
+      tiltCard.style.removeProperty('--tilt-my');
+      tiltCard.classList.remove('tilt-active');
       tiltCard = null;
     }
     if (!card) return;
@@ -2461,13 +2438,21 @@ function initContactCanvas() {
     const r = card.getBoundingClientRect();
     const dx = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2);
     const dy = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+    const mx = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const my = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    card.style.setProperty('--tilt-mx', mx);
+    card.style.setProperty('--tilt-my', my);
+    card.classList.add('tilt-active');
     card.style.transition = 'box-shadow 0.28s, border-color 0.38s';
-    card.style.transform = `perspective(800px) rotateX(${-dy * 6}deg) rotateY(${dx * 6}deg) translateZ(8px)`;
+    card.style.transform = `perspective(800px) rotateX(${-dy * TILT_DEG}deg) rotateY(${dx * TILT_DEG}deg) translateZ(${TILT_Z}px)`;
   });
   document.addEventListener('mouseleave', function() {
     if (!tiltCard) return;
     tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
     tiltCard.style.transform = '';
+    tiltCard.style.removeProperty('--tilt-mx');
+    tiltCard.style.removeProperty('--tilt-my');
+    tiltCard.classList.remove('tilt-active');
     tiltCard = null;
   });
 })();
