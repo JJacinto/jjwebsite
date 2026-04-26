@@ -4,7 +4,11 @@ on:
   push:
     branches: [main]
     paths:
-      - 'joao-website/**'
+      - 'src/**'
+      - 'public/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'tsconfig.json'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
@@ -18,6 +22,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Astro site
+        run: npm run build
+
       - name: Install cloudflared
         run: |
           curl -L --output cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb
@@ -30,10 +46,10 @@ jobs:
         run: |
           mkdir -p "$HOME/.ssh"
           chmod 700 "$HOME/.ssh"
-          
+
           printf '%s\n' "$SSH_PRIVATE_KEY" > "$HOME/.ssh/deploy_key"
           chmod 600 "$HOME/.ssh/deploy_key"
-          
+
           {
             echo "Host nas"
             echo "  HostName ssh.joaojacinto.com"
@@ -53,17 +69,7 @@ jobs:
         run: |
           tar -cz \
             --exclude='.DS_Store' \
-            --exclude='README.md' \
-            --exclude='nginx.conf' \
-            --exclude='nginx.conf.backup' \
-            --exclude='docker-compose.yml' \
-            --exclude='docker-compose.yaml' \
-            --exclude='Makefile' \
-            --exclude='.gitignore' \
-            --exclude='old-index.html' \
-            --exclude='deploy.sh.txt' \
-            --exclude='ds' \
-            -C ./joao-website . \
+            -C ./dist . \
           | ssh -F "$HOME/.ssh/config" nas \
             "tar -xz --overwrite -C /home/jjacinto8/sites/joaojacinto/public"
 
