@@ -1,0 +1,91 @@
+{
+  "version": 2,
+  "tokens": {
+    "colors": {
+      "bg": {
+        "value": "#ECEAE5",
+        "variable": "--bg"
+      },
+      "bg-alt": {
+        "value": "#E4E1DB",
+        "variable": "--bg-alt"
+      },
+      "accent": {
+        "value": "#3D3DB5",
+        "variable": "--accent"
+      },
+      "accent-dark": {
+        "value": "#3030A0",
+        "variable": "--accent-dark"
+      },
+      "accent-subtle": {
+        "value": "#ECEAFF",
+        "variable": "--accent-subtle"
+      },
+      "accent-muted": {
+        "value": "rgba(61, 61, 181, 0.12)",
+        "variable": "--accent-muted"
+      }
+    },
+    "radii": {
+      "radius-sm": {
+        "value": "8px",
+        "variable": "--radius-sm"
+      },
+      "radius-md": {
+        "value": "16px",
+        "variable": "--radius-md"
+      },
+      "radius-lg": {
+        "value": "20px",
+        "variable": "--radius-lg"
+      },
+      "radius-full": {
+        "value": "100px",
+        "variable": "--radius-full"
+      }
+    },
+    "shadows": {
+      "shadow-sm": {
+        "value": "0 1px 4px rgba(0, 0, 0, 0.04)",
+        "variable": "--shadow-sm"
+      },
+      "shadow-md": {
+        "value": "0 4px 16px rgba(0, 0, 0, 0.06)",
+        "variable": "--shadow-md"
+      },
+      "shadow-lg": {
+        "value": "0 10px 32px rgba(0, 0, 0, 0.08)",
+        "variable": "--shadow-lg"
+      }
+    },
+    "spacing": {
+      "pad": {
+        "value": "clamp(20px, 5vw, 40px)",
+        "variable": "--pad"
+      }
+    },
+    "typography": {
+      "font-display": {
+        "value": "'Hanken Grotesk', 'DM Sans', -apple-system, sans-serif",
+        "variable": "--font-display"
+      },
+      "font-body": {
+        "value": "'Mona Sans', 'DM Sans', -apple-system, sans-serif",
+        "variable": "--font-body"
+      },
+      "text-display": {
+        "value": "clamp(3.5rem, 8vw, 7rem)",
+        "variable": "--text-display"
+      },
+      "text-h1": {
+        "value": "clamp(2.5rem, 5vw, 4rem)",
+        "variable": "--text-h1"
+      },
+      "text-h2": {
+        "value": "clamp(1.8rem, 3vw, 2.6rem)",
+        "variable": "--text-h2"
+      }
+    }
+  }
+}

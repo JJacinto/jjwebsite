@@ -1,3 +1,7 @@
+---
+import RetuneBridge from '../components/RetuneBridge.tsx';
+import '../styles/tokens.css';
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,9 +9,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>João Jacinto — Senior Product Designer</title>
 <meta name="description" content="João Jacinto — Senior Product Designer based in Aveiro, Portugal. 10+ years designing digital products with startups and enterprises.">
-<link rel="icon" type="image/svg+xml" href="assets/JJ.svg">
+<link rel="icon" type="image/svg+xml" href="/assets/JJ.svg">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="tokens.css">
 <style>
 @font-face {
   font-family: 'Mona Sans';
@@ -359,7 +362,20 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   color: var(--fg3);
   margin-bottom: 44px;
   letter-spacing: 0.01em;
+  height: 1.6em;
+  overflow: hidden;
+  position: relative;
 }
+.role-item {
+  position: absolute;
+  left: 0; right: 0;
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+}
+.role-item.is-active { transform: translateY(0); opacity: 1; }
+.role-item.is-prev   { transform: translateY(-110%); opacity: 0; }
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
   height: clamp(200px, 26vw, 268px);
@@ -392,19 +408,48 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 .brands-label {
   text-align: center; margin-bottom: 36px;
 }
-.brands-row {
+.brands-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.brands-track {
   display: flex;
-  justify-content: center; align-items: center;
-  gap: clamp(24px, 5vw, 60px);
-  flex-wrap: wrap;
+  width: max-content;
+  align-items: center;
+  height: 39px;
+  gap: clamp(48px, 7vw, 96px);
+  animation: brands-scroll 28s linear infinite;
 }
-.brand-name {
-  font-family: var(--font-display); font-weight: 900;
-  font-size: clamp(0.9rem, 2vw, 1.15rem);
-  color: var(--fg3); letter-spacing: -0.02em;
-  opacity: 0.6; transition: opacity 0.2s, color 0.2s;
+@keyframes brands-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
-.brand-name:hover { opacity: 1; color: var(--fg1); }
+.brands-track a {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.brands-track img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+  opacity: 0.35;
+  filter: grayscale(100%);
+  transform: scale(1);
+  transition: opacity 0.25s, filter 0.25s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.brands-track a:hover img {
+  opacity: 0.85;
+  filter: grayscale(0%);
+  transform: scale(1.1);
+}
+.brands-marquee:has(a:hover) .brands-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brands-track { animation: none; }
+}
 
 /* ============================================================
    HOME — Stats
@@ -1070,9 +1115,15 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
     </div>
     <div class="container hero-inner">
       <h1 class="hero-greeting reveal">Hi 👋 I'm João Jacinto.</h1>
-      <p class="hero-role reveal reveal-d1">Senior Product Designer</p>
+      <p class="hero-role reveal reveal-d1" aria-label="Product design expert">
+        <span class="role-item">Product design expert</span>
+        <span class="role-item">Digital product builder</span>
+        <span class="role-item">Systems thinker</span>
+        <span class="role-item">Team player</span>
+        <span class="role-item">Multi instrumentalist</span>
+      </p>
       <div class="hero-photo reveal reveal-d2">
-        <img src="assets/images/joao-photo.webp" alt="João Jacinto" loading="eager">
+        <img src="/assets/images/joao-photo.webp" alt="João Jacinto" loading="eager">
       </div>
       <p class="hero-tagline reveal reveal-d3">Designing digital products with startups and enterprises since 2015, with love ♥</p>
       <div class="hero-ctas reveal reveal-d4">
@@ -1092,13 +1143,19 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   <section class="brands reveal">
     <div class="container">
       <p class="eyebrow brands-label">I've proudly worked with</p>
-      <div class="brands-row">
-        <span class="brand-name">Anchorage Digital</span>
-        <span class="brand-name">StreamYard</span>
-        <span class="brand-name">Hopin</span>
-        <span class="brand-name">Talkdesk</span>
-        <span class="brand-name">Namecheap</span>
-        <span class="brand-name">Be.Ubi</span>
+    </div>
+    <div class="brands-marquee">
+      <div class="brands-track">
+        <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/anchorage.png" alt="Anchorage Digital"></a>
+        <a href="https://streamyard.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/streamyard.avif" alt="StreamYard"></a>
+        <a href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/talkdesk.avif" alt="Talkdesk"></a>
+        <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/namecheap.avif" alt="Namecheap"></a>
+        <a href="https://github.com/beubi" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/beubi.avif" alt="Be.Ubi"></a>
+        <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/anchorage.png" alt=""></a>
+        <a href="https://streamyard.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/streamyard.avif" alt=""></a>
+        <a href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/talkdesk.avif" alt=""></a>
+        <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/namecheap.avif" alt=""></a>
+        <a href="https://github.com/beubi" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/beubi.avif" alt=""></a>
       </div>
     </div>
   </section>
@@ -1218,21 +1275,21 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       <p class="eyebrow reveal">You may like to read</p>
       <div class="may-like-grid">
         <article class="case-card reveal reveal-d1" onclick="switchPage('case-webinar')">
-          <img src="assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
+          <img src="/assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design</div>
             <div class="case-card-title">Redefining webinar customization</div>
           </div>
         </article>
         <article class="case-card reveal reveal-d2" onclick="switchPage('case-research')">
-          <img src="assets/images/case-research.avif" alt="Research ops" loading="lazy">
+          <img src="/assets/images/case-research.avif" alt="Research ops" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Research Ops</div>
             <div class="case-card-title">Understanding webinar organizers</div>
           </div>
         </article>
         <article class="case-card reveal reveal-d3" onclick="switchPage('case-ds')">
-          <img src="assets/images/case-ds.avif" alt="Design system" loading="lazy">
+          <img src="/assets/images/case-ds.avif" alt="Design system" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design Leadership</div>
             <div class="case-card-title">Leading and managing a design system</div>
@@ -1419,21 +1476,21 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
     <div class="container">
       <div class="cases-grid">
         <article class="case-card reveal reveal-d1" onclick="switchPage('case-webinar')">
-          <img src="assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
+          <img src="/assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design</div>
             <div class="case-card-title">Redefining webinar customization</div>
           </div>
         </article>
         <article class="case-card reveal reveal-d2" onclick="switchPage('case-research')">
-          <img src="assets/images/case-research.avif" alt="Research ops" loading="lazy">
+          <img src="/assets/images/case-research.avif" alt="Research ops" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Research Ops</div>
             <div class="case-card-title">Understanding webinar organizers</div>
           </div>
         </article>
         <article class="case-card reveal reveal-d3" onclick="switchPage('case-ds')">
-          <img src="assets/images/case-ds.avif" alt="Design system" loading="lazy">
+          <img src="/assets/images/case-ds.avif" alt="Design system" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design Leadership</div>
             <div class="case-card-title">Leading and managing a design system</div>
@@ -1442,14 +1499,14 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       </div>
       <div class="cases-grid-row-2">
         <article class="case-card reveal reveal-d1" onclick="switchPage('case-talkdesk')">
-          <img src="assets/images/case-talkdesk.avif" alt="Talkdesk AI platform" loading="lazy">
+          <img src="/assets/images/case-talkdesk.avif" alt="Talkdesk AI platform" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design</div>
             <div class="case-card-title">Reshaping an AI training platform</div>
           </div>
         </article>
         <article class="case-card reveal reveal-d2" onclick="switchPage('case-namecheap')">
-          <img src="assets/images/case-namecheap.avif" alt="Namecheap support" loading="lazy">
+          <img src="/assets/images/case-namecheap.avif" alt="Namecheap support" loading="lazy">
           <div class="case-card-body">
             <div class="case-card-cat">Design</div>
             <div class="case-card-title">Designing a support chat experience</div>
@@ -1516,7 +1573,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   <p><strong>João Jacinto</strong> · Senior Product Designer · Aveiro, Portugal · Custom-designed and hand-coded · © 2026</p>
 </footer>
 
-<script>
+<script is:inline>
 /* ============================================================
    Case study data
    ============================================================ */
@@ -1577,7 +1634,7 @@ const CASES = {
     cat: 'Design · StreamYard',
     title: 'Redefining webinar customization',
     subtitle: "How I redesigned the end-to-end customization experience for StreamYard's webinar product, serving 5M+ live streaming users.",
-    img: 'assets/images/case-webinar.avif',
+    img: '/assets/images/case-webinar.avif',
     year: '2023', role: 'Senior Product Designer', company: 'StreamYard', duration: '6 months',
     keywords: ['Webinar UX', 'Customization', 'Design Systems', 'User Research', 'Figma'],
     achievements: [
@@ -1601,7 +1658,7 @@ const CASES = {
     cat: 'Research Ops · StreamYard',
     title: 'Understanding webinar organizers',
     subtitle: "A research operations effort to build a continuous feedback loop with StreamYard's webinar segment — informing 12 months of product decisions.",
-    img: 'assets/images/case-research.avif',
+    img: '/assets/images/case-research.avif',
     year: '2022', role: 'Senior Product Designer', company: 'StreamYard', duration: '3 months (ongoing)',
     keywords: ['Research Ops', 'Moderated Testing', 'Surveys', 'Segmentation', 'Insight Repository'],
     achievements: [
@@ -1624,7 +1681,7 @@ const CASES = {
     cat: 'Design Leadership · StreamYard',
     title: 'Leading and managing a design system',
     subtitle: "How I built, scaled, and maintained a component library that became the single source of truth for StreamYard's design and engineering teams.",
-    img: 'assets/images/case-ds.avif',
+    img: '/assets/images/case-ds.avif',
     year: '2022–2023', role: 'Senior Product Designer', company: 'StreamYard', duration: '18 months',
     keywords: ['Design System', 'Component Library', 'Figma', 'Accessibility', 'Tokens', 'Engineering Collaboration'],
     achievements: [
@@ -1647,7 +1704,7 @@ const CASES = {
     cat: 'Design · Talkdesk',
     title: 'Reshaping an AI training platform',
     subtitle: "Redesigning the trainer interface for Talkdesk's AI/CX platform — making it usable for non-technical users without losing power-user depth.",
-    img: 'assets/images/case-talkdesk.avif',
+    img: '/assets/images/case-talkdesk.avif',
     year: '2021', role: 'Senior Product Designer', company: 'Talkdesk', duration: '9 months',
     keywords: ['AI/ML UX', 'Enterprise SaaS', 'Information Architecture', 'Complex Workflows', 'B2B'],
     achievements: [
@@ -1670,7 +1727,7 @@ const CASES = {
     cat: 'Design · Namecheap',
     title: 'Designing a support chat experience',
     subtitle: "Building a customer support platform from the ground up for Namecheap's engineering team — reducing ticket volume and improving resolution speed.",
-    img: 'assets/images/case-namecheap.avif',
+    img: '/assets/images/case-namecheap.avif',
     year: '2019–2020', role: 'Product Designer', company: 'Namecheap', duration: '12 months',
     keywords: ['Customer Support', 'Internal Tools', 'Chat UX', 'Engineering Platform', 'B2B2C'],
     achievements: [
@@ -1777,7 +1834,6 @@ function renderCasePage(id) {
 }
 
 function switchPage(page) {
-  // Stop canvas when leaving contact
   const prevCanvas = document.getElementById('contact-canvas');
   if (prevCanvas?._stopCanvas) { prevCanvas._stopCanvas(); prevCanvas._contactReady=false; }
 
@@ -1802,7 +1858,6 @@ function switchPage(page) {
 
   window.scrollTo({ top: 0, behavior: 'auto' });
 
-  // Start constellation when entering contact
   if (page === 'contact') requestAnimationFrame(initContactCanvas);
 
   requestAnimationFrame(() => {
@@ -2109,8 +2164,28 @@ function initContactCanvas() {
     document.getElementById('page-contact')?.removeEventListener('click', onPageClick);
   };
 }
+
+/* ============================================================
+   Hero role rotator
+   ============================================================ */
+(function() {
+  const items = document.querySelectorAll('.role-item');
+  if (!items.length) return;
+  let idx = 0;
+  items[0].classList.add('is-active');
+  setInterval(() => {
+    const prev = idx;
+    idx = (idx + 1) % items.length;
+    items[prev].classList.remove('is-active');
+    items[prev].classList.add('is-prev');
+    items[idx].classList.add('is-active');
+    setTimeout(() => items[prev].classList.remove('is-prev'), 600);
+  }, 2800);
+})();
 </script>
 
-<script src="notes.js" defer></script>
+<RetuneBridge client:only="react" />
+
+<script src="/notes.js" defer></script>
 </body>
 </html>
