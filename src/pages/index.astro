@@ -11,6 +11,9 @@ import '../styles/tokens.css';
 <meta name="description" content="João Jacinto — Senior Product Designer based in Aveiro, Portugal. 10+ years designing digital products with startups and enterprises.">
 <link rel="icon" type="image/svg+xml" href="/assets/JJ.svg">
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<script is:inline>
+  (function(){var t=localStorage.getItem('jj-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');})();
+</script>
 <style is:global>
 @font-face {
   font-family: 'Mona Sans';
@@ -34,6 +37,9 @@ body {
   text-rendering: optimizeLegibility;
   line-height: 1.75;
   overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
@@ -188,6 +194,39 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   background: rgba(240,237,232,0.10);
   color: var(--fg-inverse);
 }
+.nav.nav-dark .theme-toggle {
+  border-color: rgba(240,237,232,0.22);
+  color: rgba(240,237,232,0.65);
+}
+.nav.nav-dark .theme-toggle:hover {
+  border-color: rgba(240,237,232,0.7);
+  background: rgba(240,237,232,0.10);
+  color: var(--fg-inverse);
+}
+
+/* Dark mode nav/chrome overrides */
+[data-theme="dark"] .nav.scrolled {
+  background: rgba(24, 23, 20, 0.90);
+  box-shadow: 0 1px 0 rgba(240, 237, 232, 0.06);
+}
+[data-theme="dark"] .pill-indicator {
+  background: rgba(240, 237, 232, 0.10);
+}
+[data-theme="dark"] .pill-nav a:hover:not(.active) {
+  color: rgba(240, 237, 232, 0.75);
+}
+[data-theme="dark"] .mobile-menu {
+  background: rgba(24, 23, 20, 0.97);
+}
+[data-theme="dark"] .mobile-menu a { color: var(--fg1); }
+[data-theme="dark"] .mobile-menu a.active { color: var(--accent); }
+
+/* Nav right-side group */
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
 /* LinkedIn badge */
 .li-badge {
@@ -205,6 +244,27 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   color: var(--fg-inverse);
 }
 .li-badge svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* Theme toggle */
+.theme-toggle {
+  width: 40px; height: 40px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--fg1);
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--fg1);
+  background: var(--fg1);
+  color: var(--fg-inverse);
+}
+.theme-toggle svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.theme-toggle .icon-sun  { display: none; }
+.theme-toggle .icon-moon { display: block; }
+[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+[data-theme="dark"] .theme-toggle .icon-sun  { display: block; }
 
 /* Mobile toggle */
 .nav-toggle { display: none; width: 40px; height: 40px; align-items: center; justify-content: center; }
@@ -308,7 +368,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
    Pages
    ============================================================ */
 .page { display: none; }
-.page.active { display: block; }
+.page.active { display: block; flex: 1; }
 
 /* ============================================================
    Marquee (decorative)
@@ -1005,6 +1065,16 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   color: #b00; margin: 0; min-height: 1em;
 }
 .pw-form .btn { width: 100%; justify-content: center; }
+.pw-input-wrap { position: relative; }
+.pw-input-wrap .pw-input { padding-right: 44px; }
+.pw-reveal {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--fg3); transition: color 0.2s;
+}
+.pw-reveal:hover { color: var(--fg1); }
+.pw-reveal svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* ============================================================
    Footer
@@ -1082,13 +1152,18 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       <a data-page="contact" onclick="switchPage('contact')">Contact</a>
     </div>
 
-    <a class="li-badge" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
-    </a>
-
-    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" onclick="toggleMobile()">
-      <span></span>
-    </button>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch to dark mode" onclick="toggleTheme()">
+        <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+      <a class="li-badge" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" onclick="toggleMobile()">
+        <span></span>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -1575,6 +1650,25 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 
 <script is:inline>
 /* ============================================================
+   Theme toggle
+   ============================================================ */
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('jj-theme', next);
+  const btn = document.getElementById('themeToggle');
+  if (btn) btn.setAttribute('aria-label', next === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+}
+// Sync aria-label to stored theme on load
+(function() {
+  const btn = document.getElementById('themeToggle');
+  if (!btn) return;
+  const t = document.documentElement.getAttribute('data-theme') || 'light';
+  btn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+})();
+
+/* ============================================================
    Case study data
    ============================================================ */
 const CASE_PASSWORD = 'alohomora';
@@ -1599,7 +1693,13 @@ function renderPasswordGate(caseId) {
           <h2>This case study is private</h2>
           <p>Enter the password to read this work.</p>
           <form class="pw-form" onsubmit="submitPassword(event, '${caseId}')">
-            <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="off">
+            <div class="pw-input-wrap">
+              <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="current-password">
+              <button type="button" class="pw-reveal" id="pwReveal" aria-label="Show password" onclick="togglePwReveal()">
+                <svg class="pw-eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="pw-eye-shut" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
             <p class="pw-error" id="pwError"></p>
             <button type="submit" class="btn btn-accent">
               <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
@@ -1611,6 +1711,18 @@ function renderPasswordGate(caseId) {
     </div>
   `;
   setTimeout(() => document.getElementById('pwInput')?.focus(), 50);
+}
+
+function togglePwReveal() {
+  const input = document.getElementById('pwInput');
+  const btn = document.getElementById('pwReveal');
+  if (!input || !btn) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.querySelector('.pw-eye-open').style.display = showing ? '' : 'none';
+  btn.querySelector('.pw-eye-shut').style.display = showing ? 'none' : '';
+  btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  input.focus();
 }
 
 function submitPassword(e, caseId) {
