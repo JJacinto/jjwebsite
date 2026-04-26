@@ -221,6 +221,18 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 [data-theme="dark"] .mobile-menu a { color: var(--fg1); }
 [data-theme="dark"] .mobile-menu a.active { color: var(--accent); }
 
+/* Contact page always has a dark canvas — restore fg-inverse so text stays light */
+[data-theme="dark"] #page-contact { --fg-inverse: #F0EDE8; }
+/* Nav-dark (contact page nav) must also keep fg-inverse light in dark mode */
+[data-theme="dark"] .nav.nav-dark   { --fg-inverse: #F0EDE8; }
+/* Preserve nav-dark's own scrolled/indicator/hover values against dark-mode overrides */
+[data-theme="dark"] .nav.nav-dark.scrolled {
+  background: rgba(20, 18, 16, 0.88);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+[data-theme="dark"] .nav.nav-dark .pill-indicator { background: rgba(240, 237, 232, 0.12); }
+[data-theme="dark"] .nav.nav-dark .pill-nav a:hover:not(.active) { color: rgba(240, 237, 232, 0.80); }
+
 /* Nav right-side group */
 .nav-right {
   display: flex;
@@ -816,30 +828,56 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 }
 .contact-info {
   border-top: 1px solid rgba(240,237,232,0.08);
-  padding-top: 40px;
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+  padding-top: 32px;
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left;
 }
-.contact-info-item {
-  padding: 16px; border-radius: 12px;
-  transition: background 0.2s;
+.contact-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 14px;
+  border: 1px solid rgba(240,237,232,0.08);
+  background: rgba(240,237,232,0.03);
+  transition: background 0.2s, border-color 0.2s;
 }
-.contact-info-item[data-link] { cursor: pointer; }
-.contact-info-item[data-link]:hover { background: rgba(240,237,232,0.05); }
-.contact-info-label {
-  font-family: var(--font-body); font-size: 0.72rem;
+.contact-card:hover { background: rgba(240,237,232,0.07); border-color: rgba(240,237,232,0.16); }
+.contact-card-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  background: rgba(112,112,238,0.16); border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #8080F0;
+}
+.contact-card-icon svg { width: 18px; height: 18px; }
+.contact-card-body { flex: 1; min-width: 0; }
+.contact-card-label {
+  font-family: var(--font-body); font-size: 0.70rem;
   color: rgba(240,237,232,0.35);
-  text-transform: uppercase; letter-spacing: 0.06em;
-  margin-bottom: 8px;
+  text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px;
 }
-.contact-info-value {
-  font-family: var(--font-body); font-size: 0.9rem;
-  color: var(--fg-inverse); margin-bottom: 4px;
-  word-break: break-word;
+.contact-card-value {
+  font-family: var(--font-body); font-size: 0.88rem;
+  color: var(--fg-inverse); word-break: break-word;
 }
-.contact-info-hint {
-  font-family: var(--font-body); font-size: 0.72rem;
-  color: var(--accent);
+.contact-card-sub {
+  font-family: var(--font-body); font-size: 0.70rem;
+  color: rgba(240,237,232,0.30); margin-top: 2px;
 }
+.contact-card-action {
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 8px;
+  font-family: var(--font-body); font-size: 0.76rem;
+  color: #8080F0;
+  border: 1px solid rgba(112,112,238,0.25);
+  background: rgba(112,112,238,0.08);
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+}
+.contact-card-action:hover {
+  background: rgba(112,112,238,0.20);
+  border-color: rgba(112,112,238,0.50);
+  color: #A0A0F8;
+}
+.contact-card-action svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 /* ============================================================
    CASE DETAIL
@@ -1122,7 +1160,6 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   .cases-grid,
   .cases-grid-row-2 { grid-template-columns: 1fr; }
   .journey-row { grid-template-columns: 1fr; gap: 8px; }
-  .contact-info { grid-template-columns: 1fr; }
   .contact { padding: 100px 20px 60px; }
   .case-meta-grid { grid-template-columns: 1fr 1fr; }
   .pull-quote { padding-left: 20px; }
@@ -1605,7 +1642,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       <p class="contact-body">Whether it's a product challenge, a collaboration, or just a good conversation — I'm always open to hearing from you.</p>
 
       <div class="contact-ctas">
-        <a class="btn btn-accent" id="contact-email-btn" href="mailto:jjacinto.mail@gmail.com">
+        <a class="btn btn-accent" id="contact-email-btn" href="mailto:contact@joaojacinto.com">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
           <span>Send an email</span>
         </a>
@@ -1616,20 +1653,41 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
       </div>
 
       <div class="contact-info">
-        <div class="contact-info-item" data-link onclick="copyEmail(this)">
-          <div class="contact-info-label">Email</div>
-          <div class="contact-info-value">jjacinto.mail@gmail.com</div>
-          <div class="contact-info-hint" id="emailHint">Click to copy</div>
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Email</div>
+            <div class="contact-card-value">contact@joaojacinto.com</div>
+          </div>
+          <button class="contact-card-action" onclick="copyEmail(this)" aria-label="Copy email address">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="emailHint">Copy</span>
+          </button>
         </div>
-        <div class="contact-info-item" data-link onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/', '_blank')">
-          <div class="contact-info-label">LinkedIn</div>
-          <div class="contact-info-value">joaofranciscojacinto</div>
-          <div class="contact-info-hint">Open ↗</div>
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">LinkedIn</div>
+            <div class="contact-card-value">joaofranciscojacinto</div>
+          </div>
+          <a class="contact-card-action" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="Open LinkedIn profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            <span>Open</span>
+          </a>
         </div>
-        <div class="contact-info-item">
-          <div class="contact-info-label">Location</div>
-          <div class="contact-info-value">Aveiro, Portugal</div>
-          <div class="contact-info-hint">UTC+0/+1</div>
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Location</div>
+            <div class="contact-card-value">Aveiro, Portugal</div>
+            <div class="contact-card-sub">UTC+0/+1</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2028,7 +2086,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
    Contact helpers
    ============================================================ */
 function copyEmail(el) {
-  navigator.clipboard?.writeText('jjacinto.mail@gmail.com').then(() => {
+  navigator.clipboard?.writeText('contact@joaojacinto.com').then(() => {
     const hint = document.getElementById('emailHint');
     if (!hint) return;
     const original = hint.textContent;
