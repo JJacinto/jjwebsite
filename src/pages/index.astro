@@ -660,7 +660,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   z-index: 1;
   pointer-events: none;
   transition: opacity 0.35s ease;
-  border-radius: inherit;
+  border-radius: 14px; /* card radius (20px) minus border (6px) = inner clip radius */
 }
 .case-card:hover::before { opacity: 1; }
 .case-card::after,
@@ -773,6 +773,13 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   padding: 8px 0;
   border-bottom: 1px solid var(--border);
 }
+.about-col li a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 0.2s;
+}
+.about-col li a:hover { text-decoration-color: currentColor; }
 
 .journey { margin-bottom: 72px; }
 .journey .eyebrow { display: block; margin-bottom: 36px; }
@@ -858,15 +865,15 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 }
 .contact h1 {
   color: var(--fg-inverse);
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  letter-spacing: -0.04em; line-height: 1.08;
+  font-size: clamp(2.2rem, 4vw, 3.75rem);
+  letter-spacing: -0.04em; line-height: 1;
   margin-bottom: 14px;
 }
 .contact-subtitle {
-  font-family: var(--font-display); font-weight: 900;
+  font-family: var(--font-display); font-weight: 800;
   font-size: clamp(1.4rem, 2.5vw, 2rem);
   letter-spacing: -0.03em; line-height: 1.1;
-  color: rgba(240,237,232,0.25);
+  color: rgba(240,237,232,0.41);
   margin-bottom: 28px;
 }
 .contact-body {
@@ -1524,8 +1531,8 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
           <div class="about-col reveal reveal-d1">
             <h3>I'm…</h3>
             <ul>
-              <li>An Enneagram type 5</li>
-              <li>An INTJ-A</li>
+              <li><a href="https://www.enneagraminstitute.com/type-5/" target="_blank" rel="noopener noreferrer">An Enneagram type 5</a></li>
+              <li>An <a href="https://www.16personalities.com/intj-personality" target="_blank" rel="noopener noreferrer">INTJ-A</a></li>
             </ul>
           </div>
           <div class="about-col reveal reveal-d2">
@@ -1566,7 +1573,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
           </div>
         </div>
         <div class="journey-row reveal">
-          <div class="journey-year">2022–2024</div>
+          <div class="journey-year">2021–2024</div>
           <div>
             <div class="journey-title">
               <span class="journey-role">Senior Product Designer</span>
@@ -1576,23 +1583,13 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
           </div>
         </div>
         <div class="journey-row reveal">
-          <div class="journey-year">2021–2022</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">Senior Product Designer</span>
-              <span class="journey-co">@ Hopin</span>
-            </div>
-            <p class="journey-desc">Virtual events. Product design across attendee experience and networking features.</p>
-          </div>
-        </div>
-        <div class="journey-row reveal">
-          <div class="journey-year">2019–2021</div>
+          <div class="journey-year">2019–2020</div>
           <div>
             <div class="journey-title">
               <span class="journey-role">Senior Product Designer</span>
               <span class="journey-co">@ Talkdesk</span>
             </div>
-            <p class="journey-desc">AI/CX platform. Redesigned the AI trainer interface for non-technical users.</p>
+            <p class="journey-desc">Worked on the AI trainer to improve model training workflows for CX agents.</p>
           </div>
         </div>
         <div class="journey-row reveal">
@@ -1756,12 +1753,12 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
           </div>
           <div class="contact-card-body">
             <div class="contact-card-label">Location</div>
-            <div class="contact-card-value">Aveiro, Portugal</div>
             <div class="contact-card-sub">UTC+0/+1</div>
+            <div class="contact-card-value">Aveiro, Portugal</div>
           </div>
           <a class="contact-card-action" href="https://www.google.com/maps/@40.6405,-8.6538,13z" target="_blank" rel="noopener noreferrer" aria-label="View Aveiro on Google Maps">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>Map</span>
+            <span>View map</span>
           </a>
         </div>
       </div>
