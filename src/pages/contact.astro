@@ -18,9 +18,9 @@ import Base from '../layouts/Base.astro';
       <p class="contact-body">Whether it's a product challenge, a collaboration, or just a good conversation — I'm always open to hearing from you.</p>
 
       <div class="contact-ctas">
-        <a class="btn btn-accent" id="contact-email-btn" href="mailto:contact@joaojacinto.com">
+        <a class="btn btn-accent" id="compose-open" href="mailto:contact@joaojacinto.com?subject=Hello">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Send an email</span>
+          <span>Send a message</span>
         </a>
         <a class="btn btn-dark-outline" id="contact-linkedin-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
@@ -73,6 +73,7 @@ import Base from '../layouts/Base.astro';
         </div>
       </div>
     </div>
+    <div id="compose-root"></div>
   </section>
 
 </Base>
@@ -203,7 +204,7 @@ let _contactRAF = null;
   };
   if (contactSection) contactSection.addEventListener('click', onPageClick);
 
-  const emailBtn = document.getElementById('contact-email-btn');
+  const emailBtn = document.getElementById('compose-open');
   const linkedinBtn = document.getElementById('contact-linkedin-btn');
   if (emailBtn) {
     emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:61,cb:181}; triggerMode(); });
@@ -314,4 +315,229 @@ let _contactRAF = null;
 
   draw();
 })();
+
+/* Compose modal */
+(function () {
+  const INTENTS = [
+    {
+      label: 'Custom message',
+      subject: 'Hello João',
+      body: 'Hi João,\n\n[your message]\n\nThanks,\n'
+    },
+    {
+      label: 'Ask for a code review',
+      subject: 'Code review request',
+      body: "Hi João,\n\nI'm working on [project] and would value a fresh pair of eyes. Specifically, I'd love your read on:\n\n– [thing 1]\n– [thing 2]\n\nRepo / Figma: [link]\n\nThanks,\n"
+    },
+    {
+      label: 'Mentor me',
+      subject: 'Mentorship — quick intro',
+      body: "Hi João,\n\nI'm a [role / years of experience] working on [domain]. I've been following your work on [thing] and would love 30 minutes to ask you about [specific question].\n\nHappy to work around your schedule.\n\nThanks,\n"
+    },
+    {
+      label: 'Work together',
+      subject: "Project — let's talk",
+      body: "Hi João,\n\nWe're building [product / company] and are looking for help with [problem]. Timeline: [when]. Budget range: [if known].\n\nWould you be open to a short call?\n\nThanks,\n"
+    },
+    {
+      label: 'Just saying hi',
+      subject: 'Hello from [your name]',
+      body: 'Hi João,\n\nFound your site via [where]. Wanted to say [thing you wanted to say]. No agenda — just appreciated the work.\n\n'
+    }
+  ];
+
+  let mounted   = false;
+  let intentIdx = 0;
+  let dirtySubj = false;
+  let dirtyBody = false;
+
+  const autoGrow = (el) => {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 264) + 'px';
+  };
+
+  const updateSendLabel = () => {
+    const btn  = document.getElementById('compose-send');
+    const subj = document.getElementById('compose-subject');
+    if (btn && subj) btn.setAttribute('aria-label', `Open in email — ${subj.value}`);
+  };
+
+  const applyIntent = (idx) => {
+    const { subject, body } = INTENTS[idx];
+    const subjEl = document.getElementById('compose-subject');
+    const bodyEl = document.getElementById('compose-body');
+    if (!dirtySubj && subjEl) subjEl.value = subject;
+    if (!dirtyBody && bodyEl) { bodyEl.value = body; autoGrow(bodyEl); }
+    updateSendLabel();
+  };
+
+  const buildMailto = () => {
+    const subj = document.getElementById('compose-subject')?.value ?? '';
+    const body = document.getElementById('compose-body')?.value ?? '';
+    const addr = ['contact', '\x40', 'joaojacinto.com'].join('');
+    return `mailto:${addr}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const getHTML = () => {
+    const chipsHTML = INTENTS.map((intent, i) =>
+      `<button class="intent-chip" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" tabindex="${i === 0 ? 0 : -1}" data-idx="${i}" type="button">${intent.label}</button>`
+    ).join('');
+    return `
+<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">
+  <div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"
+       aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">
+    <div class="compose-header">
+      <span class="eyebrow" id="compose-eyebrow">Compose a message</span>
+      <h2 id="compose-heading">What brings you here?</h2>
+    </div>
+    <div class="intent-chips" role="radiogroup" aria-label="Message intent">${chipsHTML}</div>
+    <div class="compose-field">
+      <div class="compose-field-label-row">
+        <label class="eyebrow" for="compose-subject">Subject</label>
+        <button class="compose-reset" id="reset-subject" type="button" aria-label="Reset subject to template">Reset to template</button>
+      </div>
+      <input class="compose-input" id="compose-subject" type="text" autocomplete="off" value="">
+    </div>
+    <div class="compose-field">
+      <div class="compose-field-label-row">
+        <label class="eyebrow" for="compose-body">Message</label>
+        <button class="compose-reset" id="reset-body" type="button" aria-label="Reset message to template">Reset to template</button>
+      </div>
+      <textarea class="compose-textarea" id="compose-body" rows="6" autocomplete="off"></textarea>
+    </div>
+    <div class="compose-footer">
+      <p class="compose-caption">Opens in your email client. No data leaves this page until you hit send in your inbox.</p>
+      <div class="compose-footer-actions">
+        <button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>
+        <button class="btn btn-accent" id="compose-send" type="button" aria-label="Open in email">
+          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
+          <span>Open in email</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>`;
+  };
+
+  const closeModal = () => {
+    const bd = document.getElementById('compose-backdrop');
+    if (!bd) return;
+    bd.classList.remove('is-open');
+    bd.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    document.getElementById('compose-open')?.focus();
+  };
+
+  const bindEvents = () => {
+    const bd       = document.getElementById('compose-backdrop');
+    const modal    = document.getElementById('compose-modal');
+    const chips    = Array.from(document.querySelectorAll('.intent-chip'));
+    const subjEl   = document.getElementById('compose-subject');
+    const bodyEl   = document.getElementById('compose-body');
+    const resetS   = document.getElementById('reset-subject');
+    const resetB   = document.getElementById('reset-body');
+    const cancelBtn = document.getElementById('compose-cancel');
+    const sendBtn  = document.getElementById('compose-send');
+
+    applyIntent(0);
+    autoGrow(bodyEl);
+
+    bd.addEventListener('click', (e) => { if (e.target === bd) closeModal(); });
+
+    const selectIntent = (idx) => {
+      intentIdx = idx;
+      chips.forEach((c, i) => {
+        c.setAttribute('aria-checked', String(i === idx));
+        c.setAttribute('tabindex', i === idx ? '0' : '-1');
+      });
+      applyIntent(idx);
+    };
+
+    chips.forEach((chip, i) => {
+      chip.addEventListener('click', () => selectIntent(i));
+      chip.addEventListener('keydown', (e) => {
+        const len = chips.length;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          const next = (i + 1) % len;
+          selectIntent(next); chips[next].focus();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const prev = (i - 1 + len) % len;
+          selectIntent(prev); chips[prev].focus();
+        }
+      });
+    });
+
+    subjEl.addEventListener('input', () => {
+      dirtySubj = true;
+      resetS.classList.add('is-visible');
+      updateSendLabel();
+    });
+
+    bodyEl.addEventListener('input', () => {
+      dirtyBody = true;
+      resetB.classList.add('is-visible');
+      autoGrow(bodyEl);
+    });
+
+    resetS.addEventListener('click', () => {
+      subjEl.value = INTENTS[intentIdx].subject;
+      dirtySubj = false;
+      resetS.classList.remove('is-visible');
+      updateSendLabel();
+      subjEl.focus();
+    });
+
+    resetB.addEventListener('click', () => {
+      bodyEl.value = INTENTS[intentIdx].body;
+      dirtyBody = false;
+      resetB.classList.remove('is-visible');
+      autoGrow(bodyEl);
+      bodyEl.focus();
+    });
+
+    cancelBtn.addEventListener('click', closeModal);
+    sendBtn.addEventListener('click', () => { window.location.href = buildMailto(); });
+
+    const getFocusable = () => Array.from(
+      modal.querySelectorAll('button:not([disabled]):not([tabindex="-1"]), input, textarea')
+    ).filter(el => getComputedStyle(el).display !== 'none');
+
+    modal.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (e.key !== 'Tab') return;
+      const focusable = getFocusable();
+      if (!focusable.length) return;
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+  };
+
+  const openModal = () => {
+    if (!mounted) {
+      const root = document.getElementById('compose-root');
+      if (!root) return;
+      root.innerHTML = getHTML();
+      mounted = true;
+      bindEvents();
+    }
+    const bd = document.getElementById('compose-backdrop');
+    if (!bd) return;
+    bd.removeAttribute('aria-hidden');
+    bd.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    bd.querySelector('.intent-chip[aria-checked="true"]')?.focus();
+  };
+
+  document.getElementById('compose-open')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal();
+  });
+}());
 </script>

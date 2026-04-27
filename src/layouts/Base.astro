@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import RetuneBridge from '../components/RetuneBridge.tsx';
 
 interface Props {
   title?: string;
@@ -199,5 +200,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 </script>
 
 <script src="/notes.js" defer></script>
+
+<RetuneBridge client:only="react" />
 </body>
 </html>
