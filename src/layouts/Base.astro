@@ -90,15 +90,52 @@ window.addEventListener('scroll', () => {
 /* Pill indicator */
 const pillNav  = document.getElementById('pillNav');
 const pillIndicator = document.getElementById('pillIndicator');
+function getPillPos(link) {
+  const navRect = pillNav.getBoundingClientRect();
+  const aRect   = link.getBoundingClientRect();
+  return { left: aRect.left - navRect.left, width: aRect.width };
+}
 function movePillIndicator() {
   const active = pillNav.querySelector('a.active');
   if (!active) { pillIndicator.style.width = '0'; return; }
-  const navRect = pillNav.getBoundingClientRect();
-  const aRect   = active.getBoundingClientRect();
-  pillIndicator.style.left  = (aRect.left - navRect.left) + 'px';
-  pillIndicator.style.width = aRect.width + 'px';
+  const pos = getPillPos(active);
+  pillIndicator.style.transition = 'none';
+  pillIndicator.style.left  = pos.left + 'px';
+  pillIndicator.style.width = pos.width + 'px';
+  requestAnimationFrame(() => { pillIndicator.style.transition = ''; });
 }
-window.addEventListener('load', movePillIndicator);
+/* Cross-page slide: save position before navigating, restore & animate on next page */
+pillNav.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    const active = pillNav.querySelector('a.active');
+    if (!active) return;
+    const pos = getPillPos(active);
+    sessionStorage.setItem('pillFrom', JSON.stringify(pos));
+  });
+});
+window.addEventListener('load', () => {
+  const active = pillNav.querySelector('a.active');
+  if (!active) { pillIndicator.style.width = '0'; return; }
+  const toPos = getPillPos(active);
+  const saved = sessionStorage.getItem('pillFrom');
+  sessionStorage.removeItem('pillFrom');
+  if (saved) {
+    const from = JSON.parse(saved);
+    pillIndicator.style.transition = 'none';
+    pillIndicator.style.left  = from.left + 'px';
+    pillIndicator.style.width = from.width + 'px';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pillIndicator.style.transition = '';
+      pillIndicator.style.left  = toPos.left + 'px';
+      pillIndicator.style.width = toPos.width + 'px';
+    }));
+  } else {
+    pillIndicator.style.transition = 'none';
+    pillIndicator.style.left  = toPos.left + 'px';
+    pillIndicator.style.width = toPos.width + 'px';
+    requestAnimationFrame(() => { pillIndicator.style.transition = ''; });
+  }
+});
 window.addEventListener('resize', movePillIndicator);
 
 /* Mobile menu */

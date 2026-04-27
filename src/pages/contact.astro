@@ -325,24 +325,14 @@ let _contactRAF = null;
       body: 'Hi João,\n\n[your message]\n\nThanks,\n'
     },
     {
-      label: 'Ask for a code review',
-      subject: 'Code review request',
-      body: "Hi João,\n\nI'm working on [project] and would value a fresh pair of eyes. Specifically, I'd love your read on:\n\n– [thing 1]\n– [thing 2]\n\nRepo / Figma: [link]\n\nThanks,\n"
-    },
-    {
-      label: 'Mentor me',
-      subject: 'Mentorship — quick intro',
-      body: "Hi João,\n\nI'm a [role / years of experience] working on [domain]. I've been following your work on [thing] and would love 30 minutes to ask you about [specific question].\n\nHappy to work around your schedule.\n\nThanks,\n"
-    },
-    {
       label: 'Work together',
       subject: "Project — let's talk",
       body: "Hi João,\n\nWe're building [product / company] and are looking for help with [problem]. Timeline: [when]. Budget range: [if known].\n\nWould you be open to a short call?\n\nThanks,\n"
     },
     {
-      label: 'Just saying hi',
-      subject: 'Hello from [your name]',
-      body: 'Hi João,\n\nFound your site via [where]. Wanted to say [thing you wanted to say]. No agenda — just appreciated the work.\n\n'
+      label: 'Mentor me',
+      subject: 'Mentorship — quick intro',
+      body: "Hi João,\n\nI'm a [role / years of experience] working on [domain]. I've been following your work on [thing] and would love 30 minutes to ask you about [specific question].\n\nHappy to work around your schedule.\n\nThanks,\n"
     }
   ];
 
@@ -360,7 +350,7 @@ let _contactRAF = null;
   const updateSendLabel = () => {
     const btn  = document.getElementById('compose-send');
     const subj = document.getElementById('compose-subject');
-    if (btn && subj) btn.setAttribute('aria-label', `Open in email — ${subj.value}`);
+    if (btn && subj) btn.setAttribute('aria-label', `Submit message — ${subj.value}`);
   };
 
   const applyIntent = (idx) => {
@@ -372,47 +362,229 @@ let _contactRAF = null;
     updateSendLabel();
   };
 
-  const buildMailto = () => {
-    const subj = document.getElementById('compose-subject')?.value ?? '';
-    const body = document.getElementById('compose-body')?.value ?? '';
-    const addr = ['contact', '\x40', 'joaojacinto.com'].join('');
-    return `mailto:${addr}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+  const getWorkFieldsHTML = () => `
+<div class="compose-field">
+  <span class="eyebrow">What are you building?</span>
+  <div class="form-toggle" data-field="productType">
+    <button class="form-toggle-btn is-selected" data-val="Web app" type="button">Web app</button>
+    <button class="form-toggle-btn" data-val="Mobile app" type="button">Mobile app</button>
+    <button class="form-toggle-btn" data-val="Design system" type="button">Design system</button>
+    <button class="form-toggle-btn" data-val="AI product" type="button">AI product</button>
+    <button class="form-toggle-btn" data-val="Other" type="button">Other</button>
+  </div>
+</div>
+<div class="compose-field">
+  <span class="eyebrow">Budget range</span>
+  <div class="form-radio-group">
+    <label class="form-radio"><input type="radio" name="work-budget" value="&lt; $5k"><span>&lt; $5k</span></label>
+    <label class="form-radio"><input type="radio" name="work-budget" value="$5k–$20k"><span>$5k–$20k</span></label>
+    <label class="form-radio"><input type="radio" name="work-budget" value="$20k–$50k"><span>$20k–$50k</span></label>
+    <label class="form-radio"><input type="radio" name="work-budget" value="$50k+"><span>$50k+</span></label>
+    <label class="form-radio"><input type="radio" name="work-budget" value="Let's discuss"><span>Let's discuss</span></label>
+  </div>
+</div>
+<div class="compose-field">
+  <div class="form-slider-row">
+    <span class="eyebrow">Urgency</span>
+    <span class="form-slider-val" id="work-urgency-val">Flexible</span>
+  </div>
+  <input class="form-slider" type="range" id="work-urgency" min="1" max="4" value="2" step="1">
+  <div class="form-slider-ticks"><span>Exploring</span><span>Flexible</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>
+</div>
+<div class="compose-field">
+  <span class="eyebrow">What kind of help do you need?</span>
+  <div class="form-check-group">
+    <label class="form-check"><input type="checkbox" value="UX Design"><span>UX Design</span></label>
+    <label class="form-check"><input type="checkbox" value="UI Design"><span>UI Design</span></label>
+    <label class="form-check"><input type="checkbox" value="Prototyping"><span>Prototyping</span></label>
+    <label class="form-check"><input type="checkbox" value="Design System"><span>Design System</span></label>
+    <label class="form-check"><input type="checkbox" value="UX Research"><span>UX Research</span></label>
+    <label class="form-check"><input type="checkbox" value="AI tooling"><span>AI tooling</span></label>
+  </div>
+</div>
+<div class="compose-field">
+  <label class="eyebrow" for="work-context">Tell me about the project</label>
+  <textarea class="compose-textarea" id="work-context" rows="3" autocomplete="off" placeholder="What are you building, for whom, and what's the biggest design challenge right now?"></textarea>
+</div>`;
+
+  const getMentorFieldsHTML = () => `
+<div class="compose-field">
+  <span class="eyebrow">Your experience level</span>
+  <div class="form-toggle" data-field="experience">
+    <button class="form-toggle-btn is-selected" data-val="Student" type="button">Student</button>
+    <button class="form-toggle-btn" data-val="Junior (0–2y)" type="button">Junior (0–2y)</button>
+    <button class="form-toggle-btn" data-val="Mid (2–5y)" type="button">Mid (2–5y)</button>
+    <button class="form-toggle-btn" data-val="Senior (5y+)" type="button">Senior (5y+)</button>
+  </div>
+</div>
+<div class="compose-field">
+  <span class="eyebrow">What would you like to work on?</span>
+  <div class="form-check-group">
+    <label class="form-check"><input type="checkbox" value="Product Design"><span>Product Design</span></label>
+    <label class="form-check"><input type="checkbox" value="Design Systems"><span>Design Systems</span></label>
+    <label class="form-check"><input type="checkbox" value="Building with AI"><span>Building with AI</span></label>
+    <label class="form-check"><input type="checkbox" value="UX Research"><span>UX Research</span></label>
+    <label class="form-check"><input type="checkbox" value="Career Growth"><span>Career Growth</span></label>
+    <label class="form-check"><input type="checkbox" value="Portfolio review"><span>Portfolio review</span></label>
+    <label class="form-check"><input type="checkbox" value="Mock interview"><span>Mock interview</span></label>
+  </div>
+</div>
+<div class="compose-field">
+  <span class="eyebrow">What format are you looking for?</span>
+  <div class="form-radio-group">
+    <label class="form-radio"><input type="radio" name="mentor-format" value="One-time session"><span>One-time session</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-format" value="Ongoing mentorship"><span>Ongoing mentorship</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-format" value="Portfolio review"><span>Portfolio review</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-format" value="Quick question"><span>Quick question</span></label>
+  </div>
+</div>
+<div class="compose-field">
+  <span class="eyebrow">Budget per session</span>
+  <div class="form-radio-group">
+    <label class="form-radio"><input type="radio" name="mentor-budget" value="Open to exchange"><span>Open to exchange</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-budget" value="$50–$100"><span>$50–$100</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-budget" value="$100–$200"><span>$100–$200</span></label>
+    <label class="form-radio"><input type="radio" name="mentor-budget" value="$200+"><span>$200+</span></label>
+  </div>
+</div>
+<div class="compose-field">
+  <label class="eyebrow" for="mentor-context">Where are you and where do you want to go?</label>
+  <textarea class="compose-textarea" id="mentor-context" rows="3" autocomplete="off" placeholder="Current situation, what you're struggling with, what success looks like for you…"></textarea>
+</div>`;
+
+  const bindFormToggle = (container) => {
+    container.querySelectorAll('.form-toggle').forEach(group => {
+      const fbtns = group.querySelectorAll('.form-toggle-btn');
+      fbtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          fbtns.forEach(b => b.classList.remove('is-selected'));
+          btn.classList.add('is-selected');
+        });
+      });
+    });
+  };
+
+  const bindWorkSlider = (container) => {
+    const slider = container.querySelector('#work-urgency');
+    const val    = container.querySelector('#work-urgency-val');
+    const labels = ['Exploring', 'Flexible', 'Soon (1–3 mo)', 'ASAP'];
+    slider?.addEventListener('input', () => { val.textContent = labels[+slider.value - 1]; });
+  };
+
+  const showFields = (idx) => {
+    const label    = INTENTS[idx].label;
+    const std      = document.getElementById('compose-fields-standard');
+    const isWork   = label === 'Work together';
+    const isMentor = label === 'Mentor me';
+    std.style.display = (isWork || isMentor) ? 'none' : '';
+
+    let workEl   = document.getElementById('compose-fields-work');
+    let mentorEl = document.getElementById('compose-fields-mentor');
+
+    if (isWork && !workEl) {
+      workEl = document.createElement('div');
+      workEl.id = 'compose-fields-work';
+      workEl.innerHTML = getWorkFieldsHTML();
+      std.insertAdjacentElement('afterend', workEl);
+      bindFormToggle(workEl);
+      bindWorkSlider(workEl);
+    } else if (workEl) {
+      workEl.style.display = isWork ? '' : 'none';
+    }
+
+    const anchor = document.getElementById('compose-fields-work') || std;
+    if (isMentor && !mentorEl) {
+      mentorEl = document.createElement('div');
+      mentorEl.id = 'compose-fields-mentor';
+      mentorEl.innerHTML = getMentorFieldsHTML();
+      anchor.insertAdjacentElement('afterend', mentorEl);
+      bindFormToggle(mentorEl);
+    } else if (mentorEl) {
+      mentorEl.style.display = isMentor ? '' : 'none';
+    }
+  };
+
+  const collectFormData = () => {
+    const label = INTENTS[intentIdx].label;
+    if (label === 'Work together') {
+      const productType = document.querySelector('#compose-fields-work .form-toggle .is-selected')?.dataset.val ?? 'Not specified';
+      const budget      = document.querySelector('#compose-fields-work input[name="work-budget"]:checked')?.value ?? 'Not specified';
+      const urgency     = document.getElementById('work-urgency-val')?.textContent ?? 'Not specified';
+      const services    = Array.from(document.querySelectorAll('#compose-fields-work .form-check input:checked')).map(el => el.value);
+      const context     = document.getElementById('work-context')?.value ?? '';
+      return {
+        subject: `Project inquiry — ${productType}`,
+        message: [
+          `Product type: ${productType}`,
+          `Budget: ${budget}`,
+          `Urgency: ${urgency}`,
+          services.length ? `Services: ${services.join(', ')}` : null,
+          context ? `\nProject details:\n${context}` : null,
+        ].filter(Boolean).join('\n')
+      };
+    }
+    if (label === 'Mentor me') {
+      const experience = document.querySelector('#compose-fields-mentor .form-toggle .is-selected')?.dataset.val ?? 'Not specified';
+      const topics     = Array.from(document.querySelectorAll('#compose-fields-mentor .form-check input:checked')).map(el => el.value);
+      const format     = document.querySelector('#compose-fields-mentor input[name="mentor-format"]:checked')?.value ?? 'Not specified';
+      const budget     = document.querySelector('#compose-fields-mentor input[name="mentor-budget"]:checked')?.value ?? 'Not specified';
+      const context    = document.getElementById('mentor-context')?.value ?? '';
+      return {
+        subject: `Mentorship inquiry — ${experience}`,
+        message: [
+          `Experience: ${experience}`,
+          topics.length ? `Focus: ${topics.join(', ')}` : null,
+          `Format: ${format}`,
+          `Budget: ${budget}`,
+          context ? `\nAbout me:\n${context}` : null,
+        ].filter(Boolean).join('\n')
+      };
+    }
+    return {
+      subject: document.getElementById('compose-subject')?.value ?? '',
+      message: document.getElementById('compose-body')?.value ?? '',
+    };
   };
 
   const getHTML = () => {
-    const chipsHTML = INTENTS.map((intent, i) =>
-      `<button class="intent-chip" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" tabindex="${i === 0 ? 0 : -1}" data-idx="${i}" type="button">${intent.label}</button>`
+    const btnsHTML = INTENTS.map((intent, i) =>
+      `<button class="intent-btn" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" tabindex="${i === 0 ? 0 : -1}" data-idx="${i}" type="button">${intent.label}</button>`
     ).join('');
     return `
 <div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">
   <div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"
        aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">
     <div class="compose-header">
-      <span class="eyebrow" id="compose-eyebrow">Compose a message</span>
+      <span class="eyebrow" id="compose-eyebrow">Let's talk</span>
       <h2 id="compose-heading">What brings you here?</h2>
     </div>
-    <div class="intent-chips" role="radiogroup" aria-label="Message intent">${chipsHTML}</div>
-    <div class="compose-field">
-      <div class="compose-field-label-row">
-        <label class="eyebrow" for="compose-subject">Subject</label>
-        <button class="compose-reset" id="reset-subject" type="button" aria-label="Reset subject to template">Reset to template</button>
+    <div class="intent-toggle" role="radiogroup" aria-label="Message intent">${btnsHTML}</div>
+    <div id="compose-fields-standard">
+      <div class="compose-field">
+        <div class="compose-field-label-row">
+          <label class="eyebrow" for="compose-subject">Subject</label>
+          <button class="compose-reset" id="reset-subject" type="button" aria-label="Reset subject to template">Reset to template</button>
+        </div>
+        <input class="compose-input" id="compose-subject" type="text" autocomplete="off" value="">
       </div>
-      <input class="compose-input" id="compose-subject" type="text" autocomplete="off" value="">
-    </div>
-    <div class="compose-field">
-      <div class="compose-field-label-row">
-        <label class="eyebrow" for="compose-body">Message</label>
-        <button class="compose-reset" id="reset-body" type="button" aria-label="Reset message to template">Reset to template</button>
+      <div class="compose-field">
+        <div class="compose-field-label-row">
+          <label class="eyebrow" for="compose-body">Message</label>
+          <button class="compose-reset" id="reset-body" type="button" aria-label="Reset message to template">Reset to template</button>
+        </div>
+        <textarea class="compose-textarea" id="compose-body" rows="6" autocomplete="off"></textarea>
       </div>
-      <textarea class="compose-textarea" id="compose-body" rows="6" autocomplete="off"></textarea>
     </div>
     <div class="compose-footer">
-      <p class="compose-caption">Opens in your email client. No data leaves this page until you hit send in your inbox.</p>
+      <button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        <span id="compose-copy-hint">Copy my email address</span>
+      </button>
       <div class="compose-footer-actions">
         <button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>
-        <button class="btn btn-accent" id="compose-send" type="button" aria-label="Open in email">
+        <button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Open in email</span>
+          <span>Submit</span>
         </button>
       </div>
     </div>
@@ -429,16 +601,20 @@ let _contactRAF = null;
     document.getElementById('compose-open')?.focus();
   };
 
+  const FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'; // TODO: replace with your Formspree endpoint
+
   const bindEvents = () => {
-    const bd       = document.getElementById('compose-backdrop');
-    const modal    = document.getElementById('compose-modal');
-    const chips    = Array.from(document.querySelectorAll('.intent-chip'));
-    const subjEl   = document.getElementById('compose-subject');
-    const bodyEl   = document.getElementById('compose-body');
-    const resetS   = document.getElementById('reset-subject');
-    const resetB   = document.getElementById('reset-body');
+    const bd        = document.getElementById('compose-backdrop');
+    const modal     = document.getElementById('compose-modal');
+    const btns      = Array.from(document.querySelectorAll('.intent-btn'));
+    const subjEl    = document.getElementById('compose-subject');
+    const bodyEl    = document.getElementById('compose-body');
+    const resetS    = document.getElementById('reset-subject');
+    const resetB    = document.getElementById('reset-body');
     const cancelBtn = document.getElementById('compose-cancel');
-    const sendBtn  = document.getElementById('compose-send');
+    const sendBtn   = document.getElementById('compose-send');
+    const copyBtn   = document.getElementById('compose-copy-email');
+    const copyHint  = document.getElementById('compose-copy-hint');
 
     applyIntent(0);
     autoGrow(bodyEl);
@@ -447,25 +623,26 @@ let _contactRAF = null;
 
     const selectIntent = (idx) => {
       intentIdx = idx;
-      chips.forEach((c, i) => {
-        c.setAttribute('aria-checked', String(i === idx));
-        c.setAttribute('tabindex', i === idx ? '0' : '-1');
+      btns.forEach((b, i) => {
+        b.setAttribute('aria-checked', String(i === idx));
+        b.setAttribute('tabindex', i === idx ? '0' : '-1');
       });
-      applyIntent(idx);
+      showFields(idx);
+      if (INTENTS[idx].label === 'Custom message') applyIntent(idx);
     };
 
-    chips.forEach((chip, i) => {
-      chip.addEventListener('click', () => selectIntent(i));
-      chip.addEventListener('keydown', (e) => {
-        const len = chips.length;
+    btns.forEach((btn, i) => {
+      btn.addEventListener('click', () => selectIntent(i));
+      btn.addEventListener('keydown', (e) => {
+        const len = btns.length;
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
           const next = (i + 1) % len;
-          selectIntent(next); chips[next].focus();
+          selectIntent(next); btns[next].focus();
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
           e.preventDefault();
           const prev = (i - 1 + len) % len;
-          selectIntent(prev); chips[prev].focus();
+          selectIntent(prev); btns[prev].focus();
         }
       });
     });
@@ -498,8 +675,38 @@ let _contactRAF = null;
       bodyEl.focus();
     });
 
+    copyBtn?.addEventListener('click', () => {
+      const addr = ['contact', '\x40', 'joaojacinto.com'].join('');
+      navigator.clipboard?.writeText(addr).then(() => {
+        if (!copyHint) return;
+        copyHint.textContent = 'Copied!';
+        setTimeout(() => { copyHint.textContent = 'Copy my email address'; }, 2000);
+      });
+    });
+
     cancelBtn.addEventListener('click', closeModal);
-    sendBtn.addEventListener('click', () => { window.location.href = buildMailto(); });
+    sendBtn.addEventListener('click', async () => {
+      const { subject, message } = collectFormData();
+      const btnLabel = sendBtn.querySelector('span:last-child');
+      sendBtn.disabled = true;
+      btnLabel.textContent = 'Sending…';
+      try {
+        const res = await fetch(FORM_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ subject, message })
+        });
+        if (res.ok) {
+          btnLabel.textContent = 'Sent ✓';
+          setTimeout(() => closeModal(), 1800);
+        } else {
+          throw new Error('server');
+        }
+      } catch {
+        btnLabel.textContent = 'Submit';
+        sendBtn.disabled = false;
+      }
+    });
 
     const getFocusable = () => Array.from(
       modal.querySelectorAll('button:not([disabled]):not([tabindex="-1"]), input, textarea')
@@ -532,7 +739,7 @@ let _contactRAF = null;
     bd.removeAttribute('aria-hidden');
     bd.classList.add('is-open');
     document.body.style.overflow = 'hidden';
-    bd.querySelector('.intent-chip[aria-checked="true"]')?.focus();
+    bd.querySelector('.intent-btn[aria-checked="true"]')?.focus();
   };
 
   document.getElementById('compose-open')?.addEventListener('click', (e) => {
