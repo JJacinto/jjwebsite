@@ -1,0 +1,203 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  activePage?: 'home' | 'about' | 'cases' | 'contact';
+  navDark?: boolean;
+  showFooter?: boolean;
+}
+
+const {
+  title = 'João Jacinto — Senior Product Designer',
+  description = 'João Jacinto — Senior Product Designer based in Aveiro, Portugal. 10+ years designing digital products with startups and enterprises.',
+  activePage = 'home',
+  navDark = false,
+  showFooter = true,
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="icon" type="image/svg+xml" href="/assets/JJ.svg">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class:list={['nav', { 'nav-dark': navDark }]} id="nav">
+  <div class="container">
+    <a href="/" class="logo-outer" aria-label="Home">
+      <span class="logo-bg"></span>
+      <span class="logo-letters">
+        <span class="logo-j1">J</span>
+        <span class="logo-j2">J</span>
+      </span>
+    </a>
+
+    <div class="pill-nav" id="pillNav">
+      <div class="pill-indicator" id="pillIndicator"></div>
+      <a href="/" data-page="home" class:list={[{ active: activePage === 'home' }]}>Home</a>
+      <a href="/about" data-page="about" class:list={[{ active: activePage === 'about' }]}>About</a>
+      <a href="/case-studies" data-page="cases" class:list={[{ active: activePage === 'cases' }]}>Case studies</a>
+      <a href="/contact" data-page="contact" class:list={[{ active: activePage === 'contact' }]}>Contact</a>
+    </div>
+
+    <div class="nav-right">
+      <a class="li-badge" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false" onclick="toggleMobile()">
+        <span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/" data-page="home" class:list={[{ active: activePage === 'home' }]} onclick="toggleMobile()">Home</a>
+  <a href="/about" data-page="about" class:list={[{ active: activePage === 'about' }]} onclick="toggleMobile()">About</a>
+  <a href="/case-studies" data-page="cases" class:list={[{ active: activePage === 'cases' }]} onclick="toggleMobile()">Case studies</a>
+  <a href="/contact" data-page="contact" class:list={[{ active: activePage === 'contact' }]} onclick="toggleMobile()">Contact</a>
+  <div class="mobile-menu-secondary">
+    <a class="mobile-menu-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" onclick="toggleMobile()">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+      <span>LinkedIn ↗</span>
+    </a>
+  </div>
+</div>
+
+<slot />
+
+{showFooter && (
+  <footer class="footer" id="footer">
+    <p><strong>João Jacinto</strong> · Senior Product Designer · Aveiro, Portugal · Custom-designed and hand-coded · © 2026</p>
+  </footer>
+)}
+
+<script is:inline>
+/* Nav scroll */
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+/* Pill indicator */
+const pillNav  = document.getElementById('pillNav');
+const pillIndicator = document.getElementById('pillIndicator');
+function movePillIndicator() {
+  const active = pillNav.querySelector('a.active');
+  if (!active) { pillIndicator.style.width = '0'; return; }
+  const navRect = pillNav.getBoundingClientRect();
+  const aRect   = active.getBoundingClientRect();
+  pillIndicator.style.left  = (aRect.left - navRect.left) + 'px';
+  pillIndicator.style.width = aRect.width + 'px';
+}
+window.addEventListener('load', movePillIndicator);
+window.addEventListener('resize', movePillIndicator);
+
+/* Mobile menu */
+function toggleMobile() {
+  const menu   = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('navToggle');
+  const open   = menu.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', String(open));
+}
+
+/* Reveal observer */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* 3D card tilt */
+(function() {
+  let tiltCard = null;
+  const TILT_DEG = 4, TILT_Z = 6;
+  document.addEventListener('mousemove', function(e) {
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo');
+    if (tiltCard && tiltCard !== card) {
+      tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
+      tiltCard.style.transform = '';
+      tiltCard.style.removeProperty('--tilt-mx');
+      tiltCard.style.removeProperty('--tilt-my');
+      tiltCard.classList.remove('tilt-active');
+      tiltCard = null;
+    }
+    if (!card) return;
+    tiltCard = card;
+    const r  = card.getBoundingClientRect();
+    const dx = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2);
+    const dy = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+    card.style.setProperty('--tilt-mx', ((e.clientX - r.left) / r.width  * 100).toFixed(1));
+    card.style.setProperty('--tilt-my', ((e.clientY - r.top)  / r.height * 100).toFixed(1));
+    card.classList.add('tilt-active');
+    card.style.transition = 'box-shadow 0.28s, border-color 0.38s';
+    card.style.transform = `perspective(800px) rotateX(${-dy * TILT_DEG}deg) rotateY(${dx * TILT_DEG}deg) translateZ(${TILT_Z}px)`;
+  });
+  document.addEventListener('mouseleave', function() {
+    if (!tiltCard) return;
+    tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
+    tiltCard.style.transform = '';
+    tiltCard.style.removeProperty('--tilt-mx');
+    tiltCard.style.removeProperty('--tilt-my');
+    tiltCard.classList.remove('tilt-active');
+    tiltCard = null;
+  });
+})();
+
+/* Brands marquee — slow-down + tooltip */
+(function() {
+  const marquee = document.querySelector('.brands-marquee');
+  const track   = document.querySelector('.brands-track');
+  const tip     = document.getElementById('brandsTooltip');
+  if (!marquee || !track || !tip) return;
+  let rampTimer, tipTimer, anim;
+  function getAnim() { if (!anim) anim = track.getAnimations()[0]; return anim; }
+  function rampRate(target, step) {
+    clearTimeout(rampTimer);
+    const a = getAnim();
+    if (!a) return;
+    const cur = a.playbackRate;
+    if (Math.abs(cur - target) < 0.005) { a.playbackRate = target; return; }
+    a.playbackRate = cur + (target - cur) * step;
+    rampTimer = setTimeout(() => rampRate(target, step), 30);
+  }
+  marquee.addEventListener('mouseenter', () => rampRate(0.08, 0.14));
+  marquee.addEventListener('mouseleave', () => { rampRate(1, 0.18); clearTimeout(tipTimer); tip.classList.remove('visible'); });
+  document.querySelectorAll('.brands-track a').forEach(link => {
+    let host = '';
+    try { host = new URL(link.href).hostname.replace(/^www\./, ''); } catch(e) {}
+    if (!host) return;
+    link.addEventListener('mouseenter', (e) => {
+      clearTimeout(tipTimer);
+      tipTimer = setTimeout(() => {
+        tip.textContent = 'Go to ' + host;
+        tip.classList.add('visible');
+        tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
+        tip.style.top  = (e.clientY - 44) + 'px';
+      }, 2000);
+    });
+    link.addEventListener('mousemove', (e) => {
+      if (!tip.classList.contains('visible')) return;
+      tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
+      tip.style.top  = (e.clientY - 44) + 'px';
+    });
+    link.addEventListener('mouseleave', () => { clearTimeout(tipTimer); tip.classList.remove('visible'); });
+  });
+})();
+</script>
+
+<script src="/notes.js" defer></script>
+</body>
+</html>

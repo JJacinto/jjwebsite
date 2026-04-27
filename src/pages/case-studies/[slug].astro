@@ -1,0 +1,161 @@
+---
+import Base from '../../layouts/Base.astro';
+import { CASES } from '../../data/cases';
+
+export function getStaticPaths() {
+  return CASES.map(c => ({ params: { slug: c.slug }, props: { caseData: c } }));
+}
+
+const { caseData: c } = Astro.props;
+const idx = CASES.findIndex(x => x.slug === c.slug);
+const next = CASES[(idx + 1) % CASES.length];
+const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
+---
+<Base
+  activePage="cases"
+  title={`${c.title} — João Jacinto`}
+  description={c.subtitle}
+>
+
+  <div class="case-wrap" id="case-content">
+    <div class="container">
+      <a class="back-link" href="/case-studies">← Back to case studies</a>
+
+      <div class="case-header">
+        <div class="case-cat">{c.cat}</div>
+        <h1 class="case-title">{c.title}</h1>
+        <p class="case-subtitle">{c.subtitle}</p>
+
+        <div class="case-meta-grid">
+          <div><div class="case-meta-label">Company</div><div class="case-meta-val">{c.company}</div></div>
+          <div><div class="case-meta-label">Role</div><div class="case-meta-val">{c.role}</div></div>
+          <div><div class="case-meta-label">Year</div><div class="case-meta-val">{c.year}</div></div>
+          <div><div class="case-meta-label">Duration</div><div class="case-meta-val">{c.duration}</div></div>
+        </div>
+
+        <div class="case-keywords">
+          {c.keywords.map(k => <span class="keyword">{k}</span>)}
+        </div>
+      </div>
+
+      <div class="case-hero-img reveal">
+        <img src={c.img} alt={c.title} loading="lazy">
+      </div>
+
+      <div class={`outcomes ${outcomesClass} reveal`}>
+        {c.outcomes.map(o => (
+          <div class="outcome">
+            <div class="outcome-num">{o.n}</div>
+            <div class="outcome-title">{o.title}</div>
+            <div class="outcome-desc">{o.desc}</div>
+          </div>
+        ))}
+      </div>
+
+      <section class="achievements reveal">
+        <span class="eyebrow">Key outcomes</span>
+        <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
+      </section>
+
+      <div class="case-sections">
+        {c.sections.map(s => (
+          <div class="reveal">
+            <h2>{s.h}</h2>
+            <p>{s.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>
+
+      <div class="next-case-wrap">
+        <span class="eyebrow">Next case study</span>
+        <a class="next-case reveal" href={`/case-studies/${next.slug}`}>
+          <img src={next.img} alt={next.title}>
+          <div class="next-case-body">
+            <div class="next-case-cat">{next.cat}</div>
+            <div class="next-case-title">{next.title} →</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Password gate overlay — shown via JS if not unlocked -->
+  <div id="pw-overlay" style="display:none">
+    <div class="case-wrap">
+      <div class="container">
+        <a class="back-link" href="/case-studies">← Back to case studies</a>
+        <div class="pw-gate reveal visible">
+          <div class="pw-gate-lock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <span class="eyebrow">Protected</span>
+          <h2>This case study is private</h2>
+          <p>Enter the password to read this work.</p>
+          <form class="pw-form" id="pwForm">
+            <div class="pw-input-wrap">
+              <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="current-password">
+              <button type="button" class="pw-reveal" id="pwReveal" aria-label="Show password" onclick="togglePwReveal()">
+                <svg class="pw-eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="pw-eye-shut" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+            <p class="pw-error" id="pwError"></p>
+            <button type="submit" class="btn btn-accent">
+              <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+              <span>Unlock</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</Base>
+
+<script is:inline>
+const CASE_PASSWORD = 'alohomora';
+
+function isUnlocked() {
+  return sessionStorage.getItem('jj-case-unlocked') === '1';
+}
+
+if (!isUnlocked()) {
+  document.getElementById('case-content').style.display = 'none';
+  document.getElementById('pw-overlay').style.display = '';
+  setTimeout(() => document.getElementById('pwInput')?.focus(), 50);
+}
+
+document.getElementById('pwForm')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const input = document.getElementById('pwInput');
+  const error = document.getElementById('pwError');
+  if (input.value.trim().toLowerCase() === CASE_PASSWORD) {
+    sessionStorage.setItem('jj-case-unlocked', '1');
+    document.getElementById('pw-overlay').style.display = 'none';
+    document.getElementById('case-content').style.display = '';
+  } else {
+    error.textContent = 'Incorrect password — try again.';
+    input.classList.add('pw-shake');
+    input.value = '';
+    input.focus();
+    input.addEventListener('animationend', () => input.classList.remove('pw-shake'), { once: true });
+  }
+});
+
+function togglePwReveal() {
+  const input = document.getElementById('pwInput');
+  const btn   = document.getElementById('pwReveal');
+  if (!input || !btn) return;
+  const showing = input.type === 'text';
+  input.type = showing ? 'password' : 'text';
+  btn.querySelector('.pw-eye-open').style.display = showing ? '' : 'none';
+  btn.querySelector('.pw-eye-shut').style.display = showing ? 'none' : '';
+  btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  input.focus();
+}
+</script>

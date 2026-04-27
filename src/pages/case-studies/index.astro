@@ -1,0 +1,47 @@
+---
+import Base from '../../layouts/Base.astro';
+import { CASES } from '../../data/cases';
+
+const featured = CASES.slice(0, 2);
+const rest = CASES.slice(2);
+---
+<Base
+  activePage="cases"
+  title="Case Studies — João Jacinto"
+  description="Product design case studies by João Jacinto — webinar UX, research ops, design systems, AI platforms, and support tools."
+>
+
+  <div class="cases-wrap">
+    <div class="marquee cases-marquee">
+      <div class="marquee-track">
+        <span>CASE STUDIES</span><span>·</span><span>CASE STUDIES</span><span>·</span>
+        <span>CASE STUDIES</span><span>·</span><span>CASE STUDIES</span><span>·</span>
+      </div>
+    </div>
+    <div class="container">
+      <div class="cases-grid-row-2" style="margin-bottom:24px">
+        {featured.map((c, i) => (
+          <a class={`case-card case-card-featured reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`}>
+            <img src={c.img} alt={c.title} loading="lazy">
+            <div class="case-card-body">
+              <div class="case-card-cat">{c.cat}</div>
+              <div class="case-card-title">{c.title}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="cases-grid">
+        {rest.map((c, i) => (
+          <a class={`case-card reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`}>
+            <img src={c.img} alt={c.title} loading="lazy">
+            <div class="case-card-body">
+              <div class="case-card-cat">{c.cat}</div>
+              <div class="case-card-title">{c.title}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+
+</Base>
