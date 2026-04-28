@@ -5,6 +5,7 @@ import Base from '../layouts/Base.astro';
   activePage="about"
   title="About — João Jacinto"
   description="I design products that make things genuinely easier for the people who use them. Senior Product Designer based in Aveiro, Portugal."
+  showCta={true}
 >
 
   <div class="about-wrap">
@@ -132,7 +133,7 @@ import Base from '../layouts/Base.astro';
             <p>The dev background never went away. It's the reason I prototype in code when Figma stops being useful, ship my own portfolio, and treat the line between design and engineering as a tool — not a fence.</p>
           </div>
 
-          <div class="influences-right">
+          <div class="influences-right" style="display:none">
             <div class="influences-block">
               <h3>Resources I learn from</h3>
               <div class="avatar-grid">
@@ -188,7 +189,7 @@ import Base from '../layouts/Base.astro';
       <hr class="section-divider">
 
       <section class="tools reveal">
-        <span class="eyebrow">Tools I use</span>
+        <span class="eyebrow">Preferred software</span>
         <div class="tools-row">
           <span class="tool-tag">Figma</span>
           <span class="tool-tag">Framer</span>
@@ -198,17 +199,34 @@ import Base from '../layouts/Base.astro';
           <span class="tool-tag">Dovetail</span>
           <span class="tool-tag">Claude</span>
           <span class="tool-tag">Gemini</span>
+          <span class="tool-tag">Retune</span>
+          <span class="tool-tag">Loom</span>
+          <span class="tool-tag">Adobe CS</span>
+          <span class="tool-tag">VS Code</span>
+          <span class="tool-tag">Wisprflow</span>
         </div>
       </section>
 
-      <div class="about-cta reveal">
-        <h2>Want to work together?</h2>
-        <p>I'm always open to interesting projects and conversations.</p>
-        <a class="btn btn-accent" href="/contact">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Let's chat</span>
-        </a>
-      </div>
+      <section class="tools reveal">
+        <span class="eyebrow">Current hardware</span>
+        <div class="tools-row">
+          <span class="tool-tag">MacBook Pro 16"</span>
+          <span class="tool-tag">iPad Pro 10"</span>
+          <span class="tool-tag">Logitech MX Keys</span>
+          <span class="tool-tag">Logitech MX Master</span>
+          <span class="tool-tag">Focusrite 4i4</span>
+          <span class="tool-tag">T.Bone SC400</span>
+          <span class="tool-tag">Samsung Odyssey G9</span>
+          <span class="tool-tag">Stream Deck +</span>
+          <span class="tool-tag">Obsbot Tiny 3 Lite</span>
+          <span class="tool-tag">Alesis M1 Active</span>
+          <span class="tool-tag">Sennheiser HD598SE</span>
+          <span class="tool-tag">Steelcase Leap v2</span>
+          <span class="tool-tag">Delta Carpio 2.0</span>
+          <span class="tool-tag">Maidesite T2 Pro</span>
+        </div>
+      </section>
+
     </div>
   </div>
 

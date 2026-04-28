@@ -8,6 +8,7 @@ interface Props {
   activePage?: 'home' | 'about' | 'cases' | 'contact';
   navDark?: boolean;
   showFooter?: boolean;
+  showCta?: boolean;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   activePage = 'home',
   navDark = false,
   showFooter = true,
+  showCta = false,
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -74,18 +76,48 @@ const {
 
 <slot />
 
+{showCta && (
+  <section class="global-cta-section">
+    <div class="container">
+      <div class="about-cta reveal">
+        <h2>Want to work together?</h2>
+        <p>I'm always open to interesting projects and conversations.</p>
+        <div class="about-cta-btns">
+          <button class="btn btn-accent" onclick="openComposeModal()">
+            <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
+            <span>Let's chat</span>
+          </button>
+          <button class="btn btn-dark-outline" onclick="openComposeModal(2)">
+            <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="12" height="12" rx="1"/><path d="M2 6h12M6 2v4M10 2v4"/></svg></span>
+            <span>Book a call</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
+
 {showFooter && (
   <footer class="footer" id="footer">
-    <p><strong>João Jacinto</strong> · Senior Product Designer · Aveiro, Portugal · Custom-designed and hand-coded · © 2026</p>
+    <div class="footer-status" id="footer-status">
+      <span class="footer-status-dot" id="footer-status-dot"></span>
+      <span class="footer-status-label" id="footer-status-label"></span>
+    </div>
+    <p><strong>João Jacinto</strong> · Senior Product Designer · <button class="footer-email-link" onclick="openComposeModal()">contact@joaojacinto.com</button> · © 2026</p>
   </footer>
 )}
 
+<div id="compose-root"></div>
+
 <script is:inline>
-/* Nav scroll */
+/* Nav scroll + active link progress fill */
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
-});
+  const progress = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
+  const activeLink = document.querySelector('.pill-nav a.active');
+  if (activeLink) activeLink.style.setProperty('--nav-scroll-progress', progress);
+}, { passive: true });
 
 /* Pill indicator */
 const pillNav  = document.getElementById('pillNav');
@@ -165,7 +197,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   document.addEventListener('mousemove', function(e) {
     const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo');
     if (tiltCard && tiltCard !== card) {
-      tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s';
+      tiltCard.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.35s cubic-bezier(0.22,1,0.36,1)';
       tiltCard.style.transform = '';
       tiltCard.style.removeProperty('--tilt-mx');
       tiltCard.style.removeProperty('--tilt-my');
@@ -180,7 +212,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     card.style.setProperty('--tilt-mx', ((e.clientX - r.left) / r.width  * 100).toFixed(1));
     card.style.setProperty('--tilt-my', ((e.clientY - r.top)  / r.height * 100).toFixed(1));
     card.classList.add('tilt-active');
-    card.style.transition = 'box-shadow 0.28s, border-color 0.38s';
+    card.style.transition = 'box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.35s cubic-bezier(0.22,1,0.36,1)';
     card.style.transform = `perspective(800px) rotateX(${-dy * TILT_DEG}deg) rotateY(${dx * TILT_DEG}deg) translateZ(${TILT_Z}px)`;
   });
   document.addEventListener('mouseleave', function() {
@@ -234,9 +266,544 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     link.addEventListener('mouseleave', () => { clearTimeout(tipTimer); tip.classList.remove('visible'); });
   });
 })();
+
+/* Cursor ball — accent circle with arrow that tilts with card */
+(function() {
+  const TILT = 4;
+  const ball = document.createElement('div');
+  ball.id = 'cursor-ball';
+  ball.setAttribute('aria-hidden', 'true');
+  ball.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="cursor-ball-label">View testimonials on Linkedin</span>';
+  document.body.appendChild(ball);
+  let activeCard = null;
+  document.addEventListener('mousemove', function(e) {
+    ball.style.left = e.clientX + 'px';
+    ball.style.top  = e.clientY + 'px';
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case');
+    if (card !== activeCard) {
+      activeCard = card;
+      if (card) {
+        const isTestimonial = card.classList.contains('testimonial-card');
+        if (isTestimonial) {
+          ball.classList.add('is-linkedin');
+        } else {
+          ball.classList.remove('is-linkedin');
+          const svg = ball.querySelector('svg');
+          svg.style.animation = 'none';
+          svg.getBoundingClientRect();
+          svg.style.animation = '';
+        }
+        ball.classList.add('is-active');
+      } else {
+        ball.classList.remove('is-active');
+        /* keep is-linkedin during fade-out so the label doesn't flash to chevron */
+      }
+    }
+    if (card) {
+      const r  = card.getBoundingClientRect();
+      const dx = (e.clientX - (r.left + r.width  / 2)) / (r.width  / 2);
+      const dy = (e.clientY - (r.top  + r.height / 2)) / (r.height / 2);
+      ball.style.transform = `translate(-50%,-50%) perspective(800px) rotateX(${(-dy*TILT).toFixed(2)}deg) rotateY(${(dx*TILT).toFixed(2)}deg)`;
+    } else {
+      ball.style.transform = 'translate(-50%,-50%)';
+    }
+  });
+  document.addEventListener('mouseleave', function() {
+    activeCard = null;
+    ball.classList.remove('is-active');
+    ball.classList.remove('is-linkedin');
+  });
+})();
 </script>
 
 <script src="/notes.js" defer></script>
+
+<script is:inline>
+/* jordangilroy-style text hover: two stacked copies, chars slide up/in per-char with stagger */
+(function() {
+  /* Mirrors GSAP values from jordangilroy: duration 0.3s, stagger amount 0.2s */
+  var DUR     = 300; /* ms per char transition */
+  var STAGGER = 200; /* ms total stagger spread across all chars */
+
+  /* Build per-char .sc-wrap > (.sc-c1 + .sc-c2) — each wrap has its own overflow:hidden boundary */
+  function wrap(el) {
+    if (el.dataset.scDone) return;
+    el.dataset.scDone = '1';
+    var text = el.textContent;
+    el.textContent = '';
+    for (var i = 0; i < text.length; i++) {
+      var ch = text[i] === ' ' ? ' ' : text[i];
+      var w  = document.createElement('span');
+      w.className = 'sc-wrap';
+      var c1 = document.createElement('span');
+      c1.className   = 'sc-c1';
+      c1.textContent = ch;
+      var c2 = document.createElement('span');
+      c2.className   = 'sc-c2';
+      c2.setAttribute('aria-hidden', 'true');
+      c2.textContent = ch;
+      w.appendChild(c1);
+      w.appendChild(c2);
+      el.appendChild(w);
+    }
+  }
+
+  /* Set --sc-d on each .sc-wrap; CSS var inherits to both c1/c2 inside */
+  function setDelays(el, reversed) {
+    var wraps = Array.prototype.slice.call(el.querySelectorAll('.sc-wrap'));
+    var n = wraps.length;
+    wraps.forEach(function(w, i) {
+      var idx = reversed ? n - 1 - i : i;
+      w.style.setProperty('--sc-d', (n > 1 ? Math.round(idx * STAGGER / (n - 1)) : 0) + 'ms');
+    });
+  }
+
+  function bind(trigger, textEl) {
+    wrap(textEl); /* pre-wrap on load so first hover is clean */
+    trigger.addEventListener('mouseenter', function() {
+      setDelays(textEl, false);
+      textEl.getBoundingClientRect();
+      textEl.classList.add('sc-on');
+    });
+    trigger.addEventListener('mouseleave', function() {
+      setDelays(textEl, true);
+      textEl.classList.remove('sc-on');
+    });
+  }
+
+  /* 1. Pill nav */
+  document.querySelectorAll('.pill-nav a').forEach(function(a) { bind(a, a); });
+
+  /* 2. Mobile nav */
+  document.querySelectorAll('.mobile-menu a[data-page]').forEach(function(a) { bind(a, a); });
+
+  /* 3. Buttons — bind to button, animate only the text span (not the icon span) */
+  document.querySelectorAll('.btn').forEach(function(btn) {
+    var spans = Array.prototype.slice.call(btn.querySelectorAll('span')).reverse();
+    var txt = null;
+    for (var i = 0; i < spans.length; i++) {
+      if (!spans[i].classList.contains('btn-icon') && spans[i].textContent.trim()) { txt = spans[i]; break; }
+    }
+    if (txt) bind(btn, txt);
+  });
+
+  /* 4. Case card and next-case titles */
+  document.querySelectorAll('.case-card, .next-case').forEach(function(card) {
+    var title = card.querySelector('.case-card-title');
+    if (title) bind(card, title);
+  });
+})();
+</script>
+
+<script is:inline>
+/* Compose modal */
+(function () {
+  var INTENTS = ["Let’s chat", "Start a project", "Book a call"];
+  var mounted   = false;
+  var intentIdx = 0;
+  var selectIntent = null;
+
+  /* Calendar */
+  var CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var CAL_WDAYS  = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  var CAL_TIMES  = ['9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30',
+                    '13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+  var calYear  = new Date().getFullYear();
+  var calMonth = new Date().getMonth();
+  var calSel   = null;
+
+  var getChatFieldsHTML = function () {
+    return (
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="chat-name">Your name</label>' +
+        '<input class="compose-input" id="chat-name" type="text" autocomplete="name" placeholder="First name or full name">' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="chat-body">Message</label>' +
+        '<textarea class="compose-textarea" id="chat-body" rows="5" autocomplete="off" placeholder="What&#x27;s on your mind?"></textarea>' +
+      '</div>'
+    );
+  };
+
+  var getProjectFieldsHTML = function () {
+    return (
+      '<div class="compose-field">' +
+        '<span class="eyebrow">What are you building?</span>' +
+        '<div class="form-toggle" data-field="productType">' +
+          '<button class="form-toggle-btn is-selected" data-val="Web app" type="button">Web app</button>' +
+          '<button class="form-toggle-btn" data-val="Mobile app" type="button">Mobile app</button>' +
+          '<button class="form-toggle-btn" data-val="Design system" type="button">Design system</button>' +
+          '<button class="form-toggle-btn" data-val="AI product" type="button">AI product</button>' +
+          '<button class="form-toggle-btn" data-val="Other" type="button">Other</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<span class="eyebrow">Budget range</span>' +
+        '<div class="form-radio-group">' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="< $5k"><span>&lt; $5k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$20k"><span>$5k–$20k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$20k-$50k"><span>$20k–$50k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$50k+"><span>$50k+</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="Flexible"><span>Flexible</span></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<div class="form-slider-row">' +
+          '<span class="eyebrow">Timeline</span>' +
+          '<span class="form-slider-val" id="proj-timeline-val">Flexible</span>' +
+        '</div>' +
+        '<input class="form-slider" type="range" id="proj-timeline" min="1" max="4" value="2" step="1">' +
+        '<div class="form-slider-ticks"><span>Exploring</span><span>Flexible</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<span class="eyebrow">Engagement type</span>' +
+        '<div class="form-radio-group">' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time"><span>One-time</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Recurring project"><span>Recurring project</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Quote"><span>Quote</span></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="proj-context">Tell me about the project</label>' +
+        '<textarea class="compose-textarea" id="proj-context" rows="3" autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the biggest challenge?"></textarea>' +
+      '</div>'
+    );
+  };
+
+  var getBookFieldsHTML = function () {
+    var timeOpts = CAL_TIMES.map(function (t) {
+      var h    = parseInt(t.split(':')[0], 10);
+      var m    = t.split(':')[1];
+      var ampm = h >= 12 ? 'PM' : 'AM';
+      var h12  = h % 12 || 12;
+      return '<option value="' + t + '">' + h12 + ':' + m + ' ' + ampm + '</option>';
+    }).join('');
+    return (
+      '<div class="compose-cal">' +
+        '<div class="cal-nav-row">' +
+          '<button class="cal-nav-btn" id="cal-prev" type="button" aria-label="Previous month">&#8592;</button>' +
+          '<span class="cal-month-label" id="cal-month-label"></span>' +
+          '<button class="cal-nav-btn" id="cal-next" type="button" aria-label="Next month">&#8594;</button>' +
+        '</div>' +
+        '<div class="cal-weekdays">' +
+          CAL_WDAYS.map(function (d) { return '<span>' + d + '</span>'; }).join('') +
+        '</div>' +
+        '<div class="cal-grid" id="cal-grid"></div>' +
+        '<div class="cal-time-wrap" id="cal-time" style="display:none">' +
+          '<label class="eyebrow" for="cal-time-select">Select a time</label>' +
+          '<select class="compose-select" id="cal-time-select">' +
+            '<option value="">Choose a time…</option>' +
+            timeOpts +
+          '</select>' +
+        '</div>' +
+      '</div>'
+    );
+  };
+
+  var buildCalGrid = function (yr, mo) {
+    var grid    = document.getElementById('cal-grid');
+    var lbl     = document.getElementById('cal-month-label');
+    var prevBtn = document.getElementById('cal-prev');
+    if (!grid || !lbl) return;
+    lbl.textContent = CAL_MONTHS[mo] + ' ' + yr;
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    if (prevBtn) prevBtn.disabled = (yr === today.getFullYear() && mo === today.getMonth());
+    var firstDow = (new Date(yr, mo, 1).getDay() + 6) % 7; /* Mo=0 … Su=6 */
+    var daysInMo = new Date(yr, mo + 1, 0).getDate();
+    var html = '';
+    for (var i = 0; i < firstDow; i++) html += '<div class="cal-day cal-day-empty"></div>';
+    for (var d = 1; d <= daysInMo; d++) {
+      var ts  = new Date(yr, mo, d).getTime();
+      var cls = 'cal-day';
+      if (ts < today.getTime())            cls += ' is-disabled';
+      if (ts === today.getTime())           cls += ' is-today';
+      if (calSel && ts === calSel.getTime()) cls += ' is-selected';
+      html += '<div class="' + cls + '" data-d="' + d + '">' + d + '</div>';
+    }
+    grid.innerHTML = html;
+    grid.querySelectorAll('.cal-day:not(.is-disabled):not(.cal-day-empty)').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        calSel = new Date(yr, mo, parseInt(cell.dataset.d, 10));
+        buildCalGrid(yr, mo);
+        var tw  = document.getElementById('cal-time');
+        var ts2 = document.getElementById('cal-time-select');
+        if (tw) tw.style.display = '';
+        if (ts2) ts2.value = '';
+      });
+    });
+  };
+
+  var bindBookCal = function () {
+    var today = new Date(); today.setHours(0, 0, 0, 0);
+    calYear  = today.getFullYear();
+    calMonth = today.getMonth();
+    calSel   = null;
+    buildCalGrid(calYear, calMonth);
+    var prevBtn = document.getElementById('cal-prev');
+    var nextBtn = document.getElementById('cal-next');
+    if (prevBtn) prevBtn.addEventListener('click', function () {
+      calMonth--;
+      if (calMonth < 0) { calMonth = 11; calYear--; }
+      buildCalGrid(calYear, calMonth);
+    });
+    if (nextBtn) nextBtn.addEventListener('click', function () {
+      calMonth++;
+      if (calMonth > 11) { calMonth = 0; calYear++; }
+      buildCalGrid(calYear, calMonth);
+    });
+  };
+
+  var bindFormToggle = function (container) {
+    container.querySelectorAll('.form-toggle').forEach(function (group) {
+      var fbtns = group.querySelectorAll('.form-toggle-btn');
+      fbtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          fbtns.forEach(function (b) { b.classList.remove('is-selected'); });
+          btn.classList.add('is-selected');
+        });
+      });
+    });
+  };
+
+  var bindProjectSlider = function (container) {
+    var slider = container.querySelector('#proj-timeline');
+    var val    = container.querySelector('#proj-timeline-val');
+    var labels = ['Exploring', 'Flexible', 'Soon (1–3 mo)', 'ASAP'];
+    if (slider && val) {
+      slider.addEventListener('input', function () { val.textContent = labels[+slider.value - 1]; });
+    }
+  };
+
+  var showFields = function (idx) {
+    var chatEl = document.getElementById('compose-fields-chat');
+    var projEl = document.getElementById('compose-fields-project');
+    var bookEl = document.getElementById('compose-fields-book');
+    if (chatEl) chatEl.style.display = (idx === 0) ? '' : 'none';
+    if (projEl) projEl.style.display = (idx === 1) ? '' : 'none';
+    if (bookEl) bookEl.style.display = (idx === 2) ? '' : 'none';
+  };
+
+  var collectFormData = function () {
+    if (intentIdx === 2) {
+      var dateStr = calSel
+        ? calSel.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        : 'Not selected';
+      var timeEl  = document.getElementById('cal-time-select');
+      var timeStr = timeEl && timeEl.value ? timeEl.value : 'Not selected';
+      return { subject: 'Call booking request', message: 'Date: ' + dateStr + '\nTime: ' + timeStr };
+    }
+    if (intentIdx === 1) {
+      var sel         = document.querySelector('#compose-fields-project .form-toggle .is-selected');
+      var productType = sel ? sel.dataset.val : 'Not specified';
+      var budgetEl    = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
+      var budget      = budgetEl ? budgetEl.value : 'Not specified';
+      var timelineEl  = document.getElementById('proj-timeline-val');
+      var timeline    = timelineEl ? timelineEl.textContent : 'Not specified';
+      var engEl       = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
+      var engagement  = engEl ? engEl.value : 'Not specified';
+      var ctxEl       = document.getElementById('proj-context');
+      var context     = ctxEl ? ctxEl.value : '';
+      return {
+        subject: 'Project inquiry — ' + productType,
+        message: ['Product type: ' + productType, 'Budget: ' + budget,
+                  'Timeline: ' + timeline, 'Engagement: ' + engagement,
+                  context ? '\nProject details:\n' + context : null].filter(Boolean).join('\n')
+      };
+    }
+    var nameEl = document.getElementById('chat-name');
+    var bodyEl = document.getElementById('chat-body');
+    var name   = nameEl ? nameEl.value.trim() : '';
+    var msg    = bodyEl ? bodyEl.value : '';
+    return { subject: name ? 'Message from ' + name : 'New message', message: msg };
+  };
+
+  var getHTML = function () {
+    var btnsHTML = INTENTS.map(function (label, i) {
+      return '<button class="intent-btn" role="radio" aria-checked="' + (i === 0 ? 'true' : 'false') +
+        '" tabindex="' + (i === 0 ? '0' : '-1') + '" data-idx="' + i + '" type="button">' + label + '</button>';
+    }).join('');
+    return (
+      '<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">' +
+        '<div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"' +
+          ' aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">' +
+          '<div class="compose-header">' +
+            '<span class="eyebrow" id="compose-eyebrow">Let&#x27;s talk</span>' +
+            '<h2 id="compose-heading">What brings you here?</h2>' +
+          '</div>' +
+          '<div class="intent-toggle" role="radiogroup" aria-label="Message intent">' + btnsHTML + '</div>' +
+          '<div id="compose-fields-chat">' + getChatFieldsHTML() + '</div>' +
+          '<div id="compose-fields-project" style="display:none">' + getProjectFieldsHTML() + '</div>' +
+          '<div id="compose-fields-book" style="display:none">' + getBookFieldsHTML() + '</div>' +
+          '<div class="compose-footer" id="compose-footer">' +
+            '<button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">' +
+              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+              '<span id="compose-copy-hint">Copy my email address</span>' +
+            '</button>' +
+            '<div class="compose-footer-actions">' +
+              '<button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>' +
+              '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message">' +
+                '<span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>' +
+                '<span>Submit</span>' +
+              '</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  };
+
+  var closeModal = function () {
+    var bd = document.getElementById('compose-backdrop');
+    if (!bd) return;
+    bd.classList.remove('is-open');
+    bd.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    var opener = document.getElementById('compose-open');
+    if (opener) opener.focus();
+  };
+
+  var FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
+  var bindEvents = function () {
+    var bd        = document.getElementById('compose-backdrop');
+    var modal     = document.getElementById('compose-modal');
+    var btns      = Array.prototype.slice.call(document.querySelectorAll('.intent-btn'));
+    var cancelBtn = document.getElementById('compose-cancel');
+    var sendBtn   = document.getElementById('compose-send');
+    var copyBtn   = document.getElementById('compose-copy-email');
+    var copyHint  = document.getElementById('compose-copy-hint');
+    var projEl    = document.getElementById('compose-fields-project');
+    bindFormToggle(projEl);
+    bindProjectSlider(projEl);
+    bindBookCal();
+
+    selectIntent = function (idx) {
+      intentIdx = idx;
+      btns.forEach(function (b, i) {
+        b.setAttribute('aria-checked', String(i === idx));
+        b.setAttribute('tabindex', i === idx ? '0' : '-1');
+      });
+      showFields(idx);
+    };
+
+    bd.addEventListener('click', function (e) { if (e.target === bd) closeModal(); });
+
+    btns.forEach(function (btn, i) {
+      btn.addEventListener('click', function () { selectIntent(i); });
+      btn.addEventListener('keydown', function (e) {
+        var len = btns.length;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          var next = (i + 1) % len; selectIntent(next); btns[next].focus();
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          var prev = (i - 1 + len) % len; selectIntent(prev); btns[prev].focus();
+        }
+      });
+    });
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', function () {
+        var addr = ['contact', '\x40', 'joaojacinto.com'].join('');
+        navigator.clipboard && navigator.clipboard.writeText(addr).then(function () {
+          if (!copyHint) return;
+          copyHint.textContent = 'Copied!';
+          setTimeout(function () { copyHint.textContent = 'Copy my email address'; }, 2000);
+        });
+      });
+    }
+
+    cancelBtn.addEventListener('click', closeModal);
+
+    sendBtn.addEventListener('click', function () {
+      var data     = collectFormData();
+      var btnLabel = sendBtn.querySelector('span:last-child');
+      sendBtn.disabled = true;
+      btnLabel.textContent = 'Sending…';
+      fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ subject: data.subject, message: data.message })
+      }).then(function (res) {
+        if (res.ok) {
+          btnLabel.textContent = 'Sent ✓';
+          setTimeout(function () { closeModal(); }, 1800);
+        } else { throw new Error('server'); }
+      }).catch(function () {
+        btnLabel.textContent = 'Submit';
+        sendBtn.disabled = false;
+      });
+    });
+
+    var getFocusable = function () {
+      return Array.prototype.filter.call(
+        modal.querySelectorAll('button:not([disabled]):not([tabindex="-1"]), input, textarea, select'),
+        function (el) { return getComputedStyle(el).display !== 'none'; }
+      );
+    };
+
+    modal.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeModal(); return; }
+      if (e.key !== 'Tab') return;
+      var focusable = getFocusable();
+      if (!focusable.length) return;
+      var first = focusable[0], last = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    });
+  };
+
+  var openModal = function (targetIdx) {
+    if (!mounted) {
+      var root = document.getElementById('compose-root');
+      if (!root) return;
+      root.innerHTML = getHTML();
+      mounted = true;
+      bindEvents();
+    }
+    var bd = document.getElementById('compose-backdrop');
+    if (!bd) return;
+    bd.removeAttribute('aria-hidden');
+    bd.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    if (typeof targetIdx === 'number' && selectIntent) selectIntent(targetIdx);
+    var checked = bd.querySelector('.intent-btn[aria-checked="true"]');
+    if (checked) checked.focus();
+  };
+
+  window.openComposeModal = openModal;
+  var composeOpen = document.getElementById('compose-open');
+  if (composeOpen) composeOpen.addEventListener('click', function (e) { e.preventDefault(); openModal(); });
+}());
+
+/* Portugal status indicator */
+(function () {
+  function updateStatus() {
+    var now = new Date();
+    var lisbonStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: 'numeric', hour12: false });
+    var hour = parseInt(lisbonStr, 10);
+    var timeStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hour12: false });
+    var dot   = document.getElementById('footer-status-dot');
+    var label = document.getElementById('footer-status-label');
+    if (!dot || !label) return;
+    var color, text;
+    if (hour >= 9 && hour < 20) {
+      color = '#22c55e'; text = 'Available \u00b7 Working hours';
+    } else if (hour >= 1 && hour < 9) {
+      color = '#6b7280'; text = 'Sleeping \u00b7 Back at 9 am';
+    } else {
+      color = '#f59e0b'; text = 'Outside working hours';
+    }
+    dot.style.background = color;
+    label.textContent = text + ' \u00b7 ' + timeStr + ' Aveiro';
+  }
+  updateStatus();
+  setInterval(updateStatus, 60000);
+})();
+</script>
 
 <RetuneBridge client:only="react" />
 </body>
