@@ -44,19 +44,6 @@ import Base from '../layouts/Base.astro';
         </div>
         <div class="contact-card">
           <div class="contact-card-icon">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
-          </div>
-          <div class="contact-card-body">
-            <div class="contact-card-label">LinkedIn</div>
-            <div class="contact-card-value">joaofranciscojacinto</div>
-          </div>
-          <a class="contact-card-action" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="Open LinkedIn profile">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            <span>Open</span>
-          </a>
-        </div>
-        <div class="contact-card">
-          <div class="contact-card-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           </div>
           <div class="contact-card-body">
@@ -73,7 +60,7 @@ import Base from '../layouts/Base.astro';
         </div>
       </div>
     </div>
-    <div id="compose-root"></div>
+    <div id="compose-root-contact"></div>
   </section>
 
 </Base>
@@ -89,22 +76,12 @@ function copyEmail(el) {
   });
 }
 
-/* Constellation canvas */
-const CONTACT_MODES = [
-  { name:'sphere',    rotSpeed: 0.00025, rotDir: 1,  lumBase:20, lumRange:18, wobble:false },
-  { name:'disc',      rotSpeed: 0.00060, rotDir: 1,  lumBase:26, lumRange:26, wobble:false },
-  { name:'scatter',   rotSpeed: 0.00008, rotDir: 1,  lumBase:13, lumRange:11, wobble:false },
-  { name:'dense',     rotSpeed: 0.00180, rotDir: 1,  lumBase:34, lumRange:38, wobble:false },
-  { name:'torus',     rotSpeed: 0.00040, rotDir: 1,  lumBase:18, lumRange:20, wobble:true  },
-  { name:'expanded',  rotSpeed: 0.00015, rotDir:-1,  lumBase:11, lumRange: 8, wobble:false },
-  { name:'elongated', rotSpeed: 0.00055, rotDir: 1,  lumBase:24, lumRange:30, wobble:false },
-];
+/* ── Contact canvas ──────────────────────────────────────────── */
 let _contactRAF = null;
 
 (function initContactCanvas() {
   const canvas = document.getElementById('contact-canvas');
   if (!canvas) return;
-
   const ctx = canvas.getContext('2d');
   let W, H, dpr;
 
@@ -115,23 +92,77 @@ let _contactRAF = null;
     ctx.scale(dpr, dpr);
   }
   resize();
-
-  const onResize = () => { ctx.setTransform(1,0,0,1,0,0); resize(); };
-  window.addEventListener('resize', onResize);
+  window.addEventListener('resize', () => { ctx.setTransform(1,0,0,1,0,0); resize(); });
 
   const R = Math.min(window.innerHeight * 0.40, window.innerWidth * 0.32, 280);
+
+  /* sample filled pixel positions from an offscreen canvas draw function */
+  function sample(drawFn) {
+    const oc = document.createElement('canvas');
+    oc.width  = Math.max(100, W);
+    oc.height = Math.max(100, H);
+    const octx = oc.getContext('2d');
+    drawFn(octx, oc.width, oc.height);
+    const data = octx.getImageData(0, 0, oc.width, oc.height).data;
+    const out = [];
+    for (let y = 0; y < oc.height; y += 2) {
+      for (let x = 0; x < oc.width; x += 2) {
+        if (data[(y * oc.width + x) * 4 + 3] > 50) {
+          out.push([x - oc.width / 2, y - oc.height / 2]);
+        }
+      }
+    }
+    return out;
+  }
+
+  function sampleLetter(text, fh) {
+    return sample((octx, cw, ch) => {
+      octx.fillStyle = '#fff';
+      octx.font = `900 ${fh}px system-ui, -apple-system, sans-serif`;
+      octx.textAlign = 'center'; octx.textBaseline = 'middle';
+      octx.fillText(text, cw / 2, ch / 2);
+    });
+  }
+
+  /* "Send a message" → paper plane icon; "LinkedIn" → IN text */
+  const jPts = sample((octx, cw, ch) => {
+    const S  = Math.min(cw, ch) * 0.38;
+    const cx = cw / 2, cy = ch / 2;
+    const lw = Math.max(S * 0.085, 6);
+    octx.strokeStyle = '#fff';
+    octx.fillStyle   = 'rgba(255,255,255,0.28)';
+    octx.lineWidth   = lw;
+    octx.lineCap = 'round'; octx.lineJoin = 'round';
+    /* paper plane pointing upper-right (send / message icon) */
+    const tip = [cx + S*0.46, cy - S*0.36]; // nose
+    const tl  = [cx - S*0.46, cy - S*0.18]; // top-left wing
+    const br  = [cx + S*0.10, cy + S*0.48]; // tail
+    const fc  = [cx + S*0.10, cy + S*0.08]; // fold crease
+    octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...tl); octx.lineTo(...br); octx.closePath();
+    octx.fill(); octx.stroke();
+    octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...fc); octx.stroke();
+    octx.beginPath(); octx.moveTo(...fc);  octx.lineTo(...br); octx.stroke();
+  });
+  const inPts = sampleLetter('IN', Math.round(Math.min(H * 0.50, W * 0.38)));
 
   const s = {
     mouseX:-999, mouseY:-999, prevMX:0, prevMY:0,
     velX:0, velY:0, smoothVX:0, smoothVY:0,
-    rotX:0.28, rotY:0, rotVX:0, rotVY:0.0001,
-    t:0, ripples:[], modeIdx:0,
-    hoverColorProgress:0, hoverCR:61, hoverCG:61, hoverCB:181, hoverColor:null,
-    targetRotSpeed:0.00025, currentRotSpeed:0.00025,
-    targetLumBase:20, currentLumBase:20,
-    targetLumRange:18, currentLumRange:18,
+    rotX:0.04, rotY:0, rotVX:0, rotVY:0.0001,
+    t:0, ripples:[],
+    hoverColorProgress:0, hoverCR:61, hoverCG:91, hoverCB:220, hoverColor:null,
+    targetRotSpeed:0.00008, currentRotSpeed:0.00008,
+    targetLumBase:72, currentLumBase:72,
+    targetLumRange:80, currentLumRange:80,
     wobble:false,
+    activeMode:'nebula',
+    isDragging:false, dragStartX:0, dragStartY:0,
   };
+
+  function randN() {
+    const u = Math.max(1e-10, Math.random());
+    return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * Math.random());
+  }
 
   const N = 380;
   const pts = Array.from({ length: N }, (_, i) => {
@@ -145,48 +176,66 @@ let _contactRAF = null;
     const oy = rr*Math.sin(tt)*Math.sin(phi+jP);
     const oz = rr*Math.cos(tt);
     const ta = phi % (Math.PI*2), torusR = R*0.80, tubeR = R*0.38;
+
+    /* nebula: wide flat cloud, uniform disc distribution */
+    const a = Math.random() * Math.PI * 2;
+    const r2 = Math.sqrt(Math.random());
+    const nbX = r2 * Math.cos(a) * W * 0.44;
+    const nbY = r2 * Math.sin(a) * H * 0.12;
+    const nbZ = randN() * 45;
+
     return {
-      ox,oy,oz, sx:ox, sy:oy, sz:oz,
+      ox,oy,oz, nbX,nbY,nbZ,
+      lJX:0, lJY:0, lIX:0, lIY:0,
+      sx:nbX, sy:nbY, sz:nbZ,
       scX:(Math.random()-0.5)*R*2.4, scY:(Math.random()-0.5)*R*2.4, scZ:(Math.random()-0.5)*R*2.4,
       toX:(torusR+tubeR*Math.cos(theta))*Math.cos(ta),
       toY:tubeR*Math.sin(theta),
       toZ:(torusR+tubeR*Math.cos(theta))*Math.sin(ta),
-      dotR:0.9+Math.random()*1.1,
+      dotR:1.2+Math.random()*2.0,
       twinkle:Math.random()*Math.PI*2, twinkleSpeed:0.012+Math.random()*0.022,
       dispR:0, dispV:0,
+      dispX:0, dispY:0, dvX:0, dvY:0,
       lerpSpeed:0.018+Math.random()*0.018,
-      _tx:ox, _ty:oy, _tz:oz,
+      _tx:nbX, _ty:nbY, _tz:nbZ,
     };
   });
 
+  /* assign letter targets to each particle */
+  pts.forEach(p => {
+    if (jPts.length)  { const jp = jPts[Math.floor(Math.random()*jPts.length)];  p.lJX=jp[0]; p.lJY=jp[1]; }
+    if (inPts.length) { const ip = inPts[Math.floor(Math.random()*inPts.length)]; p.lIX=ip[0]; p.lIY=ip[1]; }
+  });
+
   function getTarget(p, mode) {
-    if (mode==='disc')     return [p.ox*1.1,  p.oy*0.10, p.oz*1.1];
-    if (mode==='scatter')  return [p.scX*0.7, p.scY*0.7, p.scZ*0.7];
-    if (mode==='dense')    return [p.ox*0.38, p.oy*0.38, p.oz*0.38];
-    if (mode==='torus')    return [p.toX,     p.toY,     p.toZ];
-    if (mode==='expanded') return [p.ox*1.75, p.oy*1.75, p.oz*1.75];
-    if (mode==='elongated')return [p.ox*1.2,  p.oy*0.22, p.oz*1.2];
+    if (mode==='nebula')    return [p.nbX,     p.nbY,     p.nbZ    ];
+    if (mode==='letter-j')  return [p.lJX,     p.lJY,     0        ];
+    if (mode==='letter-in') return [p.lIX,     p.lIY,     0        ];
+    if (mode==='disc')      return [p.ox*1.1,  p.oy*0.10, p.oz*1.1 ];
+    if (mode==='scatter')   return [p.scX*0.7, p.scY*0.7, p.scZ*0.7];
+    if (mode==='dense')     return [p.ox*0.38, p.oy*0.38, p.oz*0.38];
+    if (mode==='torus')     return [p.toX,     p.toY,     p.toZ    ];
+    if (mode==='expanded')  return [p.ox*1.75, p.oy*1.75, p.oz*1.75];
+    if (mode==='elongated') return [p.ox*1.2,  p.oy*0.22, p.oz*1.2 ];
     return [p.ox, p.oy, p.oz];
   }
 
-  function triggerMode(cx2, cy2) {
-    let next;
-    do { next = Math.floor(Math.random()*CONTACT_MODES.length); }
-    while (next === s.modeIdx && CONTACT_MODES.length > 1);
-    s.modeIdx = next;
-    const m = CONTACT_MODES[next];
-    s.targetRotSpeed = m.rotSpeed * m.rotDir;
-    s.targetLumBase  = m.lumBase;
-    s.targetLumRange = m.lumRange;
-    s.wobble = m.wobble;
-    pts.forEach(p => { const [tx,ty,tz]=getTarget(p,m.name); p._tx=tx; p._ty=ty; p._tz=tz; });
+  function applyMode(name, cx2, cy2) {
+    s.activeMode = name;
+    if (name === 'nebula') {
+      s.targetRotSpeed = 0.00008; s.targetLumBase = 72; s.targetLumRange = 80; s.wobble = false;
+    } else if (name === 'letter-j' || name === 'letter-in') {
+      s.targetRotSpeed = 0.00004; s.targetLumBase = 100; s.targetLumRange = 60; s.wobble = false;
+      pts.forEach(p => { p.dispX=0; p.dispY=0; p.dvX=0; p.dvY=0; });
+    }
+    pts.forEach(p => { const [tx,ty,tz] = getTarget(p, name); p._tx=tx; p._ty=ty; p._tz=tz; });
     if (cx2 !== undefined) {
       s.ripples.push({ sx:cx2, sy:cy2, t:0 });
       if (s.ripples.length > 3) s.ripples.shift();
     }
   }
 
-  const onMouseMove = (e) => {
+  window.addEventListener('mousemove', e => {
     const rect = canvas.getBoundingClientRect();
     s.velX = (e.clientX-rect.left) - s.prevMX;
     s.velY = (e.clientY-rect.top)  - s.prevMY;
@@ -194,25 +243,44 @@ let _contactRAF = null;
     s.prevMY = e.clientY-rect.top;
     s.mouseX = e.clientX-rect.left;
     s.mouseY = e.clientY-rect.top;
-  };
-  window.addEventListener('mousemove', onMouseMove);
+  });
 
-  const contactSection = document.getElementById('contact-section');
-  const onPageClick = (e) => {
+  window.addEventListener('mousedown', e => {
+    if (s.activeMode !== 'nebula') return;
+    if (e.target.closest('a,button')) return;
+    s.isDragging = true;
     const rect = canvas.getBoundingClientRect();
-    triggerMode(e.clientX-rect.left, e.clientY-rect.top);
-  };
-  if (contactSection) contactSection.addEventListener('click', onPageClick);
+    s.dragStartX = e.clientX - rect.left;
+    s.dragStartY = e.clientY - rect.top;
+  });
 
-  const emailBtn = document.getElementById('compose-open');
+  window.addEventListener('mouseup', () => {
+    if (!s.isDragging) return;
+    s.isDragging = false;
+    const ddx = s.mouseX - s.dragStartX;
+    const ddy = s.mouseY - s.dragStartY;
+    const dist = Math.sqrt(ddx*ddx + ddy*ddy);
+    if (dist < 8) return;
+    /* slingshot: fire displaced dots in the opposite direction of drag */
+    const sx = -ddx/dist, sy = -ddy/dist;
+    const power = Math.min(dist/40, 3) * 14;
+    pts.forEach(p => {
+      if (Math.sqrt(p.dispX*p.dispX + p.dispY*p.dispY) > 4) {
+        p.dvX += sx * power;
+        p.dvY += sy * power;
+      }
+    });
+  });
+
+  const emailBtn    = document.getElementById('compose-open');
   const linkedinBtn = document.getElementById('contact-linkedin-btn');
   if (emailBtn) {
-    emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:61,cb:181}; triggerMode(); });
-    emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null; triggerMode(); });
+    emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:91,cb:220};    applyMode('letter-j');  });
+    emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                     applyMode('nebula');    });
   }
   if (linkedinBtn) {
-    linkedinBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:240,cg:237,cb:232}; triggerMode(); });
-    linkedinBtn.addEventListener('mouseleave', () => { s.hoverColor=null; triggerMode(); });
+    linkedinBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:235,cg:240,cb:255}; applyMode('letter-in'); });
+    linkedinBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                    applyMode('nebula');    });
   }
 
   function rotXY(px,py,pz,rx,ry) {
@@ -236,12 +304,21 @@ let _contactRAF = null;
     s.smoothVX = s.smoothVX*0.94 + s.velX*0.06;
     s.smoothVY = s.smoothVY*0.94 + s.velY*0.06;
     s.velX*=0.8; s.velY*=0.8;
-    s.rotVX += s.smoothVX*0.0000015; s.rotVY += s.smoothVY*0.0000015;
-    s.rotVX*=0.986; s.rotVY*=0.986;
-    s.rotY += s.currentRotSpeed + s.rotVY;
-    s.rotX += s.rotVX;
-    if (s.mouseX>0) s.rotX += (((s.mouseY/Math.max(H,1))-0.5)*0.55 - s.rotX)*0.0025;
-    if (s.wobble) s.rotX += Math.sin(s.t*0.018)*0.0008;
+
+    const inLetterMode = s.activeMode==='letter-j' || s.activeMode==='letter-in';
+    if (inLetterMode) {
+      /* decay accumulated rotation so letters face the viewer */
+      s.rotVX*=0.88; s.rotVY*=0.88;
+      s.rotY*=0.97;
+      s.rotX += (0 - s.rotX) * 0.04;
+    } else {
+      s.rotVX += s.smoothVX*0.0000015; s.rotVY += s.smoothVY*0.0000015;
+      s.rotVX*=0.986; s.rotVY*=0.986;
+      s.rotY += s.currentRotSpeed + s.rotVY;
+      s.rotX += s.rotVX;
+      if (s.mouseX>0) s.rotX += (((s.mouseY/Math.max(H,1))-0.5)*0.55 - s.rotX)*0.0025;
+      if (s.wobble) s.rotX += Math.sin(s.t*0.018)*0.0008;
+    }
 
     s.ripples = s.ripples.filter(r=>r.t<RM);
     s.ripples.forEach(r=>r.t++);
@@ -259,6 +336,10 @@ let _contactRAF = null;
       p.sz += (p._tz-p.sz)*p.lerpSpeed;
       p.dispV*=0.88; p.dispR=p.dispR*0.88+p.dispV;
       p.twinkle+=p.twinkleSpeed;
+      /* spring restoration — overdamped so no bounce, slow return */
+      p.dvX += -p.dispX*0.008; p.dvY += -p.dispY*0.008;
+      p.dvX *= 0.80;            p.dvY *= 0.80;
+      p.dispX += p.dvX;         p.dispY += p.dvY;
     });
 
     const proj = pts.map((p,pi) => {
@@ -267,9 +348,45 @@ let _contactRAF = null;
       const [rx,ry,rz]=rotXY(wx,wy,wz,s.rotX,s.rotY);
       const [sx2,sy2,sc]=project(rx,ry,rz,cx,cy);
       const depth=Math.max(0,(sc-0.55)/0.9);
-      return { sx:sx2, sy:sy2, sc, depth, alpha:0.22+depth*0.52+Math.sin(p.twinkle)*0.10,
+      const baseAlpha = 0.22+depth*0.52+Math.sin(p.twinkle)*0.10;
+      return { sx:sx2, sy:sy2, sc, depth,
+               alpha: inLetterMode ? Math.min(baseAlpha*1.15+0.12, 0.78) : baseAlpha,
                r:p.dotR*(0.35+depth*0.65)*sc, rz, pi };
     });
+
+    /* mouse interaction — only in nebula mode */
+    if (s.activeMode === 'nebula' && s.mouseX > 0) {
+      const spd = Math.min(Math.sqrt(s.smoothVX*s.smoothVX + s.smoothVY*s.smoothVY), 35);
+      if (s.isDragging) {
+        /* drag: pull nearby dots along the cursor's direction of travel */
+        const DR = 220;
+        proj.forEach(pp => {
+          const dx = pp.sx - s.mouseX, dy = pp.sy - s.mouseY;
+          const d2 = dx*dx + dy*dy;
+          if (d2 < DR*DR) {
+            const falloff = 1 - Math.sqrt(d2)/DR;
+            pts[pp.pi].dvX += s.smoothVX * falloff * falloff * 0.08;
+            pts[pp.pi].dvY += s.smoothVY * falloff * falloff * 0.08;
+          }
+        });
+      } else if (spd > 1) {
+        /* hover: scatter dots radially away from cursor */
+        const IR = 180;
+        proj.forEach(pp => {
+          const dx = pp.sx - s.mouseX, dy = pp.sy - s.mouseY;
+          const d2 = dx*dx + dy*dy;
+          if (d2 < IR*IR && d2 > 0.1) {
+            const d = Math.sqrt(d2);
+            const falloff = 1 - d/IR;
+            pts[pp.pi].dvX += (dx/d) * falloff * falloff * spd * 0.06;
+            pts[pp.pi].dvY += (dy/d) * falloff * falloff * spd * 0.06;
+          }
+        });
+      }
+    }
+
+    /* apply accumulated screen-space displacement to projected positions */
+    proj.forEach(pp => { pp.sx += pts[pp.pi].dispX; pp.sy += pts[pp.pi].dispY; });
 
     s.ripples.forEach(rpl => {
       const wf=rpl.t*RS, decay=Math.pow(1-rpl.t/RM,1.8);
@@ -286,7 +403,7 @@ let _contactRAF = null;
         if (d2<68*68) {
           const prog=1-Math.sqrt(d2)/68, da=(proj[i].depth+proj[j].depth)*0.5;
           ctx.beginPath(); ctx.moveTo(proj[i].sx,proj[i].sy); ctx.lineTo(proj[j].sx,proj[j].sy);
-          ctx.strokeStyle=`rgba(100,100,100,${prog*da*0.035})`; ctx.lineWidth=0.5; ctx.stroke();
+          ctx.strokeStyle=`rgba(130,130,130,${prog*da*0.10})`; ctx.lineWidth=0.6; ctx.stroke();
         }
       }
     }
@@ -302,12 +419,13 @@ let _contactRAF = null;
         cb=Math.round(lum+(s.hoverCB-lum)*hp);
       }
       ctx.beginPath();
-      ctx.arc(p.sx, p.sy, Math.max(0.1,Math.min(p.r,2.6)), 0, Math.PI*2);
+      ctx.arc(p.sx, p.sy, Math.max(0.1, Math.min(p.r * (inLetterMode ? 1.6 : 1.0), inLetterMode ? 4.0 : 3.5)), 0, Math.PI*2);
       ctx.fillStyle=`rgba(${cr},${cg},${cb},${p.alpha})`;
       ctx.fill();
     });
 
-    const g=Math.round(s.hoverColorProgress*12);
+    const maxGlow = inLetterMode ? 28 : 12;
+    const g = Math.round(s.hoverColorProgress * maxGlow);
     canvas.style.filter = g>0 ? `drop-shadow(0 0 ${g}px rgba(${s.hoverCR},${s.hoverCG},${s.hoverCB},0.35))` : '';
 
     _contactRAF = requestAnimationFrame(draw);
@@ -315,436 +433,4 @@ let _contactRAF = null;
 
   draw();
 })();
-
-/* Compose modal */
-(function () {
-  const INTENTS = [
-    {
-      label: 'Custom message',
-      subject: 'Hello João',
-      body: 'Hi João,\n\n[your message]\n\nThanks,\n'
-    },
-    {
-      label: 'Work together',
-      subject: "Project — let's talk",
-      body: "Hi João,\n\nWe're building [product / company] and are looking for help with [problem]. Timeline: [when]. Budget range: [if known].\n\nWould you be open to a short call?\n\nThanks,\n"
-    },
-    {
-      label: 'Mentor me',
-      subject: 'Mentorship — quick intro',
-      body: "Hi João,\n\nI'm a [role / years of experience] working on [domain]. I've been following your work on [thing] and would love 30 minutes to ask you about [specific question].\n\nHappy to work around your schedule.\n\nThanks,\n"
-    }
-  ];
-
-  let mounted   = false;
-  let intentIdx = 0;
-  let dirtySubj = false;
-  let dirtyBody = false;
-
-  const autoGrow = (el) => {
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 264) + 'px';
-  };
-
-  const updateSendLabel = () => {
-    const btn  = document.getElementById('compose-send');
-    const subj = document.getElementById('compose-subject');
-    if (btn && subj) btn.setAttribute('aria-label', `Submit message — ${subj.value}`);
-  };
-
-  const applyIntent = (idx) => {
-    const { subject, body } = INTENTS[idx];
-    const subjEl = document.getElementById('compose-subject');
-    const bodyEl = document.getElementById('compose-body');
-    if (!dirtySubj && subjEl) subjEl.value = subject;
-    if (!dirtyBody && bodyEl) { bodyEl.value = body; autoGrow(bodyEl); }
-    updateSendLabel();
-  };
-
-  const getWorkFieldsHTML = () => `
-<div class="compose-field">
-  <span class="eyebrow">What are you building?</span>
-  <div class="form-toggle" data-field="productType">
-    <button class="form-toggle-btn is-selected" data-val="Web app" type="button">Web app</button>
-    <button class="form-toggle-btn" data-val="Mobile app" type="button">Mobile app</button>
-    <button class="form-toggle-btn" data-val="Design system" type="button">Design system</button>
-    <button class="form-toggle-btn" data-val="AI product" type="button">AI product</button>
-    <button class="form-toggle-btn" data-val="Other" type="button">Other</button>
-  </div>
-</div>
-<div class="compose-field">
-  <span class="eyebrow">Budget range</span>
-  <div class="form-radio-group">
-    <label class="form-radio"><input type="radio" name="work-budget" value="&lt; $5k"><span>&lt; $5k</span></label>
-    <label class="form-radio"><input type="radio" name="work-budget" value="$5k–$20k"><span>$5k–$20k</span></label>
-    <label class="form-radio"><input type="radio" name="work-budget" value="$20k–$50k"><span>$20k–$50k</span></label>
-    <label class="form-radio"><input type="radio" name="work-budget" value="$50k+"><span>$50k+</span></label>
-    <label class="form-radio"><input type="radio" name="work-budget" value="Let's discuss"><span>Let's discuss</span></label>
-  </div>
-</div>
-<div class="compose-field">
-  <div class="form-slider-row">
-    <span class="eyebrow">Urgency</span>
-    <span class="form-slider-val" id="work-urgency-val">Flexible</span>
-  </div>
-  <input class="form-slider" type="range" id="work-urgency" min="1" max="4" value="2" step="1">
-  <div class="form-slider-ticks"><span>Exploring</span><span>Flexible</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>
-</div>
-<div class="compose-field">
-  <span class="eyebrow">What kind of help do you need?</span>
-  <div class="form-check-group">
-    <label class="form-check"><input type="checkbox" value="UX Design"><span>UX Design</span></label>
-    <label class="form-check"><input type="checkbox" value="UI Design"><span>UI Design</span></label>
-    <label class="form-check"><input type="checkbox" value="Prototyping"><span>Prototyping</span></label>
-    <label class="form-check"><input type="checkbox" value="Design System"><span>Design System</span></label>
-    <label class="form-check"><input type="checkbox" value="UX Research"><span>UX Research</span></label>
-    <label class="form-check"><input type="checkbox" value="AI tooling"><span>AI tooling</span></label>
-  </div>
-</div>
-<div class="compose-field">
-  <label class="eyebrow" for="work-context">Tell me about the project</label>
-  <textarea class="compose-textarea" id="work-context" rows="3" autocomplete="off" placeholder="What are you building, for whom, and what's the biggest design challenge right now?"></textarea>
-</div>`;
-
-  const getMentorFieldsHTML = () => `
-<div class="compose-field">
-  <span class="eyebrow">Your experience level</span>
-  <div class="form-toggle" data-field="experience">
-    <button class="form-toggle-btn is-selected" data-val="Student" type="button">Student</button>
-    <button class="form-toggle-btn" data-val="Junior (0–2y)" type="button">Junior (0–2y)</button>
-    <button class="form-toggle-btn" data-val="Mid (2–5y)" type="button">Mid (2–5y)</button>
-    <button class="form-toggle-btn" data-val="Senior (5y+)" type="button">Senior (5y+)</button>
-  </div>
-</div>
-<div class="compose-field">
-  <span class="eyebrow">What would you like to work on?</span>
-  <div class="form-check-group">
-    <label class="form-check"><input type="checkbox" value="Product Design"><span>Product Design</span></label>
-    <label class="form-check"><input type="checkbox" value="Design Systems"><span>Design Systems</span></label>
-    <label class="form-check"><input type="checkbox" value="Building with AI"><span>Building with AI</span></label>
-    <label class="form-check"><input type="checkbox" value="UX Research"><span>UX Research</span></label>
-    <label class="form-check"><input type="checkbox" value="Career Growth"><span>Career Growth</span></label>
-    <label class="form-check"><input type="checkbox" value="Portfolio review"><span>Portfolio review</span></label>
-    <label class="form-check"><input type="checkbox" value="Mock interview"><span>Mock interview</span></label>
-  </div>
-</div>
-<div class="compose-field">
-  <span class="eyebrow">What format are you looking for?</span>
-  <div class="form-radio-group">
-    <label class="form-radio"><input type="radio" name="mentor-format" value="One-time session"><span>One-time session</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-format" value="Ongoing mentorship"><span>Ongoing mentorship</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-format" value="Portfolio review"><span>Portfolio review</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-format" value="Quick question"><span>Quick question</span></label>
-  </div>
-</div>
-<div class="compose-field">
-  <span class="eyebrow">Budget per session</span>
-  <div class="form-radio-group">
-    <label class="form-radio"><input type="radio" name="mentor-budget" value="Open to exchange"><span>Open to exchange</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-budget" value="$50–$100"><span>$50–$100</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-budget" value="$100–$200"><span>$100–$200</span></label>
-    <label class="form-radio"><input type="radio" name="mentor-budget" value="$200+"><span>$200+</span></label>
-  </div>
-</div>
-<div class="compose-field">
-  <label class="eyebrow" for="mentor-context">Where are you and where do you want to go?</label>
-  <textarea class="compose-textarea" id="mentor-context" rows="3" autocomplete="off" placeholder="Current situation, what you're struggling with, what success looks like for you…"></textarea>
-</div>`;
-
-  const bindFormToggle = (container) => {
-    container.querySelectorAll('.form-toggle').forEach(group => {
-      const fbtns = group.querySelectorAll('.form-toggle-btn');
-      fbtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          fbtns.forEach(b => b.classList.remove('is-selected'));
-          btn.classList.add('is-selected');
-        });
-      });
-    });
-  };
-
-  const bindWorkSlider = (container) => {
-    const slider = container.querySelector('#work-urgency');
-    const val    = container.querySelector('#work-urgency-val');
-    const labels = ['Exploring', 'Flexible', 'Soon (1–3 mo)', 'ASAP'];
-    slider?.addEventListener('input', () => { val.textContent = labels[+slider.value - 1]; });
-  };
-
-  const showFields = (idx) => {
-    const label    = INTENTS[idx].label;
-    const std      = document.getElementById('compose-fields-standard');
-    const isWork   = label === 'Work together';
-    const isMentor = label === 'Mentor me';
-    std.style.display = (isWork || isMentor) ? 'none' : '';
-
-    let workEl   = document.getElementById('compose-fields-work');
-    let mentorEl = document.getElementById('compose-fields-mentor');
-
-    if (isWork && !workEl) {
-      workEl = document.createElement('div');
-      workEl.id = 'compose-fields-work';
-      workEl.innerHTML = getWorkFieldsHTML();
-      std.insertAdjacentElement('afterend', workEl);
-      bindFormToggle(workEl);
-      bindWorkSlider(workEl);
-    } else if (workEl) {
-      workEl.style.display = isWork ? '' : 'none';
-    }
-
-    const anchor = document.getElementById('compose-fields-work') || std;
-    if (isMentor && !mentorEl) {
-      mentorEl = document.createElement('div');
-      mentorEl.id = 'compose-fields-mentor';
-      mentorEl.innerHTML = getMentorFieldsHTML();
-      anchor.insertAdjacentElement('afterend', mentorEl);
-      bindFormToggle(mentorEl);
-    } else if (mentorEl) {
-      mentorEl.style.display = isMentor ? '' : 'none';
-    }
-  };
-
-  const collectFormData = () => {
-    const label = INTENTS[intentIdx].label;
-    if (label === 'Work together') {
-      const productType = document.querySelector('#compose-fields-work .form-toggle .is-selected')?.dataset.val ?? 'Not specified';
-      const budget      = document.querySelector('#compose-fields-work input[name="work-budget"]:checked')?.value ?? 'Not specified';
-      const urgency     = document.getElementById('work-urgency-val')?.textContent ?? 'Not specified';
-      const services    = Array.from(document.querySelectorAll('#compose-fields-work .form-check input:checked')).map(el => el.value);
-      const context     = document.getElementById('work-context')?.value ?? '';
-      return {
-        subject: `Project inquiry — ${productType}`,
-        message: [
-          `Product type: ${productType}`,
-          `Budget: ${budget}`,
-          `Urgency: ${urgency}`,
-          services.length ? `Services: ${services.join(', ')}` : null,
-          context ? `\nProject details:\n${context}` : null,
-        ].filter(Boolean).join('\n')
-      };
-    }
-    if (label === 'Mentor me') {
-      const experience = document.querySelector('#compose-fields-mentor .form-toggle .is-selected')?.dataset.val ?? 'Not specified';
-      const topics     = Array.from(document.querySelectorAll('#compose-fields-mentor .form-check input:checked')).map(el => el.value);
-      const format     = document.querySelector('#compose-fields-mentor input[name="mentor-format"]:checked')?.value ?? 'Not specified';
-      const budget     = document.querySelector('#compose-fields-mentor input[name="mentor-budget"]:checked')?.value ?? 'Not specified';
-      const context    = document.getElementById('mentor-context')?.value ?? '';
-      return {
-        subject: `Mentorship inquiry — ${experience}`,
-        message: [
-          `Experience: ${experience}`,
-          topics.length ? `Focus: ${topics.join(', ')}` : null,
-          `Format: ${format}`,
-          `Budget: ${budget}`,
-          context ? `\nAbout me:\n${context}` : null,
-        ].filter(Boolean).join('\n')
-      };
-    }
-    return {
-      subject: document.getElementById('compose-subject')?.value ?? '',
-      message: document.getElementById('compose-body')?.value ?? '',
-    };
-  };
-
-  const getHTML = () => {
-    const btnsHTML = INTENTS.map((intent, i) =>
-      `<button class="intent-btn" role="radio" aria-checked="${i === 0 ? 'true' : 'false'}" tabindex="${i === 0 ? 0 : -1}" data-idx="${i}" type="button">${intent.label}</button>`
-    ).join('');
-    return `
-<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">
-  <div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"
-       aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">
-    <div class="compose-header">
-      <span class="eyebrow" id="compose-eyebrow">Let's talk</span>
-      <h2 id="compose-heading">What brings you here?</h2>
-    </div>
-    <div class="intent-toggle" role="radiogroup" aria-label="Message intent">${btnsHTML}</div>
-    <div id="compose-fields-standard">
-      <div class="compose-field">
-        <div class="compose-field-label-row">
-          <label class="eyebrow" for="compose-subject">Subject</label>
-          <button class="compose-reset" id="reset-subject" type="button" aria-label="Reset subject to template">Reset to template</button>
-        </div>
-        <input class="compose-input" id="compose-subject" type="text" autocomplete="off" value="">
-      </div>
-      <div class="compose-field">
-        <div class="compose-field-label-row">
-          <label class="eyebrow" for="compose-body">Message</label>
-          <button class="compose-reset" id="reset-body" type="button" aria-label="Reset message to template">Reset to template</button>
-        </div>
-        <textarea class="compose-textarea" id="compose-body" rows="6" autocomplete="off"></textarea>
-      </div>
-    </div>
-    <div class="compose-footer">
-      <button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        <span id="compose-copy-hint">Copy my email address</span>
-      </button>
-      <div class="compose-footer-actions">
-        <button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>
-        <button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Submit</span>
-        </button>
-      </div>
-    </div>
-  </div>
-</div>`;
-  };
-
-  const closeModal = () => {
-    const bd = document.getElementById('compose-backdrop');
-    if (!bd) return;
-    bd.classList.remove('is-open');
-    bd.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
-    document.getElementById('compose-open')?.focus();
-  };
-
-  const FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID'; // TODO: replace with your Formspree endpoint
-
-  const bindEvents = () => {
-    const bd        = document.getElementById('compose-backdrop');
-    const modal     = document.getElementById('compose-modal');
-    const btns      = Array.from(document.querySelectorAll('.intent-btn'));
-    const subjEl    = document.getElementById('compose-subject');
-    const bodyEl    = document.getElementById('compose-body');
-    const resetS    = document.getElementById('reset-subject');
-    const resetB    = document.getElementById('reset-body');
-    const cancelBtn = document.getElementById('compose-cancel');
-    const sendBtn   = document.getElementById('compose-send');
-    const copyBtn   = document.getElementById('compose-copy-email');
-    const copyHint  = document.getElementById('compose-copy-hint');
-
-    applyIntent(0);
-    autoGrow(bodyEl);
-
-    bd.addEventListener('click', (e) => { if (e.target === bd) closeModal(); });
-
-    const selectIntent = (idx) => {
-      intentIdx = idx;
-      btns.forEach((b, i) => {
-        b.setAttribute('aria-checked', String(i === idx));
-        b.setAttribute('tabindex', i === idx ? '0' : '-1');
-      });
-      showFields(idx);
-      if (INTENTS[idx].label === 'Custom message') applyIntent(idx);
-    };
-
-    btns.forEach((btn, i) => {
-      btn.addEventListener('click', () => selectIntent(i));
-      btn.addEventListener('keydown', (e) => {
-        const len = btns.length;
-        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-          e.preventDefault();
-          const next = (i + 1) % len;
-          selectIntent(next); btns[next].focus();
-        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-          e.preventDefault();
-          const prev = (i - 1 + len) % len;
-          selectIntent(prev); btns[prev].focus();
-        }
-      });
-    });
-
-    subjEl.addEventListener('input', () => {
-      dirtySubj = true;
-      resetS.classList.add('is-visible');
-      updateSendLabel();
-    });
-
-    bodyEl.addEventListener('input', () => {
-      dirtyBody = true;
-      resetB.classList.add('is-visible');
-      autoGrow(bodyEl);
-    });
-
-    resetS.addEventListener('click', () => {
-      subjEl.value = INTENTS[intentIdx].subject;
-      dirtySubj = false;
-      resetS.classList.remove('is-visible');
-      updateSendLabel();
-      subjEl.focus();
-    });
-
-    resetB.addEventListener('click', () => {
-      bodyEl.value = INTENTS[intentIdx].body;
-      dirtyBody = false;
-      resetB.classList.remove('is-visible');
-      autoGrow(bodyEl);
-      bodyEl.focus();
-    });
-
-    copyBtn?.addEventListener('click', () => {
-      const addr = ['contact', '\x40', 'joaojacinto.com'].join('');
-      navigator.clipboard?.writeText(addr).then(() => {
-        if (!copyHint) return;
-        copyHint.textContent = 'Copied!';
-        setTimeout(() => { copyHint.textContent = 'Copy my email address'; }, 2000);
-      });
-    });
-
-    cancelBtn.addEventListener('click', closeModal);
-    sendBtn.addEventListener('click', async () => {
-      const { subject, message } = collectFormData();
-      const btnLabel = sendBtn.querySelector('span:last-child');
-      sendBtn.disabled = true;
-      btnLabel.textContent = 'Sending…';
-      try {
-        const res = await fetch(FORM_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ subject, message })
-        });
-        if (res.ok) {
-          btnLabel.textContent = 'Sent ✓';
-          setTimeout(() => closeModal(), 1800);
-        } else {
-          throw new Error('server');
-        }
-      } catch {
-        btnLabel.textContent = 'Submit';
-        sendBtn.disabled = false;
-      }
-    });
-
-    const getFocusable = () => Array.from(
-      modal.querySelectorAll('button:not([disabled]):not([tabindex="-1"]), input, textarea')
-    ).filter(el => getComputedStyle(el).display !== 'none');
-
-    modal.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') { closeModal(); return; }
-      if (e.key !== 'Tab') return;
-      const focusable = getFocusable();
-      if (!focusable.length) return;
-      const first = focusable[0], last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
-      } else {
-        if (document.activeElement === last) { e.preventDefault(); first.focus(); }
-      }
-    });
-  };
-
-  const openModal = () => {
-    if (!mounted) {
-      const root = document.getElementById('compose-root');
-      if (!root) return;
-      root.innerHTML = getHTML();
-      mounted = true;
-      bindEvents();
-    }
-    const bd = document.getElementById('compose-backdrop');
-    if (!bd) return;
-    bd.removeAttribute('aria-hidden');
-    bd.classList.add('is-open');
-    document.body.style.overflow = 'hidden';
-    bd.querySelector('.intent-btn[aria-checked="true"]')?.focus();
-  };
-
-  document.getElementById('compose-open')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal();
-  });
-}());
 </script>

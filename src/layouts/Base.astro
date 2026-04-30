@@ -103,7 +103,7 @@ const {
       <span class="footer-status-dot" id="footer-status-dot"></span>
       <span class="footer-status-label" id="footer-status-label"></span>
     </div>
-    <p><strong>João Jacinto</strong> · Senior Product Designer · <button class="footer-email-link" onclick="openComposeModal()">contact@joaojacinto.com</button> · © 2026</p>
+    <p><strong>João Jacinto</strong> · <button class="footer-email-link" id="footer-email-btn">contact@joaojacinto.com</button> · © 2026</p>
   </footer>
 )}
 
@@ -201,6 +201,8 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       tiltCard.style.transform = '';
       tiltCard.style.removeProperty('--tilt-mx');
       tiltCard.style.removeProperty('--tilt-my');
+      tiltCard.style.removeProperty('--water-dx');
+      tiltCard.style.removeProperty('--water-dy');
       tiltCard.classList.remove('tilt-active');
       tiltCard = null;
     }
@@ -212,6 +214,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     card.style.setProperty('--tilt-mx', ((e.clientX - r.left) / r.width  * 100).toFixed(1));
     card.style.setProperty('--tilt-my', ((e.clientY - r.top)  / r.height * 100).toFixed(1));
     card.classList.add('tilt-active');
+    if (card.classList.contains('hero-photo')) {
+      card.style.setProperty('--water-dx', dx.toFixed(3));
+      card.style.setProperty('--water-dy', dy.toFixed(3));
+    }
     card.style.transition = 'box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.35s cubic-bezier(0.22,1,0.36,1)';
     card.style.transform = `perspective(800px) rotateX(${-dy * TILT_DEG}deg) rotateY(${dx * TILT_DEG}deg) translateZ(${TILT_Z}px)`;
   });
@@ -221,6 +227,8 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     tiltCard.style.transform = '';
     tiltCard.style.removeProperty('--tilt-mx');
     tiltCard.style.removeProperty('--tilt-my');
+    tiltCard.style.removeProperty('--water-dx');
+    tiltCard.style.removeProperty('--water-dy');
     tiltCard.classList.remove('tilt-active');
     tiltCard = null;
   });
@@ -781,27 +789,50 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
 /* Portugal status indicator */
 (function () {
+  var BOLT = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9 1L3 10h5L7 15l7-9h-5L9 1z"/></svg>';
+  var NOTE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM4.5 10.5V4l8-1.5V5l-8 1.5V10.5z"/></svg>';
+
   function updateStatus() {
-    var now = new Date();
+    var now      = new Date();
     var lisbonStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: 'numeric', hour12: false });
-    var hour = parseInt(lisbonStr, 10);
-    var timeStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hour12: false });
-    var dot   = document.getElementById('footer-status-dot');
-    var label = document.getElementById('footer-status-label');
+    var hour     = parseInt(lisbonStr, 10);
+    var timeStr  = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hour12: false });
+    var dot      = document.getElementById('footer-status-dot');
+    var label    = document.getElementById('footer-status-label');
     if (!dot || !label) return;
-    var color, text;
+    var color, text, icon, state;
     if (hour >= 9 && hour < 20) {
-      color = '#22c55e'; text = 'Available \u00b7 Working hours';
+      color = '#22c55e'; text = 'Available · Working hours'; icon = ''; state = 'available';
     } else if (hour >= 1 && hour < 9) {
-      color = '#6b7280'; text = 'Sleeping \u00b7 Back at 9 am';
+      color = '#4b5563'; text = 'Sleeping';                  icon = BOLT; state = 'sleeping';
     } else {
-      color = '#f59e0b'; text = 'Outside working hours';
+      color = '#f59e0b'; text = 'Outside working hours';     icon = ''; state = 'offhours';
     }
+    dot.className = 'footer-status-dot state-' + state;
     dot.style.background = color;
-    label.textContent = text + ' \u00b7 ' + timeStr + ' Aveiro';
+    dot.innerHTML = icon;
+    var tp = timeStr.split(':');
+    label.innerHTML = text + ' · ' + tp[0] + '<span class="clock-blink">:</span>' + tp[1] + ' Aveiro';
   }
+
   updateStatus();
   setInterval(updateStatus, 60000);
+
+  /* Footer email copy */
+  var emailBtn = document.getElementById('footer-email-btn');
+  if (emailBtn) {
+    var origHTML = emailBtn.innerHTML;
+    emailBtn.addEventListener('click', function () {
+      navigator.clipboard && navigator.clipboard.writeText('contact@joaojacinto.com').then(function () {
+        emailBtn.innerHTML = 'Copied ✓';
+        emailBtn.classList.add('copied');
+        setTimeout(function () {
+          emailBtn.innerHTML = origHTML;
+          emailBtn.classList.remove('copied');
+        }, 2000);
+      });
+    });
+  }
 })();
 </script>
 
