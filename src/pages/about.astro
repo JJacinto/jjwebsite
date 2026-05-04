@@ -1,5 +1,80 @@
 ---
 import Base from '../layouts/Base.astro';
+
+/* My Stack — Triple Diamond model.
+   Edit `phases` and `alwaysOn` below; markup maps over them.
+   Tool names intentionally repeat across phases (Dovetail, Obsidian, Claude)
+   with phase-specific reasons — this is signal, not noise. Don't dedupe. */
+
+const phases = [
+  {
+    id: "discover",
+    title: "Discover & Define",
+    descriptor: "Understanding the problem before solving it.",
+    tools: [
+      /* PLACEHOLDER reason for Figjam — review wording before publishing. */
+      { name: "Figjam",    why: "Mapping problems collaboratively before pixels" },
+      { name: "Dovetail",  why: "Tagging interviews, surfacing patterns across sessions" },
+    ],
+  },
+  {
+    id: "develop",
+    title: "Develop & Deliver",
+    descriptor: "Turning the problem into something shippable.",
+    tools: [
+      { name: "Figma",      why: "Design systems and high fidelity design" },
+      { name: "Jitter",     why: "Quick motion explorations before committing in Figma" },
+      { name: "Retune.dev", why: "Visual layer for vibe coding" },
+    ],
+  },
+  {
+    id: "deploy",
+    title: "Deploy & Learn",
+    descriptor: "Measuring what shipped, deciding what's next.",
+    /* PLACEHOLDER reasons for Fullstory / Mixpanel / Looker — review before publishing. */
+    tools: [
+      { name: "Fullstory", why: "Session replay — watching what users actually do post-launch" },
+      { name: "Mixpanel",  why: "Funnel and event tracking to measure what shipped" },
+      { name: "Looker",    why: "Dashboards for the metrics that matter after launch" },
+    ],
+  },
+];
+
+const alwaysOn = [
+  {
+    id: "comms",
+    title: "Working with people",
+    /* PLACEHOLDER reasons — replace before publishing. Defaults per spec. */
+    tools: [
+      { name: "Slack",  why: "Async team comms" },
+      { name: "Loom",   why: "Replaces unnecessary 30-min meetings" },
+      { name: "Linear", why: "Tracking work across teams" },
+      { name: "Notion", why: "Shared docs and meeting notes across teams" },
+    ],
+  },
+  {
+    id: "system",
+    title: "Daily drivers",
+    /* PLACEHOLDER reason for Obsidian — review before publishing. */
+    tools: [
+      { name: "Raycast",   why: "Managing windows and launching apps" },
+      { name: "Wisprflow", why: "Faster than typing for 1st drafts" },
+      { name: "Claude",    why: "Pair-thinking, writing, reviews" },
+      { name: "Gemini",    why: "Second opinion after Claude's" },
+    ],
+  },
+  {
+    id: "capture",
+    title: "Hardware that earned its spot",
+    /* PLACEHOLDER reasons — review and tune the one-liners before publishing. */
+    tools: [
+      { name: "Steelcase Leap v2",   why: "Where I sit in 8+ hours a day" },
+      { name: "Odyssey G9",          why: "To see all windows at a glance" },
+      { name: "Logitech MX Keys",    why: "Low-profile, quiet, multi-device" },
+      { name: "Hifiman XV",          why: "Open-back for focus, neutral enough to mix on" },
+    ],
+  },
+];
 ---
 <Base
   activePage="about"
@@ -32,7 +107,6 @@ import Base from '../layouts/Base.astro';
       <hr class="section-divider">
 
       <section class="about-me">
-        <span class="eyebrow reveal">Stack</span>
         <div class="about-grid">
           <div class="about-col reveal reveal-d1">
             <h3>Type</h3>
@@ -59,7 +133,7 @@ import Base from '../layouts/Base.astro';
               <li>Music production, drums</li>
               <li>Building with AI</li>
               <li>Gaming</li>
-              <li>Football, Padel</li>
+              <li>Football, Padel tennis</li>
             </ul>
           </div>
         </div>
@@ -67,8 +141,10 @@ import Base from '../layouts/Base.astro';
 
       <hr class="section-divider">
 
+      <h2 class="stack-title reveal">My journey</h2>
+
+      <div class="timeline">
       <section class="journey">
-        <span class="eyebrow reveal">My journey</span>
         <div class="journey-row reveal">
           <div class="journey-year">2024–now</div>
           <div>
@@ -91,7 +167,6 @@ import Base from '../layouts/Base.astro';
             </div>
             <p class="journey-desc">Live streaming SaaS. Webinars product UX, research ops, and the design system.</p>
             <ul class="journey-achievements">
-              <li class="journey-achievement">Built a contribution model that got 6 product teams' engineers and designers shipping into the design system without me as a bottleneck</li>
               <li class="journey-achievement">Tripled weekly webinar volume after shipping the customisation feature</li>
             </ul>
           </div>
@@ -137,16 +212,14 @@ import Base from '../layouts/Base.astro';
         </div>
       </section>
 
-      <hr class="section-divider">
-
       <section class="influences">
         <span class="eyebrow reveal">Roots &amp; Influences</span>
         <div class="influences-layout reveal reveal-d1">
 
           <div class="influences-narrative">
-            <h2>How I got here</h2>
-            <p>I started shipping front-end code at 15 — themes for Hi5 (now Tagged), and MySpace that pulled 50,000+ concurrent users. That early loop of "make a thing, watch people use it, learn from what breaks" became the throughline. I studied IT engineering with a front-end specialisation, then spent the last decade in product design across enterprise SaaS, crypto, live streaming, and AI tooling.</p>
-            <p>The dev background never went away. It's the reason I prototype in code when Figma stops being useful, ship my own portfolio, and treat the line between design and engineering as a tool — not a fence.</p>
+            <p>The line between design and engineering has always been a tool for me, not a fence.</p>
+            <p>I was doing digital branding for friends at 13 — logos, profile graphics, whatever they needed — before I'd even thought of it as design. By 15 I was shipping front-end code: themes for Hi5 and MySpace, some pulling 50,000+ concurrent users. That loop of making something, watching people use it, and learning from what breaks set the pattern early.</p>
+            <p>IT engineering taught me how products work; multimedia design was where I learned how they communicate. I pivoted because the second half was the one I couldn't stop thinking about — but I've kept both halves active. A decade across enterprise SaaS, crypto, live streaming, and AI tooling later, the engineering half still shapes how I design: I scope what's buildable, talk tradeoffs in engineers' language, and ship the real interaction when a mock can't carry the argument. With AI in the loop, that fluency matters more, not less — prompting a model to build something is still an engineering conversation, just at a higher level.</p>
           </div>
 
           <div class="influences-right" style="display:none">
@@ -201,49 +274,77 @@ import Base from '../layouts/Base.astro';
 
         </div>
       </section>
+      </div>
 
       <hr class="section-divider">
 
-      <section class="tools reveal">
-        <span class="eyebrow">Preferred software</span>
-        <div class="tools-row">
-          <span class="tool-tag">Figma</span>
-          <span class="tool-tag">Framer</span>
-          <span class="tool-tag">Notion</span>
-          <span class="tool-tag">Linear</span>
-          <span class="tool-tag">GitHub</span>
-          <span class="tool-tag">Dovetail</span>
-          <span class="tool-tag">Claude</span>
-          <span class="tool-tag">Gemini</span>
-          <span class="tool-tag">Retune</span>
-          <span class="tool-tag">Loom</span>
-          <span class="tool-tag">Adobe CS</span>
-          <span class="tool-tag">VS Code</span>
-          <span class="tool-tag">Wisprflow</span>
-        </div>
-      </section>
+      <h2 class="stack-title reveal">My Process and Tools</h2>
 
-      <section class="tools reveal">
-        <span class="eyebrow">Current hardware</span>
-        <div class="tools-row">
-          <span class="tool-tag">MacBook Pro 16"</span>
-          <span class="tool-tag">iPad Pro 10"</span>
-          <span class="tool-tag">Logitech MX Keys</span>
-          <span class="tool-tag">Logitech MX Master</span>
-          <span class="tool-tag">Focusrite 4i4</span>
-          <span class="tool-tag">T.Bone SC400</span>
-          <span class="tool-tag">Samsung Odyssey G9</span>
-          <span class="tool-tag">Stream Deck +</span>
-          <span class="tool-tag">Obsbot Tiny 3 Lite</span>
-          <span class="tool-tag">Alesis M1 Active</span>
-          <span class="tool-tag">Sennheiser HD598SE</span>
-          <span class="tool-tag">Steelcase Leap v2</span>
-          <span class="tool-tag">Delta Carpio 2.0</span>
-          <span class="tool-tag">Maidesite T2 Pro</span>
+      <section class="stack reveal" aria-label="My Stack">
+
+        <div class="phase-list">
+          {phases.map((phase) => (
+            <div class="phase-row">
+              <div class="phase-meta">
+                <h3 class="phase-title">{phase.title}</h3>
+                <p class="phase-descriptor"><em>{phase.descriptor}</em></p>
+              </div>
+              <dl class="phase-tools">
+                {phase.tools.map((t) => (
+                  <div class="phase-item">
+                    <dt>{t.name}</dt>
+                    <dd>{t.why}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          ))}
         </div>
+
+        <div class="always-on">
+          <p class="always-on-intro"><em>Tools that don't belong to a single phase because they span all of them.</em></p>
+          <div class="always-on-grid">
+            {alwaysOn.map((group) => (
+              <div class="always-on-group">
+                <h3 class="always-on-title">{group.title}</h3>
+                <dl class="always-on-tools">
+                  {group.tools.map((t) => (
+                    <div class="always-on-item tooltip-host" data-tip={`${t.name} — ${t.why}`}>
+                      <dt>{t.name}</dt>
+                      <dd>{t.why}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </section>
 
     </div>
   </div>
+
+  <script is:inline>
+    /* Phase timeline — fill the diamond marker once a phase has scrolled past
+       the upper portion of the viewport. Mirrors the journey timeline above. */
+    (function () {
+      const phases = document.querySelectorAll('.phase-row');
+      if (!phases.length) return;
+      function update() {
+        /* Fill only once the phase has fully scrolled past — i.e. its bottom
+           edge is above the nav bar. While scrolling through the phase
+           itself, the lozenge stays unfilled. */
+        const trigger = 80;
+        phases.forEach((p) => {
+          const rect = p.getBoundingClientRect();
+          p.classList.toggle('phase-passed', rect.bottom < trigger);
+        });
+      }
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+    })();
+  </script>
 
 </Base>
