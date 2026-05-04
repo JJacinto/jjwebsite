@@ -404,7 +404,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 <script is:inline>
 /* Compose modal */
 (function () {
-  var INTENTS = ["Let’s chat", "Start a project", "Book a call"];
+  var INTENTS = ["Let’s chat", "Start a project"];
   var mounted   = false;
   var intentIdx = 0;
   var selectIntent = null;
@@ -418,15 +418,28 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   var calMonth = new Date().getMonth();
   var calSel   = null;
 
+  /* Shared name + email — rendered once at the top of the modal body and used
+     by both the chat and project tabs. */
+  var getSharedFieldsHTML = function () {
+    return (
+      '<div class="compose-shared-row">' +
+        '<div class="compose-field">' +
+          '<label class="eyebrow" for="user-name">Your name</label>' +
+          '<input class="compose-input" id="user-name" type="text" required autocomplete="name" placeholder="First name or full name">' +
+        '</div>' +
+        '<div class="compose-field">' +
+          '<label class="eyebrow" for="user-email">Your email</label>' +
+          '<input class="compose-input" id="user-email" type="email" required autocomplete="email" placeholder="you@example.com">' +
+        '</div>' +
+      '</div>'
+    );
+  };
+
   var getChatFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="chat-name">Your name</label>' +
-        '<input class="compose-input" id="chat-name" type="text" autocomplete="name" placeholder="First name or full name">' +
-      '</div>' +
-      '<div class="compose-field">' +
         '<label class="eyebrow" for="chat-body">Message</label>' +
-        '<textarea class="compose-textarea" id="chat-body" rows="5" autocomplete="off" placeholder="What&#x27;s on your mind?"></textarea>' +
+        '<textarea class="compose-textarea" id="chat-body" rows="5" required autocomplete="off" placeholder="What&#x27;s on your mind?"></textarea>' +
       '</div>'
     );
   };
@@ -434,23 +447,19 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   var getProjectFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
-        '<span class="eyebrow">What are you building?</span>' +
-        '<div class="form-toggle" data-field="productType">' +
-          '<button class="form-toggle-btn is-selected" data-val="Web app" type="button">Web app</button>' +
-          '<button class="form-toggle-btn" data-val="Mobile app" type="button">Mobile app</button>' +
-          '<button class="form-toggle-btn" data-val="Design system" type="button">Design system</button>' +
-          '<button class="form-toggle-btn" data-val="AI product" type="button">AI product</button>' +
-          '<button class="form-toggle-btn" data-val="Other" type="button">Other</button>' +
+        '<span class="eyebrow">Engagement type</span>' +
+        '<div class="form-radio-group">' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time" required><span>One-time</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Recurring project" required><span>Recurring project</span></label>' +
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
         '<span class="eyebrow">Budget range</span>' +
         '<div class="form-radio-group">' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="< $5k"><span>&lt; $5k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$20k"><span>$5k–$20k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$20k-$50k"><span>$20k–$50k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$50k+"><span>$50k+</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="Flexible"><span>Flexible</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$3k-$5k" required><span>$3k–$5k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$10k" required><span>$5k–$10k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$10k-$25k" required><span>$10k–$25k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$25k+" required><span>$25k+</span></label>' +
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
@@ -462,16 +471,15 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         '<div class="form-slider-ticks"><span>Exploring</span><span>Flexible</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>' +
       '</div>' +
       '<div class="compose-field">' +
-        '<span class="eyebrow">Engagement type</span>' +
-        '<div class="form-radio-group">' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time"><span>One-time</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Recurring project"><span>Recurring project</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Quote"><span>Quote</span></label>' +
-        '</div>' +
+        '<label class="eyebrow" for="proj-context">Tell me about the project</label>' +
+        '<textarea class="compose-textarea" id="proj-context" rows="3" required autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the biggest challenge?"></textarea>' +
       '</div>' +
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="proj-context">Tell me about the project</label>' +
-        '<textarea class="compose-textarea" id="proj-context" rows="3" autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the biggest challenge?"></textarea>' +
+        '<label class="eyebrow" for="proj-links">Relevant links <span class="compose-optional">(optional)</span></label>' +
+        '<div class="compose-input-with-icon">' +
+          '<svg class="compose-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
+          '<input class="compose-input compose-input--has-icon" id="proj-links" type="url" autocomplete="url" placeholder="https://figma.com/…, github.com/…">' +
+        '</div>' +
       '</div>'
     );
   };
@@ -589,6 +597,15 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     if (bookEl) bookEl.style.display = (idx === 2) ? '' : 'none';
   };
 
+  var collectSharedFields = function () {
+    var nEl = document.getElementById('user-name');
+    var eEl = document.getElementById('user-email');
+    return {
+      name:  nEl ? nEl.value.trim() : '',
+      email: eEl ? eEl.value.trim() : ''
+    };
+  };
+
   var collectFormData = function () {
     if (intentIdx === 2) {
       var dateStr = calSel
@@ -598,29 +615,34 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       var timeStr = timeEl && timeEl.value ? timeEl.value : 'Not selected';
       return { subject: 'Call booking request', message: 'Date: ' + dateStr + '\nTime: ' + timeStr };
     }
+    var shared      = collectSharedFields();
+    var sharedHead  = 'From: ' + (shared.name || '—') + ' <' + (shared.email || '—') + '>';
     if (intentIdx === 1) {
-      var sel         = document.querySelector('#compose-fields-project .form-toggle .is-selected');
-      var productType = sel ? sel.dataset.val : 'Not specified';
+      var engEl       = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
+      var engagement  = engEl ? engEl.value : 'Not specified';
       var budgetEl    = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
       var budget      = budgetEl ? budgetEl.value : 'Not specified';
       var timelineEl  = document.getElementById('proj-timeline-val');
       var timeline    = timelineEl ? timelineEl.textContent : 'Not specified';
-      var engEl       = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
-      var engagement  = engEl ? engEl.value : 'Not specified';
       var ctxEl       = document.getElementById('proj-context');
       var context     = ctxEl ? ctxEl.value : '';
+      var linksEl     = document.getElementById('proj-links');
+      var links       = linksEl ? linksEl.value.trim() : '';
       return {
-        subject: 'Project inquiry — ' + productType,
-        message: ['Product type: ' + productType, 'Budget: ' + budget,
-                  'Timeline: ' + timeline, 'Engagement: ' + engagement,
-                  context ? '\nProject details:\n' + context : null].filter(Boolean).join('\n')
+        subject: 'Project inquiry — ' + engagement + (shared.name ? ' (' + shared.name + ')' : ''),
+        message: [sharedHead, '',
+                  'Engagement: ' + engagement, 'Budget: ' + budget,
+                  'Timeline: ' + timeline,
+                  context ? '\nProject details:\n' + context : null,
+                  links ? '\nRelevant links:\n' + links : null].filter(function (l) { return l !== null; }).join('\n')
       };
     }
-    var nameEl = document.getElementById('chat-name');
     var bodyEl = document.getElementById('chat-body');
-    var name   = nameEl ? nameEl.value.trim() : '';
     var msg    = bodyEl ? bodyEl.value : '';
-    return { subject: name ? 'Message from ' + name : 'New message', message: msg };
+    return {
+      subject: shared.name ? 'Message from ' + shared.name : 'New message',
+      message: sharedHead + '\n\n' + msg
+    };
   };
 
   var getHTML = function () {
@@ -632,14 +654,19 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       '<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">' +
         '<div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"' +
           ' aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">' +
-          '<div class="compose-header">' +
-            '<span class="eyebrow" id="compose-eyebrow">Let&#x27;s talk</span>' +
-            '<h2 id="compose-heading">What brings you here?</h2>' +
+          '<div class="compose-modal-top">' +
+            '<div class="compose-header">' +
+              '<span class="eyebrow" id="compose-eyebrow">Let&#x27;s talk</span>' +
+              '<h2 id="compose-heading">What brings you here?</h2>' +
+            '</div>' +
+            '<div class="intent-toggle" role="radiogroup" aria-label="Message intent">' + btnsHTML + '</div>' +
           '</div>' +
-          '<div class="intent-toggle" role="radiogroup" aria-label="Message intent">' + btnsHTML + '</div>' +
-          '<div id="compose-fields-chat">' + getChatFieldsHTML() + '</div>' +
-          '<div id="compose-fields-project" style="display:none">' + getProjectFieldsHTML() + '</div>' +
-          '<div id="compose-fields-book" style="display:none">' + getBookFieldsHTML() + '</div>' +
+          '<div class="compose-modal-body">' +
+            '<div id="compose-fields-shared">' + getSharedFieldsHTML() + '</div>' +
+            '<div id="compose-fields-chat">' + getChatFieldsHTML() + '</div>' +
+            '<div id="compose-fields-project" style="display:none">' + getProjectFieldsHTML() + '</div>' +
+            '<div id="compose-fields-book" style="display:none">' + getBookFieldsHTML() + '</div>' +
+          '</div>' +
           '<div class="compose-footer" id="compose-footer">' +
             '<button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
@@ -669,6 +696,49 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   };
 
   var FORM_ENDPOINT = 'https://formspree.io/f/YOUR_FORM_ID';
+
+  /* Client-side submission throttle. Server-side rate limiting on the form
+     endpoint is the real defence; this is a UX guard so the same browser
+     can't spam the modal. Cooldown grows after each successful submit. */
+  var THROTTLE_KEY = 'compose-throttle';
+  var COOLDOWN_SCHEDULE_MS = [
+    5  * 60 * 1000,        /* after 1st submit: 5 min */
+    30 * 60 * 1000,        /* after 2nd:        30 min */
+    2  * 60 * 60 * 1000,   /* after 3rd:        2 h */
+    12 * 60 * 60 * 1000,   /* after 4th:        12 h */
+    24 * 60 * 60 * 1000    /* after 5th+:       24 h */
+  ];
+
+  var getThrottleState = function () {
+    try {
+      var raw = localStorage.getItem(THROTTLE_KEY);
+      if (!raw) return { count: 0, lastAt: 0 };
+      var s = JSON.parse(raw);
+      return s && typeof s.count === 'number' ? s : { count: 0, lastAt: 0 };
+    } catch (_) { return { count: 0, lastAt: 0 }; }
+  };
+  var setThrottleState = function (state) {
+    try { localStorage.setItem(THROTTLE_KEY, JSON.stringify(state)); } catch (_) {}
+  };
+  var cooldownFor = function (count) {
+    if (count <= 0) return 0;
+    var idx = Math.min(count - 1, COOLDOWN_SCHEDULE_MS.length - 1);
+    return COOLDOWN_SCHEDULE_MS[idx];
+  };
+  var checkThrottle = function () {
+    var s = getThrottleState();
+    var remaining = cooldownFor(s.count) - (Date.now() - s.lastAt);
+    return { ok: remaining <= 0, remainingMs: Math.max(0, remaining) };
+  };
+  var recordSubmit = function () {
+    var s = getThrottleState();
+    setThrottleState({ count: s.count + 1, lastAt: Date.now() });
+  };
+  var formatRemaining = function (ms) {
+    if (ms < 60 * 1000)        return Math.ceil(ms / 1000)        + 's';
+    if (ms < 60 * 60 * 1000)   return Math.ceil(ms / 60000)       + ' min';
+    return Math.ceil(ms / (60 * 60 * 1000)) + ' h';
+  };
 
   var bindEvents = function () {
     var bd        = document.getElementById('compose-backdrop');
@@ -721,9 +791,53 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
     cancelBtn.addEventListener('click', closeModal);
 
+    var validateCurrentForm = function () {
+      var nameEl  = document.getElementById('user-name');
+      var emailEl = document.getElementById('user-email');
+      if (nameEl && !nameEl.value.trim()) { nameEl.focus(); nameEl.reportValidity && nameEl.reportValidity(); return false; }
+      if (emailEl && (!emailEl.value.trim() || (emailEl.checkValidity && !emailEl.checkValidity()))) {
+        emailEl.focus(); emailEl.reportValidity && emailEl.reportValidity();
+        return false;
+      }
+      if (intentIdx === 0) {
+        var body = document.getElementById('chat-body');
+        if (body && !body.value.trim()) { body.focus(); body.reportValidity && body.reportValidity(); return false; }
+        return true;
+      }
+      if (intentIdx === 1) {
+        var eng = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
+        var bud = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
+        var ctx = document.getElementById('proj-context');
+        if (!eng) {
+          var firstEng = document.querySelector('#compose-fields-project input[name="proj-engagement"]');
+          if (firstEng) { firstEng.focus(); firstEng.reportValidity && firstEng.reportValidity(); }
+          return false;
+        }
+        if (!bud) {
+          var firstBud = document.querySelector('#compose-fields-project input[name="proj-budget"]');
+          if (firstBud) { firstBud.focus(); firstBud.reportValidity && firstBud.reportValidity(); }
+          return false;
+        }
+        if (!ctx.value.trim()) { ctx.focus(); ctx.reportValidity && ctx.reportValidity(); return false; }
+        return true;
+      }
+      return true;
+    };
+
     sendBtn.addEventListener('click', function () {
-      var data     = collectFormData();
       var btnLabel = sendBtn.querySelector('span:last-child');
+      if (!validateCurrentForm()) return;
+      var gate     = checkThrottle();
+      if (!gate.ok) {
+        btnLabel.textContent = 'Try again in ' + formatRemaining(gate.remainingMs);
+        sendBtn.disabled = true;
+        setTimeout(function () {
+          btnLabel.textContent = 'Submit';
+          sendBtn.disabled = false;
+        }, 3500);
+        return;
+      }
+      var data = collectFormData();
       sendBtn.disabled = true;
       btnLabel.textContent = 'Sending…';
       fetch(FORM_ENDPOINT, {
@@ -732,6 +846,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         body: JSON.stringify({ subject: data.subject, message: data.message })
       }).then(function (res) {
         if (res.ok) {
+          recordSubmit();
           btnLabel.textContent = 'Sent ✓';
           setTimeout(function () { closeModal(); }, 1800);
         } else { throw new Error('server'); }

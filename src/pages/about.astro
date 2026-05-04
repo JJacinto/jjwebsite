@@ -12,8 +12,9 @@ const phases = [
     title: "Discover & Define",
     descriptor: "Understanding the problem before solving it.",
     tools: [
-      /* PLACEHOLDER reason for Figjam — review wording before publishing. */
+      /* PLACEHOLDER reasons for Figjam + Maze — review wording before publishing. */
       { name: "Figjam",    why: "Mapping problems collaboratively before pixels" },
+      { name: "Maze",      why: "Quick usability tests when interviews aren't enough" },
       { name: "Dovetail",  why: "Tagging interviews, surfacing patterns across sessions" },
     ],
   },
@@ -33,7 +34,7 @@ const phases = [
     descriptor: "Measuring what shipped, deciding what's next.",
     /* PLACEHOLDER reasons for Fullstory / Mixpanel / Looker — review before publishing. */
     tools: [
-      { name: "Fullstory", why: "Session replay — watching what users actually do post-launch" },
+      { name: "Fullstory", why: "Watching what users actually do post-launch" },
       { name: "Mixpanel",  why: "Funnel and event tracking to measure what shipped" },
       { name: "Looker",    why: "Dashboards for the metrics that matter after launch" },
     ],
@@ -71,7 +72,7 @@ const alwaysOn = [
       { name: "Steelcase Leap v2",   why: "Where I sit in 8+ hours a day" },
       { name: "Odyssey G9",          why: "To see all windows at a glance" },
       { name: "Logitech MX Keys",    why: "Low-profile, quiet, multi-device" },
-      { name: "Hifiman XV",          why: "Open-back for focus, neutral enough to mix on" },
+      { name: "Hifiman XV",          why: "Monitoring, calls, and music" },
     ],
   },
 ];
@@ -309,7 +310,7 @@ const alwaysOn = [
                 <h3 class="always-on-title">{group.title}</h3>
                 <dl class="always-on-tools">
                   {group.tools.map((t) => (
-                    <div class="always-on-item tooltip-host" data-tip={`${t.name} — ${t.why}`}>
+                    <div class="always-on-item">
                       <dt>{t.name}</dt>
                       <dd>{t.why}</dd>
                     </div>
