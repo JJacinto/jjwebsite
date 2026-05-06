@@ -5,28 +5,19 @@ import Base from '../layouts/Base.astro';
 
   <!-- HERO -->
   <section class="hero">
-    <div class="hero-marquee">
-      <div class="marquee-track">
-        <span>WELCOME</span><span>·</span><span>BEM-VINDO</span><span>·</span>
-        <span>WELCOME</span><span>·</span><span>BEM-VINDO</span><span>·</span>
-        <span>WELCOME</span><span>·</span><span>BEM-VINDO</span><span>·</span>
-      </div>
-    </div>
+    <canvas class="hero-bg" id="heroBg" aria-hidden="true"></canvas>
     <div class="container hero-inner">
-      <h1 class="hero-greeting reveal">Hi 👋 I'm João Jacinto.</h1>
-      <p class="hero-role reveal reveal-d1" aria-label="Product design expert">
-        <span class="role-item">Product design expert</span>
-        <span class="role-item">Digital product builder</span>
+      <h1 class="hero-greeting reveal">Hey, I'm João.</h1>
+      <p class="hero-role reveal reveal-d1" aria-label="A product designer who builds">
+        <span class="role-item">A product designer who builds.<br>Seeing structure before surfaces.</span>
+        <span class="role-item">Ten years of foreseeing which choices echo through everything downstream.</span>
+        <span class="role-item">Currently at Anchorage Digital, on the parts most people don't see.</span>
       </p>
-      <div class="hero-photo reveal reveal-d2">
-        <img src="/assets/images/joao-photo.webp" alt="João Jacinto" loading="eager">
-      </div>
-      <p class="hero-tagline reveal reveal-d3">Designing digital products with startups and enterprises since 2015, with love ♥</p>
-      <div class="hero-ctas reveal reveal-d4">
-        <a class="btn btn-ghost" href="/about">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>Learn more</span>
-        </a>
+      <div class="hero-ctas reveal reveal-d3">
+        <button class="btn btn-accent" type="button" onclick="openComposeModal(1)">
+          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
+          <span>Start project</span>
+        </button>
         <a class="btn btn-ghost" href="/case-studies">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
           <span>View work</span>
@@ -35,23 +26,56 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 
+  <!-- WORK HIGHLIGHTS -->
+  <section class="may-like">
+    <div class="container">
+      <p class="eyebrow reveal">Work highlights</p>
+      <div class="may-like-grid">
+        <a class="case-card reveal reveal-d1" href="/case-studies/redefining-webinar-customization">
+          <img src="/assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
+          <div class="case-card-body">
+            <div class="case-card-cat">Design</div>
+            <div class="case-card-title">Redefining webinar customization</div>
+          </div>
+        </a>
+        <a class="case-card reveal reveal-d2" href="/case-studies/understanding-webinar-organizers">
+          <img src="/assets/images/case-research.avif" alt="Research ops" loading="lazy">
+          <div class="case-card-body">
+            <div class="case-card-cat">Research Ops</div>
+            <div class="case-card-title">Understanding webinar organizers</div>
+          </div>
+        </a>
+        <a class="case-card reveal reveal-d3" href="/case-studies/leading-and-managing-a-design-system">
+          <img src="/assets/images/case-ds.avif" alt="Design system" loading="lazy">
+          <div class="case-card-body">
+            <div class="case-card-cat">Design Leadership</div>
+            <div class="case-card-title">Leading and managing a design system</div>
+          </div>
+        </a>
+      </div>
+      <div class="may-like-cta reveal">
+        <a class="btn btn-ghost" href="/case-studies">
+          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+          <span>View more</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- BRANDS -->
   <section class="brands reveal">
     <div class="container">
-      <p class="eyebrow brands-label">I've proudly worked with</p>
+      <p class="eyebrow brands-label">Worked with</p>
     </div>
     <div class="brands-marquee">
       <div class="brands-track">
-        <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/anchorage.png" alt="Anchorage Digital"></a>
-        <a href="https://streamyard.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/streamyard.avif" alt="StreamYard"></a>
-        <a href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/talkdesk.avif" alt="Talkdesk"></a>
-        <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/namecheap.avif" alt="Namecheap"></a>
-        <a href="https://github.com/beubi" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/beubi.avif" alt="Be.Ubi"></a>
-        <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/anchorage.png" alt=""></a>
-        <a href="https://streamyard.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/streamyard.avif" alt=""></a>
-        <a href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/talkdesk.avif" alt=""></a>
-        <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/namecheap.avif" alt=""></a>
-        <a href="https://github.com/beubi" target="_blank" rel="noopener noreferrer" aria-hidden="true" tabindex="-1"><img src="/assets/logos/beubi.avif" alt=""></a>
+        <div class="brands-cycle">
+          <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/anchorage.png" alt="Anchorage Digital"></a>
+          <a href="https://streamyard.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/streamyard.avif" alt="StreamYard"></a>
+          <a href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/talkdesk.avif" alt="Talkdesk"></a>
+          <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/namecheap.avif" alt="Namecheap"></a>
+          <a href="https://github.com/beubi" target="_blank" rel="noopener noreferrer"><img src="/assets/logos/beubi.avif" alt="Be.Ubi"></a>
+        </div>
       </div>
     </div>
   </section>
@@ -65,7 +89,7 @@ import Base from '../layouts/Base.astro';
         <div class="stat reveal reveal-d1">
           <div class="stat-num">5</div>
           <div class="stat-title">Products launched</div>
-          <div class="stat-desc">StreamYard On-Air, Talkdesk AI Trainer, and more</div>
+          <div class="stat-desc">Anchorage Digital Policies, StreamYard On-Air, Talkdesk AI Trainer, and more</div>
         </div>
         <div class="stat reveal reveal-d2">
           <div class="stat-num">25M<sup>+</sup></div>
@@ -90,7 +114,7 @@ import Base from '../layouts/Base.astro';
   <!-- TESTIMONIALS -->
   <section class="testimonials">
     <div class="container">
-      <p class="eyebrow reveal">What people are saying</p>
+      <p class="eyebrow reveal">Kind words from former colleagues</p>
       <div class="testimonials-masonry">
         <div class="testimonial-card reveal reveal-d1" onclick="window.open('https://linkedin.com/in/joaofranciscojacinto/','_blank','noopener')" style="cursor:pointer">
           <div class="testimonial-header">
@@ -131,42 +155,6 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 
-  <!-- YOU MAY LIKE -->
-  <section class="may-like">
-    <div class="container">
-      <p class="eyebrow reveal">You may like to read</p>
-      <div class="may-like-grid">
-        <a class="case-card reveal reveal-d1" href="/case-studies/redefining-webinar-customization">
-          <img src="/assets/images/case-webinar.avif" alt="Webinar customization" loading="lazy">
-          <div class="case-card-body">
-            <div class="case-card-cat">Design</div>
-            <div class="case-card-title">Redefining webinar customization</div>
-          </div>
-        </a>
-        <a class="case-card reveal reveal-d2" href="/case-studies/understanding-webinar-organizers">
-          <img src="/assets/images/case-research.avif" alt="Research ops" loading="lazy">
-          <div class="case-card-body">
-            <div class="case-card-cat">Research Ops</div>
-            <div class="case-card-title">Understanding webinar organizers</div>
-          </div>
-        </a>
-        <a class="case-card reveal reveal-d3" href="/case-studies/leading-and-managing-a-design-system">
-          <img src="/assets/images/case-ds.avif" alt="Design system" loading="lazy">
-          <div class="case-card-body">
-            <div class="case-card-cat">Design Leadership</div>
-            <div class="case-card-title">Leading and managing a design system</div>
-          </div>
-        </a>
-      </div>
-      <div class="may-like-cta reveal">
-        <a class="btn btn-ghost" href="/case-studies">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>All case studies</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
 </Base>
 
 <script is:inline>
@@ -182,7 +170,302 @@ import Base from '../layouts/Base.astro';
     items[prev].classList.add('is-prev');
     items[idx].classList.add('is-active');
     setTimeout(() => items[prev].classList.remove('is-prev'), 600);
-  }, 2800);
+  }, 5000);
+})();
+
+(function() {
+  const track = document.querySelector('.brands-track');
+  const cycle = track && track.querySelector('.brands-cycle');
+  if (!track || !cycle) return;
+  const imgs = Array.from(cycle.querySelectorAll('img'));
+  const ready = Promise.all(imgs.map(img =>
+    img.complete && img.naturalWidth > 0
+      ? Promise.resolve()
+      : new Promise(res => {
+          img.addEventListener('load', res, { once: true });
+          img.addEventListener('error', res, { once: true });
+        })
+  ));
+
+  const setup = () => {
+    const cycleWidth = cycle.getBoundingClientRect().width;
+    if (!cycleWidth) return;
+    track.style.setProperty('--brands-cycle', cycleWidth + 'px');
+    while (track.querySelector('.brands-cycle.clone')) track.querySelector('.brands-cycle.clone').remove();
+    const viewport = window.innerWidth;
+    const copies = Math.max(2, Math.ceil((viewport + cycleWidth) / cycleWidth) + 1);
+    for (let i = 1; i < copies; i++) {
+      const clone = cycle.cloneNode(true);
+      clone.classList.add('clone');
+      clone.setAttribute('aria-hidden', 'true');
+      clone.querySelectorAll('a').forEach(a => a.setAttribute('tabindex', '-1'));
+      track.appendChild(clone);
+    }
+    track.classList.add('is-ready');
+  };
+
+  ready.then(() => {
+    setup();
+    let raf;
+    window.addEventListener('resize', () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(setup);
+    });
+  });
+})();
+
+(function() {
+  const brands = document.querySelector('.brands');
+  if (!brands) return;
+  const update = () => {
+    document.documentElement.style.setProperty('--brands-h', brands.offsetHeight + 'px');
+  };
+  update();
+  if (window.ResizeObserver) new ResizeObserver(update).observe(brands);
+  window.addEventListener('resize', update);
+})();
+
+/* ──────────────────────────────────────────────────────────────
+ * Hero ambient background — light-mode wisps via WebGL fBm.
+ * Token-driven palette (no hex), domain-warped, top-third only.
+ * Vanilla WebGL, no deps. Matches the contact-canvas pattern.
+ * ────────────────────────────────────────────────────────────── */
+(function () {
+  const hero   = document.querySelector('.hero');
+  const canvas = document.getElementById('heroBg');
+  if (!hero || !canvas) return;
+  const gl = canvas.getContext('webgl', { antialias: false, premultipliedAlpha: false, alpha: false });
+  if (!gl) { canvas.style.display = 'none'; return; }   /* graceful fallback: solid bg */
+
+  /* ── Token resolution ───────────────────────────────────── */
+  const probe = document.createElement('div');
+  probe.style.position = 'absolute'; probe.style.visibility = 'hidden'; probe.style.pointerEvents = 'none';
+  document.body.appendChild(probe);
+
+  function parseRGBA(str) {
+    if (!str) return [0.92, 0.91, 0.90, 1];
+    probe.style.color = '';
+    probe.style.color = str;
+    const m = getComputedStyle(probe).color.match(/[\d.]+/g);
+    if (!m || m.length < 3) return [0.92, 0.91, 0.90, 1];
+    return [+m[0]/255, +m[1]/255, +m[2]/255, m.length === 4 ? +m[3] : 1];
+  }
+  function tokenColor(name) {
+    return parseRGBA(getComputedStyle(document.documentElement).getPropertyValue(name).trim());
+  }
+  function compositeOver(rgba, base) {
+    const a = rgba[3];
+    return [rgba[0]*a + base[0]*(1-a), rgba[1]*a + base[1]*(1-a), rgba[2]*a + base[2]*(1-a)];
+  }
+  function resolveProp(input, fallback) {
+    if (!input) return fallback;
+    if (input.startsWith('--')) {
+      const c = tokenColor(input);
+      return c[3] === 1 ? [c[0], c[1], c[2]] : compositeOver(c, fallback);
+    }
+    const c = parseRGBA(input);
+    return c[3] === 1 ? [c[0], c[1], c[2]] : compositeOver(c, fallback);
+  }
+
+  /* Defaults — derived from existing tokens, no hex literals. */
+  const cfg = {
+    base:       '--bg',           /* hero canvas base */
+    wispA:      '--bg-alt',       /* darker wisp, Δ ~3.4% pixel */
+    wispB:      '--border',       /* darkest wisp, alpha-composited on base, Δ ~6% pixel */
+    speed:      1.0,
+    intensity:  1.0,
+    fadeStart:  0.4,
+    fadeEnd:    0.7,
+  };
+  Object.assign(cfg, window.__heroBgConfig || {});
+
+  const baseRgb  = resolveProp(cfg.base,  [0.925, 0.918, 0.898]);
+  const wispARgb = resolveProp(cfg.wispA, baseRgb);
+  const wispBRgb = resolveProp(cfg.wispB, baseRgb);
+  document.body.removeChild(probe);
+
+  /* Clamp intensity per spec — protect against staining. */
+  const intensity = Math.max(0, Math.min(1.5, cfg.intensity));
+  const speed     = Math.max(0, cfg.speed);
+  const fadeStart = Math.max(0, Math.min(1, cfg.fadeStart));
+  const fadeEnd   = Math.max(fadeStart, Math.min(1, cfg.fadeEnd));
+
+  /* ── Shaders ────────────────────────────────────────────── */
+  const VERT = [
+    'attribute vec2 a_pos;',
+    'varying vec2 v_uv;',
+    'void main() {',
+    '  v_uv = (a_pos + 1.0) * 0.5;',
+    '  gl_Position = vec4(a_pos, 0.0, 1.0);',
+    '}'
+  ].join('\n');
+
+  const FRAG = [
+    'precision mediump float;',
+    'varying vec2 v_uv;',
+    'uniform vec2 u_res;',
+    'uniform float u_time;',
+    'uniform vec3 u_base;',
+    'uniform vec3 u_wispA;',
+    'uniform vec3 u_wispB;',
+    'uniform float u_intensity;',
+    'uniform float u_fadeStart;',
+    'uniform float u_fadeEnd;',
+    /* Hash-based 2D value noise — cheap, zero-dependency. */
+    'float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
+    'float vnoise(vec2 p) {',
+    '  vec2 i = floor(p), f = fract(p);',
+    '  vec2 u = f * f * (3.0 - 2.0 * f);',
+    '  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),',
+    '             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);',
+    '}',
+    /* 4-octave fBm with mild rotation per octave for less axis-aligned bias. */
+    'float fbm(vec2 p) {',
+    '  float v = 0.0; float a = 0.5;',
+    '  mat2 r = mat2(0.8, -0.6, 0.6, 0.8);',
+    '  for (int i = 0; i < 4; i++) { v += a * vnoise(p); p = r * p * 2.0; a *= 0.5; }',
+    '  return v;',
+    '}',
+    'void main() {',
+    /* Aspect-correct, anisotropic — favor horizontal flow on a wide hero. */
+    '  vec2 uv = v_uv;',
+    '  uv.x *= u_res.x / max(u_res.y, 1.0);',
+    '  uv *= vec2(0.55, 1.45);',
+    '  float t = u_time;',
+    /* Domain-warp pass 1 */
+    '  vec2 q = vec2(',
+    '    fbm(uv + vec2(0.0, t * 0.05)),',
+    '    fbm(uv + vec2(5.2, t * 0.04 + 1.3))',
+    '  );',
+    /* Domain-warp pass 2 */
+    '  vec2 r = vec2(',
+    '    fbm(uv + 1.8 * q + vec2(1.7, 9.2) + t * 0.03),',
+    '    fbm(uv + 1.8 * q + vec2(8.3, 2.8) + t * 0.025)',
+    '  );',
+    '  float n = fbm(uv + 1.6 * r);',
+    /* Vertical fade — wisps die out before reaching the headline zone. */
+    '  float mask = 1.0 - smoothstep(u_fadeStart, u_fadeEnd, v_uv.y);',
+    /* Two-layer wisp threshold — restrained on light surface but visible. */
+    '  float w1 = smoothstep(0.32, 0.74, n) * mask;',
+    '  float w2 = smoothstep(0.52, 0.90, n) * mask;',
+    /* Subtractive blend only — base mixed toward darker wisp colors.
+       Multipliers near 1 let the wisp tokens deliver their full Δ at peaks,
+       so the effect actually registers on a near-white surface. */
+    '  vec3 col = u_base;',
+    '  col = mix(col, u_wispA, w1 * 1.00 * u_intensity);',
+    '  col = mix(col, u_wispB, w2 * 0.70 * u_intensity);',
+    '  gl_FragColor = vec4(col, 1.0);',
+    '}'
+  ].join('\n');
+
+  function compile(type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      console.warn('hero-bg shader:', gl.getShaderInfoLog(sh)); return null;
+    }
+    return sh;
+  }
+  const vs = compile(gl.VERTEX_SHADER, VERT);
+  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  if (!vs || !fs) { canvas.style.display = 'none'; return; }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.style.display = 'none'; return; }
+  gl.useProgram(prog);
+
+  /* Fullscreen triangle — covers viewport, no second tri waste. */
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uRes       = gl.getUniformLocation(prog, 'u_res');
+  const uTime      = gl.getUniformLocation(prog, 'u_time');
+  const uBase      = gl.getUniformLocation(prog, 'u_base');
+  const uWispA     = gl.getUniformLocation(prog, 'u_wispA');
+  const uWispB     = gl.getUniformLocation(prog, 'u_wispB');
+  const uIntensity = gl.getUniformLocation(prog, 'u_intensity');
+  const uFadeStart = gl.getUniformLocation(prog, 'u_fadeStart');
+  const uFadeEnd   = gl.getUniformLocation(prog, 'u_fadeEnd');
+
+  gl.uniform3fv(uBase,  baseRgb);
+  gl.uniform3fv(uWispA, wispARgb);
+  gl.uniform3fv(uWispB, wispBRgb);
+  gl.uniform1f(uIntensity, intensity);
+  gl.uniform1f(uFadeStart, fadeStart);
+  gl.uniform1f(uFadeEnd,   fadeEnd);
+
+  /* ── Sizing — DPR capped at 1.25 for a background pass. ── */
+  let W = 0, H = 0;
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.25);
+    const r = hero.getBoundingClientRect();
+    W = Math.max(1, Math.floor(r.width  * dpr));
+    H = Math.max(1, Math.floor(r.height * dpr));
+    if (canvas.width !== W || canvas.height !== H) {
+      canvas.width = W; canvas.height = H;
+      gl.viewport(0, 0, W, H);
+      gl.uniform2f(uRes, W, H);
+    }
+  }
+  resize();
+
+  let resizeTimer;
+  if (window.ResizeObserver) {
+    new ResizeObserver(() => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 80);
+    }).observe(hero);
+  } else {
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(resize, 80);
+    });
+  }
+
+  /* ── Reduced motion: render one frame and stop. ───────── */
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Visibility / off-screen pause. ───────────────────── */
+  let inView = true, tabVisible = true;
+  document.addEventListener('visibilitychange', () => {
+    tabVisible = document.visibilityState === 'visible';
+    if (tabVisible && !reduceMotion && inView) loop();
+  });
+  if (window.IntersectionObserver) {
+    new IntersectionObserver((entries) => {
+      inView = entries[0].isIntersecting;
+      if (inView && !reduceMotion && tabVisible) loop();
+    }, { threshold: 0 }).observe(hero);
+  }
+
+  /* ── Loop — increment time at ~0.03 units/sec. ────────── */
+  const TIME_STEP = 0.03;
+  let t = 0;
+  let lastFrame = performance.now();
+  let raf = 0;
+  function frame(now) {
+    raf = 0;
+    const dt = Math.min((now - lastFrame) / 1000, 0.1);
+    lastFrame = now;
+    t += dt * TIME_STEP * speed;
+    gl.uniform1f(uTime, t);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    if (!reduceMotion && inView && tabVisible) raf = requestAnimationFrame(frame);
+  }
+  function loop() {
+    if (raf) return;
+    lastFrame = performance.now();
+    raf = requestAnimationFrame(frame);
+  }
+
+  /* First paint — always do one draw, then either keep looping or stop. */
+  gl.uniform1f(uTime, t);
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  if (!reduceMotion) loop();
 })();
 </script>
 

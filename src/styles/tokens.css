@@ -10,7 +10,7 @@
   --fg2:             #6B6560;
   --fg3:             #9B948D;
   --fg-inverse:      #F0EDE8;
-  --fg2-inverse:     rgba(240, 237, 232, 0.42);
+  --fg2-inverse:     rgba(240, 237, 232, 0.65);
 
   --accent:          #3D3DB5;
   --accent-dark:     #3030A0;
@@ -40,5 +40,7 @@
   --text-display:    clamp(3.5rem, 8vw, 7rem);
   --text-h1:         clamp(2.5rem, 5vw, 4rem);
   --text-h2:         clamp(1.8rem, 3vw, 2.6rem);
+  --text-subhead:    clamp(1.5rem, 2.2vw, 1.75rem);
   --text-h3:         1.4rem;
+  --text-body-lg:    1.125rem;
 }

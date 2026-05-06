@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 <Base
   activePage="contact"
   navDark={true}
-  showFooter={false}
+  showFooter={true}
   title="Contact — João Jacinto"
   description="Get in touch with João Jacinto — Senior Product Designer based in Aveiro, Portugal."
 >
@@ -12,21 +12,20 @@ import Base from '../layouts/Base.astro';
   <section class="contact" id="contact-section">
     <canvas id="contact-canvas"></canvas>
     <div class="contact-inner reveal">
-      <span class="eyebrow">Say hello</span>
-      <h1>Thanks for<br>the visit.</h1>
-      <div class="contact-subtitle">Let's make something<br>great together.</div>
-      <p class="contact-body">Whether it's a product challenge, a collaboration, or just a good conversation — I'm always open to hearing from you.</p>
+      <h1>Let's talk about<br>what you're building.</h1>
+      <p class="contact-body">Product partnerships, design system work, or 0→1 builds in the AI era.<br>Those are where I do my best work. If that sounds like your project, get in touch.</p>
 
       <div class="contact-ctas">
-        <a class="btn btn-accent" id="compose-open" href="mailto:contact@joaojacinto.com?subject=Hello">
+        <button class="btn btn-accent" id="compose-open" type="button" onclick="openComposeModal(0)">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Send a message</span>
-        </a>
-        <a class="btn btn-dark-outline" id="contact-linkedin-btn" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>LinkedIn ↗</span>
+          <span>Get in touch</span>
+        </button>
+        <a class="btn btn-dark-outline" href="https://www.cal.eu/joao-jacinto" target="_blank" rel="noopener noreferrer">
+          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="10" height="8" rx="1.5"/><path d="M11 7l4-2v6l-4-2z"/></svg></span>
+          <span>Book a 30-min call</span>
         </a>
       </div>
+      <p class="contact-response-time">I usually reply within 24h to 48h on weekdays</p>
 
       <div class="contact-info">
         <div class="contact-card">
@@ -49,7 +48,7 @@ import Base from '../layouts/Base.astro';
           <div class="contact-card-body">
             <div class="contact-card-label-row">
               <div class="contact-card-label">Location</div>
-              <div class="contact-card-sub">UTC+0/+1</div>
+              <div class="contact-card-sub" id="aveiro-clock" aria-live="polite">—</div>
             </div>
             <div class="contact-card-value">Aveiro, Portugal</div>
           </div>
@@ -58,9 +57,25 @@ import Base from '../layouts/Base.astro';
             <span>View map</span>
           </a>
         </div>
+        <div class="contact-card">
+          <div class="contact-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          </div>
+          <div class="contact-card-body">
+            <div class="contact-card-label">Socials</div>
+            <div class="contact-card-value">LinkedIn · X</div>
+          </div>
+          <div class="contact-card-actions">
+            <a class="contact-card-action contact-social-btn" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+            </a>
+            <a class="contact-card-action contact-social-btn" href="https://x.com/joao_jacinto_8" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
-    <div id="compose-root-contact"></div>
   </section>
 
 </Base>
@@ -75,6 +90,23 @@ function copyEmail(el) {
     setTimeout(() => { hint.textContent = original; }, 2000);
   });
 }
+
+/* Live Aveiro clock — refreshes every minute, aligned to wall clock. */
+(function () {
+  const el = document.getElementById('aveiro-clock');
+  if (!el) return;
+  const fmt = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Lisbon',
+    hour: '2-digit', minute: '2-digit', hour12: false
+  });
+  function tick() { el.textContent = fmt.format(new Date()) + ' local time'; }
+  tick();
+  const msToNextMinute = (60 - new Date().getSeconds()) * 1000;
+  setTimeout(function () {
+    tick();
+    setInterval(tick, 60000);
+  }, msToNextMinute);
+})();
 
 /* ── Contact canvas ──────────────────────────────────────────── */
 let _contactRAF = null;
@@ -115,16 +147,7 @@ let _contactRAF = null;
     return out;
   }
 
-  function sampleLetter(text, fh) {
-    return sample((octx, cw, ch) => {
-      octx.fillStyle = '#fff';
-      octx.font = `900 ${fh}px system-ui, -apple-system, sans-serif`;
-      octx.textAlign = 'center'; octx.textBaseline = 'middle';
-      octx.fillText(text, cw / 2, ch / 2);
-    });
-  }
-
-  /* "Send a message" → paper plane icon; "LinkedIn" → IN text */
+  /* "Send a message" → paper plane icon */
   const jPts = sample((octx, cw, ch) => {
     const S  = Math.min(cw, ch) * 0.38;
     const cx = cw / 2, cy = ch / 2;
@@ -133,17 +156,15 @@ let _contactRAF = null;
     octx.fillStyle   = 'rgba(255,255,255,0.28)';
     octx.lineWidth   = lw;
     octx.lineCap = 'round'; octx.lineJoin = 'round';
-    /* paper plane pointing upper-right (send / message icon) */
-    const tip = [cx + S*0.46, cy - S*0.36]; // nose
-    const tl  = [cx - S*0.46, cy - S*0.18]; // top-left wing
-    const br  = [cx + S*0.10, cy + S*0.48]; // tail
-    const fc  = [cx + S*0.10, cy + S*0.08]; // fold crease
+    const tip = [cx + S*0.46, cy - S*0.36];
+    const tl  = [cx - S*0.46, cy - S*0.18];
+    const br  = [cx + S*0.10, cy + S*0.48];
+    const fc  = [cx + S*0.10, cy + S*0.08];
     octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...tl); octx.lineTo(...br); octx.closePath();
     octx.fill(); octx.stroke();
     octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...fc); octx.stroke();
     octx.beginPath(); octx.moveTo(...fc);  octx.lineTo(...br); octx.stroke();
   });
-  const inPts = sampleLetter('IN', Math.round(Math.min(H * 0.50, W * 0.38)));
 
   const s = {
     mouseX:-999, mouseY:-999, prevMX:0, prevMY:0,
@@ -177,7 +198,6 @@ let _contactRAF = null;
     const oz = rr*Math.cos(tt);
     const ta = phi % (Math.PI*2), torusR = R*0.80, tubeR = R*0.38;
 
-    /* nebula: wide flat cloud, uniform disc distribution */
     const a = Math.random() * Math.PI * 2;
     const r2 = Math.sqrt(Math.random());
     const nbX = r2 * Math.cos(a) * W * 0.44;
@@ -186,7 +206,7 @@ let _contactRAF = null;
 
     return {
       ox,oy,oz, nbX,nbY,nbZ,
-      lJX:0, lJY:0, lIX:0, lIY:0,
+      lJX:0, lJY:0,
       sx:nbX, sy:nbY, sz:nbZ,
       scX:(Math.random()-0.5)*R*2.4, scY:(Math.random()-0.5)*R*2.4, scZ:(Math.random()-0.5)*R*2.4,
       toX:(torusR+tubeR*Math.cos(theta))*Math.cos(ta),
@@ -201,16 +221,13 @@ let _contactRAF = null;
     };
   });
 
-  /* assign letter targets to each particle */
   pts.forEach(p => {
     if (jPts.length)  { const jp = jPts[Math.floor(Math.random()*jPts.length)];  p.lJX=jp[0]; p.lJY=jp[1]; }
-    if (inPts.length) { const ip = inPts[Math.floor(Math.random()*inPts.length)]; p.lIX=ip[0]; p.lIY=ip[1]; }
   });
 
   function getTarget(p, mode) {
     if (mode==='nebula')    return [p.nbX,     p.nbY,     p.nbZ    ];
     if (mode==='letter-j')  return [p.lJX,     p.lJY,     0        ];
-    if (mode==='letter-in') return [p.lIX,     p.lIY,     0        ];
     if (mode==='disc')      return [p.ox*1.1,  p.oy*0.10, p.oz*1.1 ];
     if (mode==='scatter')   return [p.scX*0.7, p.scY*0.7, p.scZ*0.7];
     if (mode==='dense')     return [p.ox*0.38, p.oy*0.38, p.oz*0.38];
@@ -224,7 +241,7 @@ let _contactRAF = null;
     s.activeMode = name;
     if (name === 'nebula') {
       s.targetRotSpeed = 0.00008; s.targetLumBase = 72; s.targetLumRange = 80; s.wobble = false;
-    } else if (name === 'letter-j' || name === 'letter-in') {
+    } else if (name === 'letter-j') {
       s.targetRotSpeed = 0.00004; s.targetLumBase = 100; s.targetLumRange = 60; s.wobble = false;
       pts.forEach(p => { p.dispX=0; p.dispY=0; p.dvX=0; p.dvY=0; });
     }
@@ -261,7 +278,6 @@ let _contactRAF = null;
     const ddy = s.mouseY - s.dragStartY;
     const dist = Math.sqrt(ddx*ddx + ddy*ddy);
     if (dist < 8) return;
-    /* slingshot: fire displaced dots in the opposite direction of drag */
     const sx = -ddx/dist, sy = -ddy/dist;
     const power = Math.min(dist/40, 3) * 14;
     pts.forEach(p => {
@@ -272,15 +288,10 @@ let _contactRAF = null;
     });
   });
 
-  const emailBtn    = document.getElementById('compose-open');
-  const linkedinBtn = document.getElementById('contact-linkedin-btn');
+  const emailBtn = document.getElementById('compose-open');
   if (emailBtn) {
-    emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:91,cb:220};    applyMode('letter-j');  });
-    emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                     applyMode('nebula');    });
-  }
-  if (linkedinBtn) {
-    linkedinBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:235,cg:240,cb:255}; applyMode('letter-in'); });
-    linkedinBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                    applyMode('nebula');    });
+    emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:91,cb:220}; applyMode('letter-j');  });
+    emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                  applyMode('nebula');    });
   }
 
   function rotXY(px,py,pz,rx,ry) {
@@ -305,9 +316,8 @@ let _contactRAF = null;
     s.smoothVY = s.smoothVY*0.94 + s.velY*0.06;
     s.velX*=0.8; s.velY*=0.8;
 
-    const inLetterMode = s.activeMode==='letter-j' || s.activeMode==='letter-in';
+    const inLetterMode = s.activeMode==='letter-j';
     if (inLetterMode) {
-      /* decay accumulated rotation so letters face the viewer */
       s.rotVX*=0.88; s.rotVY*=0.88;
       s.rotY*=0.97;
       s.rotX += (0 - s.rotX) * 0.04;
@@ -336,7 +346,6 @@ let _contactRAF = null;
       p.sz += (p._tz-p.sz)*p.lerpSpeed;
       p.dispV*=0.88; p.dispR=p.dispR*0.88+p.dispV;
       p.twinkle+=p.twinkleSpeed;
-      /* spring restoration — overdamped so no bounce, slow return */
       p.dvX += -p.dispX*0.008; p.dvY += -p.dispY*0.008;
       p.dvX *= 0.80;            p.dvY *= 0.80;
       p.dispX += p.dvX;         p.dispY += p.dvY;
@@ -354,11 +363,9 @@ let _contactRAF = null;
                r:p.dotR*(0.35+depth*0.65)*sc, rz, pi };
     });
 
-    /* mouse interaction — only in nebula mode */
     if (s.activeMode === 'nebula' && s.mouseX > 0) {
       const spd = Math.min(Math.sqrt(s.smoothVX*s.smoothVX + s.smoothVY*s.smoothVY), 35);
       if (s.isDragging) {
-        /* drag: pull nearby dots along the cursor's direction of travel */
         const DR = 220;
         proj.forEach(pp => {
           const dx = pp.sx - s.mouseX, dy = pp.sy - s.mouseY;
@@ -370,7 +377,6 @@ let _contactRAF = null;
           }
         });
       } else if (spd > 1) {
-        /* hover: scatter dots radially away from cursor */
         const IR = 180;
         proj.forEach(pp => {
           const dx = pp.sx - s.mouseX, dy = pp.sy - s.mouseY;
@@ -385,7 +391,6 @@ let _contactRAF = null;
       }
     }
 
-    /* apply accumulated screen-space displacement to projected positions */
     proj.forEach(pp => { pp.sx += pts[pp.pi].dispX; pp.sy += pts[pp.pi].dispY; });
 
     s.ripples.forEach(rpl => {
