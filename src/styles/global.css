@@ -1192,6 +1192,15 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
   border-radius: 0;
   text-align: center;
 }
+.about-cta-avatar {
+  width: 96px; height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 32px;
+  border: 2px solid var(--border-inverse);
+  position: relative; z-index: 1;
+}
 .about-cta > h2,
 .about-cta > p,
 .about-cta > .about-cta-btns { position: relative; z-index: 1; }
