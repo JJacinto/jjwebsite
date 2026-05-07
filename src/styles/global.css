@@ -1164,13 +1164,14 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
    layout slot + a fallback dark color in case the canvas fails to mount. */
 .cta-footer-wrap {
   position: relative;
-  min-height: 640px;
+  min-height: 920px;
   background: var(--dark);
   overflow: hidden;
 }
-/* "Solo" footer mode (page already has its own dark surface) — no canvas
-   is rendered; the wrap is just a plain dark band. */
+/* "Solo" footer mode (page already has its own dark surface) — no canvas,
+   no gradient zone. Just a slim dark band before the footer. */
 .cta-footer-wrap--solo {
+  min-height: 0;
   background: var(--dark);
 }
 .cta-footer-bg {
@@ -1181,7 +1182,8 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
 }
 .global-cta-section {
   position: relative; z-index: 1;
-  padding: 200px 0 80px;
+  /* Content sits well below the gradient zone, on solid dark. */
+  padding: 380px 0 100px;
   background: transparent;
 }
 .about-cta {

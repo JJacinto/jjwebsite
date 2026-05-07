@@ -1109,7 +1109,9 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     var raf = 0, inView = true, tabVisible = true;
     var bgImage = null;   /* offscreen canvas with the dithered gradient */
 
-    /* Resolve --bg-alt and --dark to RGB triples once. */
+    /* Resolve --dark to RGB once. The gradient START color is detected
+       per-page from the section directly above the wrap, so the
+       transition is invisible regardless of which page renders this. */
     function probeRGB(str) {
       var p = document.createElement('div');
       p.style.color = str;
@@ -1119,8 +1121,30 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       return m ? [+m[0], +m[1], +m[2]] : [0, 0, 0];
     }
     var rootStyles = getComputedStyle(document.documentElement);
-    var BG_ALT = probeRGB(rootStyles.getPropertyValue('--bg-alt').trim() || '#E4E1DB');
     var DARK   = probeRGB(rootStyles.getPropertyValue('--dark').trim()   || '#1C1A17');
+    var BG_FALLBACK = probeRGB(rootStyles.getPropertyValue('--bg').trim() || '#ECEAE5');
+
+    function detectAboveColor() {
+      /* Walk up the previousElementSibling chain looking for an element
+         with an opaque background. Falls back to the body bg if nothing
+         opaque is found (i.e., the section above inherits page bg). */
+      var prev = wrap.previousElementSibling;
+      while (prev) {
+        var bg = getComputedStyle(prev).backgroundColor;
+        if (bg && bg !== 'transparent' && bg.indexOf('rgba(0, 0, 0, 0)') === -1) {
+          var rgba = bg.match(/[\d.]+/g);
+          if (rgba && rgba.length >= 3) {
+            var alpha = rgba.length === 4 ? +rgba[3] : 1;
+            if (alpha > 0.5) return [+rgba[0], +rgba[1], +rgba[2]];
+          }
+        }
+        prev = prev.previousElementSibling;
+      }
+      var bodyBg = getComputedStyle(document.body).backgroundColor;
+      var b = bodyBg.match(/[\d.]+/g);
+      if (b && b.length >= 3) return [+b[0], +b[1], +b[2]];
+      return BG_FALLBACK;
+    }
 
     /* Cheap hash-based 2D value noise for low-frequency organic variation. */
     function hash2(ix, iy) {
@@ -1153,15 +1177,18 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       var octx = oc.getContext('2d');
       var img = octx.createImageData(cw, ch);
       var data = img.data;
-      var transition = 560 * dprIn;        /* gradient zone in physical pixels */
+      var transition = 720 * dprIn;        /* gradient zone in physical pixels — taller for a longer fade */
       var nScale = 0.018 / dprIn;          /* low-freq noise frequency */
-      var dr = DARK[0] - BG_ALT[0], dg = DARK[1] - BG_ALT[1], db = DARK[2] - BG_ALT[2];
+      /* Pick the gradient START color to match the section directly above
+         the wrap on this page — invisible transition regardless of page. */
+      var ABOVE = detectAboveColor();
+      var dr = DARK[0] - ABOVE[0], dg = DARK[1] - ABOVE[1], db = DARK[2] - ABOVE[2];
       for (var y = 0; y < ch; y++) {
         var t  = Math.min(1, y / transition);
         var tt = t * t * (3 - 2 * t);     /* smoothstep ramp */
-        var rb = BG_ALT[0] + dr * tt;
-        var gb = BG_ALT[1] + dg * tt;
-        var bb = BG_ALT[2] + db * tt;
+        var rb = ABOVE[0] + dr * tt;
+        var gb = ABOVE[1] + dg * tt;
+        var bb = ABOVE[2] + db * tt;
         for (var x = 0; x < cw; x++) {
           /* Organic blob noise (-1..1 ish) — softens band edges across XY. */
           var n = (vnoise2(x * nScale, y * nScale) - 0.5) * 6;
