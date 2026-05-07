@@ -17,7 +17,7 @@ const {
   activePage = 'home',
   navDark = false,
   showFooter = true,
-  showCta = false,
+  showCta = true,
 } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -74,33 +74,41 @@ const {
 
 <slot />
 
-{showCta && (
-  <section class="global-cta-section">
-    <div class="container">
-      <div class="about-cta reveal">
-        <h2>Want to work together?</h2>
-        <p>I'm always open to interesting projects and conversations.</p>
-        <div class="about-cta-btns">
-          <button class="btn btn-accent" onclick="openComposeModal()">
-            <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-            <span>Let's chat</span>
-          </button>
+{(showCta || showFooter) && (
+  <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]}>
+    {showCta && <canvas class="cta-footer-bg" aria-hidden="true"></canvas>}
+    {showCta && (
+      <section class="global-cta-section">
+        <div class="container">
+          <div class="about-cta reveal">
+            <h2>Let's build something.</h2>
+            <p>Drawn to product work, design systems, and 0→1 projects where the structure matters as much as the surface.</p>
+            <div class="about-cta-btns">
+              <button class="btn btn-accent" onclick="openComposeModal()">
+                <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg></span>
+                <span>Get in touch</span>
+              </button>
+              <a class="btn btn-dark-outline" href="https://www.cal.eu/joao-jacinto" target="_blank" rel="noopener noreferrer">
+                <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z"/></svg></span>
+                <span>Book a call</span>
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-  </section>
-)}
-
-{showFooter && (
-  <footer class="footer" id="footer">
-    <div class="container">
-      <div class="footer-status" id="footer-status">
-        <span class="footer-status-dot" id="footer-status-dot"></span>
-        <span class="footer-status-label" id="footer-status-label"></span>
-      </div>
-      <p><button class="footer-email-link" id="footer-email-btn">contact@joaojacinto.com</button> · © 2026</p>
-    </div>
-  </footer>
+      </section>
+    )}
+    {showFooter && (
+      <footer class="footer" id="footer">
+        <div class="container">
+          <div class="footer-status" id="footer-status">
+            <span class="footer-status-dot" id="footer-status-dot"></span>
+            <span class="footer-status-label" id="footer-status-label"></span>
+          </div>
+          <p><button class="footer-email-link" id="footer-email-btn">contact@joaojacinto.com</button> · © 2026</p>
+        </div>
+      </footer>
+    )}
+  </div>
 )}
 
 <div id="compose-root"></div>
@@ -196,12 +204,15 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const TILT_TRANS = 'box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.32s cubic-bezier(0.34, 1.56, 0.64, 1)';
   const RESET_TRANS = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.42s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
-  /* Per-card-type tilt strength + hover baseline scale. */
+  /* Per-element tilt strength + hover baseline scale + press shrink factor. */
   const tiltConfig = function (card) {
-    if (card.classList.contains('hero-photo')) return { deg: 4, z: 6, baseScale: 1 };
+    if (card.classList.contains('hero-photo')) return { deg: 4, z: 6, baseScale: 1, pressScale: 1 };
+    /* Buttons get a more pronounced tilt — visible but proportional. */
+    if (card.classList.contains('btn'))        return { deg: 12, z: 14, baseScale: 1, pressScale: 0.94 };
     /* Case cards, testimonial cards, and next-case cards share the same
-       pronounced tilt + slight grow on hover. */
-    return { deg: 9, z: 14, baseScale: 1.04 };
+       pronounced tilt + slight grow on hover. Press shrink is gentler
+       than buttons since cards are large and 6% reads as too much. */
+    return { deg: 9, z: 14, baseScale: 1.04, pressScale: 0.97 };
   };
 
   const clearTilt = function (el) {
@@ -216,7 +227,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   };
 
   document.addEventListener('mousemove', function(e) {
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo');
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo, .btn');
     if (tiltCard && tiltCard !== card) {
       clearTilt(tiltCard);
       tiltCard = null;
@@ -246,14 +257,45 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
     card.style.transition = TILT_TRANS;
     card.style.transform = `perspective(800px) rotateX(${-dy * cfg.deg}deg) rotateY(${dx * cfg.deg}deg) translateZ(${cfg.z}px)`;
-    card.style.scale = String(cfg.baseScale + bounce);
+    /* Press-down: shrink the element slightly while the pointer is held,
+       on top of the tilt + bounce so the gesture composes naturally. */
+    var pressFactor = card.classList.contains('is-pressed') ? cfg.pressScale : 1;
+    card.style.scale = String((cfg.baseScale + bounce) * pressFactor);
     if (bounce > 0.002) {
       clearTimeout(bounceTimer);
       bounceTimer = setTimeout(function () {
-        if (tiltCard === card) card.style.scale = String(cfg.baseScale);
+        if (tiltCard === card) {
+          var pf = card.classList.contains('is-pressed') ? cfg.pressScale : 1;
+          card.style.scale = String(cfg.baseScale * pf);
+        }
       }, 90);
     }
   });
+
+  /* Press tracking — buttons AND cards feel like they sink while pointer is down. */
+  var pressedBtn = null;
+  function setPressed(el, on) {
+    if (!el) return;
+    if (on) el.classList.add('is-pressed'); else el.classList.remove('is-pressed');
+    if (tiltCard === el) {
+      var cfg = tiltConfig(el);
+      var pf = on ? cfg.pressScale : 1;
+      el.style.scale = String(cfg.baseScale * pf);
+    }
+  }
+  document.addEventListener('pointerdown', function (e) {
+    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .btn');
+    if (!t) return;
+    pressedBtn = t;
+    setPressed(t, true);
+  });
+  function releasePress() {
+    if (!pressedBtn) return;
+    setPressed(pressedBtn, false);
+    pressedBtn = null;
+  }
+  document.addEventListener('pointerup', releasePress);
+  document.addEventListener('pointercancel', releasePress);
   document.addEventListener('mouseleave', function() {
     if (!tiltCard) return;
     clearTilt(tiltCard);
@@ -730,7 +772,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
             '<div class="compose-footer-actions">' +
               '<button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>' +
               '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message">' +
-                '<span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>' +
+                '<span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg></span>' +
                 '<span>Submit</span>' +
               '</button>' +
             '</div>' +
@@ -1033,6 +1075,369 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         }, 2000);
       });
     });
+  }
+})();
+
+/* ──────────────────────────────────────────────────────────────
+ * Animated dot field for global-CTA cards.
+ * - Constellation density biases toward the CTA button (denser
+ *   near it, sparser far away). Inside-button bounds are excluded
+ *   so the field "circumvents" the button.
+ * - Mouse interaction ONLY fires while the cursor is over the
+ *   card itself (mouseenter/leave gate).
+ * - Scoped instance per .about-cta — pauses off-screen / when tab
+ *   hidden / when reduced motion is requested.
+ * ────────────────────────────────────────────────────────────── */
+(function () {
+  var wraps = document.querySelectorAll('.cta-footer-wrap');
+  if (!wraps.length) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  wraps.forEach(initCta);
+
+  function initCta(wrap) {
+    var canvas = wrap.querySelector('.cta-footer-bg');
+    var card   = wrap.querySelector('.about-cta');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) { canvas.style.display = 'none'; return; }
+
+    var W = 0, H = 0, dpr = 1;
+    var pts = [];
+    var btnZone = null;
+    var mouseX = -999, mouseY = -999, prevMX = 0, prevMY = 0, velX = 0, velY = 0;
+    var mouseInside = false;
+    var raf = 0, inView = true, tabVisible = true;
+    var bgImage = null;   /* offscreen canvas with the dithered gradient */
+
+    /* Resolve --bg-alt and --dark to RGB triples once. */
+    function probeRGB(str) {
+      var p = document.createElement('div');
+      p.style.color = str;
+      document.body.appendChild(p);
+      var m = getComputedStyle(p).color.match(/[\d.]+/g);
+      document.body.removeChild(p);
+      return m ? [+m[0], +m[1], +m[2]] : [0, 0, 0];
+    }
+    var rootStyles = getComputedStyle(document.documentElement);
+    var BG_ALT = probeRGB(rootStyles.getPropertyValue('--bg-alt').trim() || '#E4E1DB');
+    var DARK   = probeRGB(rootStyles.getPropertyValue('--dark').trim()   || '#1C1A17');
+
+    /* Cheap hash-based 2D value noise for low-frequency organic variation. */
+    function hash2(ix, iy) {
+      var s = Math.sin(ix * 127.1 + iy * 311.7) * 43758.5453;
+      return s - Math.floor(s);
+    }
+    function vnoise2(x, y) {
+      var ix = Math.floor(x), iy = Math.floor(y);
+      var fx = x - ix, fy = y - iy;
+      var u = fx * fx * (3 - 2 * fx);
+      var v = fy * fy * (3 - 2 * fy);
+      var a = hash2(ix,     iy);
+      var b = hash2(ix + 1, iy);
+      var c = hash2(ix,     iy + 1);
+      var d = hash2(ix + 1, iy + 1);
+      return (1 - u) * (1 - v) * a + u * (1 - v) * b
+           + (1 - u) * v       * c + u * v       * d;
+    }
+
+    /* Build a one-time offscreen canvas that paints the bg-alt → dark
+       transition organically. Per-pixel: smoothstep ramp + low-frequency
+       value noise (organic blobs) + per-pixel random dither (band killer).
+       Painted into the main canvas once per frame as the background, so
+       gradient banding is impossible (it's quantized after dither). */
+    function buildBackground(w, h, dprIn) {
+      var oc = document.createElement('canvas');
+      var cw = Math.max(1, Math.floor(w * dprIn));
+      var ch = Math.max(1, Math.floor(h * dprIn));
+      oc.width = cw; oc.height = ch;
+      var octx = oc.getContext('2d');
+      var img = octx.createImageData(cw, ch);
+      var data = img.data;
+      var transition = 560 * dprIn;        /* gradient zone in physical pixels */
+      var nScale = 0.018 / dprIn;          /* low-freq noise frequency */
+      var dr = DARK[0] - BG_ALT[0], dg = DARK[1] - BG_ALT[1], db = DARK[2] - BG_ALT[2];
+      for (var y = 0; y < ch; y++) {
+        var t  = Math.min(1, y / transition);
+        var tt = t * t * (3 - 2 * t);     /* smoothstep ramp */
+        var rb = BG_ALT[0] + dr * tt;
+        var gb = BG_ALT[1] + dg * tt;
+        var bb = BG_ALT[2] + db * tt;
+        for (var x = 0; x < cw; x++) {
+          /* Organic blob noise (-1..1 ish) — softens band edges across XY. */
+          var n = (vnoise2(x * nScale, y * nScale) - 0.5) * 6;
+          /* Per-pixel random dither (-3..3) — crushes the remaining 8-bit steps. */
+          var jitter = (Math.random() - 0.5) * 5;
+          var off = n + jitter;
+          var idx = (y * cw + x) * 4;
+          data[idx]     = rb + off;
+          data[idx + 1] = gb + off;
+          data[idx + 2] = bb + off;
+          data[idx + 3] = 255;
+        }
+      }
+      octx.putImageData(img, 0, 0);
+      return oc;
+    }
+
+    function measureButton() {
+      var btn = card && card.querySelector('.btn');
+      if (!btn) return null;
+      var wrapR = wrap.getBoundingClientRect();
+      var btnR  = btn.getBoundingClientRect();
+      var pad = 14;
+      return {
+        cx: btnR.left - wrapR.left + btnR.width  / 2,
+        cy: btnR.top  - wrapR.top  + btnR.height / 2,
+        hw: btnR.width  / 2 + pad,
+        hh: btnR.height / 2 + pad
+      };
+    }
+
+    function inButton(x, y, b) {
+      return Math.abs(x - b.cx) < b.hw && Math.abs(y - b.cy) < b.hh;
+    }
+
+    /* Material Symbols paths — same icons the CTA buttons use. */
+    var MAT_CHAT = 'M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z';
+    var MAT_VIDEO = 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z';
+    function samplePath(pathData, size) {
+      var oc = document.createElement('canvas');
+      oc.width = oc.height = Math.ceil(size);
+      var octx = oc.getContext('2d');
+      octx.save();
+      octx.fillStyle = '#fff';
+      /* Material viewBox is 0 -960 960 960 — translate Y origin so the icon
+         lands inside positive canvas coordinates after the scale. */
+      octx.translate(0, size);
+      octx.scale(size / 960, size / 960);
+      octx.fill(new Path2D(pathData), 'evenodd');
+      octx.restore();
+      var data = octx.getImageData(0, 0, oc.width, oc.height).data;
+      var out = [];
+      for (var y = 0; y < oc.height; y += 2) {
+        for (var x = 0; x < oc.width; x += 2) {
+          if (data[(y * oc.width + x) * 4 + 3] > 60) {
+            out.push([x - oc.width / 2, y - oc.height / 2]);
+          }
+        }
+      }
+      return out;
+    }
+
+    function generate() {
+      pts = [];
+      var w = canvas.offsetWidth, h = canvas.offsetHeight;
+      if (w === 0 || h === 0) return;
+      btnZone = measureButton();
+      var diag = Math.sqrt(w * w + h * h);
+      /* Density: full-width wrap is much larger than the old card, so a
+         lower density keeps the resting field calm. */
+      var target = Math.round((w * h) / 4200);
+      /* Sample both formations sized to the .about-cta region (NOT the full
+         wrap), since that's where the icon should converge. */
+      var cardH = card ? card.getBoundingClientRect().height : h;
+      var iconSize = Math.min(w * 0.30, cardH * 0.95);
+      var chatPts  = samplePath(MAT_CHAT,  iconSize);
+      var videoPts = samplePath(MAT_VIDEO, iconSize);
+      /* Center the icon over the card's actual position within the wrap,
+         not over the wrap's middle (which would land in the footer). */
+      var wcx = w / 2, wcy = h / 2;
+      if (card) {
+        var wrapR = wrap.getBoundingClientRect();
+        var cardR = card.getBoundingClientRect();
+        wcx = cardR.left - wrapR.left + cardR.width  / 2;
+        wcy = cardR.top  - wrapR.top  + cardR.height / 2;
+      }
+      var attempts = 0, maxAttempts = target * 25;
+      while (pts.length < target && attempts < maxAttempts) {
+        attempts++;
+        var x = Math.random() * w;
+        var y = Math.random() * h;
+        if (btnZone && inButton(x, y, btnZone)) continue;
+        /* Density bias: closer to button → higher acceptance probability,
+           so the field clusters around the button and thins out toward edges. */
+        if (btnZone) {
+          var dx = x - btnZone.cx, dy = y - btnZone.cy;
+          var d  = Math.sqrt(dx * dx + dy * dy);
+          var p  = 1 - (d / diag);          /* 1 near, 0 at far diagonal */
+          if (Math.random() > p * 1.4) continue;
+        }
+        var cp = chatPts.length  ? chatPts[Math.floor(Math.random()  * chatPts.length)]  : null;
+        var vp = videoPts.length ? videoPts[Math.floor(Math.random() * videoPts.length)] : null;
+        pts.push({
+          x: x, y: y, ox: x, oy: y, vx: 0, vy: 0,
+          tw: Math.random() * Math.PI * 2,
+          ts: 0.012 + Math.random() * 0.022,
+          /* Per-particle ambient drift — slow, lazy lissajous orbit. */
+          dPhX: Math.random() * Math.PI * 2,
+          dPhY: Math.random() * Math.PI * 2,
+          dSpX: 0.0015 + Math.random() * 0.0025,
+          dSpY: 0.0015 + Math.random() * 0.0025,
+          dAmp: 2 + Math.random() * 5,
+          /* Per-shape targets — chosen on hover by which button is hovered. */
+          chatX:  cp ? wcx + cp[0] : null, chatY:  cp ? wcy + cp[1] : null,
+          videoX: vp ? wcx + vp[0] : null, videoY: vp ? wcy + vp[1] : null,
+          r:  0.7 + Math.random() * 1.2
+        });
+      }
+    }
+
+    function resize() {
+      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      var w = wrap.clientWidth, h = wrap.clientHeight;
+      W = Math.max(1, Math.floor(w * dpr));
+      H = Math.max(1, Math.floor(h * dpr));
+      canvas.width = W; canvas.height = H;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      bgImage = buildBackground(w, h, dpr);
+      generate();
+    }
+
+    /* Mouse scatter listens on the entire dark wrap, so the cursor
+       interacts with particles anywhere in the section (including
+       the footer area). */
+    wrap.addEventListener('mouseenter', function () { mouseInside = true; });
+    wrap.addEventListener('mouseleave', function () {
+      mouseInside = false;
+      mouseX = mouseY = -999;
+      velX = velY = 0;
+    });
+    wrap.addEventListener('mousemove', function (e) {
+      var r = wrap.getBoundingClientRect();
+      var nx = e.clientX - r.left, ny = e.clientY - r.top;
+      velX = nx - prevMX; velY = ny - prevMY;
+      prevMX = nx; prevMY = ny;
+      mouseX = nx; mouseY = ny;
+    });
+
+    /* Button-hover state: particles turn accent-colored and form whichever
+       icon matches the hovered button. Eased in/out via a 0..1 progress lerp. */
+    var btnHover = false;
+    var activeShape = 'chat';   /* 'chat' for Get in touch, 'video' for Book a call */
+    var hoverProg = 0;
+    var primaryBtn   = card && card.querySelector('.btn-accent');
+    var secondaryBtn = card && card.querySelector('.btn-dark-outline');
+    if (primaryBtn) {
+      primaryBtn.addEventListener('mouseenter', function () { btnHover = true; activeShape = 'chat';  loop(); });
+      primaryBtn.addEventListener('mouseleave', function () { btnHover = false; loop(); });
+    }
+    if (secondaryBtn) {
+      secondaryBtn.addEventListener('mouseenter', function () { btnHover = true; activeShape = 'video'; loop(); });
+      secondaryBtn.addEventListener('mouseleave', function () { btnHover = false; loop(); });
+    }
+
+    var IR = 130;
+    function frame() {
+      raf = 0;
+      var w = canvas.offsetWidth, h = canvas.offsetHeight;
+      /* Paint the dithered organic gradient as the background each frame.
+         drawImage from a pre-built offscreen canvas → cheap (GPU-accel). */
+      if (bgImage) {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.drawImage(bgImage, 0, 0);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      } else {
+        ctx.clearRect(0, 0, w, h);
+      }
+
+      var spd = mouseInside ? Math.min(Math.sqrt(velX * velX + velY * velY), 30) : 0;
+
+      /* Smoothly ease the hover state — slow gravitate + color shift. */
+      hoverProg += ((btnHover ? 1 : 0) - hoverProg) * 0.04;
+
+      /* Re-measure button each frame (cheap, handles layout shifts on hover). */
+      if (btnHover && hoverProg > 0.01) btnZone = measureButton();
+
+      for (var i = 0; i < pts.length; i++) {
+        var p = pts[i];
+
+        /* Ambient drift — gentle lissajous orbit around the seed position. */
+        p.dPhX += p.dSpX; p.dPhY += p.dSpY;
+        var driftX = Math.cos(p.dPhX) * p.dAmp;
+        var driftY = Math.sin(p.dPhY) * p.dAmp;
+
+        /* Target: rest position + drift, OR snap into the active icon shape
+           when a CTA is hovered. Each particle keeps a small wiggle inside
+           the shape so the form looks alive, not frozen. */
+        var tx, ty;
+        var shapeX = activeShape === 'video' ? p.videoX : p.chatX;
+        var shapeY = activeShape === 'video' ? p.videoY : p.chatY;
+        if (hoverProg > 0.001 && shapeX !== null) {
+          var restX = p.ox + driftX, restY = p.oy + driftY;
+          var wigX  = Math.cos(p.tw * 0.45) * 1.6;
+          var wigY  = Math.sin(p.tw * 0.45) * 1.6;
+          var targetX = shapeX + wigX;
+          var targetY = shapeY + wigY;
+          tx = restX + (targetX - restX) * hoverProg;
+          ty = restY + (targetY - restY) * hoverProg;
+        } else {
+          tx = p.ox + driftX;
+          ty = p.oy + driftY;
+        }
+
+        /* Soft spring toward target — light damping so the motion stays dreamy. */
+        p.vx = (p.vx + (tx - p.x) * 0.018) * 0.90;
+        p.vy = (p.vy + (ty - p.y) * 0.018) * 0.90;
+
+        /* Cursor scatter — only while mouse is inside the card AND not hovering CTA. */
+        if (mouseInside && spd > 1 && hoverProg < 0.5) {
+          var dx = p.x - mouseX, dy = p.y - mouseY;
+          var d2 = dx * dx + dy * dy;
+          if (d2 < IR * IR && d2 > 0.1) {
+            var d  = Math.sqrt(d2);
+            var fo = 1 - d / IR;
+            p.vx += (dx / d) * fo * fo * spd * 0.06;
+            p.vy += (dy / d) * fo * fo * spd * 0.06;
+          }
+        }
+        p.x += p.vx; p.y += p.vy;
+        p.tw += p.ts;
+        /* Base alpha + a stronger boost while in the wrench formation so
+           the silhouette pops on the dark card. */
+        var a = 0.18 + 0.16 * (Math.sin(p.tw) * 0.5 + 0.5) + hoverProg * 0.35;
+        if (a > 1) a = 1;
+        /* Lerp from default off-white toward primary accent (61,61,181) on hover. */
+        var cr = Math.round(240 + (61  - 240) * hoverProg);
+        var cg = Math.round(237 + (61  - 237) * hoverProg);
+        var cb = Math.round(232 + (181 - 232) * hoverProg);
+        /* Particles also grow ~50% larger while forming the shape. */
+        var rr = p.r * (1 + hoverProg * 0.5);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a + ')';
+        ctx.fill();
+      }
+      velX *= 0.7; velY *= 0.7;
+      if (inView && tabVisible && !reduced) raf = requestAnimationFrame(frame);
+    }
+
+    function loop() { if (!raf && !reduced) raf = requestAnimationFrame(frame); }
+
+    var resizeTimer;
+    var ro = window.ResizeObserver
+      ? new ResizeObserver(function () {
+          clearTimeout(resizeTimer);
+          resizeTimer = setTimeout(resize, 80);
+        })
+      : null;
+    if (ro) ro.observe(wrap);
+    else window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80);
+    });
+
+    document.addEventListener('visibilitychange', function () {
+      tabVisible = document.visibilityState === 'visible';
+      if (tabVisible) loop();
+    });
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (es) {
+        inView = es[0].isIntersecting;
+        if (inView) loop();
+      }, { threshold: 0 }).observe(wrap);
+    }
+
+    /* Defer first measure until layout settles + the wrap is actually sized. */
+    requestAnimationFrame(function () { resize(); loop(); });
   }
 })();
 </script>

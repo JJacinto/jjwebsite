@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro';
 <Base
   activePage="contact"
   navDark={true}
+  showCta={false}
   showFooter={true}
   title="Contact — João Jacinto"
   description="Get in touch with João Jacinto — Senior Product Designer based in Aveiro, Portugal."
@@ -17,12 +18,12 @@ import Base from '../layouts/Base.astro';
 
       <div class="contact-ctas">
         <button class="btn btn-accent" id="compose-open" type="button" onclick="openComposeModal(0)">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
+          <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg></span>
           <span>Get in touch</span>
         </button>
         <a class="btn btn-dark-outline" href="https://www.cal.eu/joao-jacinto" target="_blank" rel="noopener noreferrer">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="10" height="8" rx="1.5"/><path d="M11 7l4-2v6l-4-2z"/></svg></span>
-          <span>Book a 30-min call</span>
+          <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z"/></svg></span>
+          <span>Book a call</span>
         </a>
       </div>
       <p class="contact-response-time">I usually reply within 24h to 48h on weekdays</p>
@@ -36,8 +37,8 @@ import Base from '../layouts/Base.astro';
             <div class="contact-card-label">Email</div>
             <div class="contact-card-value">contact@joaojacinto.com</div>
           </div>
-          <button class="contact-card-action" onclick="copyEmail(this)" aria-label="Copy email address">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <button class="btn btn-dark-outline contact-card-btn" onclick="copyEmail(this)" aria-label="Copy email address">
+            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
             <span id="emailHint">Copy</span>
           </button>
         </div>
@@ -52,8 +53,8 @@ import Base from '../layouts/Base.astro';
             </div>
             <div class="contact-card-value">Aveiro, Portugal</div>
           </div>
-          <a class="contact-card-action" href="https://www.google.com/maps/@40.6405,-8.6538,13z" target="_blank" rel="noopener noreferrer" aria-label="View Aveiro on Google Maps">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <a class="btn btn-dark-outline contact-card-btn" href="https://www.google.com/maps/@40.6405,-8.6538,13z" target="_blank" rel="noopener noreferrer" aria-label="View Aveiro on Google Maps">
+            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
             <span>View map</span>
           </a>
         </div>
@@ -66,10 +67,10 @@ import Base from '../layouts/Base.astro';
             <div class="contact-card-value">LinkedIn · X</div>
           </div>
           <div class="contact-card-actions">
-            <a class="contact-card-action contact-social-btn" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+            <a class="btn btn-dark-outline contact-card-btn contact-card-btn--icon" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
             </a>
-            <a class="contact-card-action contact-social-btn" href="https://x.com/joao_jacinto_8" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+            <a class="btn btn-dark-outline contact-card-btn contact-card-btn--icon" href="https://x.com/joao_jacinto_8" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
           </div>
@@ -147,24 +148,27 @@ let _contactRAF = null;
     return out;
   }
 
-  /* "Send a message" → paper plane icon */
-  const jPts = sample((octx, cw, ch) => {
-    const S  = Math.min(cw, ch) * 0.38;
+  /* Material Symbols paths (viewBox 0 -960 960 960) — drawn via Path2D and
+     normalized into the offscreen canvas. */
+  const MAT_CHAT = 'M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z';
+  const MAT_CALL = 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z';
+
+  function drawMaterial(octx, cw, ch, pathData, scaleFactor) {
+    const S = Math.min(cw, ch) * (scaleFactor || 0.55);
     const cx = cw / 2, cy = ch / 2;
-    const lw = Math.max(S * 0.085, 6);
-    octx.strokeStyle = '#fff';
-    octx.fillStyle   = 'rgba(255,255,255,0.28)';
-    octx.lineWidth   = lw;
-    octx.lineCap = 'round'; octx.lineJoin = 'round';
-    const tip = [cx + S*0.46, cy - S*0.36];
-    const tl  = [cx - S*0.46, cy - S*0.18];
-    const br  = [cx + S*0.10, cy + S*0.48];
-    const fc  = [cx + S*0.10, cy + S*0.08];
-    octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...tl); octx.lineTo(...br); octx.closePath();
-    octx.fill(); octx.stroke();
-    octx.beginPath(); octx.moveTo(...tip); octx.lineTo(...fc); octx.stroke();
-    octx.beginPath(); octx.moveTo(...fc);  octx.lineTo(...br); octx.stroke();
-  });
+    octx.save();
+    octx.fillStyle = '#fff';
+    /* Material viewBox is 0 -960 960 960 — center at (480, -480). */
+    octx.translate(cx - S / 2, cy + S / 2);
+    octx.scale(S / 960, S / 960);
+    octx.fill(new Path2D(pathData), 'evenodd');
+    octx.restore();
+  }
+
+  /* "Get in touch" → Material chat-bubble icon. */
+  const jPts     = sample((octx, cw, ch) => drawMaterial(octx, cw, ch, MAT_CHAT, 0.55));
+  /* "Book a 30-min call" → Material call/handset icon. */
+  const phonePts = sample((octx, cw, ch) => drawMaterial(octx, cw, ch, MAT_CALL, 0.55));
 
   const s = {
     mouseX:-999, mouseY:-999, prevMX:0, prevMY:0,
@@ -207,6 +211,7 @@ let _contactRAF = null;
     return {
       ox,oy,oz, nbX,nbY,nbZ,
       lJX:0, lJY:0,
+      lPX:0, lPY:0,
       sx:nbX, sy:nbY, sz:nbZ,
       scX:(Math.random()-0.5)*R*2.4, scY:(Math.random()-0.5)*R*2.4, scZ:(Math.random()-0.5)*R*2.4,
       toX:(torusR+tubeR*Math.cos(theta))*Math.cos(ta),
@@ -222,12 +227,14 @@ let _contactRAF = null;
   });
 
   pts.forEach(p => {
-    if (jPts.length)  { const jp = jPts[Math.floor(Math.random()*jPts.length)];  p.lJX=jp[0]; p.lJY=jp[1]; }
+    if (jPts.length)     { const jp = jPts[Math.floor(Math.random()*jPts.length)];     p.lJX=jp[0]; p.lJY=jp[1]; }
+    if (phonePts.length) { const pp = phonePts[Math.floor(Math.random()*phonePts.length)]; p.lPX=pp[0]; p.lPY=pp[1]; }
   });
 
   function getTarget(p, mode) {
     if (mode==='nebula')    return [p.nbX,     p.nbY,     p.nbZ    ];
     if (mode==='letter-j')  return [p.lJX,     p.lJY,     0        ];
+    if (mode==='phone')     return [p.lPX,     p.lPY,     0        ];
     if (mode==='disc')      return [p.ox*1.1,  p.oy*0.10, p.oz*1.1 ];
     if (mode==='scatter')   return [p.scX*0.7, p.scY*0.7, p.scZ*0.7];
     if (mode==='dense')     return [p.ox*0.38, p.oy*0.38, p.oz*0.38];
@@ -241,7 +248,7 @@ let _contactRAF = null;
     s.activeMode = name;
     if (name === 'nebula') {
       s.targetRotSpeed = 0.00008; s.targetLumBase = 72; s.targetLumRange = 80; s.wobble = false;
-    } else if (name === 'letter-j') {
+    } else if (name === 'letter-j' || name === 'phone') {
       s.targetRotSpeed = 0.00004; s.targetLumBase = 100; s.targetLumRange = 60; s.wobble = false;
       pts.forEach(p => { p.dispX=0; p.dispY=0; p.dvX=0; p.dvY=0; });
     }
@@ -293,6 +300,11 @@ let _contactRAF = null;
     emailBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:61,cg:91,cb:220}; applyMode('letter-j');  });
     emailBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                  applyMode('nebula');    });
   }
+  const callBtn = document.querySelector('.contact-ctas .btn-dark-outline');
+  if (callBtn) {
+    callBtn.addEventListener('mouseenter', () => { s.hoverColor={cr:235,cg:240,cb:255}; applyMode('phone');  });
+    callBtn.addEventListener('mouseleave', () => { s.hoverColor=null;                    applyMode('nebula'); });
+  }
 
   function rotXY(px,py,pz,rx,ry) {
     const y1=py*Math.cos(rx)-pz*Math.sin(rx), z1=py*Math.sin(rx)+pz*Math.cos(rx);
@@ -316,7 +328,7 @@ let _contactRAF = null;
     s.smoothVY = s.smoothVY*0.94 + s.velY*0.06;
     s.velX*=0.8; s.velY*=0.8;
 
-    const inLetterMode = s.activeMode==='letter-j';
+    const inLetterMode = s.activeMode==='letter-j' || s.activeMode==='phone';
     if (inLetterMode) {
       s.rotVX*=0.88; s.rotVY*=0.88;
       s.rotY*=0.97;
