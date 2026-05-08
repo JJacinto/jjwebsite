@@ -129,7 +129,7 @@ export const CASES: Case[] = [
     cat: 'Design · Namecheap',
     title: 'Designing a support chat experience',
     subtitle: "Building a customer support platform from the ground up for Namecheap's engineering team — reducing ticket volume and improving resolution speed.",
-    img: '/assets/images/case-namecheap.avif', imgW: 3124, imgH: 1512,
+    img: '/assets/images/case-namecheap.avif', imgW: 1600, imgH: 775,
     year: '2019–2020', role: 'Product Designer', company: 'Namecheap', duration: '12 months',
     keywords: ['Customer Support', 'Internal Tools', 'Chat UX', 'Engineering Platform', 'B2B2C'],
     achievements: [
