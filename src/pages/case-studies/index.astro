@@ -22,7 +22,7 @@ const rest = CASES.slice(2);
       <div class="cases-grid-row-2" style="margin-bottom:24px">
         {featured.map((c, i) => (
           <a class={`case-card case-card-featured reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`}>
-            <img src={c.img} alt={c.title} loading="lazy">
+            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
             <div class="case-card-body">
               <div class="case-card-cat">{c.cat}</div>
               <div class="case-card-title">{c.title}</div>
@@ -33,7 +33,7 @@ const rest = CASES.slice(2);
       <div class="cases-grid">
         {rest.map((c, i) => (
           <a class={`case-card reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`}>
-            <img src={c.img} alt={c.title} loading="lazy">
+            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="lazy">
             <div class="case-card-body">
               <div class="case-card-cat">{c.cat}</div>
               <div class="case-card-title">{c.title}</div>

@@ -8,6 +8,8 @@ export interface Case {
   title: string;
   subtitle: string;
   img: string;
+  imgW: number;
+  imgH: number;
   year: string;
   role: string;
   company: string;
@@ -26,7 +28,7 @@ export const CASES: Case[] = [
     cat: 'Design · StreamYard',
     title: 'Redefining webinar customization',
     subtitle: "How I redesigned the end-to-end customization experience for StreamYard's webinar product, serving 5M+ live streaming users.",
-    img: '/assets/images/case-webinar.avif',
+    img: '/assets/images/case-webinar.avif', imgW: 1230, imgH: 1056,
     year: '2023', role: 'Senior Product Designer', company: 'StreamYard', duration: '6 months',
     keywords: ['Webinar UX', 'Customization', 'Design Systems', 'User Research', 'Figma'],
     achievements: [
@@ -52,7 +54,7 @@ export const CASES: Case[] = [
     cat: 'Research Ops · StreamYard',
     title: 'Understanding webinar organizers',
     subtitle: "A research operations effort to build a continuous feedback loop with StreamYard's webinar segment — informing 12 months of product decisions.",
-    img: '/assets/images/case-research.avif',
+    img: '/assets/images/case-research.avif', imgW: 1522, imgH: 964,
     year: '2022', role: 'Senior Product Designer', company: 'StreamYard', duration: '3 months (ongoing)',
     keywords: ['Research Ops', 'Moderated Testing', 'Surveys', 'Segmentation', 'Insight Repository'],
     achievements: [
@@ -77,7 +79,7 @@ export const CASES: Case[] = [
     cat: 'Design Leadership · StreamYard',
     title: 'Leading and managing a design system',
     subtitle: "How I built, scaled, and maintained a component library that became the single source of truth for StreamYard's design and engineering teams.",
-    img: '/assets/images/case-ds.avif',
+    img: '/assets/images/case-ds.avif', imgW: 1440, imgH: 900,
     year: '2022–2023', role: 'Senior Product Designer', company: 'StreamYard', duration: '18 months',
     keywords: ['Design System', 'Component Library', 'Figma', 'Accessibility', 'Tokens', 'Engineering Collaboration'],
     achievements: [
@@ -102,7 +104,7 @@ export const CASES: Case[] = [
     cat: 'Design · Talkdesk',
     title: 'Reshaping an AI training platform',
     subtitle: "Redesigning the trainer interface for Talkdesk's AI/CX platform — making it usable for non-technical users without losing power-user depth.",
-    img: '/assets/images/case-talkdesk.avif',
+    img: '/assets/images/case-talkdesk.avif', imgW: 778, imgH: 516,
     year: '2021', role: 'Senior Product Designer', company: 'Talkdesk', duration: '9 months',
     keywords: ['AI/ML UX', 'Enterprise SaaS', 'Information Architecture', 'Complex Workflows', 'B2B'],
     achievements: [
@@ -127,7 +129,7 @@ export const CASES: Case[] = [
     cat: 'Design · Namecheap',
     title: 'Designing a support chat experience',
     subtitle: "Building a customer support platform from the ground up for Namecheap's engineering team — reducing ticket volume and improving resolution speed.",
-    img: '/assets/images/case-namecheap.avif',
+    img: '/assets/images/case-namecheap.avif', imgW: 3124, imgH: 1512,
     year: '2019–2020', role: 'Product Designer', company: 'Namecheap', duration: '12 months',
     keywords: ['Customer Support', 'Internal Tools', 'Chat UX', 'Engineering Platform', 'B2B2C'],
     achievements: [

@@ -40,7 +40,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
       </div>
 
       <div class="case-hero-img reveal">
-        <img src={c.img} alt={c.title} loading="lazy">
+        <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
       </div>
 
       <div class={`outcomes ${outcomesClass} reveal`}>
@@ -72,7 +72,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
       <div class="next-case-wrap">
         <span class="eyebrow">Next case study</span>
         <a class="next-case reveal" href={`/case-studies/${next.slug}`}>
-          <img src={next.img} alt={next.title}>
+          <img src={next.img} alt={next.title} width={next.imgW} height={next.imgH} loading="lazy">
           <div class="next-case-body">
             <div class="next-case-cat">{next.cat}</div>
             <div class="next-case-title">{next.title} →</div>
