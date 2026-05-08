@@ -1,0 +1,68 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base
+  activePage=""
+  navDark={true}
+  showCta={false}
+  showFooter={true}
+  title="Page not found — João Jacinto"
+  description="The page you were looking for doesn't exist or has moved."
+>
+  <section class="notfound">
+    <div class="notfound-inner reveal">
+      <p class="notfound-eyebrow">404</p>
+      <h1 class="notfound-title">This page wandered off.</h1>
+      <p class="notfound-body">The link may be broken, or the page may have moved. Let's get you back on track.</p>
+      <div class="notfound-ctas">
+        <a class="btn btn-accent" href="/">
+          <span>Back to home</span>
+        </a>
+        <a class="btn btn-dark-outline" href="/case-studies">
+          <span>See case studies</span>
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 1.5rem;
+    background: var(--bg);
+  }
+  .notfound-inner {
+    max-width: 640px;
+    text-align: center;
+  }
+  .notfound-eyebrow {
+    font-family: var(--font-mono, ui-monospace, monospace);
+    font-size: 0.875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted, #888);
+    margin: 0 0 1rem;
+  }
+  .notfound-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+  }
+  .notfound-body {
+    color: var(--muted, #888);
+    margin: 0 0 2rem;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .notfound-ctas {
+    display: inline-flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+</style>
