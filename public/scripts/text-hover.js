@@ -9,7 +9,10 @@
     var text = el.textContent;
     el.textContent = '';
     for (var i = 0; i < text.length; i++) {
-      var ch = text[i] === ' ' ? ' ' : text[i];
+      /* Replace regular spaces with non-breaking spaces — a plain space
+         inside .sc-wrap (display: inline-block) can collapse to zero
+         width, which makes "Book a call" render as "Bookacall". */
+      var ch = text[i] === ' ' ? ' ' : text[i];
       var w  = document.createElement('span');
       w.className = 'sc-wrap';
       var c1 = document.createElement('span');
