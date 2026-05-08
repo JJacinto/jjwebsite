@@ -33,10 +33,28 @@ pillNav.querySelectorAll('a').forEach(link => {
     sessionStorage.setItem('pillFrom', JSON.stringify(pos));
   });
 });
-/* Run the cross-page slide as early as fonts are ready — `window.load`
-   waits for images/CSS too, by which time heavy init work (particle
-   canvas, FBM gradient) is competing for the main thread and the slide
-   stutters. Fonts are what we actually need for accurate pill widths. */
+
+/* Land the indicator at the saved from-position synchronously — before
+   the first paint of the new page — so it doesn't visually pop from
+   default (left:0 width:0) to the from-pos before sliding. */
+const savedFrom = (function () {
+  try {
+    const raw = sessionStorage.getItem('pillFrom');
+    if (!raw) return null;
+    sessionStorage.removeItem('pillFrom');
+    return JSON.parse(raw);
+  } catch (_) { return null; }
+})();
+if (savedFrom) {
+  pillIndicator.style.transition = 'none';
+  pillIndicator.style.left  = savedFrom.left + 'px';
+  pillIndicator.style.width = savedFrom.width + 'px';
+}
+
+/* Trigger the slide as soon as fonts are ready — `window.load` waits
+   for images/CSS too, by which time heavy init work (particle canvas,
+   FBM gradient) is competing for the main thread and the slide
+   stutters. Fonts are what affect pill widths. */
 const ready = document.fonts && document.fonts.ready
   ? document.fonts.ready
   : Promise.resolve();
@@ -44,19 +62,17 @@ ready.then(() => {
   const active = pillNav.querySelector('a.active');
   if (!active) { pillIndicator.style.width = '0'; return; }
   const toPos = getPillPos(active);
-  const saved = sessionStorage.getItem('pillFrom');
-  sessionStorage.removeItem('pillFrom');
-  if (saved) {
-    const from = JSON.parse(saved);
-    pillIndicator.style.transition = 'none';
-    pillIndicator.style.left  = from.left + 'px';
-    pillIndicator.style.width = from.width + 'px';
+  if (savedFrom) {
+    /* Re-enable the transition then write the target position. Two rAFs
+       ensure the from-position has been committed to the compositor
+       before the transition starts, so the slide actually animates. */
     requestAnimationFrame(() => requestAnimationFrame(() => {
       pillIndicator.style.transition = '';
       pillIndicator.style.left  = toPos.left + 'px';
       pillIndicator.style.width = toPos.width + 'px';
     }));
   } else {
+    /* First visit / no saved position — snap silently. */
     pillIndicator.style.transition = 'none';
     pillIndicator.style.left  = toPos.left + 'px';
     pillIndicator.style.width = toPos.width + 'px';

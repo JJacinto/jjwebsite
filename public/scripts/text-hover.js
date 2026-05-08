@@ -50,18 +50,32 @@
     });
   }
 
-  document.querySelectorAll('.pill-nav a').forEach(function(a) { bind(a, a); });
-  document.querySelectorAll('.mobile-menu a[data-page]').forEach(function(a) { bind(a, a); });
-  document.querySelectorAll('.btn').forEach(function(btn) {
-    var spans = Array.prototype.slice.call(btn.querySelectorAll('span')).reverse();
-    var txt = null;
-    for (var i = 0; i < spans.length; i++) {
-      if (!spans[i].classList.contains('btn-icon') && spans[i].textContent.trim()) { txt = spans[i]; break; }
-    }
-    if (txt) bind(btn, txt);
-  });
-  document.querySelectorAll('.case-card, .next-case').forEach(function(card) {
-    var title = card.querySelector('.case-card-title');
-    if (title) bind(card, title);
-  });
+  /* Defer ALL per-char wrapping past the pill-nav cross-page slide.
+     Pre-wrapping every nav link, button, and case-card title on page
+     load mutates the DOM heavily (hundreds of inserted spans, multiple
+     forced reflows from textContent reads/writes) and runs in the same
+     frame as the 320ms slide — that's what makes the slide stutter.
+     The work is moved to idle time; first hover within the idle window
+     binds inline so there's no missed effect. */
+  function bindAll() {
+    document.querySelectorAll('.pill-nav a').forEach(function(a) { bind(a, a); });
+    document.querySelectorAll('.mobile-menu a[data-page]').forEach(function(a) { bind(a, a); });
+    document.querySelectorAll('.btn').forEach(function(btn) {
+      var spans = Array.prototype.slice.call(btn.querySelectorAll('span')).reverse();
+      var txt = null;
+      for (var i = 0; i < spans.length; i++) {
+        if (!spans[i].classList.contains('btn-icon') && spans[i].textContent.trim()) { txt = spans[i]; break; }
+      }
+      if (txt) bind(btn, txt);
+    });
+    document.querySelectorAll('.case-card, .next-case').forEach(function(card) {
+      var title = card.querySelector('.case-card-title');
+      if (title) bind(card, title);
+    });
+  }
+  if (window.requestIdleCallback) {
+    window.requestIdleCallback(bindAll, { timeout: 1200 });
+  } else {
+    setTimeout(bindAll, 420);
+  }
 })();
