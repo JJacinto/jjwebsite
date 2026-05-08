@@ -646,8 +646,12 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   border: 6px solid var(--border); padding: 24px; margin-bottom: 20px;
   box-shadow: var(--shadow-sm); will-change: transform;
   position: relative;
+  /* Now an <a> — reset default anchor decoration but keep tilt/hover. */
+  display: block;
+  text-decoration: none; color: inherit;
   transition: transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, filter 0.35s ease, scale 0.35s cubic-bezier(0.22,1,0.36,1);
 }
+.testimonial-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
 .testimonial-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
 .testimonial-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .testimonial-avatar {
