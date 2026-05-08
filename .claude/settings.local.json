@@ -28,7 +28,11 @@
       "Bash(python3 retune_changes.py)",
       "Bash(python retune_footer.py)",
       "Bash(python -c ' *)",
-      "Bash(python retune_water.py)"
+      "Bash(python retune_water.py)",
+      "Bash(grep -n \"rgba\\\\|#[0-9a-fA-F]\\\\{3,8\\\\}\" \"d:/Claude/Personal website/Repository/jjwebsite/src/styles/global.css\")",
+      "Bash(grep -n \"_contactRAF\\\\|initContactCanvas\\\\|^}\\)\\(\\);$\" \"d:/Claude/Personal website/Repository/jjwebsite/src/pages/contact.astro\")",
+      "Bash(npm outdated *)",
+      "Bash(npm audit *)"
     ]
   }
 }

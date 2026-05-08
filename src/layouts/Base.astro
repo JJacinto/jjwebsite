@@ -1,6 +1,5 @@
 ---
 import '../styles/global.css';
-import RetuneBridge from '../components/RetuneBridge.tsx';
 
 interface Props {
   title?: string;
@@ -105,7 +104,7 @@ const {
             <span class="footer-status-dot" id="footer-status-dot"></span>
             <span class="footer-status-label" id="footer-status-label"></span>
           </div>
-          <p><button class="footer-email-link" id="footer-email-btn">contact@joaojacinto.com</button> · © 2026</p>
+          <p>© 2026 João Jacinto • <button class="footer-email-link" id="footer-email-btn" aria-label="Copy email contact@joaojacinto.com to clipboard">contact@joaojacinto.com</button></p>
         </div>
       </footer>
     )}
@@ -1097,7 +1096,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
   function initCta(wrap) {
     var canvas = wrap.querySelector('.cta-footer-bg');
-    var card   = wrap.querySelector('.about-cta');
+    /* The "card" is the container holding the CTA buttons. .about-cta on
+       the global outro, .contact-inner on the contact page (which reuses
+       this same particle system on its own dark hero-fold). */
+    var card   = wrap.querySelector('.about-cta, .contact-inner');
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     if (!ctx) { canvas.style.display = 'none'; return; }
@@ -1125,13 +1127,31 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     var DARK   = probeRGB(rootStyles.getPropertyValue('--dark').trim()   || '#1C1A17');
     var BG_FALLBACK = probeRGB(rootStyles.getPropertyValue('--bg').trim() || '#ECEAE5');
 
+    var isContactPage = wrap.classList.contains('contact');
+
     function detectAboveColor() {
+      /* Contact page: hardcoded gradient. Top is a darker shade than
+         --dark; by the time the gradient reaches the hero it's already
+         at full --dark. No section-above detection here — just paint. */
+      if (isContactPage) {
+        var d = probeRGB(rootStyles.getPropertyValue('--dark').trim() || '#1C1A17');
+        return [Math.max(0, d[0] - 14), Math.max(0, d[1] - 14), Math.max(0, d[2] - 14)];
+      }
       /* Walk up the previousElementSibling chain looking for an element
-         with an opaque background. Falls back to the body bg if nothing
-         opaque is found (i.e., the section above inherits page bg). */
+         with an opaque background AND that's actually in the document
+         flow (skip fixed/absolute helpers like .brands-tooltip — those
+         are anchored elsewhere on the screen and aren't what visually
+         sits above the wrap). Falls back to body bg if nothing matches. */
       var prev = wrap.previousElementSibling;
       while (prev) {
-        var bg = getComputedStyle(prev).backgroundColor;
+        var styles = getComputedStyle(prev);
+        var pos = styles.position;
+        var disp = styles.display;
+        if (pos === 'fixed' || pos === 'absolute' || disp === 'none') {
+          prev = prev.previousElementSibling;
+          continue;
+        }
+        var bg = styles.backgroundColor;
         if (bg && bg !== 'transparent' && bg.indexOf('rgba(0, 0, 0, 0)') === -1) {
           var rgba = bg.match(/[\d.]+/g);
           if (rgba && rgba.length >= 3) {
@@ -1164,6 +1184,22 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       return (1 - u) * (1 - v) * a + u * (1 - v) * b
            + (1 - u) * v       * c + u * v       * d;
     }
+    /* 3-octave FBM with per-octave rotation — breaks the axis-aligned
+       grid pattern that single-octave value noise reveals on flat
+       gradients. Result reads as cloud/fog texture, not pixelated cells.
+       Returns roughly 0..1 (slightly compressed by octave decay). */
+    function fbm2(x, y) {
+      var v = 0, amp = 0.5;
+      var c = 0.8660254, s = 0.5;     /* rotate ~30° per octave */
+      for (var i = 0; i < 3; i++) {
+        v += amp * vnoise2(x, y);
+        var nx = (c * x - s * y) * 2.07;
+        var ny = (s * x + c * y) * 2.07;
+        x = nx; y = ny;
+        amp *= 0.5;
+      }
+      return v;
+    }
 
     /* Build a one-time offscreen canvas that paints the bg-alt → dark
        transition organically. Per-pixel: smoothstep ramp + low-frequency
@@ -1178,23 +1214,34 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       var octx = oc.getContext('2d');
       var img = octx.createImageData(cw, ch);
       var data = img.data;
-      var transition = 720 * dprIn;        /* gradient zone in physical pixels — taller for a longer fade */
+      /* Gradient zone: full canvas height for the outro wrap (so the top
+         seamlessly meets the section above). On the contact page the
+         gradient resolves quickly — by the time it reaches the hero the
+         color is at full --dark, and everything below stays --dark. */
+      var transition = isContactPage ? ch * 0.32 : ch;
       var nScale = 0.018 / dprIn;          /* low-freq noise frequency */
       /* Pick the gradient START color to match the section directly above
          the wrap on this page — invisible transition regardless of page. */
       var ABOVE = detectAboveColor();
       var dr = DARK[0] - ABOVE[0], dg = DARK[1] - ABOVE[1], db = DARK[2] - ABOVE[2];
+      /* Fade the noise/dither in over the first ~100 physical pixels so
+         the seam zone is pure flat color identical to the section above,
+         and noise only appears once the gradient has visibly moved away
+         from the start color. */
+      var noiseFadeEnd = 100 * dprIn;
       for (var y = 0; y < ch; y++) {
         var t  = Math.min(1, y / transition);
         var tt = t * t * (3 - 2 * t);     /* smoothstep ramp */
         var rb = ABOVE[0] + dr * tt;
         var gb = ABOVE[1] + dg * tt;
         var bb = ABOVE[2] + db * tt;
+        var nAtt = Math.min(1, y / noiseFadeEnd);
+        var nAtt2 = nAtt * nAtt * (3 - 2 * nAtt);  /* smoothstep the fade-in too */
         for (var x = 0; x < cw; x++) {
-          /* Organic blob noise (-1..1 ish) — softens band edges across XY. */
-          var n = (vnoise2(x * nScale, y * nScale) - 0.5) * 6;
-          /* Per-pixel random dither (-3..3) — crushes the remaining 8-bit steps. */
-          var jitter = (Math.random() - 0.5) * 5;
+          /* Multi-octave fog — subtler than a single octave and grid-free. */
+          var n = (fbm2(x * nScale, y * nScale) - 0.45) * 3.2 * nAtt2;
+          /* Per-pixel random dither — crushes the remaining 8-bit steps. */
+          var jitter = (Math.random() - 0.5) * 3.5 * nAtt2;
           var off = n + jitter;
           var idx = (y * cw + x) * 4;
           data[idx]     = rb + off;
@@ -1207,8 +1254,14 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
       return oc;
     }
 
-    function measureButton() {
-      var btn = card && card.querySelector('.btn');
+    function measureButton(which) {
+      /* `which` is 'chat' (Get in touch / .btn-accent) or 'video'
+         (Book a call / .btn-dark-outline). Falls back to the first
+         .btn so the initial generate() call still works. */
+      var sel = which === 'video' ? '.btn-dark-outline'
+              : which === 'chat'  ? '.btn-accent'
+              : '.btn';
+      var btn = card && card.querySelector(sel);
       if (!btn) return null;
       var wrapR = wrap.getBoundingClientRect();
       var btnR  = btn.getBoundingClientRect();
@@ -1296,12 +1349,13 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
           x: x, y: y, ox: x, oy: y, vx: 0, vy: 0,
           tw: Math.random() * Math.PI * 2,
           ts: 0.012 + Math.random() * 0.022,
-          /* Per-particle ambient drift — slow, lazy lissajous orbit. */
+          /* Per-particle ambient drift — wider lissajous orbit, slower
+             phase advance so peak instantaneous velocity stays similar. */
           dPhX: Math.random() * Math.PI * 2,
           dPhY: Math.random() * Math.PI * 2,
-          dSpX: 0.0015 + Math.random() * 0.0025,
-          dSpY: 0.0015 + Math.random() * 0.0025,
-          dAmp: 2 + Math.random() * 5,
+          dSpX: 0.0005 + Math.random() * 0.0012,
+          dSpY: 0.0005 + Math.random() * 0.0012,
+          dAmp: 10 + Math.random() * 22,
           /* Per-shape targets — chosen on hover by which button is hovered. */
           chatX:  cp ? wcx + cp[0] : null, chatY:  cp ? wcy + cp[1] : null,
           videoX: vp ? wcx + vp[0] : null, videoY: vp ? wcy + vp[1] : null,
@@ -1345,13 +1399,22 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     var hoverProg = 0;
     var primaryBtn   = card && card.querySelector('.btn-accent');
     var secondaryBtn = card && card.querySelector('.btn-dark-outline');
+    var hoverStart = 0;
     if (primaryBtn) {
-      primaryBtn.addEventListener('mouseenter', function () { btnHover = true; activeShape = 'chat';  loop(); });
-      primaryBtn.addEventListener('mouseleave', function () { btnHover = false; loop(); });
+      primaryBtn.addEventListener('mouseenter', function () {
+        btnHover = true; activeShape = 'chat';
+        hoverStart = performance.now();
+        loop();
+      });
+      primaryBtn.addEventListener('mouseleave', function () { btnHover = false; hoverStart = 0; loop(); });
     }
     if (secondaryBtn) {
-      secondaryBtn.addEventListener('mouseenter', function () { btnHover = true; activeShape = 'video'; loop(); });
-      secondaryBtn.addEventListener('mouseleave', function () { btnHover = false; loop(); });
+      secondaryBtn.addEventListener('mouseenter', function () {
+        btnHover = true; activeShape = 'video';
+        hoverStart = performance.now();
+        loop();
+      });
+      secondaryBtn.addEventListener('mouseleave', function () { btnHover = false; hoverStart = 0; loop(); });
     }
 
     var IR = 130;
@@ -1370,11 +1433,19 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
       var spd = mouseInside ? Math.min(Math.sqrt(velX * velX + velY * velY), 30) : 0;
 
-      /* Smoothly ease the hover state — slow gravitate + color shift. */
-      hoverProg += ((btnHover ? 1 : 0) - hoverProg) * 0.04;
+      /* Very slow ease in/out (~7.5s rise time) so the gravitation reads
+         as deliberate atmosphere, not a snap. */
+      hoverProg += ((btnHover ? 1 : 0) - hoverProg) * 0.005;
 
-      /* Re-measure button each frame (cheap, handles layout shifts on hover). */
-      if (btnHover && hoverProg > 0.01) btnZone = measureButton();
+      /* After 10 seconds of continuous hover, particles in the inner pull
+         zone enter an agitation phase: each randomly alternates between
+         being engulfed (sucked into the button) and jittering in place. */
+      var now = performance.now();
+      var agitationActive = btnHover && hoverStart && (now - hoverStart) > 10000;
+
+      /* Re-measure the *currently hovered* button each frame. Particles
+         gravitate toward whichever CTA is hovered, not always Get in touch. */
+      if (btnHover && hoverProg > 0.01) btnZone = measureButton(activeShape);
 
       for (var i = 0; i < pts.length; i++) {
         var p = pts[i];
@@ -1384,28 +1455,50 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         var driftX = Math.cos(p.dPhX) * p.dAmp;
         var driftY = Math.sin(p.dPhY) * p.dAmp;
 
-        /* Target: rest position + drift, OR snap into the active icon shape
-           when a CTA is hovered. Each particle keeps a small wiggle inside
-           the shape so the form looks alive, not frozen. */
-        var tx, ty;
-        var shapeX = activeShape === 'video' ? p.videoX : p.chatX;
-        var shapeY = activeShape === 'video' ? p.videoY : p.chatY;
-        if (hoverProg > 0.001 && shapeX !== null) {
-          var restX = p.ox + driftX, restY = p.oy + driftY;
-          var wigX  = Math.cos(p.tw * 0.45) * 1.6;
-          var wigY  = Math.sin(p.tw * 0.45) * 1.6;
-          var targetX = shapeX + wigX;
-          var targetY = shapeY + wigY;
-          tx = restX + (targetX - restX) * hoverProg;
-          ty = restY + (targetY - restY) * hoverProg;
-        } else {
-          tx = p.ox + driftX;
-          ty = p.oy + driftY;
+        /* Target: rest position + drift. When a CTA is hovered, particles
+           within 1000px of the button gravitate toward it with strength
+           that falls off with distance. Beyond the radius, particles
+           continue drifting normally and don't change color. */
+        var tx = p.ox + driftX;
+        var ty = p.oy + driftY;
+        var pull = 0;
+        if (hoverProg > 0.001 && btnZone) {
+          var ddx = p.ox - btnZone.cx, ddy = p.oy - btnZone.cy;
+          var dToBtn = Math.sqrt(ddx * ddx + ddy * ddy);
+          if (dToBtn < 1000) {
+            pull = (1 - dToBtn / 1000) * hoverProg;
+            tx = (p.ox + driftX) + (btnZone.cx - (p.ox + driftX)) * pull;
+            ty = (p.oy + driftY) + (btnZone.cy - (p.oy + driftY)) * pull;
+          }
         }
 
-        /* Soft spring toward target — light damping so the motion stays dreamy. */
-        p.vx = (p.vx + (tx - p.x) * 0.018) * 0.90;
-        p.vy = (p.vy + (ty - p.y) * 0.018) * 0.90;
+        /* Spring toward target — very slow gravitation so particles
+           drift toward the button rather than snap. Heavier damping
+           keeps the velocity from overshooting on long pulls. */
+        p.vx = (p.vx + (tx - p.x) * 0.0035) * 0.94;
+        p.vy = (p.vy + (ty - p.y) * 0.0035) * 0.94;
+
+        /* After 10s of hover, close particles randomly engulf or agitate.
+           Each one re-rolls its mode every ~1.6s so the field looks alive,
+           with some particles being sucked in and others vibrating. */
+        if (agitationActive && pull > 0.4 && btnZone) {
+          if (!p.agitAt || (now - p.agitAt) > 1600) {
+            p.agitMode = Math.random() < 0.5 ? 1 : 0;  /* 1 = engulf, 0 = agitate */
+            p.agitAt = now;
+          }
+          if (p.agitMode === 1) {
+            /* Engulf — extra acceleration toward button center on top
+               of the regular pull, so they accelerate inward fast. */
+            p.vx += (btnZone.cx - p.x) * 0.012;
+            p.vy += (btnZone.cy - p.y) * 0.012;
+          } else {
+            /* Agitate — random jitter, scaled by pull so closer particles
+               vibrate harder. Weight toward perpendicular-to-pull for
+               visual "shake". */
+            p.vx += (Math.random() - 0.5) * 1.4 * pull;
+            p.vy += (Math.random() - 0.5) * 1.4 * pull;
+          }
+        }
 
         /* Cursor scatter — only while mouse is inside the card AND not hovering CTA. */
         if (mouseInside && spd > 1 && hoverProg < 0.5) {
@@ -1419,21 +1512,71 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
           }
         }
         p.x += p.vx; p.y += p.vy;
+        /* Don't let particles cross into the button's footprint —
+           push them back to the nearest button edge if they do.
+           Stops the field from rendering "behind" the button. */
+        if (btnZone) {
+          var bdx = p.x - btnZone.cx, bdy = p.y - btnZone.cy;
+          if (Math.abs(bdx) < btnZone.hw && Math.abs(bdy) < btnZone.hh) {
+            var overX = btnZone.hw - Math.abs(bdx);
+            var overY = btnZone.hh - Math.abs(bdy);
+            if (overX < overY) {
+              p.x += (bdx >= 0 ? overX : -overX);
+              p.vx *= -0.3;
+            } else {
+              p.y += (bdy >= 0 ? overY : -overY);
+              p.vy *= -0.3;
+            }
+          }
+        }
+        /* Particles fully absorbed (touching the button edge while pulled
+           hard) respawn at a random wrap edge — keeps the field populated
+           when the user holds hover for a long time. */
+        if (btnZone && pull > 0.85) {
+          var edge = Math.floor(Math.random() * 4);
+          if (edge === 0)      { p.ox = Math.random() * w; p.oy = -10; }
+          else if (edge === 1) { p.ox = w + 10;            p.oy = Math.random() * h; }
+          else if (edge === 2) { p.ox = Math.random() * w; p.oy = h + 10; }
+          else                 { p.ox = -10;               p.oy = Math.random() * h; }
+          p.x = p.ox; p.y = p.oy;
+          p.vx = p.vy = 0;
+        }
         p.tw += p.ts;
-        /* Base alpha + a stronger boost while in the wrench formation so
-           the silhouette pops on the dark card. */
-        var a = 0.18 + 0.16 * (Math.sin(p.tw) * 0.5 + 0.5) + hoverProg * 0.35;
+        /* Base twinkle alpha; pulled particles also brighten. */
+        var a = 0.18 + 0.16 * (Math.sin(p.tw) * 0.5 + 0.5) + pull * 0.30;
         if (a > 1) a = 1;
-        /* Lerp from default off-white toward primary accent (61,61,181) on hover. */
-        var cr = Math.round(240 + (61  - 240) * hoverProg);
-        var cg = Math.round(237 + (61  - 237) * hoverProg);
-        var cb = Math.round(232 + (181 - 232) * hoverProg);
-        /* Particles also grow ~50% larger while forming the shape. */
-        var rr = p.r * (1 + hoverProg * 0.5);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
+        /* Per-particle color lerp by `pull`: only particles inside the
+           1000px radius shift toward the active CTA's color. Active color
+           is primary accent for chat (Get in touch), neutral warm grey
+           for video (Book a call). */
+        var tcr, tcg, tcb;
+        if (activeShape === 'video') { tcr = 200; tcg = 195; tcb = 188; }
+        else                          { tcr =  61; tcg =  61; tcb = 181; }
+        var cr = Math.round(240 + (tcr - 240) * pull);
+        var cg = Math.round(237 + (tcg - 237) * pull);
+        var cb = Math.round(232 + (tcb - 232) * pull);
+        /* Particles inside the radius also grow slightly while drawn in. */
+        var rr = p.r * (1 + pull * 0.4);
         ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a + ')';
-        ctx.fill();
+        if (pull > 0.02 && btnZone) {
+          /* Stretch each pulled particle into a comet-like ellipse oriented
+             toward the button. Stretch grows with pull so particles closer
+             to the button visibly elongate along the pull direction. */
+          var pdx = btnZone.cx - p.x, pdy = btnZone.cy - p.y;
+          var ang = Math.atan2(pdy, pdx);
+          var stretch = 1 + pull * 1.3;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(ang);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, rr * stretch, rr, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
       velX *= 0.7; velY *= 0.7;
       if (inView && tabVisible && !reduced) raf = requestAnimationFrame(frame);
@@ -1470,6 +1613,5 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 })();
 </script>
 
-<RetuneBridge client:only="react" />
 </body>
 </html>

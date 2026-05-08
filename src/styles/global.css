@@ -94,6 +94,50 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   -webkit-backdrop-filter: blur(16px);
   box-shadow: 0 1px 0 var(--border);
 }
+/* Two refraction layers with mismatched periods → combined pattern
+   feels sporadic (effective repeat ~9 minutes), no visible cycle.
+   Soft tapered gradients hide the cut-off at the spot edges. */
+.nav.scrolled::before,
+.nav.scrolled::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 1px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.nav.scrolled::before {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 18%,
+    rgba(28, 26, 23, 0.04) 32%,
+    rgba(28, 26, 23, 0.22) 50%,
+    rgba(28, 26, 23, 0.04) 68%,
+    transparent 82%, transparent 100%);
+  background-size: 28% 100%;
+  animation: line-refract-a 19s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+.nav.scrolled::after {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 12%,
+    rgba(28, 26, 23, 0.03) 28%,
+    rgba(28, 26, 23, 0.13) 50%,
+    rgba(28, 26, 23, 0.03) 72%,
+    transparent 88%, transparent 100%);
+  background-size: 56% 100%;
+  animation: line-refract-b 33s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation-delay: -11s;
+}
+@keyframes line-refract-a {
+  0%   { background-position: -120% 0; }
+  100% { background-position: 220% 0; }
+}
+@keyframes line-refract-b {
+  0%   { background-position: 240% 0; }
+  100% { background-position: -180% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav.scrolled::before, .nav.scrolled::after { animation: none; }
+}
 .nav .container {
   display: flex; align-items: center; justify-content: space-between;
 }
@@ -294,6 +338,15 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   pointer-events: none;
 }
 .btn:hover::before { transform: translate(-50%, -50%) scale(1); }
+/* Press state: circle blooms wide enough to cover the entire surface
+   (3.5× the already-2.5×-button-height base = ~8.75× height in radius —
+   easily wider than any reasonable button). overflow:hidden on .btn
+   clips it to the button silhouette so it reads as a fill. */
+.btn:active::before,
+.btn.is-pressed::before {
+  transform: translate(-50%, -50%) scale(3.5);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
 .btn > span, .btn > .btn-icon { position: relative; z-index: 1; }
 .btn-icon {
   display: inline-flex; align-items: center;
@@ -585,7 +638,7 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
 /* ============================================================
    HOME — Testimonials
    ============================================================ */
-.testimonials { padding: clamp(60px, 8vw, 80px) 0; background: var(--bg-alt); }
+.testimonials { padding: clamp(60px, 8vw, 80px) 0; border-top: 1px solid var(--border); }
 .testimonials .eyebrow { text-align: center; display: block; margin-bottom: 40px; }
 .testimonials-masonry { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
 .testimonial-card {
@@ -1164,7 +1217,7 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
    layout slot + a fallback dark color in case the canvas fails to mount. */
 .cta-footer-wrap {
   position: relative;
-  min-height: 920px;
+  min-height: 760px;
   background: var(--dark);
   overflow: hidden;
 }
@@ -1182,8 +1235,10 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
 }
 .global-cta-section {
   position: relative; z-index: 1;
-  /* Content sits well below the gradient zone, on solid dark. */
-  padding: 380px 0 100px;
+  /* Content sits ~halfway down the wrap so it reads as vertically
+     centered with the footer below. Top padding keeps the CTA on
+     the darker portion of the gradient. */
+  padding: 280px 0 80px;
   background: transparent;
 }
 .about-cta {
@@ -1260,22 +1315,23 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
    CONTACT
    ============================================================ */
 .contact {
-  background: var(--dark); min-height: 100vh;
+  background: var(--dark);
+  /* Leave ~80px of viewport for the footer so it sits within the fold
+     on tall viewports without scrolling. */
+  min-height: calc(100svh - 80px);
   position: relative; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
-  padding: 80px 40px; text-align: center;
+  padding: 80px 40px 40px; text-align: center;
 }
+/* Contact canvas now reuses the global cta-footer-wrap particle system
+   (it carries both #contact-canvas and .cta-footer-bg). The .contact
+   section also carries .cta-footer-wrap so the shared script picks it
+   up. Mask removed — full-fold particle field, same as home/about. */
 #contact-canvas {
   position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none;
-  mask-image: radial-gradient(ellipse 520px 380px at 50% 42%,
-    rgba(0, 0, 0, 0.20) 0,
-    rgba(0, 0, 0, 0.20) 180px,
-    #000 520px);
-  -webkit-mask-image: radial-gradient(ellipse 520px 380px at 50% 42%,
-    rgba(0, 0, 0, 0.20) 0,
-    rgba(0, 0, 0, 0.20) 180px,
-    #000 520px);
+  z-index: 0;
 }
+.contact > .contact-inner { z-index: 1; }
 .contact-inner { max-width: 800px; width: 100%; position: relative; z-index: 1; }
 .contact .eyebrow { color: var(--fg2-inverse); margin-bottom: 24px; display: block; }
 .contact h1 { color: var(--fg-inverse); font-size: var(--text-h1); letter-spacing: -0.04em; line-height: 1.05; margin-bottom: 24px; }
@@ -1697,6 +1753,42 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
   margin-top: auto;
   position: relative; z-index: 1;
 }
+/* Footer hairline gets the same two-layer treatment, mirrored to
+   highlights on dark instead of darker on light. */
+.footer::before,
+.footer::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 1px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.footer::before {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 18%,
+    rgba(255, 255, 255, 0.04) 32%,
+    rgba(255, 255, 255, 0.22) 50%,
+    rgba(255, 255, 255, 0.04) 68%,
+    transparent 82%, transparent 100%);
+  background-size: 24% 100%;
+  animation: line-refract-a 23s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: -7s;
+}
+.footer::after {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 12%,
+    rgba(255, 255, 255, 0.03) 28%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.03) 72%,
+    transparent 88%, transparent 100%);
+  background-size: 60% 100%;
+  animation: line-refract-b 41s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation-delay: -19s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer::before, .footer::after { animation: none; }
+}
 .footer .container {
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
   flex-wrap: wrap;
@@ -1717,9 +1809,36 @@ a.journey-co:focus-visible { outline: 2px solid var(--accent); outline-offset: 2
   color: rgba(255,255,255,0.45);
   text-decoration: underline; text-underline-offset: 2px;
   transition: color 0.15s;
+  position: relative;
 }
 .footer-email-link:hover { color: rgba(255,255,255,0.72); }
 .footer-email-link.copied { color: rgba(255,255,255,0.72); text-decoration: none; }
+/* "Copy to clipboard" tooltip — appears after a small hover delay. */
+.footer-email-link::after {
+  content: 'Copy to clipboard';
+  position: absolute;
+  bottom: calc(100% + 8px); left: 50%;
+  transform: translate(-50%, 4px);
+  background: var(--dark-surface);
+  color: var(--fg-inverse);
+  border: 1px solid var(--border-inverse);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--font-body); font-size: 0.7rem;
+  text-transform: none; letter-spacing: 0;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition-delay: 0s;
+}
+.footer-email-link:hover::after,
+.footer-email-link:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-delay: 0.45s;
+}
+.footer-email-link.copied::after { content: 'Copied'; }
 
 .footer-status {
   display: flex; align-items: center; gap: 8px;
