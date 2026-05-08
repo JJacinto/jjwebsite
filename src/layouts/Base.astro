@@ -167,9 +167,26 @@ const isHome      = activePage === 'home';
 
 <div id="compose-root"></div>
 
+{import.meta.env.DEV && <div id="retune-root"></div>}
+
 <script src="/scripts/nav.js" defer></script>
 <script src="/scripts/text-hover.js" defer></script>
 <script src="/scripts/compose-modal.js" defer></script>
+
+<script>
+  /* Retune visual-editing overlay — dev only. The branch is dead-code
+     eliminated in prod by Vite's `import.meta.env.DEV` replacement, so
+     React/Retune are not bundled into the production output. */
+  if (import.meta.env.DEV) {
+    const [{ Retune }, React, { createRoot }] = await Promise.all([
+      import('retune'),
+      import('react'),
+      import('react-dom/client'),
+    ]);
+    const root = document.getElementById('retune-root');
+    if (root) createRoot(root).render(React.createElement(Retune));
+  }
+</script>
 
 </body>
 </html>
