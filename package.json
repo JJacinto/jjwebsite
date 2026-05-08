@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "tokens": "node design-system/scripts/build-tokens.js"
   },
   "dependencies": {
     "astro": "^6.1.9"
