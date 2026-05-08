@@ -33,7 +33,14 @@ pillNav.querySelectorAll('a').forEach(link => {
     sessionStorage.setItem('pillFrom', JSON.stringify(pos));
   });
 });
-window.addEventListener('load', () => {
+/* Run the cross-page slide as early as fonts are ready — `window.load`
+   waits for images/CSS too, by which time heavy init work (particle
+   canvas, FBM gradient) is competing for the main thread and the slide
+   stutters. Fonts are what we actually need for accurate pill widths. */
+const ready = document.fonts && document.fonts.ready
+  ? document.fonts.ready
+  : Promise.resolve();
+ready.then(() => {
   const active = pillNav.querySelector('a.active');
   if (!active) { pillIndicator.style.width = '0'; return; }
   const toPos = getPillPos(active);

@@ -177,6 +177,10 @@ p { font-family: var(--font-body); font-size: 0.95rem; color: var(--fg2); line-h
   border-radius: var(--radius-full);
   transition: left 0.32s cubic-bezier(0.25,0.46,0.45,0.94), width 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
   pointer-events: none;
+  /* Promote to its own compositor layer so the cross-page slide doesn't
+     compete with paint work on the main thread. */
+  will-change: left, width;
+  transform: translateZ(0);
 }
 .pill-nav a {
   position: relative; z-index: 1;

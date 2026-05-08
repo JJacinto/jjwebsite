@@ -1015,6 +1015,15 @@
       }, { threshold: 0 }).observe(wrap);
     }
 
-    requestAnimationFrame(function () { resize(); loop(); });
+    /* Defer the first paint past the pill-nav cross-page slide (~320ms).
+       buildBackground() is a per-pixel canvas paint with FBM noise that
+       can block the main thread for 100-300ms — running it during the
+       nav transition makes the slide stutter visibly. */
+    var firstPaint = function () { resize(); loop(); };
+    if (window.requestIdleCallback) {
+      window.requestIdleCallback(firstPaint, { timeout: 800 });
+    } else {
+      setTimeout(firstPaint, 380);
+    }
   }
 })();
