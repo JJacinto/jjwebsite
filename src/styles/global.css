@@ -573,7 +573,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .hero-marquee .marquee-track { animation-duration: 55s; }
 .hero-marquee span {
   font-size: clamp(6rem, 14vw, 11rem);
-  color: rgba(61, 61, 181, 0.055);
+  /* Subtle brand-tinted scrim. Theme-aware via --text-brand which
+     flips primary.60 (dark purple, light mode) → primary.40 (light
+     purple, dark mode). 5.5% gives a barely-there wash in both. */
+  color: color-mix(in srgb, var(--text-brand) 5.5%, transparent);
 }
 .hero-inner { position: relative; z-index: var(--z-elevated); }
 .hero-greeting {
@@ -945,7 +948,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .cases-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
 .cases-marquee { margin-bottom: var(--dimension-space-64); }
 .cases-marquee .marquee-track { animation-duration: 22s; }
-.cases-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: var(--component-marquee-scrim); }
+.cases-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
 .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-24); margin-bottom: var(--dimension-space-24); }
 .cases-grid-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--dimension-space-24); }
 
@@ -955,7 +958,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .about-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
 .about-marquee { margin-bottom: var(--dimension-space-80); }
 .about-marquee .marquee-track { animation-duration: 28s; }
-.about-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: var(--component-marquee-scrim); }
+.about-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
 
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(var(--dimension-space-32), 6vw, var(--dimension-space-80)); margin-bottom: var(--dimension-space-80); align-items: start; }
 .why-grid .eyebrow { color: var(--text-brand); margin-bottom: var(--dimension-space-16); display: block; }

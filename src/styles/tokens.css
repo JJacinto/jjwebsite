@@ -454,10 +454,8 @@
   --component-nav-refract-stop-4: rgba(28,26,23,0.03);
   /* Cursor-ball glow halo */
   --component-cursor-ball-glow: rgba(61, 61, 181, 0.18);
-  /* Mask gradient edge color (used with mask-image) */
+  /* Mask gradient edge color (used with mask-image). Note: a marquee-scrim token was removed when the cases/about marquees migrated to color-mix(in srgb, var(--text-primary) 5%, transparent) so the wash flips with theme. */
   --component-marquee-fade-edge: #000;
-  /* Marquee scrim layer */
-  --component-marquee-scrim: rgba(28,26,23,0.05);
   --component-footer-gradient-stop-1: rgba(255,255,255,0.04);
   --component-footer-gradient-stop-2: rgba(255,255,255,0.22);
   --component-footer-gradient-stop-3: rgba(255,255,255,0.03);
