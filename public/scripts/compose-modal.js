@@ -630,20 +630,31 @@
        scoping — inside .cta-footer-wrap, --text-primary stays
        light regardless of page theme; on .contact, it follows the
        page. Recomputed each resize() / theme change. */
+    var isContactPage = wrap.classList.contains('contact');
+    /* page-particles wraps are the global above-the-fold overlay added
+       in Base.astro — paints a subtle gradient (lighter shade fading
+       to page bg) over the top half of the viewport, then mask-image
+       fades everything out at the 50% mark. */
+    var isPageParticles = wrap.classList.contains('page-particles');
+
     var readPalette = function () {
       var rs = getComputedStyle(document.documentElement);
       var ws = getComputedStyle(wrap);
+      var pageBg = probeRGB(rs.getPropertyValue('--background-page').trim() || '#ECEAE5');
       return {
-        /* Gradient endpoint = the wrap's actual computed bg, so the
-           transition lands at whatever color CSS painted the wrap
-           (dark band on home/about/work, page bg on contact). */
-        dark:     probeRGB(ws.backgroundColor),
+        /* Gradient endpoint:
+           - page-particles: the page bg, so the gradient ends seamlessly
+             matching the surrounding page color
+           - cta-footer-wrap variants: the wrap's own computed bg (dark
+             band on home/about/work, page bg on contact) */
+        dark:     isPageParticles ? pageBg : probeRGB(ws.backgroundColor),
         /* Page bg fallback — used when detectAboveColor finds no opaque
            sibling above the wrap. */
-        bg:       probeRGB(rs.getPropertyValue('--background-page').trim() || '#ECEAE5'),
+        bg:       pageBg,
         /* Particle base — derives from --text-primary IN the wrap's
            scope. Inside cta-footer-wrap (always-dark scoping) this
-           stays light cream; on .contact it flips with the page. */
+           stays light cream; on .contact it flips with the page. For
+           page-particles (no scoping override), follows page theme. */
         particle: probeRGB(ws.getPropertyValue('--text-primary').trim() || '#F0EDE8')
       };
     };
@@ -652,13 +663,14 @@
     var BG_FALLBACK = palette.bg;
     var PARTICLE_BASE = palette.particle;
 
-    var isContactPage = wrap.classList.contains('contact');
-    /* page-particles wraps are the global above-the-fold overlay added
-       in Base.astro — particles only, no painted gradient (the page
-       bg shows through, mask-image handles the 30-50% fade). */
-    var isPageParticles = wrap.classList.contains('page-particles');
-
     function detectAboveColor() {
+      if (isPageParticles) {
+        /* Page-particles overlay: subtle lighter tint at top, fading
+           to page bg. --surface-default is one shade lighter than
+           page bg in BOTH themes (neutral.20 light, neutral.90 dark)
+           — gives a soft glow that blends seamlessly. */
+        return probeRGB(getComputedStyle(document.documentElement).getPropertyValue('--surface-default').trim() || '#F7F5F1');
+      }
       if (isContactPage) {
         /* Contact page: bg is --background-page (theme-aware). For a
            subtle visible gradient at the top, start from the next
@@ -728,7 +740,15 @@
       var octx = oc.getContext('2d');
       var img = octx.createImageData(cw, ch);
       var data = img.data;
-      var transition = isContactPage ? ch * 0.32 : ch;
+      /* Gradient transition height — how much of the canvas the
+         smoothstep ramp spans before settling into DARK.
+         - page-particles: 50% so the gradient fully resolves to
+           page bg by the mask fade point (50% of viewport)
+         - contact: 32% — quick transition, wrap is full-fold
+         - everything else: full canvas */
+      var transition = isPageParticles ? ch * 0.50
+                     : isContactPage   ? ch * 0.32
+                                       : ch;
       var nScale = 0.018 / dprIn;
       var ABOVE = detectAboveColor();
       var dr = DARK[0] - ABOVE[0], dg = DARK[1] - ABOVE[1], db = DARK[2] - ABOVE[2];
@@ -862,11 +882,7 @@
       H = Math.max(1, Math.floor(h * dpr));
       canvas.width = W; canvas.height = H;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      /* page-particles wraps want particles on a transparent canvas
-         (the page bg shows through, mask-image fades them out at 50%
-         of the viewport). cta-footer-wrap variants get the FBM
-         dithered gradient as the canvas bg. */
-      bgImage = isPageParticles ? null : buildBackground(w, h, dpr);
+      bgImage = buildBackground(w, h, dpr);
       generate();
     }
 
