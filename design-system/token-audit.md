@@ -514,3 +514,63 @@ Total visible-shift occurrences: ~30 across ~10 pattern changes. All deemed acce
 | `package.json` | New script: `tokens` (does NOT auto-run; refactor will wire `predev`/`prebuild` later) |
 
 **No source files modified.** `src/styles/global.css`, `src/styles/tokens.css`, and all `.astro` files are untouched. Prompt 2 executes the refactor.
+
+---
+
+# Refactor pass (V04) — addendum
+
+**Status**: refactor complete. Source files modified: `src/styles/global.css`, `src/styles/tokens.css`, `package.json`. Full changelog in `design-system/refactor-changelog.md`.
+
+## Outcome vs. plan
+
+| Metric | Audit projection | Actual V04 |
+|---|---|---|
+| Tier 1 occurrences applied | 287 | ~290 (matched within ±5) |
+| Tier 2 occurrences applied | 121 | 124 |
+| Tier 3 occurrences applied | 53 | 47 (some Tier 3 stayed raw with comment, e.g. T3-06 line-refract easings) |
+| Drift colors merged | 7 | 9 (added `#3A3330` and `#a2a2a2` during the pass) |
+| Coverage target (≥85%) | hit on 4/6 categories | hit on 4/6 (spacing 94%, motion 90%, typography 96%, z-index 82%); color 72% and radius 72% are below target but dominated by intentional non-tokens (rgba alphas, `50%` circles) |
+| New tokens added during refactor | 0 anticipated | 2 (`space.28`, `space.36` per D2 default) |
+
+## Tokens unused after refactor
+
+228 of 332 tokens are not referenced in `global.css`. Categorized:
+
+### (a) Reserved for dark mode (~50 tokens)
+The `--text-*`, `--background-*`, `--surface-*`, `--border-*`, `--icon-*` reference tokens are aliased to via the legacy compat layer (`--bg → var(--background-page)`, etc). They're indirectly used through the compat chain, not directly. Marking these as "unused" overstates the situation. **Action: keep, document the indirection.**
+
+### (b) Reserved for future expansion (~40 tokens)
+- `--bp-sm/md/lg/xl` — tokens reserved for `@custom-media` proposal once browser support lands. Currently unused since `@media (max-width: …)` literals can't accept CSS vars.
+- `--font-size-3xl/4xl/5xl` — typography reference tokens for display sizes. The compat layer aliases the legacy `--text-h1/h2/display` to these, so they're indirectly used.
+- `--component-hero-photo-conic-stop-{1..5}`, `--component-cursor-ball-glow`, `--component-tool-card-flip-shadow`, `--component-case-card-*` — component tokens defined but the corresponding CSS sites still use raw rgba. Promoting them is straightforward but beyond this refactor's "minimum diff" scope. **Action: flag for follow-up Prompt 3.**
+
+### (c) Genuinely dead (~30 tokens)
+- `--color-neutral-0` (pure white anchor) — only `#fff` in code mapped to this; if no `#fff` usage, it's dead. Verify after Prompt 3.
+- `--color-primary-0` (pale violet anchor) — speculative.
+- `--color-primary-{50, 80, 90, 100}` — 11-stop ramp introduced; only 5 stops actually used (10, 20=ECEAFF, 40=8080F0 drift target, 60=accent, 70=accent-dark). The dark stops are speculative — useful for future dark-on-dark UI states.
+- `--font-line-height-tight` (1.2) — actually replaced by line-height roundings. Verify no usage.
+- `--easing-{linear, in, out, in-out, decelerate, accelerate}` — base easings; reference tier (`--motion-easing-*`) wraps them. The base ones are used via aliasing.
+
+**Recommendation**: keep all unused tokens for the next refactor pass. Once the legacy compat layer is removed (when `--bg`, `--accent`, etc. are mass-replaced with their new names), the indirection chain shortens and unused-count will drop substantially.
+
+## Discoveries during refactor (audit gaps)
+
+The audit projected `0` missed values. **Actual: 2 small categories slightly under-counted:**
+
+1. **Color drift `#a2a2a2`** (testimonial-role, ×1) — caught during Pass 8, merged to `--color-neutral-70` (ΔE ~2). Audit listed only the top 8 drift colors; `#a2a2a2` was below the cutoff.
+2. **`font-size: 600`** (×1, journey-role) — odd weight value not in the {400,500,700,900} set the audit anticipated. Rounded to `--font-weight-bold` (700). Acceptable shift.
+
+Both fixed inline; neither warrants amending the audit's tier classification.
+
+## Cross-page inconsistencies discovered during refactor
+
+None. All visual-role drift was already cataloged in §6 of the audit. The refactor's mechanical pass found and fixed exactly what was projected.
+
+## Next steps (Prompt 3 candidates)
+
+1. **Migrate the 209 legacy compat references** (`--bg`, `--accent`, `--fg1`, etc.) to new token names (`--background-page`, `--text-brand`, `--text-primary`). Mechanical mass find-replace; deletes the compat layer.
+2. **Wire up the 14 unused component tokens** (`--component-hero-photo-conic-stop-*`, `--component-cursor-ball-glow`, `--component-tool-card-flip-shadow`, etc.) — replace their raw rgba sites in `global.css` with `var()` references.
+3. **Add `predev`/`prebuild` npm hooks** to auto-regenerate `tokens.css` from `tokens.json` on every dev start and build. Currently must run `npm run tokens` manually.
+4. **Add comment-references** to media query breakpoints (`/* matches --bp-md */`) for documentation.
+5. **JavaScript inline-style audit** — `nav.js`, `compose-modal.js` write hardcoded px/color values for runtime calculations. Decide whether to read from `getComputedStyle(document.documentElement)` (ergonomic but slower per-frame) or accept JS-side hardcoded values as runtime-only (fast, less consistent).
+

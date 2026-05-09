@@ -61,7 +61,11 @@
   --dimension-space-16: 16px;
   --dimension-space-20: 20px;
   --dimension-space-24: 24px;
+  /* Added per audit D2 — used for section padding, card gap */
+  --dimension-space-28: 28px;
   --dimension-space-32: 32px;
+  /* Added per audit D2 — used for stat block margins */
+  --dimension-space-36: 36px;
   --dimension-space-40: 40px;
   --dimension-space-48: 48px;
   --dimension-space-56: 56px;

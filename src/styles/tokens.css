@@ -1,46 +1,537 @@
-/* JJ Design System Tokens */
+/* Generated from tokens.json — do not edit by hand.
+ * Regenerate with: node design-system/scripts/build-tokens.js
+ * DTCG Format Module 2025.10
+ */
+
 :root {
-  --bg:              #ECEAE5;
-  --bg-alt:          #E4E1DB;
-  --surface:         #F7F5F1;
-  --dark:            #1C1A17;
-  --dark-surface:    #262320;
+  /* ─── color ─── */
+  /* Pure white anchor — rarely used directly, parent of pale tints */
+  --color-neutral-0: #ffffff;
+  /* Lightest warm tint */
+  --color-neutral-10: #fbf8f4;
+  /* Surface — cards on light backgrounds. Maps to legacy --surface */
+  --color-neutral-20: #f7f5f1;
+  /* Text on dark surfaces. Maps to legacy --fg-inverse */
+  --color-neutral-30: #f0ede8;
+  /* Page background. Maps to legacy --bg */
+  --color-neutral-40: #eceae5;
+  /* Section variant background. Maps to legacy --bg-alt */
+  --color-neutral-50: #e4e1db;
+  /* Mid-light neutral — borders, dividers on light surfaces */
+  --color-neutral-60: #c0bbb3;
+  /* Tertiary text. Maps to legacy --fg3 */
+  --color-neutral-70: #9b948d;
+  /* Secondary text. Maps to legacy --fg2 */
+  --color-neutral-80: #6b6560;
+  /* Dark surface — modal/footer backgrounds. Maps to legacy --dark-surface */
+  --color-neutral-90: #262320;
+  /* Primary text + dark mode anchor. Maps to legacy --dark / --fg1 */
+  --color-neutral-100: #1c1a17;
+  /* Pale violet anchor */
+  --color-primary-0: #fafaff;
+  /* Lightest tint. Maps to legacy --accent-subtle (#ECEAFF, ΔE 0.4) */
+  --color-primary-10: #ecebff;
+  /* Pale interactive surface */
+  --color-primary-20: #d4d0ff;
+  /* Mid-light interactive */
+  --color-primary-30: #b6b0f8;
+  /* Light accent. Replaces drift color used on contact-card icons */
+  --color-primary-40: #8080f0;
+  /* Mid accent — interpolation step */
+  --color-primary-50: #5c5cd4;
+  /* Brand primary. Maps to legacy --accent */
+  --color-primary-60: #3d3db5;
+  /* Brand primary pressed. Maps to legacy --accent-dark */
+  --color-primary-70: #3030a0;
+  /* Dark primary */
+  --color-primary-80: #25287a;
+  /* Darker primary */
+  --color-primary-90: #1a1f58;
+  /* Darkest primary */
+  --color-primary-100: #0f1638;
 
-  --fg1:             #1C1A17;
-  --fg2:             #6B6560;
-  --fg3:             #9B948D;
-  --fg-inverse:      #F0EDE8;
-  --fg2-inverse:     rgba(240, 237, 232, 0.65);
+  /* ─── dimension ─── */
+  --dimension-space-0: 0px;
+  --dimension-space-2: 2px;
+  --dimension-space-4: 4px;
+  --dimension-space-6: 6px;
+  --dimension-space-8: 8px;
+  --dimension-space-10: 10px;
+  --dimension-space-12: 12px;
+  --dimension-space-16: 16px;
+  --dimension-space-20: 20px;
+  --dimension-space-24: 24px;
+  /* Added per audit D2 — used for section padding, card gap */
+  --dimension-space-28: 28px;
+  --dimension-space-32: 32px;
+  /* Added per audit D2 — used for stat block margins */
+  --dimension-space-36: 36px;
+  --dimension-space-40: 40px;
+  --dimension-space-48: 48px;
+  --dimension-space-56: 56px;
+  --dimension-space-64: 64px;
+  --dimension-space-80: 80px;
+  --dimension-space-96: 96px;
+  --dimension-space-128: 128px;
+  --dimension-space-160: 160px;
+  --dimension-space-200: 200px;
+  /* Small icon */
+  --dimension-size-16: 16px;
+  /* Default icon (button icons, nav) */
+  --dimension-size-20: 20px;
+  /* Medium icon */
+  --dimension-size-24: 24px;
+  /* Large icon, calendar nav button */
+  --dimension-size-32: 32px;
+  /* Avatar small, control height */
+  --dimension-size-40: 40px;
+  /* Avatar medium, button tall */
+  --dimension-size-48: 48px;
+  /* Diamond marker, scroll-indicator */
+  --dimension-size-64: 64px;
+  /* Avatar large (about-cta avatar) */
+  --dimension-size-96: 96px;
+  --dimension-size-container-narrow: 640px;
+  /* Maps to legacy --container */
+  --dimension-size-container-default: 1140px;
+  --dimension-radius-none: 0px;
+  --dimension-radius-xs: 4px;
+  /* Maps to legacy --radius-sm */
+  --dimension-radius-sm: 8px;
+  --dimension-radius-md: 12px;
+  /* Maps to legacy --radius-md */
+  --dimension-radius-lg: 16px;
+  /* Maps to legacy --radius-lg */
+  --dimension-radius-xl: 20px;
+  --dimension-radius-2xl: 24px;
+  /* Pill / circle. Replaces legacy --radius-full (100px) — 999 is more reliable for arbitrary widths */
+  --dimension-radius-full: 999px;
+  --dimension-border-width-0: 0px;
+  /* Canonical hairline. Used for nearly all borders. */
+  --dimension-border-width-1: 1px;
+  /* Emphasis border (avatar ring, focus ring) */
+  --dimension-border-width-2: 2px;
+  /* Heavy outline (rare) */
+  --dimension-border-width-4: 4px;
 
-  --accent:          #3D3DB5;
-  --accent-dark:     #3030A0;
-  --accent-subtle:   #ECEAFF;
-  --accent-muted:    rgba(61, 61, 181, 0.12);
+  /* ─── opacity ─── */
+  --opacity-0: 0;
+  --opacity-5: 0.05;
+  --opacity-10: 0.1;
+  --opacity-20: 0.2;
+  --opacity-30: 0.3;
+  --opacity-40: 0.4;
+  --opacity-50: 0.5;
+  --opacity-60: 0.6;
+  --opacity-70: 0.7;
+  --opacity-80: 0.8;
+  --opacity-90: 0.9;
+  --opacity-95: 0.95;
+  --opacity-100: 1;
 
+  /* ─── shadow ─── */
+  --shadow-xs: 0px 1px 2px 0px rgba(0,0,0,0.04);
+  /* Maps to legacy --shadow-sm */
+  --shadow-sm: 0px 1px 4px 0px rgba(0,0,0,0.04);
+  /* Maps to legacy --shadow-md */
+  --shadow-md: 0px 4px 16px 0px rgba(0,0,0,0.06);
+  /* Maps to legacy --shadow-lg */
+  --shadow-lg: 0px 10px 32px 0px rgba(0,0,0,0.08);
+  --shadow-xl: 0px 20px 48px 0px rgba(0,0,0,0.12);
+  --shadow-inner: inset 0px 1px 2px 0px rgba(0,0,0,0.06);
+
+  /* ─── duration ─── */
+  /* Snappy feedback (focus rings, color shifts) */
+  --duration-instant: 100ms;
+  /* Dominant short transition (hover, button states). Absorbs the 0.18s ×11 cluster */
+  --duration-fast: 180ms;
+  /* Standard motion (most card/element transitions). Absorbs 0.20-0.28s cluster */
+  --duration-base: 240ms;
+  /* Expressive transitions (card hover, image fade). Absorbs 0.35s ×6 cluster */
+  --duration-slow: 350ms;
+  /* Reveal entry animations */
+  --duration-slower: 550ms;
+  /* Hero reveal full-fold animations. Absorbs 0.65s reveal cluster */
+  --duration-slowest: 650ms;
+
+  /* ─── easing ─── */
+  --easing-linear: cubic-bezier(0, 0, 1, 1);
+  /* CSS ease-in equivalent */
+  --easing-in: cubic-bezier(0.42, 0, 1, 1);
+  /* CSS ease-out equivalent */
+  --easing-out: cubic-bezier(0, 0, 0.58, 1);
+  --easing-in-out: cubic-bezier(0.42, 0, 0.58, 1);
+  /* Material standard. Absorbs the (0.4,0,0.2,1) ×7 cluster */
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Canonical site easing. Absorbs the (0.22,1,0.36,1) ×13 cluster */
+  --easing-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  /* Bouncy elastic. Used for button press/tilt scale */
+  --easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ─── font ─── */
+  /* Display headings. Maps to legacy --font-display */
+  --font-family-display: 'Hanken Grotesk', 'DM Sans', -apple-system, system-ui, sans-serif;
+  /* Body text. Maps to legacy --font-body */
+  --font-family-body: 'DM Sans', 'Mona Sans', -apple-system, system-ui, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-black: 900;
+  /* Eyebrow, smallest meta */
+  --font-size-xs: 0.72rem;
+  /* Form labels, secondary meta */
+  --font-size-sm: 0.84rem;
+  /* Default body */
+  --font-size-base: 0.95rem;
+  /* Standard body */
+  --font-size-md: 1rem;
+  /* Body-lg, lead paragraphs. Maps to legacy --text-body-lg */
+  --font-size-lg: 1.125rem;
+  /* h3. Maps to legacy --text-h3 */
+  --font-size-xl: 1.4rem;
+  /* Subhead. Maps to legacy --text-subhead */
+  --font-size-2xl: clamp(1.5rem, 2.2vw, 1.75rem);
+  /* h2. Maps to legacy --text-h2 */
+  --font-size-3xl: clamp(1.8rem, 3vw, 2.6rem);
+  /* h1. Maps to legacy --text-h1 */
+  --font-size-4xl: clamp(2.5rem, 5vw, 4rem);
+  /* Display. Maps to legacy --text-display */
+  --font-size-5xl: clamp(3.5rem, 8vw, 7rem);
+  /* Display headings (h1, h2, hero) */
+  --font-line-height-heading: 1.15;
+  /* Tight body, subheads */
+  --font-line-height-tight: 1.2;
+  /* Card titles, multi-line labels */
+  --font-line-height-snug: 1.3;
+  /* Default body */
+  --font-line-height-normal: 1.5;
+  /* Long-form body, descriptions */
+  --font-line-height-relaxed: 1.6;
+  /* Generous body (taglines, hero) */
+  --font-line-height-loose: 1.75;
+  /* Display headings */
+  --font-letter-spacing-tighter: -0.04em;
+  /* h1, h2, large titles */
+  --font-letter-spacing-tight: -0.025em;
+  /* Body headings, large text */
+  --font-letter-spacing-snug: -0.01em;
+  --font-letter-spacing-normal: 0em;
+  /* Small caps, tag labels */
+  --font-letter-spacing-wide: 0.04em;
+  /* Eyebrows */
+  --font-letter-spacing-wider: 0.06em;
+
+  /* ─── z ─── */
+  --z-base: 0;
+  /* Above local stacking context (canvas overlays, content z-1) */
+  --z-raised: 1;
+  /* Above raised content (hero-inner over canvas) */
+  --z-elevated: 2;
+  /* Sticky nav. Maps to legacy z-index: 100 */
+  --z-sticky: 100;
+  /* Modal backdrop (compose-backdrop) */
+  --z-overlay: 200;
+  --z-modal: 300;
+  /* Cursor-ball, brands tooltip */
+  --z-toast: 9999;
+
+  /* ─── bp ─── */
+  /* Mobile */
+  --bp-sm: 480px;
+  /* Tablet portrait */
+  --bp-md: 720px;
+  /* Tablet landscape / small desktop */
+  --bp-lg: 900px;
+  /* Desktop */
+  --bp-xl: 1024px;
+
+  /* ─── background ─── */
+  /* Page bg */
+  --background-page: var(--color-neutral-40);
+  --background-section-default: var(--color-neutral-40);
+  --background-section-muted: var(--color-neutral-50);
+  /* Dark sections (footer, contact, error pages) */
+  --background-section-inverse: var(--color-neutral-100);
+
+  /* ─── surface ─── */
+  /* Card on light bg */
+  --surface-default: var(--color-neutral-20);
+  --surface-raised: var(--color-neutral-10);
+  --surface-sunken: var(--color-neutral-50);
+  /* Modal sheet on dark scrim */
+  --surface-overlay: var(--color-neutral-90);
+
+  /* ─── fill ─── */
+  --fill-brand-default: var(--color-primary-60);
+  --fill-brand-hover: var(--color-primary-50);
+  --fill-brand-active: var(--color-primary-70);
+  --fill-brand-subtle: var(--color-primary-10);
+  --fill-neutral-default: var(--color-neutral-20);
+  --fill-neutral-subtle: var(--color-neutral-10);
+  --fill-neutral-muted: var(--color-neutral-50);
+  --fill-neutral-inverse: var(--color-neutral-90);
+
+  /* ─── text ─── */
+  /* Highest-emphasis body text. Maps to --fg1 */
+  --text-primary: var(--color-neutral-100);
+  /* Maps to --fg2 */
+  --text-secondary: var(--color-neutral-80);
+  /* Maps to --fg3 */
+  --text-tertiary: var(--color-neutral-70);
+  --text-disabled: var(--color-neutral-60);
+  --text-brand: var(--color-primary-60);
+  /* Text on brand fills */
+  --text-on-brand: var(--color-neutral-10);
+  /* Text on dark surfaces. Maps to --fg-inverse */
+  --text-inverse: var(--color-neutral-30);
+  /* Lower-emphasis text on dark — paired with opacity.65 in components */
+  --text-inverse-muted: var(--color-neutral-30);
+
+  /* ─── border ─── */
+  --border-subtle: var(--color-neutral-50);
+  /* Default visible border */
+  --border-default: var(--color-neutral-60);
+  --border-strong: var(--color-neutral-80);
+  --border-focus: var(--color-primary-60);
+  /* Border on dark surfaces */
+  --border-inverse: var(--color-neutral-30);
+
+  /* ─── icon ─── */
+  --icon-primary: var(--color-neutral-100);
+  --icon-secondary: var(--color-neutral-80);
+  --icon-tertiary: var(--color-neutral-70);
+  --icon-brand: var(--color-primary-60);
+  --icon-on-brand: var(--color-neutral-10);
+
+  /* ─── elevation ─── */
+  /* No shadow */
+  --elevation-0: 0px 0px 0px 0px rgba(0,0,0,0);
+  --elevation-1: var(--shadow-xs);
+  --elevation-2: var(--shadow-sm);
+  --elevation-3: var(--shadow-md);
+  --elevation-4: var(--shadow-lg);
+  --elevation-5: var(--shadow-xl);
+
+  /* ─── motion ─── */
+  /* Color/opacity feedback */
+  --motion-duration-micro: var(--duration-instant);
+  /* Hover, focus */
+  --motion-duration-short: var(--duration-fast);
+  /* Default UI motion */
+  --motion-duration-standard: var(--duration-base);
+  /* Card transitions, image fade */
+  --motion-duration-expressive: var(--duration-slow);
+  /* Section reveal entry */
+  --motion-duration-reveal: var(--duration-slowest);
+  --motion-easing-enter: var(--easing-decelerate);
+  --motion-easing-exit: var(--easing-accelerate);
+  --motion-easing-standard: var(--easing-standard);
+  --motion-easing-emphasized: var(--easing-emphasized);
+  --motion-easing-spring: var(--easing-spring);
+
+  /* ─── spacing ─── */
+  --spacing-inset-xs: var(--dimension-space-6);
+  --spacing-inset-sm: var(--dimension-space-10);
+  --spacing-inset-md: var(--dimension-space-16);
+  --spacing-inset-lg: var(--dimension-space-24);
+  --spacing-inset-xl: var(--dimension-space-32);
+  --spacing-stack-xs: var(--dimension-space-4);
+  --spacing-stack-sm: var(--dimension-space-8);
+  --spacing-stack-md: var(--dimension-space-16);
+  --spacing-stack-lg: var(--dimension-space-24);
+  --spacing-stack-xl: var(--dimension-space-40);
+  --spacing-inline-xs: var(--dimension-space-4);
+  --spacing-inline-sm: var(--dimension-space-8);
+  --spacing-inline-md: var(--dimension-space-12);
+  --spacing-inline-lg: var(--dimension-space-20);
+  --spacing-inline-xl: var(--dimension-space-32);
+  /* Inter-section gap. Maps to legacy --section-gap */
+  --spacing-section-gap: clamp(80px, 10vw, 120px);
+  /* Container side padding. Maps to legacy --pad */
+  --spacing-container-pad: clamp(20px, 5vw, 40px);
+
+  /* ─── radius ─── */
+  /* Buttons, inputs */
+  --radius-control: var(--dimension-radius-sm);
+  --radius-card: var(--dimension-radius-lg);
+  /* Large feature cards (testimonial, case-card) */
+  --radius-card-lg: var(--dimension-radius-2xl);
+  --radius-pill: var(--dimension-radius-full);
+  /* Images, thumbnails */
+  --radius-media: var(--dimension-radius-md);
+
+  /* ─── typography ─── */
+  --typography-display-5xl-font-family: var(--font-family-display);
+  --typography-display-5xl-font-size: var(--font-size-5xl);
+  --typography-display-5xl-font-weight: var(--font-weight-black);
+  --typography-display-5xl-line-height: var(--font-line-height-heading);
+  --typography-display-5xl-letter-spacing: var(--font-letter-spacing-tighter);
+  --typography-display-4xl-font-family: var(--font-family-display);
+  --typography-display-4xl-font-size: var(--font-size-4xl);
+  --typography-display-4xl-font-weight: var(--font-weight-black);
+  --typography-display-4xl-line-height: var(--font-line-height-heading);
+  --typography-display-4xl-letter-spacing: var(--font-letter-spacing-tight);
+  --typography-heading-3xl-font-family: var(--font-family-display);
+  --typography-heading-3xl-font-size: var(--font-size-3xl);
+  --typography-heading-3xl-font-weight: var(--font-weight-black);
+  --typography-heading-3xl-line-height: var(--font-line-height-tight);
+  --typography-heading-3xl-letter-spacing: var(--font-letter-spacing-tight);
+  --typography-heading-2xl-font-family: var(--font-family-display);
+  --typography-heading-2xl-font-size: var(--font-size-2xl);
+  --typography-heading-2xl-font-weight: var(--font-weight-black);
+  --typography-heading-2xl-line-height: var(--font-line-height-tight);
+  --typography-heading-2xl-letter-spacing: var(--font-letter-spacing-snug);
+  --typography-heading-xl-font-family: var(--font-family-display);
+  --typography-heading-xl-font-size: var(--font-size-xl);
+  --typography-heading-xl-font-weight: var(--font-weight-black);
+  --typography-heading-xl-line-height: var(--font-line-height-tight);
+  --typography-heading-xl-letter-spacing: var(--font-letter-spacing-snug);
+  --typography-body-lg-font-family: var(--font-family-body);
+  --typography-body-lg-font-size: var(--font-size-lg);
+  --typography-body-lg-font-weight: var(--font-weight-regular);
+  --typography-body-lg-line-height: var(--font-line-height-relaxed);
+  --typography-body-lg-letter-spacing: var(--font-letter-spacing-normal);
+  --typography-body-md-font-family: var(--font-family-body);
+  --typography-body-md-font-size: var(--font-size-md);
+  --typography-body-md-font-weight: var(--font-weight-regular);
+  --typography-body-md-line-height: var(--font-line-height-normal);
+  --typography-body-md-letter-spacing: var(--font-letter-spacing-normal);
+  --typography-body-sm-font-family: var(--font-family-body);
+  --typography-body-sm-font-size: var(--font-size-sm);
+  --typography-body-sm-font-weight: var(--font-weight-regular);
+  --typography-body-sm-line-height: var(--font-line-height-normal);
+  --typography-body-sm-letter-spacing: var(--font-letter-spacing-normal);
+  --typography-label-md-font-family: var(--font-family-body);
+  --typography-label-md-font-size: var(--font-size-sm);
+  --typography-label-md-font-weight: var(--font-weight-medium);
+  --typography-label-md-line-height: var(--font-line-height-tight);
+  --typography-label-md-letter-spacing: var(--font-letter-spacing-normal);
+  --typography-label-sm-font-family: var(--font-family-body);
+  --typography-label-sm-font-size: var(--font-size-xs);
+  --typography-label-sm-font-weight: var(--font-weight-medium);
+  --typography-label-sm-line-height: var(--font-line-height-tight);
+  --typography-label-sm-letter-spacing: var(--font-letter-spacing-normal);
+  --typography-eyebrow-font-family: var(--font-family-body);
+  --typography-eyebrow-font-size: var(--font-size-xs);
+  --typography-eyebrow-font-weight: var(--font-weight-regular);
+  --typography-eyebrow-line-height: var(--font-line-height-tight);
+  --typography-eyebrow-letter-spacing: var(--font-letter-spacing-wider);
+
+  /* ─── component ─── */
+  /* Hero photo conic gradient stop 1 */
+  --component-hero-photo-conic-stop-1: rgba(61, 100, 255, 0.72);
+  --component-hero-photo-conic-stop-2: rgba(30, 200, 230, 0.65);
+  --component-hero-photo-conic-stop-3: rgba(70, 240, 200, 0.60);
+  --component-hero-photo-conic-stop-4: rgba(140, 80, 255, 0.68);
+  --component-hero-photo-conic-stop-5: rgba(30, 160, 255, 0.72);
+  /* Brand-tinted hover glow */
+  --component-hero-photo-brand-glow: rgba(61, 61, 181, 0.3);
+  /* Nav-dark scrolled state — near-black with film transparency */
+  --component-nav-scrolled-bg: rgba(20, 18, 16, 0.88);
+  /* Hairline divider on dark nav */
+  --component-nav-scrolled-hairline: rgba(255,255,255,0.06);
+  /* Line-refract gradient — light nav top divider */
+  --component-nav-refract-stop-1: rgba(28,26,23,0.04);
+  --component-nav-refract-stop-2: rgba(28,26,23,0.22);
+  --component-nav-refract-stop-3: rgba(28,26,23,0.13);
+  --component-nav-refract-stop-4: rgba(28,26,23,0.03);
+  /* Cursor-ball glow halo */
+  --component-cursor-ball-glow: rgba(61, 61, 181, 0.18);
+  /* Mask gradient edge color (used with mask-image) */
+  --component-marquee-fade-edge: #000;
+  /* Marquee scrim layer */
+  --component-marquee-scrim: rgba(28,26,23,0.05);
+  --component-footer-gradient-stop-1: rgba(255,255,255,0.04);
+  --component-footer-gradient-stop-2: rgba(255,255,255,0.22);
+  --component-footer-gradient-stop-3: rgba(255,255,255,0.03);
+  --component-footer-gradient-stop-4: rgba(255,255,255,0.12);
+  /* Footer body text */
+  --component-footer-text-default: rgba(255,255,255,0.45);
+  /* Footer paragraph muted */
+  --component-footer-text-muted: rgba(255,255,255,0.28);
+  /* Footer status indicator text */
+  --component-footer-status-color: rgba(255,255,255,0.38);
+  /* Sleeping status dot — neutral grey, not in palette */
+  --component-footer-status-sleeping: #4b5563;
+  /* Input fill on light bg */
+  --component-form-input-bg-light: rgba(28, 26, 23, 0.04);
+  --component-form-input-bg-light-focus: rgba(28, 26, 23, 0.06);
+  /* Input fill on dark bg (compose modal) */
+  --component-form-input-bg-dark: rgba(255, 255, 255, 0.04);
+  --component-form-input-bg-dark-focus: rgba(255, 255, 255, 0.07);
+  /* Intent button / form-toggle / form-radio default fill */
+  --component-form-toggle-fill: rgba(240,237,232,0.06);
+  /* Active state fill — same value used in 3 form components */
+  --component-form-toggle-fill-active: rgba(240,237,232,0.15);
+  /* Modal scrim — full black is intentional, not in neutral ramp */
+  --component-compose-modal-backdrop: rgba(0, 0, 0, 0.6);
+  /* Password input error border — system red, not in palette */
+  --component-password-gate-error-border: #c00;
+  /* Password error message text */
+  --component-password-gate-error-text: #b00;
+  /* Brand-tinted lift shadow on tool-card flip — not in neutral elevation scale */
+  --component-tool-card-flip-shadow: 0px 12px 40px 0px rgba(115, 89, 182, 0.18);
+  /* Case-card hover focus glow */
+  --component-case-card-hover-glow: rgba(61, 61, 181, 0.18);
+  /* Thumbnail radial highlight */
+  --component-case-card-thumb-overlay: rgba(255,255,255,0.18);
+
+}
+
+/* ────────────────────────────────────────────────────────────────────
+ * Legacy compatibility layer
+ * Maps the V03 token names to the new DTCG tokens. Existing
+ * global.css references (var(--bg), var(--accent), etc.) keep
+ * working while the refactor pass migrates usages to new names.
+ * Safe to remove once token coverage hits 100% on legacy names.
+ * ──────────────────────────────────────────────────────────────────── */
+:root {
+  /* Backgrounds & surfaces */
+  --bg:              var(--background-page);
+  --bg-alt:          var(--background-section-muted);
+  --surface:         var(--surface-default);
+  --dark:            var(--color-neutral-100);
+  --dark-surface:    var(--color-neutral-90);
+
+  /* Text colors */
+  --fg1:             var(--text-primary);
+  --fg2:             var(--text-secondary);
+  --fg3:             var(--text-tertiary);
+  --fg-inverse:      var(--text-inverse);
+  --fg2-inverse:     rgba(240, 237, 232, 0.65);  /* keep raw — semi-transparent inverse text role */
+
+  /* Brand */
+  --accent:          var(--color-primary-60);
+  --accent-dark:     var(--color-primary-70);
+  --accent-subtle:   var(--color-primary-10);
+  --accent-muted:    rgba(61, 61, 181, 0.12);    /* keep raw — muted accent fill */
+
+  /* Borders (raw rgba — no clean reference token; component-specific) */
   --border:          rgba(28, 26, 23, 0.08);
   --border-strong:   rgba(28, 26, 23, 0.16);
   --border-inverse:  rgba(240, 237, 232, 0.10);
 
-  --radius-sm:       8px;
-  --radius-md:       16px;
-  --radius-lg:       20px;
-  --radius-full:     100px;
+  /* Radii */
+  --radius-sm:       var(--dimension-radius-sm);   /* 8px */
+  --radius-md:       var(--dimension-radius-lg);   /* 16px */
+  --radius-lg:       var(--dimension-radius-xl);   /* 20px */
+  --radius-full:     var(--dimension-radius-full); /* 999px (was 100px, T2-04) */
 
-  --shadow-sm:       0 1px 4px rgba(0, 0, 0, 0.04);
-  --shadow-md:       0 4px 16px rgba(0, 0, 0, 0.06);
-  --shadow-lg:       0 10px 32px rgba(0, 0, 0, 0.08);
+  /* Container & layout */
+  --container:       var(--dimension-size-container-default);
+  --pad:             var(--spacing-container-pad);
+  --section-gap:     var(--spacing-section-gap);
 
-  --container:       1140px;
-  --pad:             clamp(20px, 5vw, 40px);
-  --section-gap:     clamp(80px, 10vw, 120px);
-
-  --font-display:    'Hanken Grotesk', 'DM Sans', -apple-system, sans-serif;
-  --font-body:       'Mona Sans', 'DM Sans', -apple-system, sans-serif;
-
-  --text-display:    clamp(3.5rem, 8vw, 7rem);
-  --text-h1:         clamp(2.5rem, 5vw, 4rem);
-  --text-h2:         clamp(1.8rem, 3vw, 2.6rem);
-  --text-subhead:    clamp(1.5rem, 2.2vw, 1.75rem);
-  --text-h3:         1.4rem;
-  --text-body-lg:    1.125rem;
+  /* Type ramp */
+  --font-display:    var(--font-family-display);
+  --font-body:       var(--font-family-body);
+  --text-display:    var(--font-size-5xl);
+  --text-h1:         var(--font-size-4xl);
+  --text-h2:         var(--font-size-3xl);
+  --text-subhead:    var(--font-size-2xl);
+  --text-h3:         var(--font-size-xl);
+  --text-body-lg:    var(--font-size-lg);
 }
