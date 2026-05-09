@@ -90,7 +90,6 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
  * loop on both modes.
  * ────────────────────────────────────────────────────────────── */
 .cta-footer-wrap,
-.contact,
 .compose-modal,
 .footer,
 .nav.nav-dark {
@@ -1476,7 +1475,10 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
    CONTACT
    ============================================================ */
 .contact {
-  background: var(--background-section-inverse);
+  /* Page-theme bg — light page in light mode, dark in dark mode.
+     Overrides the inherited cta-footer-wrap dark fill since contact
+     is the page itself, not a footer band before content. */
+  background: var(--background-page);
   /* Leave ~80px of viewport for the footer so it sits within the fold
      on tall viewports without scrolling. */
   min-height: calc(100svh - 80px);
@@ -1484,14 +1486,14 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   display: flex; align-items: center; justify-content: center;
   padding: var(--dimension-space-80) var(--dimension-space-40) var(--dimension-space-40); text-align: center;
 }
-/* Error pages reuse the contact dark canvas + particle field. The eyebrow
+/* Error pages reuse the contact canvas + particle field. The eyebrow
    sits above the headline as a code label (404 / 403 / 500 / Error). */
 .error-page .error-code {
-  color: var(--text-inverse-muted);
+  color: var(--text-tertiary);
   margin-bottom: var(--dimension-space-24);
   display: inline-block;
 }
-/* Contact canvas now reuses the global cta-footer-wrap particle system
+/* Contact canvas reuses the global cta-footer-wrap particle system
    (it carries both #contact-canvas and .cta-footer-bg). The .contact
    section also carries .cta-footer-wrap so the shared script picks it
    up. Mask removed — full-fold particle field, same as home/about. */
@@ -1501,27 +1503,27 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 }
 .contact > .contact-inner { z-index: var(--z-raised); }
 .contact-inner { max-width: 800px; width: 100%; position: relative; z-index: var(--z-raised); }
-.contact .eyebrow { color: var(--text-inverse-muted); margin-bottom: var(--dimension-space-24); display: block; }
-.contact h1 { color: var(--text-inverse); font-size: var(--font-size-4xl); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
-.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-lg); color: var(--text-inverse-muted); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
+.contact .eyebrow { color: var(--text-tertiary); margin-bottom: var(--dimension-space-24); display: block; }
+.contact h1 { color: var(--text-primary); font-size: var(--font-size-4xl); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
+.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-lg); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
 .contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: var(--dimension-space-16); }
 .contact-response-time {
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-inverse-muted); margin: var(--dimension-space-24) 0 var(--dimension-space-56);
+  color: var(--text-tertiary); margin: var(--dimension-space-24) 0 var(--dimension-space-56);
 }
-.contact-info { border-top: var(--dimension-border-width-1) solid rgba(240,237,232,0.08); padding-top: var(--dimension-space-32); display: flex; flex-direction: column; gap: var(--dimension-space-8); text-align: left; }
-.contact-card { display: flex; align-items: center; gap: var(--dimension-space-12); padding: var(--dimension-space-12) var(--dimension-space-16); border-radius: var(--dimension-radius-md); border: var(--dimension-border-width-1) solid rgba(240,237,232,0.08); background: rgba(240,237,232,0.03); transition: background var(--motion-duration-short), border-color var(--motion-duration-short); }
-.contact-card:hover { background: rgba(240,237,232,0.07); border-color: rgba(240,237,232,0.16); }
-.contact-card-icon { width: 40px; height: 40px; flex-shrink: 0; background: rgba(112,112,238,0.16); border-radius: var(--dimension-radius-md); display: flex; align-items: center; justify-content: center; color: var(--color-primary-40); }
+.contact-info { border-top: var(--dimension-border-width-1) solid var(--border-subtle); padding-top: var(--dimension-space-32); display: flex; flex-direction: column; gap: var(--dimension-space-8); text-align: left; }
+.contact-card { display: flex; align-items: center; gap: var(--dimension-space-12); padding: var(--dimension-space-12) var(--dimension-space-16); border-radius: var(--dimension-radius-md); border: var(--dimension-border-width-1) solid var(--border-subtle); background: var(--surface-default); transition: background var(--motion-duration-short), border-color var(--motion-duration-short); }
+.contact-card:hover { background: var(--surface-raised); border-color: var(--border-strong); }
+.contact-card-icon { width: 40px; height: 40px; flex-shrink: 0; background: var(--fill-brand-muted); border-radius: var(--dimension-radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-brand); }
 .contact-card-icon svg { width: 18px; height: 18px; }
 .contact-card-body { flex: 1; min-width: 0; }
 .contact-card-label-row { display: flex; align-items: baseline; gap: var(--dimension-space-8); margin-bottom: var(--dimension-space-4); }
 .contact-card-label-row .contact-card-label { margin-bottom: 0; }
-.contact-card-label { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: rgba(240,237,232,0.35); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-4); }
-.contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-inverse); word-break: break-word; }
-.contact-card-sub { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: rgba(240,237,232,0.30); margin-top: var(--dimension-space-2); }
-.contact-card-action { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-16); min-height: var(--target-min); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--color-primary-40); border: var(--dimension-border-width-1) solid rgba(112,112,238,0.25); background: rgba(112,112,238,0.08); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
-.contact-card-action:hover { background: rgba(112,112,238,0.20); border-color: rgba(112,112,238,0.50); color: var(--color-primary-30); }
+.contact-card-label { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-4); }
+.contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-primary); word-break: break-word; }
+.contact-card-sub { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: var(--dimension-space-2); }
+.contact-card-action { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-16); min-height: var(--target-min); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-brand); border: var(--dimension-border-width-1) solid color-mix(in srgb, var(--text-brand) 25%, transparent); background: var(--fill-brand-muted); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
+.contact-card-action:hover { background: color-mix(in srgb, var(--text-brand) 20%, transparent); border-color: color-mix(in srgb, var(--text-brand) 50%, transparent); color: var(--text-brand); }
 .contact-card-action svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 /* Multiple buttons stacked horizontally inside a contact card. */

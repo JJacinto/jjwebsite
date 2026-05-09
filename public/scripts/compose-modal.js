@@ -624,25 +624,43 @@
       document.body.removeChild(p);
       return m ? [+m[0], +m[1], +m[2]] : [0, 0, 0];
     }
-    /* Read the theme-aware tokens so the particle gradient flips with
-       data-theme=dark. Recomputed each resize() / theme change. */
+    /* Read the theme-aware tokens so the particle gradient AND
+       particle color flip with data-theme=dark. Reading from the
+       wrap (not documentElement) respects always-dark surface
+       scoping — inside .cta-footer-wrap, --text-primary stays
+       light regardless of page theme; on .contact, it follows the
+       page. Recomputed each resize() / theme change. */
     var readPalette = function () {
-      var s = getComputedStyle(document.documentElement);
+      var rs = getComputedStyle(document.documentElement);
+      var ws = getComputedStyle(wrap);
       return {
-        dark: probeRGB(s.getPropertyValue('--background-section-inverse').trim() || '#1C1A17'),
-        bg:   probeRGB(s.getPropertyValue('--background-page').trim()             || '#ECEAE5')
+        /* Gradient endpoint = the wrap's actual computed bg, so the
+           transition lands at whatever color CSS painted the wrap
+           (dark band on home/about/work, page bg on contact). */
+        dark:     probeRGB(ws.backgroundColor),
+        /* Page bg fallback — used when detectAboveColor finds no opaque
+           sibling above the wrap. */
+        bg:       probeRGB(rs.getPropertyValue('--background-page').trim() || '#ECEAE5'),
+        /* Particle base — derives from --text-primary IN the wrap's
+           scope. Inside cta-footer-wrap (always-dark scoping) this
+           stays light cream; on .contact it flips with the page. */
+        particle: probeRGB(ws.getPropertyValue('--text-primary').trim() || '#F0EDE8')
       };
     };
     var palette = readPalette();
-    var DARK   = palette.dark;
+    var DARK    = palette.dark;
     var BG_FALLBACK = palette.bg;
+    var PARTICLE_BASE = palette.particle;
 
     var isContactPage = wrap.classList.contains('contact');
 
     function detectAboveColor() {
       if (isContactPage) {
-        var d = probeRGB(getComputedStyle(document.documentElement).getPropertyValue('--background-section-inverse').trim() || '#1C1A17');
-        return [Math.max(0, d[0] - 14), Math.max(0, d[1] - 14), Math.max(0, d[2] - 14)];
+        /* Contact page: bg is --background-page (theme-aware). For a
+           subtle visible gradient at the top, start from the next
+           neutral stop (section-muted = neutral.50 light / neutral.90
+           dark) — one shade off page bg in both themes. */
+        return probeRGB(getComputedStyle(document.documentElement).getPropertyValue('--background-section-muted').trim() || '#E4E1DB');
       }
       var prev = wrap.previousElementSibling;
       while (prev) {
@@ -833,6 +851,7 @@
       palette = readPalette();
       DARK = palette.dark;
       BG_FALLBACK = palette.bg;
+      PARTICLE_BASE = palette.particle;
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       var w = wrap.clientWidth, h = wrap.clientHeight;
       W = Math.max(1, Math.floor(w * dpr));
@@ -987,9 +1006,15 @@
         var tcr, tcg, tcb;
         if (activeShape === 'video') { tcr = 200; tcg = 195; tcb = 188; }
         else                          { tcr =  61; tcg =  61; tcb = 181; }
-        var cr = Math.round(240 + (tcr - 240) * pull);
-        var cg = Math.round(237 + (tcg - 237) * pull);
-        var cb = Math.round(232 + (tcb - 232) * pull);
+        /* Particle base derives from --text-primary in the wrap's
+           scope, so on the contact page (light in light mode) this
+           is dark text rgb(28,26,23) and particles are dark on light;
+           on cta-footer-wrap (always-dark scoping) it stays light
+           cream rgb(240,237,232). Indexed access avoids shadowing
+           an outer `bg` var. */
+        var cr = Math.round(PARTICLE_BASE[0] + (tcr - PARTICLE_BASE[0]) * pull);
+        var cg = Math.round(PARTICLE_BASE[1] + (tcg - PARTICLE_BASE[1]) * pull);
+        var cb = Math.round(PARTICLE_BASE[2] + (tcb - PARTICLE_BASE[2]) * pull);
         var rr = p.r * (1 + pull * 0.4);
         ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a + ')';
         if (pull > 0.02 && btnZone) {
