@@ -1544,14 +1544,19 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .btn.contact-card-btn .btn-icon svg {
   width: 13px; height: 13px;
 }
-/* Icon-only variant (e.g. social icons) — square pill, icon always visible. */
+/* Icon-only variant (e.g. social icons) — circular. Width matches the
+   inherited 44px min-height from .btn (WCAG 2.5.5 touch target), so
+   the inherited --radius-pill renders as a perfect circle instead of
+   the 30×44 ellipse it was producing before. */
 .btn.contact-card-btn--icon {
-  padding: var(--dimension-space-6);
-  width: 30px; height: 30px;
+  width: var(--target-min);
+  min-width: var(--target-min);
+  height: var(--target-min);
+  padding: 0;
   justify-content: center;
 }
 .btn.contact-card-btn--icon svg {
-  width: 13px; height: 13px;
+  width: var(--dimension-space-16); height: var(--dimension-space-16);
   fill: currentColor;
 }
 .btn.contact-card-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
