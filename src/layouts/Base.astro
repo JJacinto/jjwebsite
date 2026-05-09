@@ -84,17 +84,18 @@ const isHome      = activePage === 'home';
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- Theme bootstrap — runs before paint to prevent FOUC. Reads
-     localStorage (explicit override) or matchMedia (system pref) and
-     sets data-theme on <html>. Inline + sync = no flash. -->
+<!-- Theme bootstrap — runs before paint to prevent FOUC. Dark is the
+     default; localStorage 'light' is the only value that opts out.
+     System prefers-color-scheme is intentionally ignored so first-time
+     visitors land on the brand-intended dark experience. -->
 <script is:inline>
   (function () {
     try {
       var stored = localStorage.getItem('theme');
-      var prefDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = stored === 'light' || stored === 'dark' ? stored : (prefDark ? 'dark' : 'light');
-      if (theme === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    } catch (_) {}
+      if (stored !== 'light') document.documentElement.setAttribute('data-theme', 'dark');
+    } catch (_) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   })();
 </script>
 </head>

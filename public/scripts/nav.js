@@ -89,34 +89,20 @@ ready.then(() => {
 });
 window.addEventListener('resize', movePillIndicator);
 
-/* Theme toggle — light ↔ dark. Persists to localStorage so the
-   anti-FOUC bootstrap script can pick up the choice on next page
-   load. matchMedia listener keeps "system" choice live until the
-   user explicitly overrides. */
+/* Theme toggle — light ↔ dark. Dark is the site default; clicking the
+   toggle stores the user's choice in localStorage so the anti-FOUC
+   bootstrap on the next page load applies it before paint. System
+   prefers-color-scheme is intentionally not followed. */
 (function () {
   const btn = document.getElementById('themeToggle');
   if (!btn) return;
   const root = document.documentElement;
-  const mql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
-  function apply(theme) {
-    if (theme === 'dark') root.setAttribute('data-theme', 'dark');
-    else root.removeAttribute('data-theme');
-  }
   btn.addEventListener('click', () => {
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    apply(next);
+    if (next === 'dark') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
     try { localStorage.setItem('theme', next); } catch (_) {}
   });
-  /* When the user hasn't chosen explicitly, follow the system. */
-  if (mql) {
-    const onChange = (e) => {
-      let stored;
-      try { stored = localStorage.getItem('theme'); } catch (_) {}
-      if (stored !== 'light' && stored !== 'dark') apply(e.matches ? 'dark' : 'light');
-    };
-    if (mql.addEventListener) mql.addEventListener('change', onChange);
-    else if (mql.addListener) mql.addListener(onChange);
-  }
 })();
 
 /* Mobile menu */
