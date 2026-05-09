@@ -1380,23 +1380,18 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   background: var(--background-section-inverse);
   overflow: hidden;
 }
-/* "Solo" footer mode — used on contact + error pages where the page
-   above is theme-aware (light in light mode). Gives a vertical
-   gradient that fades from the page bg into the dark section-inverse,
-   matching the soft transition the home/about/work pages get from
-   the canvas particle field. Footer is pushed to the bottom via
-   flex layout so it sits over the solid-dark portion of the gradient. */
+/* "Solo" footer mode — used on contact + error pages. The canvas
+   paints the FBM-dithered gradient (same script as the regular
+   cta-footer-wrap) for a seamless organic transition. Background
+   here is just a fallback for the tiny moment before the canvas
+   first paints; flex pushes the footer to the bottom so it sits
+   over the dark end of the canvas gradient. */
 .cta-footer-wrap--solo {
-  min-height: 200px;
+  min-height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: linear-gradient(
-    to bottom,
-    var(--background-page) 0%,
-    var(--background-section-inverse) 60%,
-    var(--background-section-inverse) 100%
-  );
+  background: var(--background-section-inverse);
 }
 .cta-footer-bg {
   position: absolute; inset: 0;
