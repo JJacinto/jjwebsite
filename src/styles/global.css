@@ -230,10 +230,13 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   background: none; padding: 0;
   transition: transform var(--motion-duration-short) var(--motion-easing-standard);
 }
-.logo-outer:active { transform: scale(0.93); }
+/* Press scale removed — the global tilt JS now handles press via
+   the .is-pressed class + element.style.scale, matching how it
+   treats .btn / .case-card. Keeping a CSS :active here would
+   compete with the JS-applied scale. */
 .logo-bg {
   position: absolute; inset: 0; border-radius: 50%;
-  background: rgba(28, 26, 23, 0.08);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -314,8 +317,8 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    (case-study detail pages) or by global dark mode. */
 .nav.nav-dark .logo-mark,
 [data-theme="dark"] .logo-mark { filter: invert(1); }
-.nav.nav-dark .logo-bg { background: rgba(240, 237, 232, 0.10); }
-[data-theme="dark"] .logo-bg { background: rgba(240, 237, 232, 0.10); }
+/* (.logo-bg theme overrides removed — the base rule now uses
+   color-mix on --text-primary which flips automatically.) */
 .nav.nav-dark .li-badge {
   border-color: rgba(240,237,232,0.22);
   color: rgba(240,237,232,0.65);
@@ -369,7 +372,12 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   color: var(--icon-secondary);
 }
 .btn.theme-toggle:hover { color: var(--icon-primary); }
-.btn.theme-toggle .btn-icon {
+/* Hover state needs an explicit selector with at least the same
+   specificity as `.btn:hover .btn-icon` (0,3,0) — otherwise the
+   global rule expands the container by 2px + adds 6px margin-right,
+   recentering the icon ~4px to the left during hover. */
+.btn.theme-toggle .btn-icon,
+.btn.theme-toggle:hover .btn-icon {
   max-width: var(--dimension-space-20);
   opacity: 1;
   margin-right: 0;
