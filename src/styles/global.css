@@ -1475,6 +1475,24 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
    CONTACT
    ============================================================ */
 .contact {
+  /* The element carries .cta-footer-wrap (so the particle field JS
+     picks it up), and .cta-footer-wrap is in the always-dark surface
+     scoping rule above. That scoping forces text/border/icon tokens
+     to light values, but on the contact page we want them to follow
+     the page theme. Inherit unsets the scoping override and falls
+     back to the :root / [data-theme=dark] cascade. */
+  --text-primary:    inherit;
+  --text-secondary:  inherit;
+  --text-tertiary:   inherit;
+  --text-brand:      inherit;
+  --border-subtle:   inherit;
+  --border-default:  inherit;
+  --border-strong:   inherit;
+  --icon-primary:    inherit;
+  --icon-secondary:  inherit;
+  --icon-brand:      inherit;
+  --fill-brand-muted: inherit;
+
   /* Page-theme bg — light page in light mode, dark in dark mode.
      Overrides the inherited cta-footer-wrap dark fill since contact
      is the page itself, not a footer band before content. */
