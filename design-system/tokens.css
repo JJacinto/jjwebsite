@@ -85,7 +85,9 @@
   --dimension-size-32: 32px;
   /* Avatar small, control height */
   --dimension-size-40: 40px;
-  /* Avatar medium, button tall */
+  /* WCAG 2.5.5 (AAA) target size minimum / Apple HIG touch target */
+  --dimension-size-44: 44px;
+  /* Material Design touch target / avatar medium */
   --dimension-size-48: 48px;
   /* Diamond marker, scroll-indicator */
   --dimension-size-64: 64px;
@@ -337,6 +339,12 @@
   --motion-easing-standard: var(--easing-standard);
   --motion-easing-emphasized: var(--easing-emphasized);
   --motion-easing-spring: var(--easing-spring);
+
+  /* ─── target ─── */
+  /* WCAG 2.5.5 AAA target — minimum tappable size for all interactive controls */
+  --target-min: var(--dimension-size-44);
+  /* Material/preferred — used for primary actions on mobile */
+  --target-comfortable: var(--dimension-size-48);
 
   /* ─── spacing ─── */
   --spacing-inset-xs: var(--dimension-space-6);

@@ -95,6 +95,8 @@ const isHome      = activePage === 'home';
 </head>
 <body>
 
+<a href="#main-content" class="skip-link">Skip to content</a>
+
 <nav class:list={['nav', { 'nav-dark': navDark }]} id="nav">
   <div class="container">
     <a href="/" class="logo-outer" aria-label="Home">
@@ -139,7 +141,9 @@ const isHome      = activePage === 'home';
   </div>
 </div>
 
-<slot />
+<main id="main-content">
+  <slot />
+</main>
 
 {(showCta || showFooter) && (
   <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]}>

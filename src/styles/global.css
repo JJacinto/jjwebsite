@@ -29,6 +29,45 @@ body {
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 button { font-family: inherit; background: none; border: none; cursor: pointer; color: inherit; }
+
+/* ──────────────────────────────────────────────────────────────────
+ * Accessibility — universal focus ring + skip link
+ * Single source of truth for keyboard-visible focus styling. Replaces
+ * ~12 ad-hoc :focus-visible declarations scattered through the file.
+ * ────────────────────────────────────────────────────────────────── */
+:where(a, button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: var(--dimension-space-2);
+  border-radius: var(--dimension-radius-xs);
+}
+
+/* Skip link — keyboard users can jump straight to main content per
+   WCAG 2.4.1. Visually hidden until focused, then surfaces top-left. */
+.skip-link {
+  position: absolute; top: var(--dimension-space-8); left: var(--dimension-space-8);
+  padding: var(--dimension-space-8) var(--dimension-space-16);
+  background: var(--color-primary-60); color: var(--color-neutral-10);
+  border-radius: var(--dimension-radius-sm);
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  z-index: var(--z-toast);
+  transform: translateY(-200%);
+  transition: transform var(--motion-duration-short) var(--motion-easing-standard);
+}
+.skip-link:focus { transform: translateY(0); }
+
+/* Honour user motion preferences globally — kills all transitions
+   and animations for users who request reduced motion. Per-component
+   overrides below have always-on behaviour preserved (e.g. compose
+   modal fade-in, which is essential UI feedback). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .container { max-width: var(--dimension-size-container-default); margin: 0 auto; padding: 0 var(--spacing-container-pad); }
 
 h1, h2, h3, h4 {
@@ -261,7 +300,8 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    shown via [data-theme] on <html>; the inactive one is display:none. */
 .theme-toggle {
   display: inline-flex; align-items: center; justify-content: center;
-  width: var(--dimension-size-40); height: var(--dimension-size-40);
+  /* WCAG 2.5.5 (AAA) — 44×44 minimum touch target. */
+  width: var(--target-min); height: var(--target-min);
   border: var(--dimension-border-width-1) solid var(--border-subtle);
   border-radius: var(--radius-pill);
   background: transparent;
@@ -279,7 +319,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 [data-theme="dark"] .theme-icon-moon { display: inline; }
 
 
-.nav-toggle { display: none; width: 40px; height: 40px; align-items: center; justify-content: center; }
+.nav-toggle { display: none; width: var(--target-min); height: var(--target-min); align-items: center; justify-content: center; cursor: pointer; background: transparent; border: none; padding: 0; }
 .nav-toggle span,
 .nav-toggle span::before,
 .nav-toggle span::after {
@@ -333,10 +373,12 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    Buttons
    ============================================================ */
 .btn {
-  display: inline-flex; align-items: center; gap: 0;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0;
   padding: var(--dimension-space-12) var(--dimension-space-28); border-radius: var(--radius-pill);
   font-family: var(--font-family-body); font-size: var(--font-size-base);
   position: relative; overflow: hidden; white-space: nowrap;
+  /* WCAG 2.5.5 (AAA) — minimum touch target size for all buttons. */
+  min-height: var(--target-min);
   transition:
     color var(--motion-duration-expressive) var(--motion-easing-standard),
     border-color var(--motion-duration-expressive) var(--motion-easing-standard),
@@ -1296,7 +1338,8 @@ a.journey-co:focus-visible { outline: 2px solid var(--color-primary-60); outline
 .cal-nav-btn {
   background: none; border: var(--dimension-border-width-1) solid var(--border-inverse);
   border-radius: var(--dimension-radius-sm); color: var(--text-inverse-muted);
-  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  /* WCAG 2.5.5 (AAA) — 44×44 minimum touch target. */
+  width: var(--target-min); height: var(--target-min); display: flex; align-items: center; justify-content: center;
   cursor: pointer; font-size: var(--font-size-md); transition: background var(--motion-duration-short), color var(--motion-duration-short);
 }
 .cal-nav-btn:hover:not(:disabled) { background: rgba(240,237,232,0.1); color: var(--text-inverse); }
@@ -1384,7 +1427,7 @@ a.journey-co:focus-visible { outline: 2px solid var(--color-primary-60); outline
 .contact-card-label { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: rgba(240,237,232,0.35); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-4); }
 .contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-inverse); word-break: break-word; }
 .contact-card-sub { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: rgba(240,237,232,0.30); margin-top: var(--dimension-space-2); }
-.contact-card-action { flex-shrink: 0; display: flex; align-items: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-12); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--color-primary-40); border: var(--dimension-border-width-1) solid rgba(112,112,238,0.25); background: rgba(112,112,238,0.08); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
+.contact-card-action { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-16); min-height: var(--target-min); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--color-primary-40); border: var(--dimension-border-width-1) solid rgba(112,112,238,0.25); background: rgba(112,112,238,0.08); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
 .contact-card-action:hover { background: rgba(112,112,238,0.20); border-color: rgba(112,112,238,0.50); color: var(--color-primary-30); }
 .contact-card-action svg { width: 13px; height: 13px; flex-shrink: 0; }
 
@@ -1460,8 +1503,9 @@ a.journey-co:focus-visible { outline: 2px solid var(--color-primary-60); outline
   border-bottom: var(--dimension-border-width-1) solid var(--border-inverse);
 }
 .compose-close {
-  position: absolute; top: var(--dimension-space-12); right: var(--dimension-space-12);
-  width: 32px; height: 32px;
+  position: absolute; top: var(--dimension-space-8); right: var(--dimension-space-8);
+  /* WCAG 2.5.5 (AAA) — 44×44 minimum touch target. */
+  width: var(--target-min); height: var(--target-min);
   display: inline-flex; align-items: center; justify-content: center;
   background: transparent; border: none; border-radius: var(--dimension-radius-sm);
   color: var(--text-inverse-muted); cursor: pointer; padding: 0;
@@ -1580,7 +1624,9 @@ a.journey-co:focus-visible { outline: 2px solid var(--color-primary-60); outline
   font-family: var(--font-family-body); font-size: var(--font-size-xs);
   color: var(--text-inverse-muted);
   background: none; border: none; cursor: pointer;
-  padding: 0; transition: color var(--motion-duration-short);
+  /* WCAG 2.5.5 (AAA) — 44px minimum touch target via padding (kept inline because the label is meant to read as text). */
+  min-height: var(--target-min); padding: var(--dimension-space-8) var(--dimension-space-4);
+  transition: color var(--motion-duration-short);
 }
 .compose-copy-email:hover { color: var(--text-inverse); }
 .compose-copy-email svg { width: 14px; height: 14px; flex-shrink: 0; }
@@ -1836,7 +1882,10 @@ a.journey-co:focus-visible { outline: 2px solid var(--color-primary-60); outline
 }
 .footer strong { color: var(--component-footer-text-default); font-weight: var(--font-weight-medium); }
 .footer-email-link {
-  background: none; border: none; padding: 0; cursor: pointer;
+  background: none; border: none; cursor: pointer;
+  /* Inline button — expand vertical hit area without affecting layout
+     (line-height contains the visual; padding adds tap area). WCAG 2.5.8 AA satisfied. */
+  padding: var(--dimension-space-8) var(--dimension-space-4); margin: calc(-1 * var(--dimension-space-8)) calc(-1 * var(--dimension-space-4));
   font-family: var(--font-family-body); font-size: inherit; text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wide);
   color: var(--component-footer-text-default);
   text-decoration: underline; text-underline-offset: 2px;
