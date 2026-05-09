@@ -741,48 +741,20 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .brands-track a:hover img { opacity: 0.85; filter: grayscale(0%); transform: scale(1.1); }
 
-/* Dark-mode logo swap. Most company wordmarks ship as dark text on
-   transparent bg — invisible on a dark page, even with the rest-
-   state grayscale filter. Two strategies:
-   1. Anchorage: content:url() swap to the white SVG (saved at
-      /assets/logos/anchorage-white.svg). Crisp white logo at
-      both rest and hover.
-   2. All other logos: filter: invert(1) on top of the existing
-      grayscale chain. Mathematically equivalent to a white
-      version for monochrome wordmarks (Talkdesk, Namecheap,
-      Be.Ubi). For Streamyard's colored duck, the rest-state
-      grayscale strips colors so it's fine; on hover the inverted
-      duck colors look unusual (green→magenta etc.) — known
-      stopgap until a proper white-duck asset is saved at
-      /assets/logos/streamyard-dark.png and the commented-out
-      content:url() rule below is uncommented. */
+/* Dark-mode logo swap. The marquee logos are dark on transparent —
+   invisible on a dark page. Each img swaps to a white-version
+   asset via content:url(). Existing rest-state grayscale filter
+   still applies to the swapped image; hover reveals brand colors
+   from the white asset. */
 [data-theme="dark"] .brands-track img[alt="Anchorage Digital"] {
   content: url("/assets/logos/anchorage-white.svg");
 }
-[data-theme="dark"] .brands-track img[alt="Talkdesk"],
-[data-theme="dark"] .brands-track img[alt="StreamYard"],
-[data-theme="dark"] .brands-track img[alt="Namecheap"],
-[data-theme="dark"] .brands-track img[alt="Be.Ubi"] {
-  filter: grayscale(100%) invert(1);
+[data-theme="dark"] .brands-track img[alt="Talkdesk"] {
+  content: url("/assets/logos/talkdesk-white.png");
 }
-[data-theme="dark"] .brands-track a:hover img[alt="Talkdesk"],
-[data-theme="dark"] .brands-track a:hover img[alt="StreamYard"],
-[data-theme="dark"] .brands-track a:hover img[alt="Namecheap"],
-[data-theme="dark"] .brands-track a:hover img[alt="Be.Ubi"] {
-  filter: grayscale(0%) invert(1);
-}
-/* Once /assets/logos/streamyard-dark.png exists, uncomment this
-   to use the actual white-duck asset on hover (proper brand colors
-   instead of inverted): */
-/*
 [data-theme="dark"] .brands-track img[alt="StreamYard"] {
-  content: url("/assets/logos/streamyard-dark.png");
-  filter: grayscale(100%);
+  content: url("/assets/logos/streamyard-white.png");
 }
-[data-theme="dark"] .brands-track a:hover img[alt="StreamYard"] {
-  filter: grayscale(0%);
-}
-*/
 
 @media (prefers-reduced-motion: reduce) { .brands-track { animation: none; } }
 .brands-tooltip {
