@@ -1990,12 +1990,18 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 }
 .footer-email-link:hover { color: rgba(255,255,255,0.72); }
 .footer-email-link.copied { color: rgba(255,255,255,0.72); text-decoration: none; }
-/* "Copy to clipboard" tooltip — appears after a small hover delay. */
+/* "Copy to clipboard" tooltip — appears after a small hover delay.
+   Anchored to the right edge of the email link, extending leftward.
+   The link sits on the right side of the footer (text-align: right
+   on desktop), and the parent .cta-footer-wrap has overflow: hidden
+   for the canvas particles — a centred tooltip would have its right
+   half clipped by that overflow. Anchoring right keeps it inside. */
 .footer-email-link::after {
   content: 'Copy to clipboard';
   position: absolute;
-  bottom: calc(100% + var(--dimension-space-8)); left: 50%;
-  transform: translate(-50%, 4px);
+  bottom: calc(100% + var(--dimension-space-8));
+  right: 0;
+  transform: translateY(4px);
   background: var(--color-neutral-90);
   color: var(--text-inverse);
   border: var(--dimension-border-width-1) solid var(--border-inverse);
@@ -2012,7 +2018,7 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .footer-email-link:hover::after,
 .footer-email-link:focus-visible::after {
   opacity: 1;
-  transform: translate(-50%, 0);
+  transform: translateY(0);
   transition-delay: 0.45s;
 }
 .footer-email-link.copied::after { content: 'Copied'; }
