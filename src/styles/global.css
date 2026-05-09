@@ -355,24 +355,26 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .btn.nav-cta .btn-icon { display: none; }
 .btn.nav-cta:hover { box-shadow: none; }
 
-/* Theme toggle — sun on light, moon on dark. The active icon is
-   shown via [data-theme] on <html>; the inactive one is display:none. */
-.theme-toggle {
-  display: inline-flex; align-items: center; justify-content: center;
-  /* WCAG 2.5.5 (AAA) — 44×44 minimum touch target. */
-  width: var(--target-min); height: var(--target-min);
-  border: var(--dimension-border-width-1) solid var(--border-subtle);
-  border-radius: var(--radius-pill);
-  background: transparent;
+/* Theme toggle — sun on light, moon on dark. Inherits .btn.btn-ghost
+   styling (pill border, ghost translucent fill, cursor-radial hover
+   effect via .btn::before, 3D tilt via the global tilt JS, focus
+   ring). Only overrides geometry to stay icon-square (44×44), keeps
+   the icon always visible (the default .btn-icon hides at rest and
+   slides in on hover, which is the wrong default for an icon-only
+   button), and tones the colour to match other nav-right icons. */
+.btn.theme-toggle {
+  width: var(--target-min);
+  min-width: var(--target-min);
+  padding: 0;
   color: var(--icon-secondary);
-  cursor: pointer;
-  transition: background var(--motion-duration-short) var(--motion-easing-standard),
-              color var(--motion-duration-short) var(--motion-easing-standard),
-              border-color var(--motion-duration-short) var(--motion-easing-standard);
 }
-.theme-toggle:hover { background: var(--fill-neutral-default); color: var(--icon-primary); }
-.theme-toggle:focus-visible { outline: var(--dimension-border-width-2) solid var(--border-focus); outline-offset: var(--dimension-space-2); }
-.theme-icon { width: var(--dimension-space-20); height: var(--dimension-space-20); }
+.btn.theme-toggle:hover { color: var(--icon-primary); }
+.btn.theme-toggle .btn-icon {
+  max-width: var(--dimension-space-20);
+  opacity: 1;
+  margin-right: 0;
+}
+.btn.theme-toggle .btn-icon svg { width: var(--dimension-space-20); height: var(--dimension-space-20); }
 .theme-icon-moon { display: none; }
 [data-theme="dark"] .theme-icon-sun { display: none; }
 [data-theme="dark"] .theme-icon-moon { display: inline; }
