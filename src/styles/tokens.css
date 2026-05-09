@@ -526,24 +526,20 @@
 
   /* ─── text ─── */
   --text-primary: var(--color-neutral-30);
-  /* Muted body text on dark surfaces */
+  /* Muted body text on dark page */
   --text-secondary: rgba(240,237,232,0.65);
   --text-tertiary: var(--color-neutral-60);
   --text-disabled: var(--color-neutral-70);
   --text-brand: var(--color-primary-40);
-  --text-on-brand: var(--color-neutral-10);
-  --text-inverse: var(--color-neutral-100);
-  /* Muted text on light overlay surfaces */
-  --text-inverse-muted: rgba(28,26,23,0.65);
+  /* Dark text on the lighter brand fill (primary-40) used in dark mode — gives ~6:1 contrast vs. ~3.5:1 for white-on-light-purple */
+  --text-on-brand: var(--color-neutral-100);
 
   /* ─── border ─── */
-  /* Hairline on dark surfaces (mirrors light-mode border-inverse) */
+  /* Hairline on dark page surfaces */
   --border-subtle: rgba(240,237,232,0.10);
   --border-default: var(--color-neutral-70);
   --border-strong: rgba(240,237,232,0.16);
   --border-focus: var(--color-primary-40);
-  /* In dark mode, border-inverse refers to light-side hairline */
-  --border-inverse: rgba(28,26,23,0.08);
 
   /* ─── icon ─── */
   --icon-primary: var(--color-neutral-30);
