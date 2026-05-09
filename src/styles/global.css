@@ -1394,20 +1394,29 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   background: var(--background-section-inverse);
 }
 
-/* Page-wide particle overlay — same particle system as the cta-footer-
-   wrap, but rendered above the fold of every page (except contact
-   and error pages, which paint their own field in their hero). The
-   wrap requires #main-content to be position: relative so this
-   anchors to the page top. Mask fades the particles out from 30% to
-   50% of the viewport, so they greet the user at page entry and
-   gracefully disappear as they scroll. */
-#main-content { position: relative; }
+/* Page-wide particle + gradient overlay — same particle system as
+   the cta-footer-wrap, but rendered above the fold of every page
+   (except contact and error pages, which paint their own field).
+   - #main-content carries `isolation: isolate` to create a stacking
+     context so the negative-z child stays scoped to main and doesn't
+     fall behind the body bg.
+   - .page-particles sits at z-index -1 — above the main's (transparent)
+     background but BELOW in-flow content like the cycling-text
+     marquees, so the marquees and other content read clearly over
+     the gradient + particles.
+   - Mask fades the canvas out from 30% to 50% of the viewport, so
+     the effect greets the user at page entry and gracefully
+     disappears as they scroll. */
+#main-content {
+  position: relative;
+  isolation: isolate;
+}
 .page-particles {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 100svh;
   pointer-events: none;
-  z-index: var(--z-raised);
+  z-index: -1;
   mask-image: linear-gradient(
     to bottom,
     var(--component-marquee-fade-edge) 0%,
