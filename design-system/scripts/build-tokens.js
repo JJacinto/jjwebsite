@@ -147,49 +147,81 @@ lines.push(' */');
 lines.push('');
 lines.push(':root {');
 
-/* Group leaves by top-level key to emit one block per group with a heading. */
+/* Group leaves by top-level key to emit one block per group with a heading.
+   Theme leaves (theme.dark.X.Y) are routed to a separate selector block; their
+   path is rewritten to drop the "theme.dark." prefix so they OVERRIDE the
+   matching reference token at runtime. */
 const groups = new Map();
+const themeLeaves = new Map(); /* themeName → [leaf with path stripped of theme.X. prefix] */
 for (const leaf of leaves) {
+  if (leaf.path[0] === 'theme' && leaf.path.length > 2) {
+    const themeName = leaf.path[1];
+    const overridePath = leaf.path.slice(2);
+    if (!themeLeaves.has(themeName)) themeLeaves.set(themeName, []);
+    themeLeaves.get(themeName).push({ ...leaf, path: overridePath });
+    continue;
+  }
   const groupKey = leaf.path[0];
   if (!groups.has(groupKey)) groups.set(groupKey, []);
   groups.get(groupKey).push(leaf);
 }
 
+const emitLeaf = (leaf) => {
+  /* typography composite — fan out to one var per property */
+  if (leaf.$type === 'typography' && leaf.$value && typeof leaf.$value === 'object') {
+    if (leaf.$description) lines.push(`  /* ${leaf.$description} */`);
+    for (const [prop, val] of Object.entries(leaf.$value)) {
+      const suffix = prop.replace(/([A-Z])/g, '-$1').toLowerCase(); /* fontFamily → font-family */
+      const varName = cssVar(leaf.path, suffix);
+      let rendered;
+      if (typeof val === 'string') {
+        const m = val.match(ALIAS_RE);
+        if (m) {
+          rendered = `var(--${m[1].replace(/\./g, '-')})`;
+        } else {
+          rendered = val;
+        }
+      } else {
+        rendered = String(val);
+      }
+      lines.push(`  ${varName}: ${rendered};`);
+    }
+    return;
+  }
+
+  if (leaf.$description) lines.push(`  /* ${leaf.$description} */`);
+  const name  = cssVar(leaf.path);
+  const value = renderValue(leaf);
+  lines.push(`  ${name}: ${value};`);
+};
+
 for (const [groupKey, groupLeaves] of groups) {
   lines.push(`  /* ─── ${groupKey} ─── */`);
-  for (const leaf of groupLeaves) {
-    /* typography composite — fan out to one var per property */
-    if (leaf.$type === 'typography' && leaf.$value && typeof leaf.$value === 'object') {
-      if (leaf.$description) lines.push(`  /* ${leaf.$description} */`);
-      for (const [prop, val] of Object.entries(leaf.$value)) {
-        const suffix = prop.replace(/([A-Z])/g, '-$1').toLowerCase(); /* fontFamily → font-family */
-        const varName = cssVar(leaf.path, suffix);
-        let rendered;
-        if (typeof val === 'string') {
-          const m = val.match(ALIAS_RE);
-          if (m) {
-            rendered = `var(--${m[1].replace(/\./g, '-')})`;
-          } else {
-            rendered = val;
-          }
-        } else {
-          rendered = String(val);
-        }
-        lines.push(`  ${varName}: ${rendered};`);
-      }
-      continue;
-    }
-
-    if (leaf.$description) lines.push(`  /* ${leaf.$description} */`);
-    const name  = cssVar(leaf.path);
-    const value = renderValue(leaf);
-    lines.push(`  ${name}: ${value};`);
-  }
+  for (const leaf of groupLeaves) emitLeaf(leaf);
   lines.push('');
 }
 
 lines.push('}');
 lines.push('');
+
+/* Theme override blocks — one selector per non-default theme. */
+for (const [themeName, leavesForTheme] of themeLeaves) {
+  lines.push(`[data-theme="${themeName}"] {`);
+  /* Re-group by category for readability */
+  const byGroup = new Map();
+  for (const leaf of leavesForTheme) {
+    const k = leaf.path[0];
+    if (!byGroup.has(k)) byGroup.set(k, []);
+    byGroup.get(k).push(leaf);
+  }
+  for (const [k, ls] of byGroup) {
+    lines.push(`  /* ─── ${k} ─── */`);
+    for (const leaf of ls) emitLeaf(leaf);
+    lines.push('');
+  }
+  lines.push('}');
+  lines.push('');
+}
 
 const output = lines.join('\n');
 for (const dest of OUTPUTS) {

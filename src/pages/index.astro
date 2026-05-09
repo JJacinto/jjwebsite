@@ -261,11 +261,13 @@ import Base from '../layouts/Base.astro';
     return c[3] === 1 ? [c[0], c[1], c[2]] : compositeOver(c, fallback);
   }
 
-  /* Defaults — derived from existing tokens, no hex literals. */
+  /* Defaults — derived from theme-aware reference tokens, no hex
+     literals. The shader reads --background-page and --background-
+     section-muted via getComputedStyle, so it auto-adapts to dark mode. */
   const cfg = {
-    base:       '--bg',           /* hero canvas base */
-    wispA:      '--bg-alt',       /* darker wisp, Δ ~3.4% pixel */
-    wispB:      '--border',       /* darkest wisp, alpha-composited on base, Δ ~6% pixel */
+    base:       '--background-page',         /* hero canvas base */
+    wispA:      '--background-section-muted', /* darker wisp, Δ ~3.4% pixel */
+    wispB:      '--border-subtle',            /* darkest wisp, alpha-composited on base, Δ ~6% pixel */
     speed:      1.0,
     intensity:  1.0,
     fadeStart:  0.4,
@@ -276,7 +278,10 @@ import Base from '../layouts/Base.astro';
   const baseRgb  = resolveProp(cfg.base,  [0.925, 0.918, 0.898]);
   const wispARgb = resolveProp(cfg.wispA, baseRgb);
   const wispBRgb = resolveProp(cfg.wispB, baseRgb);
-  document.body.removeChild(probe);
+  /* Probe element stays in the DOM — pushPalette() re-reads tokens
+     when the theme changes, and parseRGBA needs a live element to
+     compute color resolution. Probe is invisible (visibility:hidden,
+     position:absolute), zero footprint. */
 
   /* Clamp intensity per spec — protect against staining. */
   const intensity = Math.max(0, Math.min(1.5, cfg.intensity));
@@ -385,12 +390,27 @@ import Base from '../layouts/Base.astro';
   const uFadeStart = gl.getUniformLocation(prog, 'u_fadeStart');
   const uFadeEnd   = gl.getUniformLocation(prog, 'u_fadeEnd');
 
-  gl.uniform3fv(uBase,  baseRgb);
-  gl.uniform3fv(uWispA, wispARgb);
-  gl.uniform3fv(uWispB, wispBRgb);
+  function pushPalette() {
+    const b = resolveProp(cfg.base,  baseRgb);
+    const a = resolveProp(cfg.wispA, b);
+    const c = resolveProp(cfg.wispB, b);
+    gl.uniform3fv(uBase,  b);
+    gl.uniform3fv(uWispA, a);
+    gl.uniform3fv(uWispB, c);
+  }
+  pushPalette();
   gl.uniform1f(uIntensity, intensity);
   gl.uniform1f(uFadeStart, fadeStart);
   gl.uniform1f(uFadeEnd,   fadeEnd);
+
+  /* Theme switches mutate <html data-theme="...">. Re-read the
+     palette tokens and push fresh uniforms when that happens. */
+  if (window.MutationObserver) {
+    new MutationObserver(() => pushPalette()).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+  }
 
   /* ── Sizing — DPR capped at 1.25 for a background pass. ── */
   let W = 0, H = 0;

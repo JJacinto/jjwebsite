@@ -253,8 +253,10 @@
   --background-page: var(--color-neutral-40);
   --background-section-default: var(--color-neutral-40);
   --background-section-muted: var(--color-neutral-50);
-  /* Dark sections (footer, contact, error pages) */
+  /* Dark sections (cta-footer-wrap, contact hero, error pages). Dark mode override keeps this dark + slightly elevated from page bg */
   --background-section-inverse: var(--color-neutral-100);
+  /* Footer cap — slightly lighter than --background-section-inverse so footer reads as a distinct band */
+  --background-footer: var(--color-neutral-90);
 
   /* ─── surface ─── */
   /* Card on light bg */
@@ -482,5 +484,64 @@
   --component-case-card-hover-glow: rgba(61, 61, 181, 0.18);
   /* Thumbnail radial highlight */
   --component-case-card-thumb-overlay: rgba(255,255,255,0.18);
+
+}
+
+[data-theme="dark"] {
+  /* ─── background ─── */
+  /* Dark page bg */
+  --background-page: var(--color-neutral-100);
+  --background-section-default: var(--color-neutral-100);
+  --background-section-muted: var(--color-neutral-90);
+  /* Stays dark in dark mode — slight elevation above page bg keeps the cta-footer-wrap visible */
+  --background-section-inverse: var(--color-neutral-90);
+  /* Footer cap — slightly lighter than section-inverse for distinction */
+  --background-footer: var(--color-neutral-80);
+
+  /* ─── surface ─── */
+  --surface-default: var(--color-neutral-90);
+  --surface-raised: var(--color-neutral-80);
+  --surface-sunken: var(--color-neutral-100);
+  --surface-overlay: var(--color-neutral-80);
+
+  /* ─── fill ─── */
+  /* Lightened brand for AA contrast on dark surfaces */
+  --fill-brand-default: var(--color-primary-40);
+  --fill-brand-hover: var(--color-primary-30);
+  --fill-brand-active: var(--color-primary-50);
+  --fill-brand-subtle: var(--color-primary-90);
+  --fill-brand-muted: rgba(128,128,240,0.18);
+  --fill-neutral-default: var(--color-neutral-90);
+  --fill-neutral-subtle: var(--color-neutral-100);
+  --fill-neutral-muted: var(--color-neutral-80);
+  --fill-neutral-inverse: var(--color-neutral-10);
+
+  /* ─── text ─── */
+  --text-primary: var(--color-neutral-30);
+  /* Muted body text on dark surfaces */
+  --text-secondary: rgba(240,237,232,0.65);
+  --text-tertiary: var(--color-neutral-60);
+  --text-disabled: var(--color-neutral-70);
+  --text-brand: var(--color-primary-40);
+  --text-on-brand: var(--color-neutral-10);
+  --text-inverse: var(--color-neutral-100);
+  /* Muted text on light overlay surfaces */
+  --text-inverse-muted: rgba(28,26,23,0.65);
+
+  /* ─── border ─── */
+  /* Hairline on dark surfaces (mirrors light-mode border-inverse) */
+  --border-subtle: rgba(240,237,232,0.10);
+  --border-default: var(--color-neutral-70);
+  --border-strong: rgba(240,237,232,0.16);
+  --border-focus: var(--color-primary-40);
+  /* In dark mode, border-inverse refers to light-side hairline */
+  --border-inverse: rgba(28,26,23,0.08);
+
+  /* ─── icon ─── */
+  --icon-primary: var(--color-neutral-30);
+  --icon-secondary: var(--color-neutral-60);
+  --icon-tertiary: var(--color-neutral-70);
+  --icon-brand: var(--color-primary-40);
+  --icon-on-brand: var(--color-neutral-100);
 
 }

@@ -624,15 +624,24 @@
       document.body.removeChild(p);
       return m ? [+m[0], +m[1], +m[2]] : [0, 0, 0];
     }
-    var rootStyles = getComputedStyle(document.documentElement);
-    var DARK   = probeRGB(rootStyles.getPropertyValue('--dark').trim()   || '#1C1A17');
-    var BG_FALLBACK = probeRGB(rootStyles.getPropertyValue('--bg').trim() || '#ECEAE5');
+    /* Read the theme-aware tokens so the particle gradient flips with
+       data-theme=dark. Recomputed each resize() / theme change. */
+    var readPalette = function () {
+      var s = getComputedStyle(document.documentElement);
+      return {
+        dark: probeRGB(s.getPropertyValue('--background-section-inverse').trim() || '#1C1A17'),
+        bg:   probeRGB(s.getPropertyValue('--background-page').trim()             || '#ECEAE5')
+      };
+    };
+    var palette = readPalette();
+    var DARK   = palette.dark;
+    var BG_FALLBACK = palette.bg;
 
     var isContactPage = wrap.classList.contains('contact');
 
     function detectAboveColor() {
       if (isContactPage) {
-        var d = probeRGB(rootStyles.getPropertyValue('--dark').trim() || '#1C1A17');
+        var d = probeRGB(getComputedStyle(document.documentElement).getPropertyValue('--background-section-inverse').trim() || '#1C1A17');
         return [Math.max(0, d[0] - 14), Math.max(0, d[1] - 14), Math.max(0, d[2] - 14)];
       }
       var prev = wrap.previousElementSibling;
@@ -819,6 +828,11 @@
     }
 
     function resize() {
+      /* Re-read the palette so dark mode toggle picks up the new
+         background colors before the offscreen canvas is rebuilt. */
+      palette = readPalette();
+      DARK = palette.dark;
+      BG_FALLBACK = palette.bg;
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       var w = wrap.clientWidth, h = wrap.clientHeight;
       W = Math.max(1, Math.floor(w * dpr));
@@ -827,6 +841,15 @@
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       bgImage = buildBackground(w, h, dpr);
       generate();
+    }
+
+    /* Theme switches mutate <html data-theme="...">. Repaint the
+       gradient + particles when that happens. */
+    if (window.MutationObserver) {
+      new MutationObserver(function () {
+        resize();
+        loop();
+      }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
     wrap.addEventListener('mouseenter', function () { mouseInside = true; });
