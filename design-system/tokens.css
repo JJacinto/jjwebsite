@@ -513,12 +513,14 @@
   --surface-overlay: var(--color-neutral-80);
 
   /* ─── fill ─── */
-  /* Lightened brand for AA contrast on dark surfaces */
-  --fill-brand-default: var(--color-primary-40);
-  --fill-brand-hover: var(--color-primary-30);
-  --fill-brand-active: var(--color-primary-50);
-  --fill-brand-subtle: var(--color-primary-90);
-  --fill-brand-muted: rgba(128,128,240,0.18);
+  /* Mid-saturation brand fill — readable against dark page (~3.5:1 vs neutral.100) and against white text (~4.7:1). Was primary.40, but #8080F0 read as too pastel for the primary CTA. */
+  --fill-brand-default: var(--color-primary-50);
+  /* Hover lifts to lighter purple */
+  --fill-brand-hover: var(--color-primary-40);
+  /* Pressed dips to standard brand purple */
+  --fill-brand-active: var(--color-primary-60);
+  --fill-brand-subtle: var(--color-primary-80);
+  --fill-brand-muted: rgba(92,92,212,0.18);
   --fill-neutral-default: var(--color-neutral-90);
   --fill-neutral-subtle: var(--color-neutral-100);
   --fill-neutral-muted: var(--color-neutral-80);
@@ -531,8 +533,8 @@
   --text-tertiary: var(--color-neutral-60);
   --text-disabled: var(--color-neutral-70);
   --text-brand: var(--color-primary-40);
-  /* Dark text on the lighter brand fill (primary-40) used in dark mode — gives ~6:1 contrast vs. ~3.5:1 for white-on-light-purple */
-  --text-on-brand: var(--color-neutral-100);
+  /* Light text on the mid-purple brand fill (primary-50) used in dark mode — gives ~4.7:1 contrast */
+  --text-on-brand: var(--color-neutral-10);
 
   /* ─── border ─── */
   /* Hairline on dark page surfaces */

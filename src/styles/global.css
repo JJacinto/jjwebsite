@@ -252,16 +252,28 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   background: transparent;
 }
 .pill-indicator {
-  position: absolute; top: var(--dimension-space-4); bottom: var(--dimension-space-4);
-  background: rgba(28,26,23,0.07);
+  position: absolute; left: 0; top: var(--dimension-space-4); bottom: var(--dimension-space-4);
+  /* Theme-aware tint — uses --text-primary (which flips with theme)
+     mixed at 10% with transparent. On a light page that's a near-black
+     wash; on a dark page that's a near-white wash. */
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
   border-radius: var(--radius-pill);
-  transition: left 0.32s cubic-bezier(0.25,0.46,0.45,0.94), width 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
+  /* Hidden until JS positions it — prevents the indicator from briefly
+     painting at left:0 width:0 before the cross-page slide starts. JS
+     adds .is-positioned which fades it in concurrent with the slide. */
+  opacity: 0;
+  /* X movement runs on the compositor via translate3d (no per-frame
+     layout cost). Width still animates but is cheap on a leaf
+     absolutely-positioned element with no descendants. */
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity var(--motion-duration-short) var(--motion-easing-standard),
+    transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94),
+    width 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
   pointer-events: none;
-  /* Promote to its own compositor layer so the cross-page slide doesn't
-     compete with paint work on the main thread. */
-  will-change: left, width;
-  transform: translateZ(0);
+  will-change: transform, width;
 }
+.pill-indicator.is-positioned { opacity: 1; }
 .pill-nav a {
   position: relative; z-index: var(--z-raised);
   font-size: var(--font-size-sm); color: var(--text-secondary);
@@ -287,7 +299,8 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .nav.nav-dark .pill-nav a { color: rgba(240,237,232,0.45); }
 .nav.nav-dark .pill-nav a:hover:not(.active) { color: rgba(240,237,232,0.80); }
 .nav.nav-dark .pill-nav a.active { color: var(--text-inverse); }
-.nav.nav-dark .pill-indicator { background: rgba(240,237,232,0.12); }
+/* (.nav-dark .pill-indicator removed — the color-mix on --text-primary now
+   resolves correctly on .nav-dark via the always-dark surface scoping.) */
 .nav.nav-dark .nav-toggle span,
 .nav.nav-dark .nav-toggle span::before,
 .nav.nav-dark .nav-toggle span::after { background: var(--text-inverse); }

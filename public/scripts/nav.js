@@ -20,8 +20,8 @@ function movePillIndicator() {
   if (!active) { pillIndicator.style.width = '0'; return; }
   const pos = getPillPos(active);
   pillIndicator.style.transition = 'none';
-  pillIndicator.style.left  = pos.left + 'px';
-  pillIndicator.style.width = pos.width + 'px';
+  pillIndicator.style.transform = `translate3d(${pos.left}px, 0, 0)`;
+  pillIndicator.style.width     = pos.width + 'px';
   requestAnimationFrame(() => { pillIndicator.style.transition = ''; });
 }
 /* Cross-page slide: save position before navigating, restore & animate on next page */
@@ -47,8 +47,13 @@ const savedFrom = (function () {
 })();
 if (savedFrom) {
   pillIndicator.style.transition = 'none';
-  pillIndicator.style.left  = savedFrom.left + 'px';
-  pillIndicator.style.width = savedFrom.width + 'px';
+  pillIndicator.style.transform = `translate3d(${savedFrom.left}px, 0, 0)`;
+  pillIndicator.style.width     = savedFrom.width + 'px';
+  /* Reveal the indicator now that it's at the correct from-position;
+     the .is-positioned class fades it in (opacity 0 → 1) concurrent
+     with the slide, hiding the brief moment when CSS painted it at
+     transform:0 width:0 before this script ran. */
+  pillIndicator.classList.add('is-positioned');
 }
 
 /* Trigger the slide as soon as fonts are ready — `window.load` waits
@@ -68,15 +73,18 @@ ready.then(() => {
        before the transition starts, so the slide actually animates. */
     requestAnimationFrame(() => requestAnimationFrame(() => {
       pillIndicator.style.transition = '';
-      pillIndicator.style.left  = toPos.left + 'px';
-      pillIndicator.style.width = toPos.width + 'px';
+      pillIndicator.style.transform = `translate3d(${toPos.left}px, 0, 0)`;
+      pillIndicator.style.width     = toPos.width + 'px';
     }));
   } else {
-    /* First visit / no saved position — snap silently. */
+    /* First visit / no saved position — snap silently then reveal. */
     pillIndicator.style.transition = 'none';
-    pillIndicator.style.left  = toPos.left + 'px';
-    pillIndicator.style.width = toPos.width + 'px';
-    requestAnimationFrame(() => { pillIndicator.style.transition = ''; });
+    pillIndicator.style.transform = `translate3d(${toPos.left}px, 0, 0)`;
+    pillIndicator.style.width     = toPos.width + 'px';
+    requestAnimationFrame(() => {
+      pillIndicator.style.transition = '';
+      pillIndicator.classList.add('is-positioned');
+    });
   }
 });
 window.addEventListener('resize', movePillIndicator);
