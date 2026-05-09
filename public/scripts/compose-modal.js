@@ -596,7 +596,7 @@
 
 /* Animated dot field for global-CTA cards. */
 (function () {
-  var wraps = document.querySelectorAll('.cta-footer-wrap');
+  var wraps = document.querySelectorAll('.cta-footer-wrap, .page-particles');
   if (!wraps.length) return;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   wraps.forEach(initCta);
@@ -653,6 +653,10 @@
     var PARTICLE_BASE = palette.particle;
 
     var isContactPage = wrap.classList.contains('contact');
+    /* page-particles wraps are the global above-the-fold overlay added
+       in Base.astro — particles only, no painted gradient (the page
+       bg shows through, mask-image handles the 30-50% fade). */
+    var isPageParticles = wrap.classList.contains('page-particles');
 
     function detectAboveColor() {
       if (isContactPage) {
@@ -858,7 +862,11 @@
       H = Math.max(1, Math.floor(h * dpr));
       canvas.width = W; canvas.height = H;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      bgImage = buildBackground(w, h, dpr);
+      /* page-particles wraps want particles on a transparent canvas
+         (the page bg shows through, mask-image fades them out at 50%
+         of the viewport). cta-footer-wrap variants get the FBM
+         dithered gradient as the canvas bg. */
+      bgImage = isPageParticles ? null : buildBackground(w, h, dpr);
       generate();
     }
 

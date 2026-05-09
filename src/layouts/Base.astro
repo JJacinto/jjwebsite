@@ -8,6 +8,10 @@ interface Props {
   navDark?: boolean;
   showFooter?: boolean;
   showCta?: boolean;
+  /* Disable the page-wide particle overlay above the fold. Set true
+     on pages that already paint their own particle field in the hero
+     (contact, error pages) to avoid doubling up. */
+  disablePageParticles?: boolean;
 }
 
 const {
@@ -17,6 +21,7 @@ const {
   navDark = false,
   showFooter = true,
   showCta = true,
+  disablePageParticles = false,
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
@@ -141,6 +146,11 @@ const isHome      = activePage === 'home';
 </div>
 
 <main id="main-content">
+  {!disablePageParticles && (
+    <div class="page-particles" aria-hidden="true">
+      <canvas class="cta-footer-bg"></canvas>
+    </div>
+  )}
   <slot />
 </main>
 
