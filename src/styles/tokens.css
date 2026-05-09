@@ -535,10 +535,10 @@
   --text-on-brand: var(--color-neutral-10);
 
   /* ─── border ─── */
-  /* Hairline on dark page surfaces */
-  --border-subtle: rgba(240,237,232,0.10);
+  /* Hairline on dark page surfaces. Lower alpha than light mode (0.08) because white-on-dark is perceptually more prominent than black-on-light, and on cards the 6px stroke at 10% was creating a brighter halo than the card's own elevation from page bg. */
+  --border-subtle: rgba(240,237,232,0.05);
   --border-default: var(--color-neutral-70);
-  --border-strong: rgba(240,237,232,0.16);
+  --border-strong: rgba(240,237,232,0.10);
   --border-focus: var(--color-primary-40);
 
   /* ─── icon ─── */
