@@ -13,7 +13,7 @@ const { code, title, body, pageTitle, description } = Astro.props;
 ---
 <Base
   activePage=""
-  navDark={true}
+  navDark={false}
   showCta={false}
   showFooter={true}
   title={pageTitle}
@@ -30,7 +30,7 @@ const { code, title, body, pageTitle, description } = Astro.props;
           <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></span>
           <span>Back to home</span>
         </a>
-        <a class="btn btn-dark-outline" href="/case-studies">
+        <a class="btn btn-ghost" href="/case-studies">
           <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h14M11 6l6 6-6 6"/></svg></span>
           <span>See case studies</span>
         </a>
