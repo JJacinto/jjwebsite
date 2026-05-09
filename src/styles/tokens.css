@@ -269,6 +269,8 @@
   --fill-brand-hover: var(--color-primary-50);
   --fill-brand-active: var(--color-primary-70);
   --fill-brand-subtle: var(--color-primary-10);
+  /* Muted accent fill — semi-transparent brand. Maps to legacy --accent-muted */
+  --fill-brand-muted: rgba(61,61,181,0.12);
   --fill-neutral-default: var(--color-neutral-20);
   --fill-neutral-subtle: var(--color-neutral-10);
   --fill-neutral-muted: var(--color-neutral-50);
@@ -287,17 +289,19 @@
   --text-on-brand: var(--color-neutral-10);
   /* Text on dark surfaces. Maps to --fg-inverse */
   --text-inverse: var(--color-neutral-30);
-  /* Lower-emphasis text on dark — paired with opacity.65 in components */
-  --text-inverse-muted: var(--color-neutral-30);
+  /* Lower-emphasis text on dark surfaces. Maps to legacy --fg2-inverse */
+  --text-inverse-muted: rgba(240,237,232,0.65);
 
   /* ─── border ─── */
-  --border-subtle: var(--color-neutral-50);
-  /* Default visible border */
+  /* Hairline border on light surfaces. Maps to legacy --border */
+  --border-subtle: rgba(28,26,23,0.08);
+  /* Default visible border on light surfaces */
   --border-default: var(--color-neutral-60);
-  --border-strong: var(--color-neutral-80);
+  /* Emphasized border on light surfaces. Maps to legacy --border-strong */
+  --border-strong: rgba(28,26,23,0.16);
   --border-focus: var(--color-primary-60);
-  /* Border on dark surfaces */
-  --border-inverse: var(--color-neutral-30);
+  /* Hairline border on dark surfaces. Maps to legacy --border-inverse */
+  --border-inverse: rgba(240,237,232,0.10);
 
   /* ─── icon ─── */
   --icon-primary: var(--color-neutral-100);
@@ -479,59 +483,4 @@
   /* Thumbnail radial highlight */
   --component-case-card-thumb-overlay: rgba(255,255,255,0.18);
 
-}
-
-/* ────────────────────────────────────────────────────────────────────
- * Legacy compatibility layer
- * Maps the V03 token names to the new DTCG tokens. Existing
- * global.css references (var(--bg), var(--accent), etc.) keep
- * working while the refactor pass migrates usages to new names.
- * Safe to remove once token coverage hits 100% on legacy names.
- * ──────────────────────────────────────────────────────────────────── */
-:root {
-  /* Backgrounds & surfaces */
-  --bg:              var(--background-page);
-  --bg-alt:          var(--background-section-muted);
-  --surface:         var(--surface-default);
-  --dark:            var(--color-neutral-100);
-  --dark-surface:    var(--color-neutral-90);
-
-  /* Text colors */
-  --fg1:             var(--text-primary);
-  --fg2:             var(--text-secondary);
-  --fg3:             var(--text-tertiary);
-  --fg-inverse:      var(--text-inverse);
-  --fg2-inverse:     rgba(240, 237, 232, 0.65);  /* keep raw — semi-transparent inverse text role */
-
-  /* Brand */
-  --accent:          var(--color-primary-60);
-  --accent-dark:     var(--color-primary-70);
-  --accent-subtle:   var(--color-primary-10);
-  --accent-muted:    rgba(61, 61, 181, 0.12);    /* keep raw — muted accent fill */
-
-  /* Borders (raw rgba — no clean reference token; component-specific) */
-  --border:          rgba(28, 26, 23, 0.08);
-  --border-strong:   rgba(28, 26, 23, 0.16);
-  --border-inverse:  rgba(240, 237, 232, 0.10);
-
-  /* Radii */
-  --radius-sm:       var(--dimension-radius-sm);   /* 8px */
-  --radius-md:       var(--dimension-radius-lg);   /* 16px */
-  --radius-lg:       var(--dimension-radius-xl);   /* 20px */
-  --radius-full:     var(--dimension-radius-full); /* 999px (was 100px, T2-04) */
-
-  /* Container & layout */
-  --container:       var(--dimension-size-container-default);
-  --pad:             var(--spacing-container-pad);
-  --section-gap:     var(--spacing-section-gap);
-
-  /* Type ramp */
-  --font-display:    var(--font-family-display);
-  --font-body:       var(--font-family-body);
-  --text-display:    var(--font-size-5xl);
-  --text-h1:         var(--font-size-4xl);
-  --text-h2:         var(--font-size-3xl);
-  --text-subhead:    var(--font-size-2xl);
-  --text-h3:         var(--font-size-xl);
-  --text-body-lg:    var(--font-size-lg);
 }

@@ -20,9 +20,13 @@
 const fs   = require('node:fs');
 const path = require('node:path');
 
-const ROOT       = path.resolve(__dirname, '..');
-const SOURCE     = path.join(ROOT, 'tokens.json');
-const OUTPUT     = path.join(ROOT, 'tokens.css');
+const ROOT        = path.resolve(__dirname, '..');
+const REPO_ROOT   = path.resolve(ROOT, '..');
+const SOURCE      = path.join(ROOT, 'tokens.json');
+const OUTPUTS     = [
+  path.join(ROOT, 'tokens.css'),
+  path.join(REPO_ROOT, 'src', 'styles', 'tokens.css'),
+];
 
 const tokens = JSON.parse(fs.readFileSync(SOURCE, 'utf8'));
 
@@ -188,7 +192,10 @@ lines.push('}');
 lines.push('');
 
 const output = lines.join('\n');
-fs.writeFileSync(OUTPUT, output);
+for (const dest of OUTPUTS) {
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.writeFileSync(dest, output);
+}
 
 /* ────────────────────────────────────────────────────────────────────
  * Summary report on stdout.
@@ -200,7 +207,7 @@ const counts = {
   component: leaves.filter(l => l.path[0] === 'component').length,
 };
 
-console.log(`✓ tokens.css written (${output.split('\n').length} lines)`);
+console.log(`✓ tokens.css written to ${OUTPUTS.length} location(s) (${output.split('\n').length} lines)`);
 console.log(`  Total tokens: ${counts.total}`);
 console.log(`  Base:         ${counts.base}`);
 console.log(`  Reference:    ${counts.reference}`);

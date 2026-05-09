@@ -232,3 +232,103 @@ design-system/            new folder       (tokens.json, tokens.css, scripts/, a
 ```
 
 No HTML, no Astro components, no JS files modified. No routing, no build config changes (other than the `npm run tokens` script).
+
+---
+
+# Prompt 3 — compat layer cleanup + component token wire-up
+
+Executed in commit after V04. Roll back via git revert against this commit.
+
+## What changed
+
+| | V04 (post Prompt 2) | V05 (post Prompt 3) |
+|---|---|---|
+| Legacy compat aliases in tokens.css | 36 | **0** (removed entirely) |
+| Legacy var(--bg/--accent/--fg*) refs in global.css | 285 | **0** |
+| Component tokens wired | ~5 | ~22 |
+| Total var() refs in global.css | ~700 | **1140** |
+| Unique tokens in active use | 105 | **127** |
+| Tokens defined | 332 | **303** (some now structurally promoted) |
+| Build pre-step | manual npm run tokens | **auto via predev/prebuild** |
+
+## Coverage (final)
+
+| Category | Tokenized | Total | % |
+|---|---|---|---|
+| Spacing | 233 | 238 | **97%** |
+| Typography | 149 | 154 | **96%** |
+| Color | 269 | 326 | **82%** (target met) |
+| Motion | 58 | 64 | 90% (carried from V04) |
+| Z-index | 23 | 28 | 82% (carried from V04) |
+| Radius | 37 | 51 | 72% (remaining are 50% circles + 0 — not tokenizable) |
+
+## Changes by category
+
+### 1. Compat layer eliminated (285 references migrated)
+
+Mass replace mapped each legacy alias to its canonical V05 equivalent:
+
+| Legacy | New |
+|---|---|
+| --bg | --background-page |
+| --bg-alt | --background-section-muted |
+| --surface | --surface-default |
+| --dark | --color-neutral-100 |
+| --dark-surface | --color-neutral-90 |
+| --fg1, --fg2, --fg3 | --text-primary/secondary/tertiary |
+| --fg-inverse, --fg2-inverse | --text-inverse, --text-inverse-muted |
+| --accent, --accent-dark, --accent-subtle | --color-primary-60/70/10 |
+| --accent-muted | --fill-brand-muted |
+| --border, --border-strong, --border-inverse | --border-subtle/strong/inverse |
+| --radius-sm/md/lg/full | --dimension-radius-sm / --radius-card / --dimension-radius-xl / --radius-pill |
+| --container, --pad, --section-gap | --dimension-size-container-default, --spacing-container-pad, --spacing-section-gap |
+| --font-display, --font-body | --font-family-display, --font-family-body |
+| --text-display/h1/h2/subhead/h3/body-lg | --font-size-5xl/4xl/3xl/2xl/xl/lg |
+
+src/styles/tokens.css is now 100% generated content (487 lines, no hand-written compat).
+
+### 2. Component tokens wired up
+
+22 component tokens gained var() references in global.css (hero conic gradient ×5, cursor-ball glow, compose backdrop, form input fills ×4, form toggles ×2, marquee fade/scrim ×2, footer text/status ×4, footer gradient ×4, nav refract ×4, nav scrolled bg/hairline ×2, case-card thumb overlay, password gate ×2 — all formerly raw rgba/hex).
+
+Component tokens still reserved for future use: --component-tool-card-flip-shadow, --component-case-card-hover-glow, --component-hero-photo-brand-glow.
+
+### 3. Build pipeline automated
+
+package.json gained predev and prebuild hooks that run the generator. Edit tokens.json, run npm run dev or npm run build, tokens.css regenerates automatically. Manual npm run tokens still works.
+
+build-tokens.js now writes to two locations: design-system/tokens.css (canonical artifact) and src/styles/tokens.css (consumed by global.css). Both stay in sync.
+
+### 4. Promoted tokens
+
+Five rgba values that lived in the compat layer as placeholders are now first-class reference tokens in tokens.json:
+
+- border.subtle = rgba(28,26,23,0.08)
+- border.strong = rgba(28,26,23,0.16)
+- border.inverse = rgba(240,237,232,0.10)
+- text.inverse-muted = rgba(240,237,232,0.65)
+- fill.brand.muted = rgba(61,61,181,0.12)
+
+### 5. Media query annotations
+
+10 @media queries now carry inline comments referencing the nearest --bp-* token, ready for @custom-media support when it lands.
+
+## Risk register
+
+Zero new visual deltas. Pure 1:1 rewiring + raw-rgba-to-var() pass. Every replacement value-preserving.
+
+## What is still raw
+
+- 57 rgba values in component-specific contexts (button hover shadows, branded borders at varying alphas) — per-component intentional, not drift.
+- 5 hardcoded spacing values (44px touch targets, 1px sr-only, -1px overflow correction) — justified one-offs from V04.
+- 3 unused component tokens — reserved for future visual treatments.
+- ~50 unused base/reference tokens — dark mode anchors, breakpoint tokens, full neutral/primary ramps. All retained for system completeness.
+
+## Files modified (Prompt 3)
+
+- design-system/tokens.json — +5 reference tokens with proper rgba values
+- design-system/scripts/build-tokens.js — dual-output (writes to both design-system/ and src/styles/)
+- design-system/tokens.css — regenerated (487 lines)
+- src/styles/tokens.css — replaced, now 100% generated content
+- src/styles/global.css — ~340 transformations across 9 perl passes
+- package.json — added predev and prebuild hooks

@@ -269,6 +269,8 @@
   --fill-brand-hover: var(--color-primary-50);
   --fill-brand-active: var(--color-primary-70);
   --fill-brand-subtle: var(--color-primary-10);
+  /* Muted accent fill — semi-transparent brand. Maps to legacy --accent-muted */
+  --fill-brand-muted: rgba(61,61,181,0.12);
   --fill-neutral-default: var(--color-neutral-20);
   --fill-neutral-subtle: var(--color-neutral-10);
   --fill-neutral-muted: var(--color-neutral-50);
@@ -287,17 +289,19 @@
   --text-on-brand: var(--color-neutral-10);
   /* Text on dark surfaces. Maps to --fg-inverse */
   --text-inverse: var(--color-neutral-30);
-  /* Lower-emphasis text on dark — paired with opacity.65 in components */
-  --text-inverse-muted: var(--color-neutral-30);
+  /* Lower-emphasis text on dark surfaces. Maps to legacy --fg2-inverse */
+  --text-inverse-muted: rgba(240,237,232,0.65);
 
   /* ─── border ─── */
-  --border-subtle: var(--color-neutral-50);
-  /* Default visible border */
+  /* Hairline border on light surfaces. Maps to legacy --border */
+  --border-subtle: rgba(28,26,23,0.08);
+  /* Default visible border on light surfaces */
   --border-default: var(--color-neutral-60);
-  --border-strong: var(--color-neutral-80);
+  /* Emphasized border on light surfaces. Maps to legacy --border-strong */
+  --border-strong: rgba(28,26,23,0.16);
   --border-focus: var(--color-primary-60);
-  /* Border on dark surfaces */
-  --border-inverse: var(--color-neutral-30);
+  /* Hairline border on dark surfaces. Maps to legacy --border-inverse */
+  --border-inverse: rgba(240,237,232,0.10);
 
   /* ─── icon ─── */
   --icon-primary: var(--color-neutral-100);
