@@ -32,6 +32,12 @@ jobs:
         run: npm ci
 
       - name: Build Astro site
+        env:
+          # Umami analytics — public values, ship to the browser anyway,
+          # so there's no secret to hide here. Astro reads PUBLIC_* env
+          # vars at build time and inlines into the rendered HTML.
+          PUBLIC_UMAMI_SCRIPT_URL: https://umami-lemon-five.vercel.app/script.js
+          PUBLIC_UMAMI_WEBSITE_ID: c3f64c99-b061-4c87-a56e-dc6d519dcf5a
         run: npm run build
 
       - name: Install cloudflared
