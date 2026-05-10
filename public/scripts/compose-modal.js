@@ -461,6 +461,18 @@
       var data = collectFormData();
       sendBtn.disabled = true;
 
+      /* intentIdx: 0 = chat, 1 = project, 2 = book a call */
+      var intentLabel = ['chat', 'project', 'book-call'][intentIdx] || 'chat';
+
+      var trackSubmit = function (transport) {
+        if (window.umami && typeof window.umami.track === 'function') {
+          window.umami.track('compose-modal-submit', {
+            intent:    intentLabel,
+            transport: transport
+          });
+        }
+      };
+
       var mailtoFallback = function () {
         var url = 'mailto:' + CONTACT_EMAIL +
           '?subject=' + encodeURIComponent(data.subject) +
@@ -468,6 +480,7 @@
         btnLabel.textContent = 'Opening mail…';
         window.location.href = url;
         recordSubmit();
+        trackSubmit('mailto');
         setTimeout(function () {
           btnLabel.textContent = 'Sent ✓';
           setTimeout(function () { closeModal(); }, 1400);
@@ -496,6 +509,7 @@
       }).then(function (json) {
         if (!json.success) throw new Error(json.message || 'server');
         recordSubmit();
+        trackSubmit('web3forms');
         btnLabel.textContent = 'Sent ✓';
         setTimeout(function () { closeModal(); }, 1800);
       }).catch(function () {

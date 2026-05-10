@@ -71,7 +71,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 
       <div class="next-case-wrap">
         <span class="eyebrow">Next case study</span>
-        <a class="next-case reveal" href={`/case-studies/${next.slug}`}>
+        <a class="next-case reveal" href={`/case-studies/${next.slug}`} data-umami-event="next-case" data-umami-event-slug={next.slug}>
           <img src={next.img} alt={next.title} width={next.imgW} height={next.imgH} loading="lazy">
           <div class="next-case-body">
             <div class="next-case-cat">{next.cat}</div>

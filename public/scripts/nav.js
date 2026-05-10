@@ -102,6 +102,12 @@ window.addEventListener('resize', movePillIndicator);
     if (next === 'dark') root.setAttribute('data-theme', 'dark');
     else root.removeAttribute('data-theme');
     try { localStorage.setItem('theme', next); } catch (_) {}
+    /* Override the data-umami-event auto-fire with a richer call that
+       carries the resulting theme as a property — gives the dashboard
+       a "switched-to-dark vs switched-to-light" breakdown. */
+    if (window.umami && typeof window.umami.track === 'function') {
+      window.umami.track('theme-toggle', { theme: next });
+    }
   });
 })();
 
