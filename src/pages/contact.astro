@@ -18,11 +18,11 @@ import Base from '../layouts/Base.astro';
       <p class="contact-body">Product partnerships, design system work, or 0→1 builds in the AI era.<br>Those are where I do my best work. If that sounds like your project, get in touch.</p>
 
       <div class="contact-ctas">
-        <button class="btn btn-accent" id="compose-open" type="button" onclick="openComposeModal(0)">
+        <button class="btn btn-accent" id="compose-open" type="button" data-umami-event="contact-get-in-touch" onclick="openComposeModal(0)">
           <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm-46 0v-480 480Z"/></svg></span>
           <span>Get in touch</span>
         </button>
-        <a class="btn btn-ghost" href="https://www.cal.eu/joao-jacinto" target="_blank" rel="noopener noreferrer">
+        <a class="btn btn-ghost" data-umami-event="contact-book-call" href="https://www.cal.eu/joao-jacinto" target="_blank" rel="noopener noreferrer">
           <span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h480q33 0 56.5 23.5T720-720v180l160-160v440L720-420v180q0 33-23.5 56.5T640-160H160Zm0-80h480v-480H160v480Zm0 0v-480 480Z"/></svg></span>
           <span>Book a call</span>
         </a>
