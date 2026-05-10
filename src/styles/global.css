@@ -568,12 +568,57 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   flex-direction: column;
   justify-content: center;
 }
-.hero .hero-inner { width: 100%; }
+.hero .hero-inner {
+  width: 100%;
+  /* Sit above .hero-bg (z 0) and .hero-particles (z 1) so headline
+     and CTAs read crisply over both the fractal and the dot field. */
+  position: relative;
+  z-index: var(--z-elevated);
+}
 .hero-bg {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   z-index: 0;
   pointer-events: none;
+  display: block;
+}
+/* Particle overlay paired with .hero-bg — rendered by the same
+   compose-modal init (queried by the .hero-particles class), but
+   with bgImage skipped so the underlying WebGL fractal shows
+   through. Clipped by .hero { overflow: hidden } so it never
+   bleeds into the brands strip below.
+   - The CSS background reproduces the same top-fading gradient that
+     page-particles paints on its canvas (lighter --surface-default
+     at top → fully transparent by 50%), so the home hero gets the
+     same "lifted" wash visitors see on about / work above the fold.
+     The transparent particle canvas sits on top of this background,
+     and the mask-image fades both gradient and particles out at
+     50% — same fade curve as .page-particles, so the page→hero
+     transition matches across routes. */
+.hero-particles {
+  position: absolute; inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--surface-default) 0%,
+    transparent 50%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    var(--component-marquee-fade-edge) 0%,
+    var(--component-marquee-fade-edge) 30%,
+    transparent 50%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    var(--component-marquee-fade-edge) 0%,
+    var(--component-marquee-fade-edge) 30%,
+    transparent 50%
+  );
+}
+.hero-particles canvas {
+  width: 100%; height: 100%;
   display: block;
 }
 .hero-marquee {
@@ -1414,6 +1459,10 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .page-particles {
   position: absolute;
   top: 0; left: 0; right: 0;
+  /* vh fallback first for older mobile browsers where svh resolves
+     to 0 / unrecognised — the canvas would silently render at zero
+     height and the particles wouldn't show. */
+  height: 100vh;
   height: 100svh;
   pointer-events: none;
   z-index: -1;
@@ -1578,7 +1627,14 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 }
 .contact-info { border-top: var(--dimension-border-width-1) solid var(--border-subtle); padding-top: var(--dimension-space-32); display: flex; flex-direction: column; gap: var(--dimension-space-8); text-align: left; }
 .contact-card { display: flex; align-items: center; gap: var(--dimension-space-12); padding: var(--dimension-space-12) var(--dimension-space-16); border-radius: var(--dimension-radius-md); border: var(--dimension-border-width-1) solid var(--border-subtle); background: var(--surface-default); transition: background var(--motion-duration-short), border-color var(--motion-duration-short); }
-.contact-card:hover { background: var(--surface-raised); border-color: var(--border-strong); }
+.contact-card:hover {
+  /* Subtle hover lift — derives from --text-primary so it tracks
+     the active theme. 4% mix on the surface gives a near-imperceptible
+     wash in dark mode (was using --surface-raised, which jumped two
+     neutral stops and read as harsh). */
+  background: color-mix(in srgb, var(--text-primary) 4%, var(--surface-default));
+  border-color: color-mix(in srgb, var(--text-primary) 14%, var(--border-subtle));
+}
 .contact-card-icon { width: 40px; height: 40px; flex-shrink: 0; background: var(--fill-brand-muted); border-radius: var(--dimension-radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-brand); }
 .contact-card-icon svg { width: 18px; height: 18px; }
 .contact-card-body { flex: 1; min-width: 0; }

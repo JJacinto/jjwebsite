@@ -94,21 +94,24 @@ window.addEventListener('resize', movePillIndicator);
    bootstrap on the next page load applies it before paint. System
    prefers-color-scheme is intentionally not followed. */
 (function () {
-  const btn = document.getElementById('themeToggle');
-  if (!btn) return;
   const root = document.documentElement;
-  btn.addEventListener('click', () => {
+  function flip(source) {
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     if (next === 'dark') root.setAttribute('data-theme', 'dark');
     else root.removeAttribute('data-theme');
     try { localStorage.setItem('theme', next); } catch (_) {}
     /* Override the data-umami-event auto-fire with a richer call that
        carries the resulting theme as a property — gives the dashboard
-       a "switched-to-dark vs switched-to-light" breakdown. */
+       a "switched-to-dark vs switched-to-light" breakdown, plus a
+       source dimension so we can see desktop nav vs mobile menu use. */
     if (window.umami && typeof window.umami.track === 'function') {
-      window.umami.track('theme-toggle', { theme: next });
+      window.umami.track('theme-toggle', { theme: next, source: source });
     }
-  });
+  }
+  const navBtn = document.getElementById('themeToggle');
+  if (navBtn) navBtn.addEventListener('click', () => flip('nav'));
+  const mobileBtn = document.getElementById('mobileThemeToggle');
+  if (mobileBtn) mobileBtn.addEventListener('click', () => flip('mobile-menu'));
 })();
 
 /* Mobile menu */

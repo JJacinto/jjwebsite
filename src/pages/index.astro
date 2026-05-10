@@ -1,11 +1,20 @@
 ---
 import Base from '../layouts/Base.astro';
 ---
-<Base activePage="home" showCta={true}>
+<Base activePage="home" showCta={true} disablePageParticles={true}>
 
   <!-- HERO -->
   <section class="hero">
     <canvas class="hero-bg" id="heroBg" aria-hidden="true"></canvas>
+    <!-- Particle overlay — sits between the WebGL fractal and the hero
+         text so the same drifting dot field that greets visitors on
+         work / about / case pages is also present on the home hero,
+         floating above the wisp gradient. The compose-modal init
+         picks this up via the .hero-particles class and skips its
+         background paint so the fractal underneath shows through. -->
+    <div class="hero-particles" aria-hidden="true">
+      <canvas class="cta-footer-bg"></canvas>
+    </div>
     <div class="container hero-inner">
       <h1 class="hero-greeting reveal">Hey, I'm João.</h1>
       <p class="hero-role reveal reveal-d1" aria-label="A product designer who builds">

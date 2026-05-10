@@ -628,7 +628,7 @@
 
 /* Animated dot field for global-CTA cards. */
 (function () {
-  var wraps = document.querySelectorAll('.cta-footer-wrap, .page-particles');
+  var wraps = document.querySelectorAll('.cta-footer-wrap, .page-particles, .hero-particles');
   if (!wraps.length) return;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   wraps.forEach(initCta);
@@ -668,6 +668,12 @@
        to page bg) over the top half of the viewport, then mask-image
        fades everything out at the 50% mark. */
     var isPageParticles = wrap.classList.contains('page-particles');
+    /* hero-particles is the home-page variant: same drifting dot
+       field as page-particles, but paired with the WebGL fractal
+       behind it. We skip the gradient bgImage entirely so the
+       fractal underneath remains visible and only the particles
+       are layered on top. */
+    var isHeroParticles = wrap.classList.contains('hero-particles');
 
     var readPalette = function () {
       var rs = getComputedStyle(document.documentElement);
@@ -914,7 +920,11 @@
       H = Math.max(1, Math.floor(h * dpr));
       canvas.width = W; canvas.height = H;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      bgImage = buildBackground(w, h, dpr);
+      /* Hero-particles intentionally skips buildBackground — the
+         WebGL fractal beneath is already painting the gradient.
+         Leaving bgImage null makes frame() clearRect each tick so
+         the canvas stays transparent and the fractal shows through. */
+      bgImage = isHeroParticles ? null : buildBackground(w, h, dpr);
       generate();
     }
 
@@ -927,19 +937,47 @@
       }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
-    wrap.addEventListener('mouseenter', function () { mouseInside = true; });
-    wrap.addEventListener('mouseleave', function () {
-      mouseInside = false;
-      mouseX = mouseY = -999;
-      velX = velY = 0;
-    });
-    wrap.addEventListener('mousemove', function (e) {
-      var r = wrap.getBoundingClientRect();
-      var nx = e.clientX - r.left, ny = e.clientY - r.top;
-      velX = nx - prevMX; velY = ny - prevMY;
-      prevMX = nx; prevMY = ny;
-      mouseX = nx; mouseY = ny;
-    });
+    /* page-particles + hero-particles wraps carry pointer-events:none
+       so they don't block clicks on the content layered above. That
+       also kills mousemove on the wrap itself, so the particles
+       wouldn't react to the cursor (which is the same reach-to-mouse
+       behaviour the footer/contact fields have). For those wraps,
+       hook the listener on the window instead and translate the
+       coordinates into wrap-local space, gating "inside" by the
+       wrap's bounding rect. */
+    var passThrough = isPageParticles || isHeroParticles;
+    if (passThrough) {
+      window.addEventListener('mousemove', function (e) {
+        var r = wrap.getBoundingClientRect();
+        var nx = e.clientX - r.left, ny = e.clientY - r.top;
+        var inside = nx >= 0 && ny >= 0 && nx <= r.width && ny <= r.height;
+        if (inside) {
+          if (!mouseInside) { prevMX = nx; prevMY = ny; }
+          mouseInside = true;
+          velX = nx - prevMX; velY = ny - prevMY;
+          prevMX = nx; prevMY = ny;
+          mouseX = nx; mouseY = ny;
+        } else if (mouseInside) {
+          mouseInside = false;
+          mouseX = mouseY = -999;
+          velX = velY = 0;
+        }
+      }, { passive: true });
+    } else {
+      wrap.addEventListener('mouseenter', function () { mouseInside = true; });
+      wrap.addEventListener('mouseleave', function () {
+        mouseInside = false;
+        mouseX = mouseY = -999;
+        velX = velY = 0;
+      });
+      wrap.addEventListener('mousemove', function (e) {
+        var r = wrap.getBoundingClientRect();
+        var nx = e.clientX - r.left, ny = e.clientY - r.top;
+        velX = nx - prevMX; velY = ny - prevMY;
+        prevMX = nx; prevMY = ny;
+        mouseX = nx; mouseY = ny;
+      });
+    }
 
     var btnHover = false;
     var activeShape = 'chat';
