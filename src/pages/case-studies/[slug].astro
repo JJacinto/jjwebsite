@@ -20,7 +20,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 
   <div class="case-wrap" id="case-content">
     <div class="container">
-      <a class="back-link" href="/case-studies">← Back to case studies</a>
+      <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
 
       <div class="case-header">
         <div class="case-cat">{c.cat}</div>
@@ -86,7 +86,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
   <div id="pw-overlay" style="display:none">
     <div class="case-wrap">
       <div class="container">
-        <a class="back-link" href="/case-studies">← Back to case studies</a>
+        <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
         <div class="pw-gate reveal visible">
           <div class="pw-gate-lock">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -134,7 +134,11 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
   e.preventDefault();
   const input = document.getElementById('pwInput');
   const error = document.getElementById('pwError');
-  if (input.value.trim().toLowerCase() === CASE_PASSWORD) {
+  const ok = input.value.trim().toLowerCase() === CASE_PASSWORD;
+  if (window.umami && typeof window.umami.track === 'function') {
+    window.umami.track(ok ? 'case-unlock-success' : 'case-unlock-fail');
+  }
+  if (ok) {
     sessionStorage.setItem('jj-case-unlocked', '1');
     document.getElementById('pw-overlay').style.display = 'none';
     document.getElementById('case-content').style.display = '';

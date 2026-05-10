@@ -113,7 +113,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
 </head>
 <body>
 
-<a href="#main-content" class="skip-link">Skip to content</a>
+<a href="#main-content" class="skip-link" data-umami-event="skip-link">Skip to content</a>
 
 <nav class:list={['nav', { 'nav-dark': navDark }]} id="nav">
   <div class="container">
@@ -151,7 +151,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <a href="/case-studies" data-page="cases" class:list={[{ active: activePage === 'cases' }]} onclick="toggleMobile()">Work</a>
   <a href="/contact" data-page="contact" class:list={[{ active: activePage === 'contact' }]} onclick="toggleMobile()">Contact</a>
   <div class="mobile-menu-secondary">
-    <button class="mobile-menu-btn" type="button" onclick="toggleMobile(); openComposeModal(1);">
+    <button class="mobile-menu-btn" type="button" data-umami-event="mobile-menu-start-project" onclick="toggleMobile(); openComposeModal(1);">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18v12H3z"/><path d="M3 6l9 7 9-7"/></svg>
       <span>Start project</span>
     </button>
@@ -205,7 +205,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
             <span class="footer-status-dot" id="footer-status-dot"></span>
             <span class="footer-status-label" id="footer-status-label"></span>
           </div>
-          <p>© 2026 João Jacinto • <button class="footer-email-link" id="footer-email-btn" aria-label="Copy email contact@joaojacinto.com to clipboard">contact@joaojacinto.com</button></p>
+          <p>© 2026 João Jacinto • <button class="footer-email-link" id="footer-email-btn" data-umami-event="footer-email-copy" aria-label="Copy email contact@joaojacinto.com to clipboard">contact@joaojacinto.com</button></p>
         </div>
       </footer>
     )}

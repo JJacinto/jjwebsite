@@ -374,27 +374,37 @@
     bindProjectSlider(projEl);
     bindBookCal();
 
-    selectIntent = function (idx) {
+    selectIntent = function (idx, fromUserInteraction) {
+      var prev = intentIdx;
       intentIdx = idx;
       btns.forEach(function (b, i) {
         b.setAttribute('aria-checked', String(i === idx));
         b.setAttribute('tabindex', i === idx ? '0' : '-1');
       });
       showFields(idx);
+      /* Track in-modal intent switches (user clicked a different tab
+         after opening). Only fire when the user actually changed
+         the value AND the change came from interaction (not from
+         openModal's auto-select). Lets the dashboard see "people
+         opened to project but switched to chat" patterns. */
+      if (fromUserInteraction && prev !== idx && window.umami && typeof window.umami.track === 'function') {
+        var label = ['chat', 'project', 'book-call'][idx] || 'chat';
+        window.umami.track('compose-modal-intent-switch', { intent: label });
+      }
     };
 
     bd.addEventListener('click', function (e) { if (e.target === bd) closeModal(); });
 
     btns.forEach(function (btn, i) {
-      btn.addEventListener('click', function () { selectIntent(i); });
+      btn.addEventListener('click', function () { selectIntent(i, true); });
       btn.addEventListener('keydown', function (e) {
         var len = btns.length;
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
-          var next = (i + 1) % len; selectIntent(next); btns[next].focus();
+          var next = (i + 1) % len; selectIntent(next, true); btns[next].focus();
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
           e.preventDefault();
-          var prev = (i - 1 + len) % len; selectIntent(prev); btns[prev].focus();
+          var prev = (i - 1 + len) % len; selectIntent(prev, true); btns[prev].focus();
         }
       });
     });
@@ -554,6 +564,14 @@
     if (typeof targetIdx === 'number' && selectIntent) selectIntent(targetIdx);
     var checked = bd.querySelector('.intent-btn[aria-checked="true"]');
     if (checked) checked.focus();
+    /* Track modal-open with the resulting intent so the dashboard can
+       break down opens by which CTA pre-selected the tab (Start
+       project pre-picks "project", Get in touch pre-picks "chat",
+       etc.). Fires every time the modal opens. */
+    if (window.umami && typeof window.umami.track === 'function') {
+      var openIntent = ['chat', 'project', 'book-call'][typeof targetIdx === 'number' ? targetIdx : intentIdx] || 'chat';
+      window.umami.track('compose-modal-open', { intent: openIntent });
+    }
   };
 
   window.openComposeModal = openModal;
