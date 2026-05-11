@@ -2199,6 +2199,14 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   .pill-nav { display: none; }
   .nav-toggle { display: inline-flex; }
   .nav-right .nav-cta { display: none; }
+  /* Move the theme toggle into the mobile menu (.mobile-menu has its
+     own #mobileThemeToggle button) so the header collapses to just
+     logo + hamburger and the toggle isn't sitting awkwardly next to
+     the menu icon. */
+  .nav-right .theme-toggle { display: none; }
+  /* Center mobile-menu-btn content now that the icon is gone from
+     the Start project button. */
+  .mobile-menu-btn { justify-content: center; }
   .stats-grid { grid-template-columns: 1fr; gap: var(--dimension-space-32); }
   .testimonials-masonry { grid-template-columns: 1fr; }
   .may-like-grid, .cases-grid, .cases-grid-row-2 { grid-template-columns: 1fr; }
