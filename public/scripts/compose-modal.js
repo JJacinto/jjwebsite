@@ -48,7 +48,7 @@
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
-        '<span class="eyebrow">Budget range</span>' +
+        '<span class="eyebrow" id="proj-budget-label">Budget</span>' +
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$3k-$5k" required><span>$3k–$5k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$10k" required><span>$5k–$10k</span></label>' +
@@ -203,6 +203,21 @@
         slider.setAttribute('aria-valuetext', label);
       });
     }
+  };
+
+  /* Budget label tracks the engagement type — one-time work is a flat
+     "Budget", a recurring engagement reads as "Monthly budget" so the
+     same $3k/$5k/$10k brackets parse as a monthly rate. */
+  var bindBudgetLabel = function (container) {
+    var label = container.querySelector('#proj-budget-label');
+    var radios = container.querySelectorAll('input[name="proj-engagement"]');
+    if (!label || !radios.length) return;
+    var update = function () {
+      var checked = container.querySelector('input[name="proj-engagement"]:checked');
+      label.textContent = (checked && checked.value === 'Recurring project') ? 'Monthly budget' : 'Budget';
+    };
+    radios.forEach(function (r) { r.addEventListener('change', update); });
+    update();
   };
 
   var showFields = function (idx) {
@@ -372,6 +387,7 @@
     var projEl    = document.getElementById('compose-fields-project');
     bindFormToggle(projEl);
     bindProjectSlider(projEl);
+    bindBudgetLabel(projEl);
     bindBookCal();
 
     selectIntent = function (idx, fromUserInteraction) {
@@ -631,6 +647,54 @@
   var wraps = document.querySelectorAll('.cta-footer-wrap, .page-particles, .hero-particles');
   if (!wraps.length) return;
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ─── Parallax shared state ──────────────────────────────────────────
+     One window-level scroll listener and one window-level mousemove
+     listener feed every active wrap. The eased cursor value is computed
+     per-wrap inside its own frame loop (cheap math, no race condition
+     of practical consequence — all wraps converge to the same target).
+     - Scroll listener: passive, just stashes window.scrollY.
+     - Mousemove listener: only attached on devices with hover capability
+       AND when reduced-motion is off. clientX/Y is normalised to [-1, 1]
+       from viewport center so the cursor parallax magnitudes feel
+       symmetric regardless of viewport width.
+     - Mobile (max-width 720px) halves the scroll factors so the effect
+       reads as depth rather than excessive drift on small screens.
+     - Per-layer factors:
+         depth 1 (far):  scroll 0.10 · cursor 3px
+         depth 2 (mid):  scroll 0.25 · cursor 8px
+         depth 3 (near): scroll 0.50 · cursor 20px
+       Stars on the "near" layer move ~5× as much as "far" stars,
+       which is what reads as depth when scrolling through the hero. */
+  var pxState = {
+    scrollY:    window.scrollY || window.pageYOffset || 0,
+    cursorTX:   0,
+    cursorTY:   0,
+    isMobile:   window.matchMedia('(max-width: 720px)').matches,
+    canHover:   !window.matchMedia('(hover: none)').matches,
+    scrollMul: [0.10, 0.25, 0.50],
+    cursorMul: [3, 8, 20]
+  };
+  if (!reduced) {
+    window.addEventListener('scroll', function () {
+      pxState.scrollY = window.scrollY || window.pageYOffset || 0;
+    }, { passive: true });
+    if (pxState.canHover) {
+      window.addEventListener('mousemove', function (e) {
+        pxState.cursorTX = (e.clientX / window.innerWidth)  * 2 - 1;
+        pxState.cursorTY = (e.clientY / window.innerHeight) * 2 - 1;
+      }, { passive: true });
+    }
+  }
+  var pxResizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(pxResizeTimer);
+    pxResizeTimer = setTimeout(function () {
+      pxState.isMobile = window.matchMedia('(max-width: 720px)').matches;
+      pxState.canHover = !window.matchMedia('(hover: none)').matches;
+    }, 120);
+  }, { passive: true });
+
   wraps.forEach(initCta);
 
   function initCta(wrap) {
@@ -647,6 +711,18 @@
     var mouseInside = false;
     var raf = 0, inView = true, tabVisible = true;
     var bgImage = null;
+    /* Per-wrap parallax state. wrapAbsTop is the wrap's document-
+       absolute top, cached so frame() can compute the wrap-relative
+       scroll progress without calling getBoundingClientRect every
+       tick. cursorEX/EY are the locally-eased cursor coords — each
+       wrap eases independently toward the shared target, so multiple
+       wraps remain in sync without any global rAF coordinator. */
+    var wrapAbsTop = 0;
+    var cursorEX = 0, cursorEY = 0;
+    function recalcWrapTop() {
+      var r = wrap.getBoundingClientRect();
+      wrapAbsTop = r.top + (window.scrollY || window.pageYOffset || 0);
+    }
 
     function probeRGB(str) {
       var p = document.createElement('div');
@@ -891,6 +967,20 @@
         }
         var cp = chatPts.length  ? chatPts[Math.floor(Math.random()  * chatPts.length)]  : null;
         var vp = videoPts.length ? videoPts[Math.floor(Math.random() * videoPts.length)] : null;
+        /* Depth tier (1 = far, 2 = mid, 3 = near). Weighted random:
+           50% / 30% / 20% so far stars dominate the field and near
+           stars are sparse — reads as natural depth.
+           - depthScale modulates particle radius:
+               far  0.6×  · mid 1.0× · near 1.4×
+           - depthAlpha modulates the final alpha (atmospheric perspective
+             — distant stars dim, close stars bright):
+               far 0.55  · mid 0.85 · near 1.0
+           Looked up by depth index in frame() to compute the parallax
+           offset against pxState.scrollMul / cursorMul. */
+        var rnd = Math.random();
+        var depth = rnd < 0.5 ? 1 : (rnd < 0.8 ? 2 : 3);
+        var depthScale = depth === 1 ? 0.6 : depth === 2 ? 1.0 : 1.4;
+        var depthAlpha = depth === 1 ? 0.55 : depth === 2 ? 0.85 : 1.0;
         pts.push({
           x: x, y: y, ox: x, oy: y, vx: 0, vy: 0,
           tw: Math.random() * Math.PI * 2,
@@ -902,7 +992,8 @@
           dAmp: 10 + Math.random() * 22,
           chatX:  cp ? wcx + cp[0] : null, chatY:  cp ? wcy + cp[1] : null,
           videoX: vp ? wcx + vp[0] : null, videoY: vp ? wcy + vp[1] : null,
-          r:  0.7 + Math.random() * 1.2
+          r:  0.7 + Math.random() * 1.2,
+          depth: depth, depthScale: depthScale, depthAlpha: depthAlpha
         });
       }
     }
@@ -914,6 +1005,9 @@
       DARK = palette.dark;
       BG_FALLBACK = palette.bg;
       PARTICLE_BASE = palette.particle;
+      /* Document-absolute wrap top changes when the document above
+         the wrap reflows — recompute alongside the canvas resize. */
+      recalcWrapTop();
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       var w = wrap.clientWidth, h = wrap.clientHeight;
       W = Math.max(1, Math.floor(w * dpr));
@@ -1023,6 +1117,47 @@
 
       if (btnHover && hoverProg > 0.01) btnZone = measureButton(activeShape);
 
+      /* Parallax setup — computed once per frame, applied per particle
+         in the draw loop by indexing depthDX/depthDY by p.depth.
+         - wrapScroll: how far the wrap has scrolled past its origin
+           (positive while the user scrolls down past the wrap top).
+           Using wrap-relative scroll instead of raw window.scrollY keeps
+           the parallax neutral when the wrap first enters the viewport,
+           which is what reads as "the stars are at rest, then drift as
+           the user scrolls past."
+         - cursorEX/EY: lerped toward the shared cursor target each
+           frame. 0.10 ease factor matches the brief's 0.08-0.12 range.
+           Skipped on touch (canHover false) — cursorEX/EY stay at 0,
+           so no cursor offset is applied.
+         - scrollMul is halved on mobile so the effect reads as
+           atmospheric rather than excessive on small viewports. */
+      var wrapScroll = pxState.scrollY - wrapAbsTop;
+      if (pxState.canHover) {
+        cursorEX += (pxState.cursorTX - cursorEX) * 0.10;
+        cursorEY += (pxState.cursorTY - cursorEY) * 0.10;
+      }
+      var mobileScrollDamp = pxState.isMobile ? 0.5 : 1;
+      var sm0 = pxState.scrollMul[0] * mobileScrollDamp;
+      var sm1 = pxState.scrollMul[1] * mobileScrollDamp;
+      var sm2 = pxState.scrollMul[2] * mobileScrollDamp;
+      var cm0 = pxState.cursorMul[0];
+      var cm1 = pxState.cursorMul[1];
+      var cm2 = pxState.cursorMul[2];
+      /* Negative scroll term → particles translate UP as page scrolls
+         down. Negative cursor term → layers "look at" the cursor (they
+         translate opposite to cursor movement, like depth parallax in
+         a 3D scene). */
+      var depthDX = [
+        -cursorEX * cm0,
+        -cursorEX * cm1,
+        -cursorEX * cm2
+      ];
+      var depthDY = [
+        -wrapScroll * sm0 - cursorEY * cm0,
+        -wrapScroll * sm1 - cursorEY * cm1,
+        -wrapScroll * sm2 - cursorEY * cm2
+      ];
+
       for (var i = 0; i < pts.length; i++) {
         var p = pts[i];
 
@@ -1095,7 +1230,10 @@
           p.vx = p.vy = 0;
         }
         p.tw += p.ts;
-        var a = 0.18 + 0.16 * (Math.sin(p.tw) * 0.5 + 0.5) + pull * 0.30;
+        /* depthAlpha gives the atmospheric-perspective falloff — far
+           stars dim, near stars bright — while leaving the existing
+           twinkle + button-pull alpha math intact. */
+        var a = (0.18 + 0.16 * (Math.sin(p.tw) * 0.5 + 0.5) + pull * 0.30) * p.depthAlpha;
         if (a > 1) a = 1;
         var tcr, tcg, tcb;
         if (activeShape === 'video') { tcr = 200; tcg = 195; tcb = 188; }
@@ -1109,14 +1247,24 @@
         var cr = Math.round(PARTICLE_BASE[0] + (tcr - PARTICLE_BASE[0]) * pull);
         var cg = Math.round(PARTICLE_BASE[1] + (tcg - PARTICLE_BASE[1]) * pull);
         var cb = Math.round(PARTICLE_BASE[2] + (tcb - PARTICLE_BASE[2]) * pull);
-        var rr = p.r * (1 + pull * 0.4);
+        /* depthScale multiplies the radius — far stars smaller, near
+           stars larger. Layered on top of the existing button-pull
+           radius bump so cursor-near particles still grow. */
+        var rr = p.r * p.depthScale * (1 + pull * 0.4);
         ctx.fillStyle = 'rgba(' + cr + ',' + cg + ',' + cb + ',' + a + ')';
+        /* Per-depth parallax offset added at DRAW time (not stored on
+           the particle) so the physics (drift, button-pull, velocity)
+           still works against the un-offset origin. The visual layers
+           just slide; the simulation stays in place. */
+        var di = p.depth - 1;
+        var px = p.x + depthDX[di];
+        var py = p.y + depthDY[di];
         if (pull > 0.02 && btnZone) {
           var pdx = btnZone.cx - p.x, pdy = btnZone.cy - p.y;
           var ang = Math.atan2(pdy, pdx);
           var stretch = 1 + pull * 1.3;
           ctx.save();
-          ctx.translate(p.x, p.y);
+          ctx.translate(px, py);
           ctx.rotate(ang);
           ctx.beginPath();
           ctx.ellipse(0, 0, rr * stretch, rr, 0, 0, Math.PI * 2);
@@ -1124,7 +1272,7 @@
           ctx.restore();
         } else {
           ctx.beginPath();
-          ctx.arc(p.x, p.y, rr, 0, Math.PI * 2);
+          ctx.arc(px, py, rr, 0, Math.PI * 2);
           ctx.fill();
         }
       }
