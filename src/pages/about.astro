@@ -13,9 +13,9 @@ const phases = [
     descriptor: "Understanding the problem before solving it.",
     tools: [
       /* PLACEHOLDER reasons for Figjam + Maze — review wording before publishing. */
-      { name: "Figjam",    why: "Mapping problems collaboratively before pixels" },
-      { name: "Maze",      why: "Quick usability tests when interviews aren't enough" },
-      { name: "Dovetail",  why: "finding patterns" },
+      { name: "Figjam",    why: "Where I drag stakeholders before anyone opens Figma" },
+      { name: "Maze",      why: "When I need signal in a day, not a research sprint" },
+      { name: "Dovetail",  why: "The only way I've found to keep research from rotting in Notion" },
     ],
   },
   {
@@ -23,9 +23,9 @@ const phases = [
     title: "Develop & Deliver",
     descriptor: "Turning the problem into something shippable.",
     tools: [
-      { name: "Figma",      why: "Design systems and high fidelity design" },
-      { name: "Jitter",     why: "Exploring motion..." },
-      { name: "Retune.dev", why: "Visual layer for vibe coding" },
+      { name: "Figma",      why: "Components, specs, and the thing devs actually open" },
+      { name: "Jitter",     why: "Stills lie about how an interaction feels" },
+      { name: "Retune.dev", why: "My visual layer when I'm coding the portfolio you're reading" },
     ],
   },
   {
@@ -34,7 +34,7 @@ const phases = [
     descriptor: "Measuring what shipped, deciding what's next.",
     /* PLACEHOLDER reasons for Fullstory / Mixpanel / Looker — review before publishing. */
     tools: [
-      { name: "Fullstory", why: "Watching what users actually do post-launch" },
+      { name: "Fullstory", why: "Session replays catch the bugs analytics won't" },
       { name: "Mixpanel",  why: "Funnel and event tracking to measure what shipped" },
       { name: "Looker",    why: "Dashboards for the metrics that matter after launch" },
     ],
@@ -58,7 +58,7 @@ const alwaysOn = [
     title: "Daily drivers",
     /* PLACEHOLDER reason for Obsidian — review before publishing. */
     tools: [
-      { name: "Raycast",   why: "Managing windows and launching apps" },
+      { name: "Raycast",   why: "Windows, launching, snippets" },
       { name: "Wisprflow", why: "Faster than typing for 1st drafts" },
       { name: "Claude",    why: "Pair-thinking, writing, reviews" },
       { name: "Gemini",    why: "Second opinion after Claude's" },
@@ -69,10 +69,10 @@ const alwaysOn = [
     title: "Hardware that earned its spot",
     /* PLACEHOLDER reasons — review and tune the one-liners before publishing. */
     tools: [
-      { name: "Steelcase Leap v2",   why: "Where I sit in 8+ hours a day" },
-      { name: "Odyssey G9",          why: "To see all windows at a glance" },
+      { name: "Steelcase Leap v2",   why: "Where I sit 8+ hours a day" },
+      { name: "Odyssey G9",          why: "One screen, every window" },
       { name: "Logitech MX Keys",    why: "Low-profile, quiet, multi-device" },
-      { name: "Heddphone D1",        why: "Monitoring, calls, and music" },
+      { name: "HEDDphone D1",        why: "Monitoring, calls, and music" },
     ],
   },
 ];
@@ -303,7 +303,7 @@ const alwaysOn = [
         </div>
 
         <div class="always-on">
-          <p class="always-on-intro"><em>Tools that don't belong to a single phase because they span all of them.</em></p>
+          <p class="always-on-intro"><em>Everything else</em></p>
           <div class="always-on-grid">
             {alwaysOn.map((group) => (
               <div class="always-on-group">
