@@ -1676,7 +1676,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   margin: 0 auto var(--dimension-space-32);
   z-index: var(--z-raised);
   cursor: pointer;
-  perspective: 600px;
+  /* Tighter perspective = stronger foreshortening = more dramatic
+     3D. 380px is roughly 4× the avatar's 96px width, which makes
+     the rotation read as a real flip in space rather than a flat
+     squish — close enough to feel volumetric without distorting
+     the photo at flat. */
+  perspective: 380px;
   /* Default state stays as a simple 2D composite — preserve-3d
      here was making the entire CTA section flash on scroll-into-
      view because the parent .about-cta's .reveal transition
@@ -1730,11 +1735,17 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(5) { animation-delay: 1.2s; }
 .about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(6) { animation-delay: 1.5s; }
 @keyframes avatar-page-flip {
-  0%   { opacity: 0; transform: rotateY(-90deg); }
-  4%   { opacity: 1; transform: rotateY(0deg); }
-  13%  { opacity: 1; transform: rotateY(0deg); }
-  17%  { opacity: 0; transform: rotateY(90deg); }
-  100% { opacity: 0; transform: rotateY(90deg); }
+  /* translateZ pushes the off-screen states ~40px back in 3D space
+     so each frame "flies in" from depth, lands flat at translateZ
+     0 (the camera plane), and recedes back as it flips out. The
+     forward motion through Z combined with the rotateY rotation
+     is what reads as a real coin flip with depth, not a 2D
+     opacity crossfade. */
+  0%   { opacity: 0; transform: rotateY(-90deg) translateZ(-40px); }
+  4%   { opacity: 1; transform: rotateY(0deg) translateZ(0); }
+  13%  { opacity: 1; transform: rotateY(0deg) translateZ(0); }
+  17%  { opacity: 0; transform: rotateY(90deg) translateZ(-40px); }
+  100% { opacity: 0; transform: rotateY(90deg) translateZ(-40px); }
 }
 @media (prefers-reduced-motion: reduce) {
   /* Static fallback — show only the original headshot, no cycling,

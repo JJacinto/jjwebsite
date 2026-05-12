@@ -1249,8 +1249,21 @@
          - Otherwise (default, hovering, or settled in .is-resting),
            start a new freeze on the currently-visible frame.
          Either branch fires the particle pulse + ensures the rAF
-         loop is alive so the pulse renders. */
-      avatarEl.addEventListener('click', function () {
+         loop is alive so the pulse renders.
+         pointerdown (not click) is used so the handler fires
+         reliably on iOS Safari: on a <div> with cursor:pointer,
+         the synthesized click event can be suppressed after the
+         first tap (which iOS interprets as "show hover state"),
+         leaving subsequent taps unresponsive. pointerdown fires
+         on every press regardless of hover-simulation state.
+         lastTap debounce guards against the rare desktop case
+         where pointerdown + the now-unused click event both
+         dispatch — same handler, fires twice, undesirable. */
+      var lastTap = 0;
+      avatarEl.addEventListener('pointerdown', function () {
+        var nowT = performance.now();
+        if (nowT - lastTap < 250) return;
+        lastTap = nowT;
         if (avatarEl.classList.contains('is-frozen')) {
           fullResetAvatar();
         } else {
