@@ -420,6 +420,12 @@ import Base from '../layouts/Base.astro';
     gl.uniform3fv(uBase,  b);
     gl.uniform3fv(uWispA, a);
     gl.uniform3fv(uWispB, c);
+    /* Force a synchronous draw with the fresh uniforms — without
+       this, theme toggles only repaint via the rAF loop, which is
+       paused when the hero is off-screen or when prefers-reduced-
+       motion is set. Hero would then keep its old-theme gradient
+       until the user scrolled back into the hero. */
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
   pushPalette();
   gl.uniform1f(uIntensity, intensity);

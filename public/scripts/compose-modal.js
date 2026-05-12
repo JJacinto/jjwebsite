@@ -1008,6 +1008,8 @@
       /* Document-absolute wrap top changes when the document above
          the wrap reflows — recompute alongside the canvas resize. */
       recalcWrapTop();
+      /* Avatar's wrap-local centre also shifts if the wrap reflows. */
+      if (avatarEl) avatarZone = measureAvatar();
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       var w = wrap.clientWidth, h = wrap.clientHeight;
       W = Math.max(1, Math.floor(w * dpr));
@@ -1023,11 +1025,19 @@
     }
 
     /* Theme switches mutate <html data-theme="...">. Repaint the
-       gradient + particles when that happens. */
+       gradient + particles when that happens. We call frame()
+       DIRECTLY (not just loop()) so the new bgImage paints
+       synchronously even when the wrap is off-screen (rAF paused
+       by IntersectionObserver) or prefers-reduced-motion is set
+       (rAF loop disabled). Without the direct call the canvas
+       would retain its old-theme gradient until the user scrolled
+       back into the section, producing the "footer stayed in the
+       opposite color" bug after toggling themes. */
     if (window.MutationObserver) {
       new MutationObserver(function () {
         resize();
-        loop();
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        frame();
       }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
     }
 
@@ -1077,7 +1087,14 @@
     var activeShape = 'chat';
     var hoverProg = 0;
     var primaryBtn   = card && card.querySelector('.btn-accent');
-    var secondaryBtn = card && card.querySelector('.btn-dark-outline');
+    /* Secondary CTA: the about-cta variant uses .btn-dark-outline,
+       the contact page's .contact-ctas uses .btn-ghost. Both are
+       the "Book a call" action — particles should be drawn toward
+       either one on hover. Scoping the .btn-ghost match to
+       .contact-ctas avoids accidentally targeting the contact-card
+       email/map/social .btn-ghost buttons that live inside the
+       same .contact-inner card. */
+    var secondaryBtn = card && card.querySelector('.btn-dark-outline, .contact-ctas .btn-ghost');
     var hoverStart = 0;
     if (primaryBtn) {
       primaryBtn.addEventListener('mouseenter', function () {
@@ -1094,6 +1111,154 @@
         loop();
       });
       secondaryBtn.addEventListener('mouseleave', function () { btnHover = false; hoverStart = 0; loop(); });
+    }
+
+    /* Avatar orbit — when the user hovers .about-cta-avatar-stack
+       the particles get pulled into rotating bands around the
+       avatar's centre. avatarHoverStart marks the moment of
+       hover-in; per-particle adoption probability grows with
+       elapsed hover time so the orbit fills out gradually rather
+       than snapping all particles into place at once. avatarZone
+       caches the avatar's wrap-local centre + radius, recomputed
+       on hover-in and on resize (mounted alongside the existing
+       ResizeObserver). */
+    var avatarEl = card && card.querySelector('.about-cta-avatar-stack');
+    var avatarHover = false;
+    var avatarHoverStart = 0;
+    var avatarZone = null;
+    /* Pulse state — set to a timestamp on avatar click/tap. While
+       (now - pulseStart) < pulseDuration, orbiting particles get a
+       temporary outward radius boost that traces a half-sine wave:
+       0 at start → peak (pulseAmplitude) at midpoint → 0 at end.
+       Underlying spiral-in continues uninterrupted, so once the
+       pulse decays the particles resume moving toward the avatar. */
+    var pulseStart = 0;
+    var pulseDuration = 1.6;
+    var pulseAmplitude = 70;
+    /* Freeze state — set by clicking the avatar. Lifecycle:
+       1. Click → .is-frozen on the stack + .is-current on the
+          visible frame. Tooltip + 4s progress ring fade in.
+       2. After 4s → settleToBase(): swap .is-current to the FIRST
+          frame, replace .is-frozen with .is-resting. The avatar
+          now holds the base headshot, no tooltip, no progress —
+          the freeze has resolved. Persists even if the cursor
+          left mid-timer.
+       3. Mouseleave AFTER the timer settled → fullReset(): clears
+          .is-resting + .is-current so the next hover starts a
+          fresh roulette.
+       Hover-out DURING the 4s timer is a no-op (the freeze keeps
+       running) per the explicit "should continue even if the
+       avatar is unhovered" requirement. */
+    var freezeTimer = null;
+    var avatarTooltipEl = avatarEl && avatarEl.querySelector('.about-cta-avatar-tooltip');
+    var avatarProgressCircle = avatarEl && avatarEl.querySelector('.about-cta-avatar-progress circle');
+    function settleToBase() {
+      if (!avatarEl) return;
+      if (freezeTimer) { clearTimeout(freezeTimer); freezeTimer = null; }
+      var frames = avatarEl.querySelectorAll('.about-cta-avatar-frame');
+      for (var k = 0; k < frames.length; k++) frames[k].classList.remove('is-current');
+      if (frames[0]) frames[0].classList.add('is-current');
+      avatarEl.classList.remove('is-frozen');
+      avatarEl.classList.add('is-resting');
+      if (avatarTooltipEl) avatarTooltipEl.textContent = '';
+    }
+    function fullResetAvatar() {
+      if (!avatarEl) return;
+      if (freezeTimer) { clearTimeout(freezeTimer); freezeTimer = null; }
+      avatarEl.classList.remove('is-frozen');
+      avatarEl.classList.remove('is-resting');
+      var frames = avatarEl.querySelectorAll('.about-cta-avatar-frame');
+      for (var m = 0; m < frames.length; m++) frames[m].classList.remove('is-current');
+      if (avatarTooltipEl) avatarTooltipEl.textContent = '';
+    }
+    function freezeAvatar() {
+      if (!avatarEl) return;
+      var frames = avatarEl.querySelectorAll('.about-cta-avatar-frame');
+      if (!frames.length) return;
+      /* Find the currently-visible frame by reading computed opacity —
+         getComputedStyle returns the live animated value during a
+         running CSS animation, so this catches whichever frame the
+         page-flip happens to be holding at "flat" right now. Falls
+         back to the first frame on a static state (no animation
+         running, mobile tap without hover). */
+      var visibleFrame = frames[0];
+      var maxOp = -1;
+      for (var i = 0; i < frames.length; i++) {
+        var op = parseFloat(getComputedStyle(frames[i]).opacity);
+        if (op > maxOp) { maxOp = op; visibleFrame = frames[i]; }
+      }
+      /* Reset prior freeze without leaving stale .is-current. Also
+         drop .is-resting in case we're transitioning from a settled
+         state into a fresh freeze. */
+      if (freezeTimer) { clearTimeout(freezeTimer); freezeTimer = null; }
+      for (var j = 0; j < frames.length; j++) frames[j].classList.remove('is-current');
+      avatarEl.classList.remove('is-resting');
+      visibleFrame.classList.add('is-current');
+      if (avatarTooltipEl) avatarTooltipEl.textContent = visibleFrame.dataset.tooltip || '';
+      /* Restart the progress-fill keyframe: toggling animation
+         doesn't replay on its own once it's reached end state, so
+         we reflow to force a fresh run. */
+      if (avatarProgressCircle) {
+        avatarProgressCircle.style.animation = 'none';
+        // eslint-disable-next-line no-unused-expressions
+        avatarProgressCircle.offsetWidth;
+        avatarProgressCircle.style.animation = '';
+      }
+      avatarEl.classList.add('is-frozen');
+      freezeTimer = setTimeout(settleToBase, 4000);
+    }
+    function measureAvatar() {
+      if (!avatarEl) return null;
+      var wrapR = wrap.getBoundingClientRect();
+      var avR   = avatarEl.getBoundingClientRect();
+      return {
+        cx: avR.left - wrapR.left + avR.width  / 2,
+        cy: avR.top  - wrapR.top  + avR.height / 2,
+        r:  Math.min(avR.width, avR.height) / 2
+      };
+    }
+    if (avatarEl) {
+      avatarEl.addEventListener('mouseenter', function () {
+        avatarHover = true;
+        avatarHoverStart = performance.now();
+        avatarZone = measureAvatar();
+        loop();
+      });
+      avatarEl.addEventListener('mouseleave', function () {
+        avatarHover = false;
+        avatarHoverStart = 0;
+        /* Don't null avatarZone — particles still need a target to
+           release from. They drop out of orbit via the !avatarHover
+           branch in the frame loop, which clears p.orbitT and lets
+           the normal drift physics pull them back to ox/oy. */
+        /* Two-stage freeze: while .is-frozen is active (the 4s
+           viewing window), un-hover is a no-op — the photo and
+           tooltip remain visible until the timer settles to the
+           base photo. Once settled (.is-resting), mousing out
+           clears that resting state so the next hover starts a
+           fresh roulette. */
+        if (avatarEl.classList.contains('is-resting')) {
+          fullResetAvatar();
+        }
+      });
+      /* Tap/click on the avatar:
+         - If currently mid-freeze (.is-frozen, 4s timer running),
+           cancel the freeze and return to the roulette — the
+           default-photo tooltip "Click again. I dare you." reads
+           as the call-to-action for this second click.
+         - Otherwise (default, hovering, or settled in .is-resting),
+           start a new freeze on the currently-visible frame.
+         Either branch fires the particle pulse + ensures the rAF
+         loop is alive so the pulse renders. */
+      avatarEl.addEventListener('click', function () {
+        if (avatarEl.classList.contains('is-frozen')) {
+          fullResetAvatar();
+        } else {
+          freezeAvatar();
+        }
+        pulseStart = performance.now();
+        loop();
+      });
     }
 
     var IR = 130;
@@ -1158,6 +1323,12 @@
         -wrapScroll * sm2 - cursorEY * cm2
       ];
 
+      /* Avatar orbit — per-frame state. avatarElapsed is the number of
+         seconds the avatar has been continuously hovered, used to
+         ramp up the per-particle adoption probability so the orbit
+         fills out gradually rather than all-at-once. */
+      var avatarElapsed = avatarHover && avatarHoverStart ? (now - avatarHoverStart) * 0.001 : 0;
+
       for (var i = 0; i < pts.length; i++) {
         var p = pts[i];
 
@@ -1168,45 +1339,133 @@
         var tx = p.ox + driftX;
         var ty = p.oy + driftY;
         var pull = 0;
-        if (hoverProg > 0.001 && btnZone) {
-          var ddx = p.ox - btnZone.cx, ddy = p.oy - btnZone.cy;
-          var dToBtn = Math.sqrt(ddx * ddx + ddy * ddy);
-          if (dToBtn < 1000) {
-            pull = (1 - dToBtn / 1000) * hoverProg;
-            tx = (p.ox + driftX) + (btnZone.cx - (p.ox + driftX)) * pull;
-            ty = (p.oy + driftY) + (btnZone.cy - (p.oy + driftY)) * pull;
+
+        /* ─── Avatar orbit branch ───────────────────────────────────
+           When hovering the avatar, particles get adopted into
+           orbits and SPIRAL INWARD toward a tight target radius.
+           The longer the user hovers, the more particles join the
+           swirl AND the closer the existing ones have moved.
+
+           Smoothness rules:
+           - At adoption, orbitR0 + orbitAngle0 are computed from
+             the particle's CURRENT (drift-modulated) position, so
+             the orbit's t=0 sample coincides exactly with where the
+             particle already is. No "snap toward the ring" at
+             adoption — the motion just bends from linear drift
+             into a slow inward spiral.
+           - Lerp ramps gently from 0.05 → 0.15 (was 0.18 → 0.40):
+             follow rate is just enough to track the orbit target
+             without ever yanking the particle. The "snap toward
+             the ring" complaint was at the 0.40 cap.
+           - orbitW slowed to ±0.25-0.65 rad/s (was up to ±1.0) so
+             each orbit traces a noticeable curve over several
+             seconds rather than racing around.
+           - orbitTransit lengthened to 5-7s (was 3.5-5s) so the
+             spiral-in is slow, steady, gradual.
+           - Adoption rate halved: 0.0025 base + 0.009 ramp,
+             ramped over 5s instead of 3s. Particles join one or
+             two at a time instead of in bursts. */
+        var inOrbit = false;
+        if (avatarHover && avatarZone) {
+          if (!p.orbitT) {
+            var adoptionPerFrame = 0.0025 + 0.009 * Math.min(1, avatarElapsed / 5);
+            if (Math.random() < adoptionPerFrame) {
+              /* Seed orbit so its t=0 position matches the particle's
+                 current position — orbit appears to grow OUT of the
+                 particle's drift, not warp it across the canvas. */
+              var seedDX = p.x - avatarZone.cx;
+              var seedDY = p.y - avatarZone.cy;
+              var seedR  = Math.max(20, Math.sqrt(seedDX * seedDX + seedDY * seedDY));
+              p.orbitT       = now;
+              p.orbitAngle0  = Math.atan2(seedDY, seedDX);
+              p.orbitR0      = seedR;
+              p.orbitRTarget = 55 + Math.random() * 25;
+              p.orbitW       = (Math.random() < 0.5 ? 1 : -1) * (0.25 + Math.random() * 0.40);
+              p.orbitTransit = 5 + Math.random() * 2;
+            }
           }
+          if (p.orbitT) {
+            inOrbit = true;
+            var orbitAge = (now - p.orbitT) * 0.001;
+            /* Ease-out quad on radius transit — slow steady inward
+               motion that settles at the target ring. */
+            var rT = Math.min(1, orbitAge / p.orbitTransit);
+            var rEase = 1 - (1 - rT) * (1 - rT);
+            var currentR = p.orbitR0 + (p.orbitRTarget - p.orbitR0) * rEase;
+            /* Pulse offset — additive outward push on top of the
+               spiral-in radius. Half-sine wave: 0 → +amplitude → 0
+               over pulseDuration. After the wave decays the
+               underlying spiral-in math resumes unchanged, so the
+               particle continues moving toward the avatar. */
+            if (pulseStart) {
+              var pulseAge = (now - pulseStart) * 0.001;
+              if (pulseAge < pulseDuration) {
+                currentR += Math.sin((pulseAge / pulseDuration) * Math.PI) * pulseAmplitude;
+              }
+            }
+            var theta = p.orbitAngle0 + orbitAge * p.orbitW;
+            var orbitX = avatarZone.cx + Math.cos(theta) * currentR;
+            var orbitY = avatarZone.cy + Math.sin(theta) * currentR;
+            /* Gentle follow: 0.05 base, ramping to 0.15 over ~2s.
+               Low enough to never read as a "push" — the particle
+               just glides along the orbit curve. */
+            var lerp = Math.min(0.15, 0.05 + orbitAge * 0.05);
+            p.x += (orbitX - p.x) * lerp;
+            p.y += (orbitY - p.y) * lerp;
+            p.vx = 0; p.vy = 0;
+            /* Pull = 0 keeps particles at their original colour,
+               radius, and twinkle alpha — the orbit is conveyed by
+               motion alone, no brand-tint blend or size boost. */
+            pull = 0;
+          }
+        } else if (p.orbitT) {
+          /* Hover ended — release the particle. The default drift +
+             velocity-damping physics below will pull it home to
+             (ox, oy) smoothly. */
+          p.orbitT = 0;
         }
 
-        p.vx = (p.vx + (tx - p.x) * 0.0035) * 0.94;
-        p.vy = (p.vy + (ty - p.y) * 0.0035) * 0.94;
+        if (!inOrbit) {
+          if (hoverProg > 0.001 && btnZone) {
+            var ddx = p.ox - btnZone.cx, ddy = p.oy - btnZone.cy;
+            var dToBtn = Math.sqrt(ddx * ddx + ddy * ddy);
+            if (dToBtn < 1000) {
+              pull = (1 - dToBtn / 1000) * hoverProg;
+              tx = (p.ox + driftX) + (btnZone.cx - (p.ox + driftX)) * pull;
+              ty = (p.oy + driftY) + (btnZone.cy - (p.oy + driftY)) * pull;
+            }
+          }
 
-        if (agitationActive && pull > 0.4 && btnZone) {
-          if (!p.agitAt || (now - p.agitAt) > 1600) {
-            p.agitMode = Math.random() < 0.5 ? 1 : 0;
-            p.agitAt = now;
-          }
-          if (p.agitMode === 1) {
-            p.vx += (btnZone.cx - p.x) * 0.012;
-            p.vy += (btnZone.cy - p.y) * 0.012;
-          } else {
-            p.vx += (Math.random() - 0.5) * 1.4 * pull;
-            p.vy += (Math.random() - 0.5) * 1.4 * pull;
-          }
-        }
+          p.vx = (p.vx + (tx - p.x) * 0.0035) * 0.94;
+          p.vy = (p.vy + (ty - p.y) * 0.0035) * 0.94;
 
-        if (mouseInside && spd > 1 && hoverProg < 0.5) {
-          var dx = p.x - mouseX, dy = p.y - mouseY;
-          var d2 = dx * dx + dy * dy;
-          if (d2 < IR * IR && d2 > 0.1) {
-            var d  = Math.sqrt(d2);
-            var fo = 1 - d / IR;
-            p.vx += (dx / d) * fo * fo * spd * 0.06;
-            p.vy += (dy / d) * fo * fo * spd * 0.06;
+          if (agitationActive && pull > 0.4 && btnZone) {
+            if (!p.agitAt || (now - p.agitAt) > 1600) {
+              p.agitMode = Math.random() < 0.5 ? 1 : 0;
+              p.agitAt = now;
+            }
+            if (p.agitMode === 1) {
+              p.vx += (btnZone.cx - p.x) * 0.012;
+              p.vy += (btnZone.cy - p.y) * 0.012;
+            } else {
+              p.vx += (Math.random() - 0.5) * 1.4 * pull;
+              p.vy += (Math.random() - 0.5) * 1.4 * pull;
+            }
           }
+
+          if (mouseInside && spd > 1 && hoverProg < 0.5) {
+            var dx = p.x - mouseX, dy = p.y - mouseY;
+            var d2 = dx * dx + dy * dy;
+            if (d2 < IR * IR && d2 > 0.1) {
+              var d  = Math.sqrt(d2);
+              var fo = 1 - d / IR;
+              p.vx += (dx / d) * fo * fo * spd * 0.06;
+              p.vy += (dy / d) * fo * fo * spd * 0.06;
+            }
+          }
+          p.x += p.vx; p.y += p.vy;
         }
-        p.x += p.vx; p.y += p.vy;
-        if (btnZone) {
+        if (!inOrbit && btnZone) {
           var bdx = p.x - btnZone.cx, bdy = p.y - btnZone.cy;
           if (Math.abs(bdx) < btnZone.hw && Math.abs(bdy) < btnZone.hh) {
             var overX = btnZone.hw - Math.abs(bdx);
@@ -1220,7 +1479,7 @@
             }
           }
         }
-        if (btnZone && pull > 0.85) {
+        if (!inOrbit && btnZone && pull > 0.85) {
           var edge = Math.floor(Math.random() * 4);
           if (edge === 0)      { p.ox = Math.random() * w; p.oy = -10; }
           else if (edge === 1) { p.ox = w + 10;            p.oy = Math.random() * h; }
@@ -1298,18 +1557,32 @@
       tabVisible = document.visibilityState === 'visible';
       if (tabVisible) loop();
     });
-    if (window.IntersectionObserver) {
-      new IntersectionObserver(function (es) {
-        inView = es[0].isIntersecting;
-        if (inView) loop();
-      }, { threshold: 0 }).observe(wrap);
-    }
-
     /* Defer the first paint past the pill-nav cross-page slide (~320ms).
        buildBackground() is a per-pixel canvas paint with FBM noise that
        can block the main thread for 100-300ms — running it during the
-       nav transition makes the slide stutter visibly. */
-    var firstPaint = function () { resize(); loop(); };
+       nav transition makes the slide stutter visibly.
+       But: if the user scrolls quickly enough that the wrap enters view
+       BEFORE the idle callback fires, the un-painted canvas reveals the
+       wrap's CSS background-color (a dark grey on cta-footer-wrap),
+       flashing for a frame or two before the deferred paint runs.
+       The IntersectionObserver below force-runs firstPaint synchronously
+       in that case, so a fast scroll always sees a painted canvas. */
+    var firstPaintDone = false;
+    var firstPaint = function () {
+      if (firstPaintDone) return;
+      firstPaintDone = true;
+      resize();
+      loop();
+    };
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (es) {
+        inView = es[0].isIntersecting;
+        if (inView) {
+          firstPaint(); // synchronously paint if the deferred call hasn't run yet
+          loop();
+        }
+      }, { threshold: 0 }).observe(wrap);
+    }
     if (window.requestIdleCallback) {
       window.requestIdleCallback(firstPaint, { timeout: 800 });
     } else {

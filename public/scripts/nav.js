@@ -125,7 +125,13 @@ window.addEventListener('resize', movePillIndicator);
   const navBtn = document.getElementById('themeToggle');
   if (navBtn) navBtn.addEventListener('click', () => flip('nav'));
   const mobileBtn = document.getElementById('mobileThemeToggle');
-  if (mobileBtn) mobileBtn.addEventListener('click', () => flip('mobile-menu'));
+  if (mobileBtn) mobileBtn.addEventListener('click', () => {
+    flip('mobile-menu');
+    /* Drop focus so the button doesn't keep its :focus ring after tap
+       — touch users were reading the persistent focus state as "this
+       button stays selected". */
+    mobileBtn.blur();
+  });
 })();
 
 /* Mobile menu */
@@ -159,10 +165,11 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const RESET_TRANS = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.28s, border-color 0.38s, opacity 0.35s ease, filter 0.35s ease, scale 0.42s cubic-bezier(0.34, 1.56, 0.64, 1)';
 
   const tiltConfig = function (card) {
-    if (card.classList.contains('hero-photo'))  return { deg: 4,  z: 6,  baseScale: 1,    pressScale: 1    };
-    if (card.classList.contains('logo-outer'))  return { deg: 8,  z: 10, baseScale: 1,    pressScale: 0.93 };
-    if (card.classList.contains('btn'))         return { deg: 12, z: 14, baseScale: 1,    pressScale: 0.94 };
-    return                                             { deg: 9,  z: 14, baseScale: 1.04, pressScale: 0.97 };
+    if (card.classList.contains('hero-photo'))             return { deg: 4,  z: 6,  baseScale: 1,    pressScale: 1    };
+    if (card.classList.contains('logo-outer'))             return { deg: 8,  z: 10, baseScale: 1,    pressScale: 0.93 };
+    if (card.classList.contains('btn'))                    return { deg: 12, z: 14, baseScale: 1,    pressScale: 0.94 };
+    if (card.classList.contains('about-cta-avatar-stack')) return { deg: 12, z: 14, baseScale: 1,    pressScale: 0.94 };
+    return                                                        { deg: 9,  z: 14, baseScale: 1.04, pressScale: 0.97 };
   };
 
   const clearTilt = function (el) {
@@ -177,7 +184,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   };
 
   document.addEventListener('mousemove', function(e) {
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo, .btn, .logo-outer');
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
     if (tiltCard && tiltCard !== card) {
       clearTilt(tiltCard);
       tiltCard = null;
@@ -229,7 +236,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     }
   }
   document.addEventListener('pointerdown', function (e) {
-    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .btn, .logo-outer');
+    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .btn, .logo-outer, .about-cta-avatar-stack');
     if (!t) return;
     pressedBtn = t;
     setPressed(t, true);

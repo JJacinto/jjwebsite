@@ -239,6 +239,31 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   0%   { background-position: 240% 0; }
   100% { background-position: -180% 0; }
 }
+/* Variants used by section-wide dividers (.section-divider, .brands,
+   .testimonials) that carry a SECOND background layer — a narrow
+   white spot used as a "lightning flash". These keyframes animate
+   the multi-value `background-position` so the first layer (the
+   subtle refraction stripe) moves at its normal linear pace while
+   the second layer (the lightning spot) stays parked off-screen
+   for ~88% of the cycle, then sweeps across the divider in the
+   final ~7%. The lightning percentages match across A and B
+   variants so the only timing difference between dividers is the
+   underlying animation-duration, which keeps the flashes
+   desynchronised across the page. */
+@keyframes line-refract-a-flash {
+  0%   { background-position: -120% 0,    200% 0; }
+  88%  { background-position: 179.2% 0,   200% 0; }
+  90%  { background-position: 186% 0,    -20% 0; }
+  95%  { background-position: 203% 0,    120% 0; }
+  100% { background-position: 220% 0,    120% 0; }
+}
+@keyframes line-refract-b-flash {
+  0%   { background-position: 240% 0,    200% 0; }
+  88%  { background-position: -129.6% 0, 200% 0; }
+  90%  { background-position: -138% 0,  -20% 0; }
+  95%  { background-position: -159% 0,   120% 0; }
+  100% { background-position: -180% 0,   120% 0; }
+}
 @media (prefers-reduced-motion: reduce) {
   .nav.scrolled::before, .nav.scrolled::after { animation: none; }
 }
@@ -459,10 +484,37 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   color: var(--text-secondary); cursor: pointer; text-decoration: none;
   transition: border-color var(--motion-duration-short), color var(--motion-duration-short), background var(--motion-duration-short);
 }
-.mobile-menu-btn:hover {
-  border-color: var(--text-brand); color: var(--text-brand); background: var(--fill-brand-muted);
+/* Hover-tinted state scoped to devices with real hover (desktops
+   with a mouse). iOS Safari otherwise leaves :hover sticky after a
+   tap, so the button reads as "still selected" until the user taps
+   somewhere else — confusing on touch. With this gate the hover
+   colour only applies on devices that actually hover. */
+@media (hover: hover) {
+  .mobile-menu-btn:hover {
+    border-color: var(--text-brand); color: var(--text-brand); background: var(--fill-brand-muted);
+  }
 }
 .mobile-menu-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Mobile primary action — filled brand colour, higher visual weight
+   than the outline-only Switch theme button. The Start project button
+   is the main CTA in the mobile menu, so it deserves the prominent
+   treatment to lead the eye. Padding is bumped a tier to add visible
+   weight in the stack. */
+.mobile-menu-btn--primary {
+  background: var(--fill-brand-default);
+  border-color: var(--fill-brand-default);
+  color: var(--color-neutral-0);
+  padding: var(--dimension-space-16) var(--dimension-space-16);
+  font-weight: var(--font-weight-medium);
+}
+@media (hover: hover) {
+  .mobile-menu-btn--primary:hover {
+    background: var(--fill-brand-hover);
+    border-color: var(--fill-brand-hover);
+    color: var(--color-neutral-0);
+  }
+}
 
 /* ============================================================
    Buttons
@@ -787,10 +839,61 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    HOME — Brands strip
    ============================================================ */
 .brands {
+  position: relative;
   padding: var(--dimension-space-64) 0;
   border-top: var(--dimension-border-width-1) solid var(--border-subtle);
   border-bottom: var(--dimension-border-width-1) solid var(--border-subtle);
   overflow: hidden;
+}
+/* Section-wide divider animations — same two-stripe refraction
+   pattern .section-divider and .nav.scrolled use. ::before rides
+   the top border, ::after rides the bottom. Stripes use different
+   speeds + offsets so the top and bottom don't ever sync up. */
+.brands::before,
+.brands::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 1px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.brands::before {
+  top: -1px;
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%, transparent 18%,
+      var(--component-form-input-bg-light) 32%,
+      var(--component-nav-refract-stop-2) 50%,
+      var(--component-form-input-bg-light) 68%,
+      transparent 82%, transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%, transparent 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 58%, transparent 100%);
+  background-size: 28% 100%, 8% 100%;
+  animation: line-refract-a-flash 23s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: -7s;
+}
+.brands::after {
+  bottom: -1px;
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%, transparent 12%,
+      var(--component-nav-refract-stop-4) 28%,
+      var(--component-nav-refract-stop-3) 50%,
+      var(--component-nav-refract-stop-4) 72%,
+      transparent 88%, transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%, transparent 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 58%, transparent 100%);
+  background-size: 56% 100%, 8% 100%;
+  animation: line-refract-b-flash 41s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation-delay: -19s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .brands::before, .brands::after { animation: none; }
 }
 .brands-label { text-align: center; margin-bottom: var(--dimension-space-36); }
 .brands-marquee {
@@ -879,7 +982,36 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 /* ============================================================
    HOME — Testimonials
    ============================================================ */
-.testimonials { padding: clamp(var(--dimension-space-64), 8vw, var(--dimension-space-80)) 0; border-top: var(--dimension-border-width-1) solid var(--border-subtle); }
+.testimonials { position: relative; padding: clamp(var(--dimension-space-64), 8vw, var(--dimension-space-80)) 0; border-top: var(--dimension-border-width-1) solid var(--border-subtle); }
+/* Top border carries the same refraction animation as .section-divider
+   and .brands — single ::before, one of the two stripe variants for
+   visual variety against neighboring dividers. */
+.testimonials::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 0; right: 0;
+  height: 1px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%, transparent 18%,
+      var(--component-form-input-bg-light) 32%,
+      var(--component-nav-refract-stop-2) 50%,
+      var(--component-form-input-bg-light) 68%,
+      transparent 82%, transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%, transparent 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 58%, transparent 100%);
+  background-size: 28% 100%, 8% 100%;
+  animation: line-refract-a-flash 27s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  animation-delay: -13s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .testimonials::before { animation: none; }
+}
 .testimonials .eyebrow { text-align: center; display: block; margin-bottom: var(--dimension-space-40); }
 .testimonials-masonry { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-20); }
 .testimonial-card {
@@ -893,12 +1025,16 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 /* Brand-tint wash on hover — same recipe .case-card uses. The fade-in
    pseudo sits above the card background but below the content (header
    + quote get z-elevated below) so the avatar, name, and quote stay
-   crisp over the translucent purple. */
+   crisp over the translucent purple. Inner radius steps DOWN from the
+   card's outer radius (--radius-card-lg = 24px) by ~8px so the pseudo's
+   corner curve aligns with the inner border curve — `inherit` left
+   visible corner gaps because the pseudo's box is offset 6px inside
+   the 6px border but its radius still tracked the outer curve. */
 .testimonial-card::before {
   content: ''; position: absolute; inset: 0;
   background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
   pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
-  border-radius: inherit;
+  border-radius: var(--dimension-radius-lg);
 }
 .testimonial-card:hover::before { opacity: 1; }
 .testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
@@ -931,12 +1067,12 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 #cursor-ball.is-linkedin svg { display: none; }
 #cursor-ball.is-linkedin .cursor-ball-label { display: block; }
 /* Custom cursor-ball replaces the system cursor on tilt cards
-   (case-card, testimonial-card, next-case, hero-photo). Buttons
-   keep the system cursor since they have their own hover state +
-   click affordance, and the logo is exempted — it's a navigation
-   target, not a tilt-rich card surface, and hiding the cursor on
-   the masthead reads as broken. */
-.tilt-active:not(.btn):not(.logo-outer) { cursor: none; }
+   (case-card, testimonial-card, next-case, hero-photo). Buttons,
+   the masthead logo, and the CTA avatar roulette stay on the
+   system cursor — the avatar uses cursor:pointer to advertise its
+   hover behaviour, which we don't want hidden behind the
+   cursor-ball overlay. */
+.tilt-active:not(.btn):not(.logo-outer):not(.about-cta-avatar-stack) { cursor: none; }
 .case-card:hover, .testimonial-card:hover, .next-case:hover { cursor: none; }
 @keyframes cursor-nudge {
   0%    { transform: translateX(0); }
@@ -1121,24 +1257,38 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   background-repeat: no-repeat;
 }
 .section-divider::before {
-  background-image: linear-gradient(90deg,
-    transparent 0%, transparent 18%,
-    var(--component-form-input-bg-light) 32%,
-    var(--component-nav-refract-stop-2) 50%,
-    var(--component-form-input-bg-light) 68%,
-    transparent 82%, transparent 100%);
-  background-size: 28% 100%;
-  animation: line-refract-a 19s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  /* Two background layers: subtle refraction stripe + a narrow,
+     bright white "lightning" spot that crosses the divider once
+     per cycle (~7% of total duration). Layer order: refract first
+     so the lightning paints on top during its brief sweep. */
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%, transparent 18%,
+      var(--component-form-input-bg-light) 32%,
+      var(--component-nav-refract-stop-2) 50%,
+      var(--component-form-input-bg-light) 68%,
+      transparent 82%, transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%, transparent 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 58%, transparent 100%);
+  background-size: 28% 100%, 8% 100%;
+  animation: line-refract-a-flash 19s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
 }
 .section-divider::after {
-  background-image: linear-gradient(90deg,
-    transparent 0%, transparent 12%,
-    var(--component-nav-refract-stop-4) 28%,
-    var(--component-nav-refract-stop-3) 50%,
-    var(--component-nav-refract-stop-4) 72%,
-    transparent 88%, transparent 100%);
-  background-size: 56% 100%;
-  animation: line-refract-b 33s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  background-image:
+    linear-gradient(90deg,
+      transparent 0%, transparent 12%,
+      var(--component-nav-refract-stop-4) 28%,
+      var(--component-nav-refract-stop-3) 50%,
+      var(--component-nav-refract-stop-4) 72%,
+      transparent 88%, transparent 100%),
+    linear-gradient(90deg,
+      transparent 0%, transparent 42%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 58%, transparent 100%);
+  background-size: 56% 100%, 8% 100%;
+  animation: line-refract-b-flash 33s cubic-bezier(0.6, 0, 0.4, 1) infinite;
   animation-delay: -11s;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1504,14 +1654,187 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   border-radius: 0;
   text-align: center;
 }
-.about-cta-avatar {
+/* Avatar roulette — book-page flip variant. .about-cta-avatar-stack
+   is a 96px circular well; the six .about-cta-avatar-frame <img>s
+   are stacked inside and absolutely positioned over each other.
+   The original headshot (first child) is the static default. On
+   hover the six frames cycle through a 3D rotateY page-flip:
+   each frame flips IN from rotateY(-90deg) at the start of its
+   slice, holds flat at rotateY(0deg) for ~50% of its slice, then
+   flips OUT to rotateY(90deg) and waits hidden until the cycle
+   restarts. The flip-in of frame N+1 overlaps with the flip-out of
+   frame N, so the visual reads as one continuous page-turn.
+   - cursor: pointer kept visible (the tilt JS adds .tilt-active
+     and the existing cursor:none rule excludes this class).
+   - perspective on the stack creates the 3D viewing context for
+     the children's rotateY transforms.
+   - backface-visibility:hidden on the frames keeps the mirrored
+     reverse side from peeking through as a frame crosses 90°. */
+.about-cta-avatar-stack {
+  position: relative;
   width: 96px; height: 96px;
-  border-radius: 50%;
+  margin: 0 auto var(--dimension-space-32);
+  z-index: var(--z-raised);
+  cursor: pointer;
+  perspective: 600px;
+  /* Default state stays as a simple 2D composite — preserve-3d
+     here was making the entire CTA section flash on scroll-into-
+     view because the parent .about-cta's .reveal transition
+     (opacity + translateY) had to re-composite a 3D-context
+     child on every paint of the fade-in. preserve-3d is added
+     only on hover, where the tilt JS's outer perspective and the
+     per-frame inner rotateY actually need to compose. */
+}
+.about-cta-avatar-stack:hover {
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+.about-cta-avatar-frame {
+  /* Border and radius live on the frame now (not the stack) — when
+     a frame rotateYs the WHOLE circle (border + photo) turns with
+     it, matching the "circle flips on itself" intent. box-sizing
+     border-box keeps total size at 96px even with a 2px border.
+     No explicit `transform: rotateY(0deg)` in the default state —
+     the keyframe drives transform only while hovered. Declaring it
+     at rest was promoting each frame to its own compositor layer
+     on first paint, producing a brief flash on initial load. */
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  box-sizing: border-box;
   object-fit: cover;
   display: block;
-  margin: 0 auto var(--dimension-space-32);
+  opacity: 0;
+  border-radius: 50%;
   border: 2px solid var(--border-inverse);
-  position: relative; z-index: var(--z-raised);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+/* Static state: only the first frame visible, flat. */
+.about-cta-avatar-frame:first-child { opacity: 1; }
+
+/* Hover: every frame runs the page-flip animation, staggered by
+   one-sixth of the 1.8s cycle (0.3s each). At 0% each frame is
+   edge-on at rotateY(-90deg); by 4% it's flat at rotateY(0); it
+   holds flat to 13%, then rotates to rotateY(90deg) by 17% and
+   stays edge-on for the rest of its cycle (until its next loop).
+   Two frames are mid-rotation at any moment — one flipping in,
+   one flipping out — which produces the page-turn effect. */
+.about-cta-avatar-stack:hover .about-cta-avatar-frame {
+  animation: avatar-page-flip 1.8s linear infinite;
+}
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(1) { animation-delay: 0s;   }
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(2) { animation-delay: 0.3s; }
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(3) { animation-delay: 0.6s; }
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(4) { animation-delay: 0.9s; }
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(5) { animation-delay: 1.2s; }
+.about-cta-avatar-stack:hover .about-cta-avatar-frame:nth-child(6) { animation-delay: 1.5s; }
+@keyframes avatar-page-flip {
+  0%   { opacity: 0; transform: rotateY(-90deg); }
+  4%   { opacity: 1; transform: rotateY(0deg); }
+  13%  { opacity: 1; transform: rotateY(0deg); }
+  17%  { opacity: 0; transform: rotateY(90deg); }
+  100% { opacity: 0; transform: rotateY(90deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Static fallback — show only the original headshot, no cycling,
+     no hover flip. */
+  .about-cta-avatar-stack:hover .about-cta-avatar-frame { animation: none; }
+}
+
+/* ─── Freeze state (avatar click) ────────────────────────────────
+   When the user clicks the avatar mid-roulette, JS adds .is-frozen
+   to the stack and .is-current to whichever frame was visible at
+   click time. The animation pauses, the frozen frame holds at
+   opacity 1, the progress ring fills over 4s, and a small tooltip
+   panel slides in to the right showing that photo's caption. The
+   class auto-clears after 4s (or on hover-out) and the roulette
+   resumes from wherever the cycle had progressed.
+   - !important on animation/opacity wins over the .hover rule's
+     animation declaration (same specificity, but ordering matters
+     and !important guarantees it regardless). */
+.about-cta-avatar-stack.is-frozen .about-cta-avatar-frame,
+.about-cta-avatar-stack.is-resting .about-cta-avatar-frame {
+  animation: none !important;
+  opacity: 0 !important;
+  transform: none !important;
+}
+.about-cta-avatar-stack.is-frozen .about-cta-avatar-frame.is-current,
+.about-cta-avatar-stack.is-resting .about-cta-avatar-frame.is-current {
+  opacity: 1 !important;
+}
+
+/* Progress ring — 2px brand-coloured circle that draws clockwise
+   from 12 o'clock over 4 seconds, signalling the remaining freeze
+   time. inset:-8px positions it outside the avatar's 2px border
+   with a small gap. transform: rotate(-90deg) puts the dash start
+   at 12 o'clock instead of 3 o'clock (SVG default). */
+.about-cta-avatar-progress {
+  position: absolute;
+  inset: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  pointer-events: none;
+  opacity: 0;
+  transform: rotate(-90deg);
+  transition: opacity var(--motion-duration-short) ease-out;
+}
+.about-cta-avatar-progress circle {
+  fill: none;
+  stroke: var(--text-brand);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+.about-cta-avatar-stack.is-frozen .about-cta-avatar-progress {
+  opacity: 1;
+}
+.about-cta-avatar-stack.is-frozen .about-cta-avatar-progress circle {
+  animation: avatar-progress-fill 4s linear forwards;
+}
+@keyframes avatar-progress-fill {
+  from { stroke-dashoffset: 100; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Tooltip — small panel anchored to the avatar's right edge. Wraps
+   to a few lines for the longer captions. Slides in from a touch
+   to the right with a fade as .is-frozen engages. Pointer events
+   off so it never blocks clicks on neighbouring content. */
+.about-cta-avatar-tooltip {
+  position: absolute;
+  left: calc(100% + var(--dimension-space-16));
+  top: 50%;
+  width: max-content;
+  max-width: 220px;
+  padding: var(--dimension-space-8) var(--dimension-space-12);
+  background: var(--surface-default);
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-md);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-primary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-line-height-snug);
+  text-align: left;
+  white-space: normal;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(calc(-1 * var(--dimension-space-4)));
+  transition:
+    opacity var(--motion-duration-standard) var(--motion-easing-standard),
+    transform var(--motion-duration-standard) var(--motion-easing-standard);
+}
+.about-cta-avatar-stack.is-frozen .about-cta-avatar-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-cta-avatar-progress,
+  .about-cta-avatar-tooltip { transition: none; }
+  .about-cta-avatar-stack.is-frozen .about-cta-avatar-progress circle { animation: none; }
 }
 .about-cta > h2,
 .about-cta > p,
@@ -1631,7 +1954,7 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
    case-detail page titles but still distinctly larger than the h2
    section heads on about. */
 .contact h1 { color: var(--text-primary); font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
-.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-lg); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
+.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
 .contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: var(--dimension-space-16); }
 .contact-response-time {
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
@@ -2098,6 +2421,20 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .next-case-wrap .eyebrow { display: block; margin-bottom: var(--dimension-space-20); }
 .next-case { background: var(--surface-default); border-radius: var(--radius-card); border: 6px solid var(--border-subtle); overflow: hidden; cursor: pointer; display: grid; grid-template-columns: 1fr 2fr; align-items: center; will-change: transform; position: relative; transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard); }
 .next-case:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
+/* Brand-tint wash on hover — same recipe .case-card and
+   .testimonial-card use. Inner radius steps DOWN from the card's
+   outer (--radius-card = --dimension-radius-lg, 16px) by ~6px to
+   align with the inner border curve, avoiding the corner gaps
+   that `border-radius: inherit` produced on .testimonial-card. */
+.next-case::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
+  pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
+  border-radius: var(--dimension-radius-sm);
+}
+.next-case:hover::before { opacity: 1; }
+.next-case img,
+.next-case .next-case-body { position: relative; z-index: var(--z-elevated); }
 .next-case img { width: 100%; height: 160px; object-fit: cover; }
 .next-case-body { padding: var(--dimension-space-28); }
 .next-case-cat { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-8); }

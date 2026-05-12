@@ -156,7 +156,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
       <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span class="mobile-theme-label">Switch theme</span>
     </button>
-    <button class="mobile-menu-btn" type="button" data-umami-event="mobile-menu-start-project" onclick="toggleMobile(); openComposeModal(1);">
+    <button class="mobile-menu-btn mobile-menu-btn--primary" type="button" data-umami-event="mobile-menu-start-project" onclick="toggleMobile(); openComposeModal(1);">
       <span>Start project</span>
     </button>
   </div>
@@ -181,11 +181,36 @@ const umamiOn  = !!(umamiSrc && umamiId);
       <section class="global-cta-section">
         <div class="container">
           <div class="about-cta reveal">
-            <picture>
-              <source type="image/avif" srcset="/assets/images/photo.avif">
-              <source type="image/webp" srcset="/assets/images/photo.webp">
-              <img class="about-cta-avatar" src="/assets/images/photo.webp" alt="" aria-hidden="true" width="96" height="96" loading="lazy">
-            </picture>
+            <div class="about-cta-avatar-stack" aria-hidden="true">
+              {/* Six-frame roulette, hover-triggered. Each <img> is
+                  absolutely positioned over the others; the original
+                  headshot is shown statically by default. Hovering
+                  the stack runs avatar-roulette across the six
+                  frames at 1.8s total / 0.3s per frame, snapping
+                  between photos for a slot-machine feel. Reduced-
+                  motion users see only the first frame, static.
+                  data-tooltip is read by the click handler in
+                  compose-modal.js to populate the freeze tooltip. */}
+              <img class="about-cta-avatar-frame" src="/assets/images/photo.webp" data-tooltip="Click again. I dare you." alt="" width="96" height="96" loading="lazy">
+              <img class="about-cta-avatar-frame" src="/assets/images/photo-astronaut.webp" data-tooltip="Trained for zero gravity. Employed for zero margin." alt="" width="96" height="96" loading="lazy">
+              <img class="about-cta-avatar-frame" src="/assets/images/photo-guitar.webp" data-tooltip="Practicing quietly. The neighbors disagree." alt="" width="96" height="96" loading="lazy">
+              <img class="about-cta-avatar-frame" src="/assets/images/photo-tickets.webp" data-tooltip="Itinerary: aspirational. Carry-on: overpacked." alt="" width="96" height="96" loading="lazy">
+              <img class="about-cta-avatar-frame" src="/assets/images/photo-vr.webp" data-tooltip="911 in VR. EV in the garage. Identity crisis." alt="" width="96" height="96" loading="lazy">
+              <img class="about-cta-avatar-frame" src="/assets/images/photo-padel.webp" data-tooltip="Smash intent. Lob outcome." alt="" width="96" height="96" loading="lazy">
+              {/* Progress ring — renders around the avatar when the
+                  stack carries .is-frozen, with a 4s circular fill
+                  showing the time remaining before the roulette
+                  resumes. pathLength="100" lets the fill animate via
+                  stroke-dashoffset 100 → 0 in CSS without computing
+                  the actual circumference. */}
+              <svg class="about-cta-avatar-progress" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="48" pathLength="100"></circle>
+              </svg>
+              {/* Tooltip — JS fills .textContent from the active
+                  frame's data-tooltip on click, then .is-frozen
+                  fades it in. */}
+              <span class="about-cta-avatar-tooltip"></span>
+            </div>
             <h2>Let's build something.</h2>
             <p>Drawn to product work, design systems, and 0→1 projects where the structure matters as much as the surface.</p>
             <div class="about-cta-btns">
