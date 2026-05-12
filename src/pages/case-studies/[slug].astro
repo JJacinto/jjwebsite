@@ -10,6 +10,19 @@ const { caseData: c } = Astro.props;
 const idx = CASES.findIndex(x => x.slug === c.slug);
 const next = CASES[(idx + 1) % CASES.length];
 const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
+
+/* Side-TOC items. Labels are fixed (Context / Problem / Approach /
+   Solution / Impact) — they describe the reader's journey through
+   every case, regardless of the wording used in each section's
+   own h2. Section anchors fall through if a case has fewer than
+   three sections, so the TOC adapts without throwing. */
+const tocItems = [
+  { id: 'case-context', label: 'Context' },
+  c.sections[0] ? { id: 'case-section-0', label: 'Problem' } : null,
+  c.sections[1] ? { id: 'case-section-1', label: 'Approach' } : null,
+  c.sections[2] ? { id: 'case-section-2', label: 'Solution' } : null,
+  { id: 'case-impact', label: 'Impact' },
+].filter(Boolean);
 ---
 <Base
   activePage="cases"
@@ -19,10 +32,18 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 >
 
   <div class="case-wrap" id="case-content">
+    <div class="case-toc-rail">
+      <nav class="case-toc" aria-label="Case study sections">
+        {tocItems.map(item => (
+          <a href={`#${item.id}`} data-toc-target={item.id} data-umami-event="case-toc" data-umami-event-target={item.id}>{item.label}</a>
+        ))}
+      </nav>
+    </div>
+
     <div class="container">
       <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
 
-      <div class="case-header">
+      <div class="case-header" id="case-context">
         <div class="case-cat">{c.cat}</div>
         <h1 class="case-title">{c.title}</h1>
         <p class="case-subtitle">{c.subtitle}</p>
@@ -43,7 +64,7 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
         <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
       </div>
 
-      <div class={`outcomes ${outcomesClass} reveal`}>
+      <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
         {c.outcomes.map(o => (
           <div class="outcome">
             <div class="outcome-num">{o.n}</div>
@@ -59,8 +80,8 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
       </section>
 
       <div class="case-sections">
-        {c.sections.map(s => (
-          <div class="reveal">
+        {c.sections.map((s, sIdx) => (
+          <div class="reveal" id={`case-section-${sIdx}`}>
             <h2>{s.h}</h2>
             <p>{s.body}</p>
           </div>
@@ -162,4 +183,88 @@ function togglePwReveal() {
   btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
   input.focus();
 }
+
+/* Floating side-TOC behavior.
+   - paintActive(): chooses the deepest target whose top has crossed
+     the 35%-viewport activation line. Highlights its TOC link.
+   - paintFade(): reads .case-wrap's bottom edge in viewport
+     coordinates and fades the TOC out as the wrap end approaches
+     the TOC's own bottom — so the rail disappears smoothly before
+     the contact section below would overlap it. Pointer events
+     drop too while faded so a dim link can't be tab-trapped.
+   - paintCentering(): the TOC starts vertically centered on the
+     viewport at scroll=0; once scrolled past the centering offset
+     it sticks (CSS handles that — we just keep the centering
+     margin-top in sync with the TOC's measured half-height). */
+(function () {
+  var rail  = document.querySelector('.case-toc-rail');
+  var toc   = document.querySelector('.case-toc');
+  var wrap  = document.querySelector('.case-wrap');
+  var links = toc ? toc.querySelectorAll('a') : [];
+  if (!rail || !toc || !wrap || !links.length) return;
+
+  var targets = [];
+  links.forEach(function (link) {
+    var id = link.getAttribute('data-toc-target');
+    var el = id && document.getElementById(id);
+    if (el) targets.push({ id: id, el: el, link: link });
+  });
+  if (!targets.length) return;
+
+  function syncCentering() {
+    /* Centering margin-top: half the viewport minus half the TOC
+       height. Sticky `top` is set in CSS to the nav-clearance
+       value, so once scrolling consumes this margin the TOC parks
+       beneath the nav and stays there. */
+    var h = toc.offsetHeight;
+    rail.style.setProperty('--case-toc-half-h', (h / 2) + 'px');
+  }
+
+  function paintActive() {
+    var activeIdx = -1;
+    var activationY = window.innerHeight * 0.35;
+    targets.forEach(function (t, i) {
+      var r = t.el.getBoundingClientRect();
+      if (r.top - activationY <= 0) activeIdx = i;
+    });
+    if (activeIdx === -1) activeIdx = 0;
+    targets.forEach(function (t, i) {
+      t.link.classList.toggle('is-active', i === activeIdx);
+    });
+  }
+
+  function paintFade() {
+    var wr = wrap.getBoundingClientRect();
+    var tr = toc.getBoundingClientRect();
+    /* Buffer: vertical gap between TOC bottom and case-wrap bottom.
+       Positive while case-wrap extends below the TOC; goes negative
+       once the wrap end has scrolled past the TOC bottom. We start
+       fading 200px before that crossover so the disappearance is
+       gentle, not a snap. */
+    var buffer = wr.bottom - tr.bottom;
+    var fadeRange = 200;
+    var opacity = 1;
+    if (buffer < fadeRange) {
+      opacity = Math.max(0, Math.min(1, buffer / fadeRange));
+    }
+    toc.style.opacity = opacity;
+    toc.style.pointerEvents = opacity < 0.1 ? 'none' : '';
+  }
+
+  function paint() {
+    paintActive();
+    paintFade();
+  }
+
+  syncCentering();
+  paint();
+  window.addEventListener('scroll', paint, { passive: true });
+  window.addEventListener('resize', function () {
+    syncCentering();
+    paint();
+  }, { passive: true });
+  /* TOC item count can change between unlock states or fonts loading;
+     observe its size so the centering offset stays correct. */
+  if (window.ResizeObserver) new ResizeObserver(syncCentering).observe(toc);
+})();
 </script>

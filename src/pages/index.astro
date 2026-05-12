@@ -17,11 +17,11 @@ import Base from '../layouts/Base.astro';
     </div>
     <div class="container hero-inner">
       <h1 class="hero-greeting reveal">Hey, I'm João.</h1>
-      <p class="hero-role reveal reveal-d1" aria-label="I design the parts users don't see, so the parts they do see hold up">
-        <span class="role-item">I design the parts users don't see, so the parts they do see hold up.</span>
-        <span class="role-item">A product designer who builds.<br>Seeing structure before surfaces.</span>
-        <span class="role-item">Ten years designing systems where one decision shapes a thousand others.</span>
-        <span class="role-item">Currently at Anchorage Digital, on the parts most people don't see.</span>
+      <p class="hero-role reveal reveal-d1" aria-label="I design the parts users don't see, so the parts they do see hold">
+        <span class="role-item">I design the parts users don't see, so the parts they do see hold.</span>
+        <span class="role-item">A product designer who builds. The work starts before the pixels.</span>
+        <span class="role-item">Ten years of work where one decision shapes a thousand others.</span>
+        <span class="role-item">At Anchorage, I'm learning what it means to design for irreversible decisions.</span>
       </p>
       <div class="hero-ctas reveal reveal-d3">
         <button class="btn btn-accent" type="button" data-umami-event="hero-start-project" onclick="openComposeModal(1)">
@@ -181,19 +181,12 @@ import Base from '../layouts/Base.astro';
   const track = document.querySelector('.brands-track');
   const cycle = track && track.querySelector('.brands-cycle');
   if (!track || !cycle) return;
-  const imgs = Array.from(cycle.querySelectorAll('img'));
-  const ready = Promise.all(imgs.map(img =>
-    img.complete && img.naturalWidth > 0
-      ? Promise.resolve()
-      : new Promise(res => {
-          img.addEventListener('load', res, { once: true });
-          img.addEventListener('error', res, { once: true });
-        })
-  ));
 
+  let lastCycleWidth = 0;
   const setup = () => {
     const cycleWidth = cycle.getBoundingClientRect().width;
-    if (!cycleWidth) return;
+    if (!cycleWidth || cycleWidth === lastCycleWidth) return;
+    lastCycleWidth = cycleWidth;
     track.style.setProperty('--brands-cycle', cycleWidth + 'px');
     while (track.querySelector('.brands-cycle.clone')) track.querySelector('.brands-cycle.clone').remove();
     const viewport = window.innerWidth;
@@ -208,14 +201,34 @@ import Base from '../layouts/Base.astro';
     track.classList.add('is-ready');
   };
 
-  ready.then(() => {
-    setup();
+  /* Eager attempt on next frame in case the cycle is already laid out
+     (typical desktop case where the brands strip is at or near the
+     initial viewport). */
+  requestAnimationFrame(setup);
+
+  /* Observe the cycle itself — its width changes when the lazy-loaded
+     logo images finally arrive (mobile: brands sit below the fold, so
+     images load only on scroll). The prior implementation waited for
+     a one-shot Promise.all on img load events and measured ONCE; on
+     mobile that often raced with layout, left cycleWidth at 0, and
+     the `if (!cycleWidth) return;` early-bail kept `is-ready` off the
+     track — animation never started. ResizeObserver naturally
+     handles late image loads, font shifts, and viewport rotation in
+     one mechanism. */
+  if (window.ResizeObserver) {
+    new ResizeObserver(setup).observe(cycle);
+  } else {
+    /* Fallback: window resize + a couple of retries for the lazy
+       image case. Older browsers without ResizeObserver are rare
+       enough that this is best-effort. */
     let raf;
     window.addEventListener('resize', () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(setup);
     });
-  });
+    setTimeout(setup, 500);
+    setTimeout(setup, 1500);
+  }
 })();
 
 (function() {

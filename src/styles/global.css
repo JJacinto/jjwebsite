@@ -13,6 +13,31 @@
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
+
+/* Smooth cross-fade when the theme toggle is pressed. The
+   .theme-transitioning class is added to <html> by the toggle
+   handler in nav.js just before data-theme flips, then removed
+   500ms later. While present, every element gets a 0.5s ease
+   transition on the properties that depend on theme-aware tokens
+   (text color, background, border, SVG fill/stroke, shadow), so
+   the swap reads as a slow fade instead of an instant flash.
+   !important wins against the per-component transitions
+   (transition: color X, …) that already exist site-wide for
+   their own hover/state behavior — those resume once the class
+   drops off. Reduced-motion users never get the class added, so
+   their swap stays instant. */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition:
+    color 0.5s ease,
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    fill 0.5s ease,
+    stroke 0.5s ease,
+    box-shadow 0.5s ease !important;
+}
 body {
   font-family: var(--font-family-body);
   background: var(--background-page);
@@ -905,7 +930,13 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 #cursor-ball.is-linkedin { width: auto; height: 32px; padding: 0 var(--dimension-space-12); border-radius: var(--radius-pill); }
 #cursor-ball.is-linkedin svg { display: none; }
 #cursor-ball.is-linkedin .cursor-ball-label { display: block; }
-.tilt-active:not(.btn) { cursor: none; }
+/* Custom cursor-ball replaces the system cursor on tilt cards
+   (case-card, testimonial-card, next-case, hero-photo). Buttons
+   keep the system cursor since they have their own hover state +
+   click affordance, and the logo is exempted — it's a navigation
+   target, not a tilt-rich card surface, and hiding the cursor on
+   the masthead reads as broken. */
+.tilt-active:not(.btn):not(.logo-outer) { cursor: none; }
 .case-card:hover, .testimonial-card:hover, .next-case:hover { cursor: none; }
 @keyframes cursor-nudge {
   0%    { transform: translateX(0); }
@@ -1064,7 +1095,55 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .why-grid h2 { font-size: var(--font-size-3xl); }
 .why-grid p { margin-bottom: var(--dimension-space-12); }
 
-.section-divider { border: none; border-top: var(--dimension-border-width-1) solid var(--border-subtle); margin-bottom: var(--dimension-space-80); }
+/* Section dividers carry the same two-stripe refraction animation
+   as the navbar's scroll-state hairline — a slow, organic pair of
+   gradient bands sliding across an otherwise-static line. The base
+   border-top stays visible at all times; the ::before/::after pseudo-
+   elements overlay on top of that border position (top: -1px so they
+   sit ON the border, not below it). Pseudo-element support on <hr>
+   is reliable across modern engines (Chrome, Firefox, Safari 16+),
+   so no markup change needed. Same line-refract-a/b keyframes the
+   .nav.scrolled rule already declares — no new animations added. */
+.section-divider {
+  position: relative;
+  border: none;
+  border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+  margin-bottom: var(--dimension-space-80);
+}
+.section-divider::before,
+.section-divider::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: -1px;
+  height: 1px;
+  pointer-events: none;
+  background-repeat: no-repeat;
+}
+.section-divider::before {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 18%,
+    var(--component-form-input-bg-light) 32%,
+    var(--component-nav-refract-stop-2) 50%,
+    var(--component-form-input-bg-light) 68%,
+    transparent 82%, transparent 100%);
+  background-size: 28% 100%;
+  animation: line-refract-a 19s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+.section-divider::after {
+  background-image: linear-gradient(90deg,
+    transparent 0%, transparent 12%,
+    var(--component-nav-refract-stop-4) 28%,
+    var(--component-nav-refract-stop-3) 50%,
+    var(--component-nav-refract-stop-4) 72%,
+    transparent 88%, transparent 100%);
+  background-size: 56% 100%;
+  animation: line-refract-b 33s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation-delay: -11s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .section-divider::before, .section-divider::after { animation: none; }
+}
 
 .stack-title { font-size: var(--font-size-3xl); margin-bottom: var(--dimension-space-32); }
 
@@ -1878,7 +1957,113 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 /* ============================================================
    CASE DETAIL
    ============================================================ */
-.case-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, var(--dimension-space-128)); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
+.case-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, var(--dimension-space-128)); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); position: relative; }
+
+/* Floating right-side TOC for case study pages.
+   - .case-toc-rail spans the full height of .case-wrap (absolute
+     positioning + height 100%) so the sticky TOC inside it has
+     room to slide from "centered at top of page" down to "parked
+     below the nav".
+   - .case-toc itself is sticky. margin-top centers it in the
+     viewport at scroll=0 (50vh minus half its measured height,
+     fed in via --case-toc-half-h by the inline script). Once the
+     reader scrolls past that centering offset, it sticks at
+     `top: --case-toc-stick-top` — i.e. just below the fixed nav.
+   - Past the case body, the inline script fades opacity to 0 so
+     the rail doesn't overlap the global CTA / contact band below.
+   - The active indicator is a 2px vertical bar to the LEFT of the
+     active link's text, not a dot beside it. Inactive items show
+     no bar; only the bar's opacity changes between states. */
+.case-toc-rail {
+  position: absolute;
+  top: 0; right: var(--spacing-container-pad);
+  height: 100%;
+  width: max-content;
+  pointer-events: none;
+  z-index: var(--z-raised);
+  /* Stuck offset = nav height (--target-min) + a comfortable gap so
+     the rail doesn't crowd the nav once anchored. --space-80 reads
+     as ~48px below the nav's bottom edge — clear breathing room. */
+  --case-toc-stick-top: calc(var(--target-min) + var(--dimension-space-80));
+  --case-toc-half-h: 80px; /* JS-overridden after measuring the TOC */
+}
+.case-toc {
+  position: sticky;
+  top: var(--case-toc-stick-top);
+  margin-top: calc(50vh - var(--case-toc-half-h));
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--dimension-space-10);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  /* JS controls opacity for the fade-near-bottom behavior; default
+     to 1 so reduced-motion / no-JS users still see the rail. */
+  transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
+}
+/* Subtle full-height track behind the active-link indicator —
+   theme-aware faint rail (--border-subtle is rgba alpha 0.05 in
+   both themes) that spans the height of all five entries. The
+   per-link active indicator paints on top of this track at the
+   same x position + width, so the highlight reads as a slider
+   moving along a fixed groove. */
+.case-toc::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--dimension-space-6);
+  bottom: var(--dimension-space-6);
+  width: 2px;
+  background: var(--border-subtle);
+  border-radius: 1px;
+  pointer-events: none;
+}
+.case-toc a {
+  position: relative;
+  display: block;
+  padding: var(--dimension-space-4) 0 var(--dimension-space-4) var(--dimension-space-16);
+  color: var(--text-tertiary);
+  text-decoration: none;
+  line-height: var(--font-line-height-snug);
+  white-space: nowrap;
+  transition: color var(--motion-duration-short) var(--motion-easing-standard);
+}
+.case-toc a:hover { color: var(--text-secondary); }
+.case-toc a:focus-visible {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: 2px;
+  border-radius: var(--dimension-radius-sm);
+}
+.case-toc a.is-active {
+  color: var(--text-primary);
+  font-weight: var(--font-weight-medium);
+}
+/* Active-state indicator: a thin vertical bar to the left of the
+   text. Sized to roughly match the line-box so it reads as the
+   "you are here" mark from the screenshot mockup. */
+.case-toc a::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--dimension-space-6);
+  bottom: var(--dimension-space-6);
+  width: 2px;
+  background: var(--text-primary);
+  border-radius: 1px;
+  opacity: 0;
+  transition: opacity var(--motion-duration-short) var(--motion-easing-standard);
+}
+.case-toc a.is-active::before { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .case-toc, .case-toc a, .case-toc a::before { transition: none; }
+}
+@media (max-width: 1024px) { /* matches --bp-xl */
+  /* Hide the rail on narrow viewports — case body fills the screen
+     and there's nowhere to park a fixed sidebar without overlapping
+     content. */
+  .case-toc-rail { display: none; }
+}
 .back-link { display: inline-flex; align-items: center; gap: var(--dimension-space-8); font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--dimension-space-48); transition: color var(--motion-duration-short); }
 .back-link:hover { color: var(--text-primary); }
 .case-header { padding-bottom: var(--dimension-space-48); border-bottom: var(--dimension-border-width-1) solid var(--border-subtle); margin-bottom: var(--dimension-space-56); }

@@ -95,11 +95,25 @@ window.addEventListener('resize', movePillIndicator);
    prefers-color-scheme is intentionally not followed. */
 (function () {
   const root = document.documentElement;
+  /* Reduced-motion users skip the cross-fade — they get an instant
+     swap, which is the existing pre-animation behavior. */
+  const allowAnim = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function flip(source) {
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    /* Drop the transient class onto <html> *before* mutating
+       data-theme so the CSS rule it activates is already in effect
+       when the custom properties cascade. The matching rule in
+       global.css applies a 0.5s transition to color / background-
+       color / border-color / fill / stroke / box-shadow on every
+       element for the duration; the class is removed at 500ms so
+       it doesn't burden subsequent hover interactions. */
+    if (allowAnim) root.classList.add('theme-transitioning');
     if (next === 'dark') root.setAttribute('data-theme', 'dark');
     else root.removeAttribute('data-theme');
     try { localStorage.setItem('theme', next); } catch (_) {}
+    if (allowAnim) {
+      setTimeout(() => root.classList.remove('theme-transitioning'), 500);
+    }
     /* Override the data-umami-event auto-fire with a richer call that
        carries the resulting theme as a property — gives the dashboard
        a "switched-to-dark vs switched-to-light" breakdown, plus a
