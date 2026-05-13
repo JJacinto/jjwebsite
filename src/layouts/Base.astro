@@ -92,11 +92,14 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- Theme bootstrap — runs before paint to prevent FOUC. Dark is the
-     default; localStorage 'light' is the only value that opts out.
-     System prefers-color-scheme is intentionally ignored so first-time
-     visitors land on the brand-intended dark experience. -->
+<!-- Theme bootstrap — runs before paint to prevent FOUC. Theme is
+     locked to dark while the user-facing toggle is commented out
+     (see .nav-right + .mobile-menu-secondary). Re-enable the
+     toggle and the localStorage opt-out (kept below, commented)
+     to restore user choice. -->
 <script is:inline>
+  document.documentElement.setAttribute('data-theme', 'dark');
+  /*
   (function () {
     try {
       var stored = localStorage.getItem('theme');
@@ -105,6 +108,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
       document.documentElement.setAttribute('data-theme', 'dark');
     }
   })();
+  */
 </script>
 
 {umamiOn && (
@@ -131,9 +135,15 @@ const umamiOn  = !!(umamiSrc && umamiId);
     </div>
 
     <div class="nav-right">
+      {/* Theme toggle — temporarily disabled. The button is kept
+          commented out so it can be re-enabled by uncommenting
+          this block (the click handler in nav.js still looks for
+          #themeToggle and short-circuits when it isn't there). */}
+      {/*
       <button class="btn btn-ghost theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
         <span class="btn-icon"><svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
       </button>
+      */}
       <button class="btn btn-ghost nav-cta" type="button" data-umami-event="nav-cta-start-project" onclick="openComposeModal(1)">
         <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
         <span>Start project</span>
@@ -151,11 +161,16 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <a href="/case-studies" data-page="cases" class:list={[{ active: activePage === 'cases' }]} onclick="toggleMobile()">Work</a>
   <a href="/contact" data-page="contact" class:list={[{ active: activePage === 'contact' }]} onclick="toggleMobile()">Contact</a>
   <div class="mobile-menu-secondary">
+    {/* Mobile theme toggle — temporarily disabled. Uncomment to
+        restore. The handler in nav.js short-circuits when
+        #mobileThemeToggle isn't in the DOM. */}
+    {/*
     <button class="mobile-menu-btn" type="button" id="mobileThemeToggle" aria-label="Toggle dark mode">
       <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
       <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       <span class="mobile-theme-label">Switch theme</span>
     </button>
+    */}
     <button class="mobile-menu-btn mobile-menu-btn--primary" type="button" data-umami-event="mobile-menu-start-project" onclick="toggleMobile(); openComposeModal(1);">
       <span>Start project</span>
     </button>

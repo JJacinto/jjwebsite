@@ -19,6 +19,11 @@ export interface Case {
   outcomes: CaseOutcome[];
   sections: CaseSection[];
   quote: string;
+  /* Soft-hide flag. When true the case is filtered out of the
+     /case-studies index grid and of the next-case nav, but the
+     [slug].astro route still builds — direct deep-links keep
+     working. Flip to false (or remove) to surface again. */
+  hidden?: boolean;
 }
 
 export const CASES: Case[] = [
@@ -28,7 +33,7 @@ export const CASES: Case[] = [
     cat: 'Design · StreamYard',
     title: 'Redefining webinar customization',
     subtitle: "How I redesigned the end-to-end customization experience for StreamYard's webinar product, serving 5M+ live streaming users.",
-    img: '/assets/images/case-webinar.avif', imgW: 1230, imgH: 1056,
+    img: '/assets/images/case-namecheap.avif', imgW: 1600, imgH: 775,
     year: '2023', role: 'Senior Product Designer', company: 'StreamYard', duration: '6 months',
     keywords: ['Webinar UX', 'Customization', 'Design Systems', 'User Research', 'Figma'],
     achievements: [
@@ -99,6 +104,7 @@ export const CASES: Case[] = [
     quote: 'The design system became the single source of truth — reducing design debt and letting the team move faster with confidence.',
   },
   {
+    hidden: true,
     slug: 'reshaping-an-ai-training-platform',
     legacyId: 'case-talkdesk',
     cat: 'Design · Talkdesk',
@@ -129,7 +135,7 @@ export const CASES: Case[] = [
     cat: 'Design · Namecheap',
     title: 'Designing a support chat experience',
     subtitle: "Building a customer support platform from the ground up for Namecheap's engineering team — reducing ticket volume and improving resolution speed.",
-    img: '/assets/images/case-namecheap.avif', imgW: 1600, imgH: 775,
+    img: '/assets/images/case-webinar.avif', imgW: 1230, imgH: 1056,
     year: '2019–2020', role: 'Product Designer', company: 'Namecheap', duration: '12 months',
     keywords: ['Customer Support', 'Internal Tools', 'Chat UX', 'Engineering Platform', 'B2B2C'],
     achievements: [

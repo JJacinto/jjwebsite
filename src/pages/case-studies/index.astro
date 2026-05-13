@@ -2,8 +2,11 @@
 import Base from '../../layouts/Base.astro';
 import { CASES } from '../../data/cases';
 
-const featured = CASES.slice(0, 2);
-const rest = CASES.slice(2);
+/* Soft-hide via the `hidden` flag in cases.ts — filter the visible
+   list once, then slice into featured/rest from the filtered view. */
+const visible  = CASES.filter(c => !c.hidden);
+const featured = visible.slice(0, 2);
+const rest     = visible.slice(2);
 ---
 <Base
   activePage="cases"
@@ -14,8 +17,8 @@ const rest = CASES.slice(2);
   <div class="cases-wrap">
     <div class="marquee cases-marquee">
       <div class="marquee-track">
-        <span>CASE STUDIES</span><span>·</span><span>CASE STUDIES</span><span>·</span>
-        <span>CASE STUDIES</span><span>·</span><span>CASE STUDIES</span><span>·</span>
+        <span>CASE STUDIES</span><span>·</span><span>WORK</span><span>·</span>
+        <span>CASE STUDIES</span><span>·</span><span>WORK</span><span>·</span>
       </div>
     </div>
     <div class="container">
@@ -30,7 +33,7 @@ const rest = CASES.slice(2);
           </a>
         ))}
       </div>
-      <div class="cases-grid">
+      <div class={rest.length <= 2 ? 'cases-grid-row-2' : 'cases-grid'}>
         {rest.map((c, i) => (
           <a class={`case-card reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`} data-umami-event="case-card-index" data-umami-event-slug={c.slug}>
             <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="lazy">

@@ -39,7 +39,10 @@ import Base from '../layouts/Base.astro';
             <div class="contact-card-value">contact@joaojacinto.com</div>
           </div>
           <button class="btn btn-ghost contact-card-btn" data-umami-event="contact-email-copy" onclick="copyEmail(this)" aria-label="Copy email address">
-            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span>
+            <span class="btn-icon">
+              <svg class="copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg class="copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
             <span id="emailHint">Copy</span>
           </button>
         </div>
@@ -92,7 +95,18 @@ function copyEmail(el) {
        (CCooppyy) because of the c1/c2 layered spans. */
     const original = hint.innerHTML;
     hint.textContent = 'Copied!';
-    setTimeout(() => { hint.innerHTML = original; }, 2000);
+    /* Swap the copy SVG out for a checkmark for the same 2s window
+       — the icon transition reinforces the success state alongside
+       the label change. */
+    const def = el.querySelector('.copy-icon-default');
+    const ok  = el.querySelector('.copy-icon-success');
+    if (def) def.style.display = 'none';
+    if (ok)  ok.style.display  = '';
+    setTimeout(() => {
+      hint.innerHTML = original;
+      if (def) def.style.display = '';
+      if (ok)  ok.style.display  = 'none';
+    }, 2000);
   });
 }
 

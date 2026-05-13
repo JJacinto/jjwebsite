@@ -7,8 +7,16 @@ export function getStaticPaths() {
 }
 
 const { caseData: c } = Astro.props;
-const idx = CASES.findIndex(x => x.slug === c.slug);
-const next = CASES[(idx + 1) % CASES.length];
+/* "Next case" walks only the visible cases — soft-hidden ones (see
+   the `hidden` flag in cases.ts) are skipped so they don't surface
+   via the case-detail pager. getStaticPaths still builds their
+   pages above, so direct URLs continue to work. */
+const visibleCases = CASES.filter(x => !x.hidden);
+const visIdx = visibleCases.findIndex(x => x.slug === c.slug);
+/* If the current case is itself hidden (deep-linked), fall back to
+   the first visible case rather than NaN-ing the modulo. */
+const nextIdx = visIdx === -1 ? 0 : (visIdx + 1) % visibleCases.length;
+const next = visibleCases[nextIdx];
 const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 
 /* Side-TOC items. Labels are fixed (Context / Problem / Approach /

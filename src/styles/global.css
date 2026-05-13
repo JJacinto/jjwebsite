@@ -17,15 +17,15 @@ html { scroll-behavior: smooth; }
 /* Smooth cross-fade when the theme toggle is pressed. The
    .theme-transitioning class is added to <html> by the toggle
    handler in nav.js just before data-theme flips, then removed
-   500ms later. While present, every element gets a 0.5s ease
-   transition on the properties that depend on theme-aware tokens
-   (text color, background, border, SVG fill/stroke, shadow), so
-   the swap reads as a slow fade instead of an instant flash.
-   !important wins against the per-component transitions
-   (transition: color X, …) that already exist site-wide for
-   their own hover/state behavior — those resume once the class
-   drops off. Reduced-motion users never get the class added, so
-   their swap stays instant. */
+   500ms later. Acts as a DEFAULT transition for theme-dependent
+   properties — elements that already declare their own
+   `transition` (buttons, contact-card, case-toc indicator, etc.)
+   keep theirs and snap into the new colors at their own pace.
+   Dropping !important here was necessary: with it, per-element
+   transitions were being clobbered for 500ms and some colours
+   read as "not shifting" because their normal timing pipeline
+   was overridden then reverted mid-fade. Reduced-motion users
+   never get the class added, so their swap stays instant. */
 html.theme-transitioning,
 html.theme-transitioning *,
 html.theme-transitioning *::before,
@@ -36,7 +36,7 @@ html.theme-transitioning *::after {
     border-color 0.5s ease,
     fill 0.5s ease,
     stroke 0.5s ease,
-    box-shadow 0.5s ease !important;
+    box-shadow 0.5s ease;
 }
 body {
   font-family: var(--font-family-body);
@@ -95,28 +95,21 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
 
 /* ──────────────────────────────────────────────────────────────────
  * Always-dark surface scoping
- * These elements ALWAYS have a dark background regardless of theme
- * (the cta-footer-wrap is the dark band before the footer; the
- * contact hero and footer share the same dark-band treatment; the
- * compose modal is a dark sheet on a scrim; .nav-dark variant
- * applies on case-study detail pages).
+ * These elements ALWAYS have a dark background regardless of theme:
+ * the compose modal sheet sits on a scrim (consistent dark UI), and
+ * .nav-dark applies on case-study detail pages where the nav is
+ * forced dark for branding.
+ *
+ * Used to also scope .cta-footer-wrap and .footer here, but that
+ * locked the bottom of every page in a fixed-dark state while the
+ * rest of the page transitioned on theme toggle. Removed so those
+ * sections inherit the page theme and shift with it.
  *
  * Children read --text-primary, --text-brand, etc. — within these
  * scopes those resolve to "always-light-on-dark" values, so the
- * same component CSS works unchanged in both themes.
- *
- * Without this, the dark-mode override of --text-primary (which
- * flips to light for the page) would still apply here too — but
- * since these surfaces don't flip, the light text on light surface
- * would happen to work in dark mode; the original problem was that
- * --text-inverse was flipping dark, breaking the LIGHT mode for
- * elements that explicitly used it. The fix above (removing the
- * dark override of inverse tokens) plus this scoping closes the
- * loop on both modes.
+ * same component CSS works unchanged regardless of page theme.
  * ────────────────────────────────────────────────────────────── */
-.cta-footer-wrap,
 .compose-modal,
-.footer,
 .nav.nav-dark {
   --text-primary:    var(--color-neutral-30);
   --text-secondary:  rgba(240, 237, 232, 0.65);
@@ -499,13 +492,13 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 /* Mobile primary action — filled brand colour, higher visual weight
    than the outline-only Switch theme button. The Start project button
    is the main CTA in the mobile menu, so it deserves the prominent
-   treatment to lead the eye. Padding is bumped a tier to add visible
-   weight in the stack. */
+   treatment to lead the eye. Padding inherits from .mobile-menu-btn
+   so both stacked buttons stay the same height — the colour fill +
+   medium weight do the hierarchy work. */
 .mobile-menu-btn--primary {
   background: var(--fill-brand-default);
   border-color: var(--fill-brand-default);
   color: var(--color-neutral-0);
-  padding: var(--dimension-space-16) var(--dimension-space-16);
   font-weight: var(--font-weight-medium);
 }
 @media (hover: hover) {
@@ -603,13 +596,16 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 
 .btn-dark-outline {
   background: transparent;
-  border: var(--dimension-border-width-2) solid var(--component-footer-text-muted);
-  color: var(--text-inverse);
+  /* Theme-aware now — the .cta-footer-wrap that hosts this button
+     no longer locks to a dark surface, so the border + text must
+     follow the page theme to stay legible in both modes. */
+  border: var(--dimension-border-width-2) solid var(--border-strong);
+  color: var(--text-primary);
 }
-.btn-dark-outline::before { background: var(--component-footer-gradient-stop-4); }
+.btn-dark-outline::before { background: var(--fill-brand-muted); }
 .btn-dark-outline:hover {
-  border-color: rgba(255,255,255,0.6);
-  color: var(--color-neutral-0);
+  border-color: var(--text-primary);
+  color: var(--text-primary);
 }
 
 /* ============================================================
@@ -1022,6 +1018,45 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
 }
 .testimonial-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
+/* Refraction light effect — two diagonal gradient bands sweep
+   across the card in opposite directions, masked to show only on
+   the 6px border ring. Single animation animates both background-
+   position layers via multi-value keyframes (separate animations
+   would fight over the shared background-position property).
+   Per-card animation-delay desyncs the cards so the moving light
+   pattern reads as random across the masonry. */
+.testimonial-stroke-light {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.18) 50%, transparent 62%),
+    linear-gradient(245deg, transparent 35%, rgba(255, 255, 255, 0.10) 50%, transparent 65%);
+  background-size: 240% 240%, 320% 320%;
+  background-repeat: no-repeat;
+  /* Cut out the padding-box from the visible mask so the
+     gradients only show inside the 6px border zone. */
+  mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  -webkit-mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  animation: testimonial-stroke-refract 22s linear infinite;
+}
+.testimonials-masonry .testimonial-card:nth-child(2) .testimonial-stroke-light { animation-delay: -7s; }
+.testimonials-masonry .testimonial-card:nth-child(3) .testimonial-stroke-light { animation-delay: -14s; }
+@keyframes testimonial-stroke-refract {
+  0%   { background-position: -100% -60%, 200%  200%; }
+  100% { background-position:  200%  200%, -100% -60%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .testimonial-stroke-light { animation: none; }
+}
 /* Brand-tint wash on hover — same recipe .case-card uses. The fade-in
    pseudo sits above the card background but below the content (header
    + quote get z-elevated below) so the avatar, name, and quote stay
@@ -1145,6 +1180,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .case-card-body { padding: var(--dimension-space-20) var(--dimension-space-20) var(--dimension-space-24); position: relative; z-index: var(--z-elevated); }
 .case-card-cat { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-8); }
 .case-card-title { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-md); letter-spacing: var(--font-letter-spacing-snug); line-height: var(--font-line-height-snug); color: var(--text-primary); }
+/* Highlight subline — one-sentence outcome shown below the title
+   on home-page case cards. Body font, secondary text colour so it
+   reads as supporting context, not headline. */
+.case-card-highlight { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-snug); margin-top: var(--dimension-space-8); }
 
 /* Bento variant of .case-card — full-bleed brand color, 4:3 aspect, 4 zones.
    Inherits padding, radius, shadow, hover and tilt behavior from .case-card. */
@@ -1208,7 +1247,11 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    section. */
 .may-like { padding: clamp(var(--dimension-space-32), 5vw, var(--dimension-space-64)) 0 clamp(var(--dimension-space-80), 10vw, 100px); }
 .may-like .eyebrow { text-align: center; display: block; margin-bottom: var(--dimension-space-40); }
-.may-like-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-24); }
+/* Two-up on the home page now (Redefining + Understanding). The
+   1024px and 480px breakpoints below already collapse to 2-col
+   and 1-col respectively, so the desktop grid just steps down a
+   tier to match. */
+.may-like-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--dimension-space-24); }
 .may-like-cta { text-align: center; margin-top: var(--dimension-space-48); }
 
 .cases-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
@@ -1478,18 +1521,19 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   .how-i-work-divider::before, .how-i-work-divider::after { animation: none; }
 }
 
-/* Condensed tool index — now the right-hand column of .how-i-work-grid,
-   separated from the body by the animated stroke (not a border-top).
-   The two-column auto-grid on the <dl> lets every <dt> share one
-   auto-sized label column, keeping the <dd> values vertically
-   aligned across rows without reaching for pixel widths. */
+/* Condensed tool index — right-hand column of .how-i-work-grid,
+   separated from the body by the animated stroke. <dt> stacks
+   on top of its <dd> (single column), with a small gap inside
+   each label/values pair and a larger gap between pairs so the
+   groups read as discrete chunks. */
 .tool-index {
   margin: 0;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--dimension-space-10) var(--dimension-space-16);
-  align-items: baseline;
+  grid-template-columns: 1fr;
+  gap: var(--dimension-space-2);
 }
+.tool-index dt + dd { margin-bottom: var(--dimension-space-16); }
+.tool-index dd:last-of-type { margin-bottom: 0; }
 .tool-index dt {
   font-family: var(--font-family-body);
   font-weight: var(--font-weight-medium);
@@ -1516,14 +1560,14 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
     row-gap: var(--dimension-space-32);
   }
   .how-i-work-divider { display: none; }
+  /* Desktop already stacks .tool-index in a single column now,
+     so the mobile breakpoint only adds the border-top separator
+     (the animated stroke goes away when the grid collapses to
+     one column — the index needs its own visual divider above). */
   .tool-index {
-    grid-template-columns: 1fr;
-    gap: var(--dimension-space-2);
     padding-top: var(--dimension-space-32);
     border-top: var(--dimension-border-width-1) solid var(--border-subtle);
   }
-  .tool-index dt + dd { margin-bottom: var(--dimension-space-10); }
-  .tool-index dd:last-of-type { margin-bottom: 0; }
 }
 .tool-tag {
   padding: var(--dimension-space-8) var(--dimension-space-16); border: var(--dimension-border-width-2) solid var(--border-subtle); border-radius: var(--radius-pill);
@@ -1574,21 +1618,22 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .cta-footer-wrap {
   position: relative;
   min-height: 760px;
-  background: var(--background-section-inverse);
+  /* Theme-aware subtle band — slightly off from page bg in both
+     themes, so the CTA section shifts visibly with the theme
+     toggle. Previously this was --background-section-inverse
+     (locked dark in both themes), which made the bottom of every
+     page read as "stuck in dark mode" while the page above
+     transitioned. */
+  background: var(--background-section-muted);
   overflow: hidden;
 }
-/* "Solo" footer mode — used on contact + error pages. The canvas
-   paints the FBM-dithered gradient (same script as the regular
-   cta-footer-wrap) for a seamless organic transition. Background
-   here is just a fallback for the tiny moment before the canvas
-   first paints; flex pushes the footer to the bottom so it sits
-   over the dark end of the canvas gradient. */
+/* "Solo" footer mode — used on contact + error pages. */
 .cta-footer-wrap--solo {
   min-height: 240px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: var(--background-section-inverse);
+  background: var(--background-section-muted);
 }
 
 /* Page-wide particle + gradient overlay — same particle system as
@@ -1850,8 +1895,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .about-cta > h2,
 .about-cta > p,
 .about-cta > .about-cta-btns { position: relative; z-index: var(--z-raised); }
-.about-cta h2 { color: var(--text-inverse); margin-bottom: var(--dimension-space-16); font-size: clamp(1.8rem, 3vw, 2.4rem); }
-.about-cta p { color: rgba(240,237,232,0.55); max-width: 420px; margin: 0 auto var(--dimension-space-32); }
+/* Theme-aware now — .cta-footer-wrap no longer locked to a dark
+   surface, so headline + body need to follow the page theme to
+   stay readable. --text-inverse was always-light-cream; swapped
+   for --text-primary which flips. */
+.about-cta h2 { color: var(--text-primary); margin-bottom: var(--dimension-space-16); font-size: clamp(1.8rem, 3vw, 2.4rem); }
+.about-cta p { color: var(--text-secondary); max-width: 420px; margin: 0 auto var(--dimension-space-32); }
 .about-cta-btns { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; }
 /* Compose calendar (Book a call tab) */
 .compose-cal { display: flex; flex-direction: column; gap: var(--dimension-space-20); }
@@ -2558,7 +2607,7 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-24);
   flex-wrap: wrap;
 }
-.footer p { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--component-footer-text-muted); line-height: var(--font-line-height-loose); text-align: right; text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wide); overflow-wrap: anywhere; margin: 0; }
+.footer p { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); line-height: var(--font-line-height-loose); text-align: right; text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wide); overflow-wrap: anywhere; margin: 0; }
 @media (max-width: 640px) { /* near --bp-sm (480px) */
   .footer .container {
     flex-direction: column;
@@ -2567,19 +2616,19 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   }
   .footer p { text-align: left; }
 }
-.footer strong { color: var(--component-footer-text-default); font-weight: var(--font-weight-medium); }
+.footer strong { color: var(--text-secondary); font-weight: var(--font-weight-medium); }
 .footer-email-link {
   background: none; border: none; cursor: pointer;
   /* Inline button — expand vertical hit area without affecting layout
      (line-height contains the visual; padding adds tap area). WCAG 2.5.8 AA satisfied. */
   padding: var(--dimension-space-8) var(--dimension-space-4); margin: calc(-1 * var(--dimension-space-8)) calc(-1 * var(--dimension-space-4));
   font-family: var(--font-family-body); font-size: inherit; text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wide);
-  color: var(--component-footer-text-default);
+  color: var(--text-secondary);
   text-decoration: underline; text-underline-offset: 2px;
   transition: color var(--motion-duration-short);
   position: relative;
 }
-.footer-email-link:hover { color: rgba(255,255,255,0.72); }
+.footer-email-link:hover { color: var(--text-primary); }
 .footer-email-link.copied { color: rgba(255,255,255,0.72); text-decoration: none; }
 /* "Copy to clipboard" tooltip — appears after a small hover delay.
    Anchored to the right edge of the email link, extending leftward.
