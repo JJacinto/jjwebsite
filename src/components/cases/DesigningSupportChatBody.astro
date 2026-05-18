@@ -1,0 +1,1054 @@
+---
+/* Rich body for the "Designing a support chat experience" case
+   study (Namecheap). The shared [slug].astro template renders
+   this when the slug matches; the default templated layout is
+   bypassed. Layout primitives (.rwc-* classes, .case-img-ph,
+   image lightbox) mirror the other custom-body case components
+   so all case studies feel consistent. */
+---
+
+<div class="rwc-body">
+
+  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  <section class="rwc-hero" id="case-context">
+    <div class="rwc-hero-left">
+      <div class="case-cat">Case study · Platform for Namecheap's customer support</div>
+      <h1 class="case-title">Designing a support chat experience</h1>
+      <p class="case-subtitle">
+        One of the biggest domain providers in the world, driven to pursue
+        an amazing customer experience, challenged me to build an in-house
+        customer support app.
+      </p>
+
+      <div class="rwc-callout">
+        <div class="rwc-callout-title">
+          <span class="rwc-callout-star" aria-hidden="true">★</span>
+          Core achievements
+        </div>
+        <ul>
+          <li>
+            Designed a customer support app and widget from scratch,
+            learning from its users, and creating its own design system.
+          </li>
+          <li>
+            Achieved a 97.4% positive feedback rate just 4 months after
+            release, on the new chat and support experience.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rwc-hero-right">
+      <img class="rwc-hero-mark" src="/assets/images/cases/namecheap/hero-mark.svg" alt="Namecheap mark" loading="eager" />
+      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/namecheap/hero.webp" alt="Namecheap branding — Building a better online world together" loading="eager" fetchpriority="high" />
+      </div>
+      <p class="case-img-caption">Image by Namecheap via namecheap.com</p>
+    </div>
+  </section>
+
+  {/* ───────────────────── MY ROLE + KEYWORDS ───────────────────── */}
+  <section class="rwc-role" id="case-role">
+    <div class="rwc-role-left">
+      <div class="eyebrow">My role</div>
+      <h2 class="rwc-h2">UX Designer</h2>
+
+      <p>
+        I led the customer support app design from its start, created a
+        design system to support it, ran research with customer support
+        users, and was responsible for the whole design process, from
+        discovery to delivery.
+      </p>
+
+      <dl class="rwc-aside">
+        <div>
+          <dt>My responsibilities</dt>
+          <dd>Lead designer, front-end code reviewer</dd>
+        </div>
+        <div>
+          <dt>The team</dt>
+          <dd>Lead designer (myself), 7 engineers, 1 product manager, 1 engineering manager, 8 engineers</dd>
+        </div>
+        <div>
+          <dt>Duration</dt>
+          <dd>10 months</dd>
+        </div>
+      </dl>
+    </div>
+
+    <aside class="rwc-role-right">
+      <div class="rwc-initiatives-title">Keywords</div>
+      <ul class="rwc-initiatives-list">
+        <li>Customer support engagement</li>
+        <li>Prototyping</li>
+        <li>Motion</li>
+        <li>Field research</li>
+        <li>Multistreaming</li>
+        <li>Built a design system</li>
+        <li>Designed product from its inception</li>
+      </ul>
+    </aside>
+  </section>
+
+  {/* ───────────────────── THE CHALLENGE ───────────────────── */}
+  <section class="rwc-section" id="case-challenge">
+    <div class="rwc-challenge">
+      <div class="rwc-challenge-text">
+        <div class="eyebrow">The challenge</div>
+        <h2 class="rwc-h2">Customer support chat application</h2>
+        <p>
+          The challenge was to create an in-house customer support
+          application with multichannel capabilities. Namecheap's customer
+          support teams were using a dated app, and it didn't fit their
+          needs. We started by creating a chat + bot, along with a CS agent
+          application, while learning from in-house customer support agents.
+        </p>
+
+        <p class="rwc-currently-live">
+          <strong>Currently live at:</strong><br/>
+          <a href="https://www.namecheap.com/help-center/" target="_blank" rel="noopener noreferrer">Namecheap's Help Center</a><br/>
+          <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">Spaceship</a>
+        </p>
+      </div>
+
+      <div class="rwc-challenge-img">
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/chat-widget-feedback.webp" alt="Chat widget with Your Feedback Matters thumbs prompt" loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── KICKOFF AND RESEARCH ───────────────────── */}
+  <section class="rwc-section" id="case-kickoff">
+    <h2 class="rwc-h2">Kickoff and research</h2>
+    <p class="rwc-lead">
+      The project kicked off with a clear vision, communicated to me and
+      the engineering lead by the existing customer support leads. We
+      started by interviewing them to learn as much as we could about
+      their process, so we could design a v1 that met their needs and
+      provided the structure to scale.
+    </p>
+
+    <div class="rwc-columns cols-3">
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="1-1">
+          <img src="/assets/images/cases/namecheap/shadowing.webp" alt="Shadowing a Namecheap customer support agent at their desk in Ukraine" loading="lazy" />
+        </div>
+        <h3>Shadowing + interviews</h3>
+        <p>
+          Went to Namecheap's Customer Support HQ in Ukraine to meet the
+          agents, supervisors, and managers, and understand how they work
+          daily.
+        </p>
+      </div>
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="1-1">
+          <img src="/assets/images/cases/namecheap/experience-canvas.webp" alt="Experience canvas template — hypothesis, problems, value, users, MVP, success metrics" loading="lazy" />
+        </div>
+        <h3>Built an experience canvas</h3>
+        <p>
+          Used all the input I got from the customer support teams to
+          build an experience canvas, as a blueprint to kickstart the
+          project.
+        </p>
+      </div>
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="1-1">
+          <img src="/assets/images/cases/namecheap/competitive-benchmark.webp" alt="Competitive support tool — VIP inbox, conversations, and reply panel" loading="lazy" />
+        </div>
+        <h3>Competitive benchmark</h3>
+        <p>
+          Identified possible product competitors and highlighted what
+          makes each one stand out, gaps, and benefits.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── WHAT WE DISCOVERED ───────────────────── */}
+  <section class="rwc-section" id="case-discovery">
+    <h2 class="rwc-h2">What we discovered</h2>
+
+    <div class="rwc-discovery">
+      <ul class="rwc-bullets">
+        <li>
+          Agents had inefficient shifts, required an extremely high amount
+          of training to learn 20+ different tools, and their current
+          tool, Kayako, wasn't optimized to their exact needs.
+        </li>
+        <li>
+          Support agents had to handle more than 5 chats at once, while
+          they had 20+ browser tabs open — each with a different, specific
+          tool to solve customer problems.
+        </li>
+        <li>
+          Clients reaching out to customer support had difficulty
+          accessing the chat quickly without their account info.
+          Engagement feedback at the end of the chat was low, which led
+          to poor NPS scores.
+        </li>
+      </ul>
+
+      <div class="rwc-goal">
+        <p class="rwc-goal-eyebrow">Our goal was clear:</p>
+        <h3 class="rwc-goal-title">
+          To build an integrated solution for support agents and customers.
+        </h3>
+        <ul class="rwc-bullets">
+          <li>
+            By increasing agent satisfaction and the ease-of-use of the
+            customer support engagement software, when compared to their
+            current toolset.
+          </li>
+          <li>
+            By increasing the positive feedback received overall from
+            clients, and the absolute number of chats receiving feedback,
+            contributing to an increased NPS score.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── LOW-FI / HIGH-FI / TESTS ───────────────────── */}
+  <section class="rwc-section" id="case-design-iterations">
+    <h2 class="rwc-h2">Low-fi, High-fi, Unmoderated tests</h2>
+
+    <div class="rwc-sketch-grid">
+      <div class="case-img-ph is-filled" data-ratio="4-3">
+        <img class="rwc-flip-v" src="/assets/images/cases/namecheap/sketch-ui-notes.webp" alt="Sketchbook: UI notes into messages — chat bubble layouts" loading="lazy" />
+      </div>
+      <div class="case-img-ph is-filled rwc-rotated-tile" data-ratio="1-1">
+        <img class="rwc-rotate-90" src="/assets/images/cases/namecheap/sketch-arrangement.webp" alt="Sketchbook: arrangement notes and admin report wireframes" loading="lazy" />
+      </div>
+      <div class="case-img-ph is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/namecheap/sketch-bubble-variants.webp" alt="Sketchbook: chat bubble variants — T, T+A, T+A+Expand" loading="lazy" />
+      </div>
+    </div>
+
+    <div class="rwc-columns cols-2">
+      <p>
+        Working out the arrangement between chat bubbles, and
+        distinguishing received from sent ones, just by using layout. Also
+        considering each message's specific actions.
+      </p>
+      <p>
+        Wireframes to map out the variants of the chat bubble. T - Just
+        text / T+A - Text and attachment / T+A+Expand - All the previous
+        but containing a huge text message (allowing collapse/expand).
+      </p>
+    </div>
+
+    {/* System blueprints / User flows */}
+    <div class="rwc-subsection">
+      <h3 class="rwc-h3">System blueprints / User flows</h3>
+      <p>
+        This system blueprint + flow to tackle alerts on
+        disconnect/auth-error/general errors was a big part of making sure
+        the system provided the right UX at such critical moments.
+      </p>
+      <div class="case-img-ph is-filled" data-ratio="16-9">
+        <img src="/assets/images/cases/namecheap/system-blueprint.webp" alt="System blueprint and user flow tackling disconnect, auth-error, and general-error alerts" loading="lazy" />
+      </div>
+    </div>
+
+    {/* High-fi prototypes */}
+    <div class="rwc-subsection">
+      <h3 class="rwc-h3">High-fi prototypes</h3>
+      <p>
+        Moved on to high-fidelity and motion design, where we aimed to
+        provide an easy-going appearance to the chat, with a neutral
+        tone-of-voice.
+      </p>
+
+      <div class="rwc-columns cols-3">
+        <div class="rwc-column">
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/floating-button-states.webp" alt="Floating button — hover, default, agent avatar variants for Storybook Clients and Agents" loading="lazy" />
+          </div>
+          <p class="rwc-caption">
+            Scheme of the floating button states (above), and a complete
+            view of the widget opened with an ongoing conversation.
+          </p>
+        </div>
+        <div class="rwc-column">
+          <div class="rwc-error-stack">
+            <div class="case-img-ph is-filled" data-ratio="1-1">
+              <img src="/assets/images/cases/namecheap/error-503.webp" alt="503 error illustration — ladder, wrench, and pile in a hole" loading="lazy" />
+            </div>
+            <div class="case-img-ph is-filled" data-ratio="1-1">
+              <img src="/assets/images/cases/namecheap/error-404.webp" alt="404 error illustration — ladder and magnifying glass over a hole" loading="lazy" />
+            </div>
+          </div>
+          <p class="rwc-caption">Illustrations for errors.</p>
+        </div>
+        <div class="rwc-column">
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="High-fidelity chat widget mockup — Jane Doe Available" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── CUSTOMER-FACING CHAT ───────────────────── */}
+  <section class="rwc-section" id="case-customer-chat">
+    <h2 class="rwc-h2">The customer-facing chat interface.</h2>
+
+    <div class="rwc-annotated">
+      <ul class="rwc-annotated-list">
+        <li>
+          We opted for a hovering widget that could be there as the user
+          is browsing, unlike Kayako, which used a native OS window
+          separate from the main browser one.
+        </li>
+        <li>We made it themable to any other brand requirements.</li>
+        <li>
+          Avatars only included for agents' messages, as users don't have
+          a profile picture.
+        </li>
+        <li>
+          Floating button included an animated feature to convey the look
+          &amp; feel we wanted.
+        </li>
+      </ul>
+
+      <div class="case-img-ph is-filled rwc-annotated-img" data-ratio="3-4">
+        <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="Annotated customer-facing chat widget" loading="lazy" />
+      </div>
+
+      <ul class="rwc-annotated-list">
+        <li>
+          Visibility of system status is provided on the header, on both
+          agent status and if errors occur.
+        </li>
+        <li>
+          If colorblind, the user can still scan the message author based
+          on bubble grid alignment.
+        </li>
+        <li>Messages stacked if sent within the same sequence (10 seconds).</li>
+        <li>
+          Main input field will reveal additional controls if focused, or
+          if it contains files ready to be sent (progressive disclosure).
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {/* ───────────────────── BUILDING A DESIGN SYSTEM ───────────────────── */}
+  <section class="rwc-section" id="case-design-system">
+    <h2 class="rwc-h2">Building a design system</h2>
+    <h3 class="rwc-h3">From foundation and principles to styleguide and components.</h3>
+    <p>
+      The chat was intended to be a white-label product, so we considered
+      different themes to kick off its system. We did 2 themes to start
+      with, for namecheap.com and ssls.com.
+    </p>
+
+    {/* Restructured: button docs (the largest piece of evidence) is
+       a full-width visual; the two palettes sit as equal-weight
+       tiles below, instead of being squashed alongside it. */}
+    <div class="case-img-ph is-filled" data-ratio="16-10">
+      <img src="/assets/images/cases/namecheap/button-docs.webp" alt="Button component documentation — variants, sizes, color classes, states" loading="lazy" />
+    </div>
+
+    <p class="case-img-caption">
+      Our documentation on Sketch was extensive and kept by myself, and
+      synced with the Storybook front-end repositories.
+    </p>
+
+    <div class="rwc-columns cols-2">
+      <div class="rwc-column">
+        <h3>Status tokens</h3>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/status-colors.webp" alt="Status colors — Success, Warning, Danger, Info tokens at 10/40/50 stops" loading="lazy" />
+        </div>
+      </div>
+      <div class="rwc-column">
+        <h3>Per-brand palette</h3>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/ssls-colors.webp" alt="SSLs.com primary color palette — sep-ssl tokens" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="rwc-columns cols-2">
+      <div class="rwc-column">
+        <h3>Component variants</h3>
+        <p>
+          We mapped and created components to feed the system as the
+          product needs and features evolved. (Alert component above.)
+        </p>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/alert-component.webp" alt="Alert component variants — default, danger, warning, success, info" loading="lazy" />
+        </div>
+      </div>
+      <div class="rwc-column">
+        <h3>Component anatomy</h3>
+        <p>
+          Each component had a description of its anatomy and composition.
+        </p>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/floating-button-anatomy.webp" alt="Floating button anatomy — background, optional badge, content slots" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="rwc-subsection">
+      <h3 class="rwc-h3">Web accessibility</h3>
+      <p>
+        To match WCAG guidelines, we applied contrast compliance (A, AA),
+        focus ordering details, and focus states for keyboard and speech
+        navigation.
+      </p>
+      <div class="case-img-ph is-filled" data-ratio="16-9">
+        <img src="/assets/images/cases/namecheap/accessibility.webp" alt="Web accessibility examples — feedback form, focus order, focus outline on keyboard press" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
+  <section class="rwc-section" id="case-impact">
+    <h2 class="rwc-h2">Outcomes and impact</h2>
+
+    <div class="rwc-stats">
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">28.9<span class="rwc-stat-unit">%</span></div>
+        <div class="rwc-stat-desc">
+          Increase in customer engagement chats for the same period. From
+          15k using Kayako, to 21k, in 4 months.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">4800<span class="rwc-stat-unit">+</span></div>
+        <div class="rwc-stat-desc">
+          Chats received feedback — an increase of over 15% compared to
+          the same period before launch.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">97.4<span class="rwc-stat-unit">%</span></div>
+        <div class="rwc-stat-desc">
+          Positive feedback to all chats, on the new chat and support
+          experience.
+        </div>
+      </div>
+    </div>
+
+    <p>
+      We kept track of metrics such as monthly engagements, monthly
+      feedback rates, and feedback reports.
+    </p>
+
+    {/* Not everything was perfect */}
+    <div class="rwc-subsection">
+      <h3 class="rwc-h3">Not everything was perfect, though.</h3>
+      <div class="rwc-challenge">
+        <div class="rwc-challenge-text">
+          <p>
+            We detected an agent-side platform navigation inefficiency,
+            which we acknowledged after following up with our agents. We
+            adjusted the navigation, tested it, and after 2 weeks we found
+            a solution our agents were happy with.
+          </p>
+          <p>
+            The revamped navigation for the agents' platform achieved a
+            4.6 out of 5 satisfaction rating with the newly proposed
+            navigation, as well as a higher preference compared to the
+            first release, giving us the confidence to move forward with
+            it.
+          </p>
+        </div>
+        <div class="rwc-challenge-img">
+          <div class="case-img-ph is-filled" data-ratio="16-10">
+            <img src="/assets/images/cases/namecheap/preference-survey.webp" alt="Preference survey results between the new and previous navigation" loading="lazy" />
+          </div>
+          <div class="case-img-ph is-filled" data-ratio="16-10">
+            <img src="/assets/images/cases/namecheap/satisfaction-chart.webp" alt="Satisfaction emoji chart — 0%, 0%, 15%, 44%, 41%" loading="lazy" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── CURRENT PRODUCT STATE ───────────────────── */}
+  <section class="rwc-section" id="case-current-state">
+    <h2 class="rwc-h2">Current product state</h2>
+    <p>
+      The Engagement.AI chat is currently available on both
+      <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">namecheap.com</a>
+      and
+      <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">spaceship.com</a>.
+      It's themed according to each of the target brands.
+    </p>
+
+    <div class="rwc-columns cols-3">
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/floating-motion.gif" alt="Floating button and chat window motion in the live product" loading="lazy" />
+        </div>
+        <p class="rwc-caption">Floating button and chat window motion.</p>
+      </div>
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/chat-widget-feedback.webp" alt="Live product — new feedback form" loading="lazy" />
+        </div>
+        <p class="rwc-caption">New feedback form.</p>
+      </div>
+      <div class="rwc-column">
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/live-chat.gif" alt="Live product — chat widget menu with Namecheap Engagement.AI agent" loading="lazy" />
+        </div>
+        <p class="rwc-caption">Chat widget menu.</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── RETROSPECTIVE ───────────────────── */}
+  <section class="rwc-section" id="case-retrospective">
+    <h2 class="rwc-h2">Retrospective</h2>
+
+    <div class="rwc-columns cols-2">
+      <div class="rwc-column">
+        <h3>What went well</h3>
+        <p>
+          Great collaboration with the engineering team led to great
+          results and feedback from both users and customer support
+          agents.
+        </p>
+        <p>
+          Front-end and design collaboration effectiveness and efficiency
+          was consistently improved over time. We gradually refined our
+          design QA process.
+        </p>
+        <p>
+          Having refined the process as a team showed its benefits — at
+          the later stages we were an oiled machine in delivering value.
+        </p>
+      </div>
+      <div class="rwc-column">
+        <h3>What could've been better</h3>
+        <p>
+          Even though it was an in-house project, reaching users with
+          enough time to do research wasn't always easy.
+        </p>
+        <p>Technical delays held the project back in schedule.</p>
+        <p>
+          It was a great challenge to create such a huge product from
+          scratch — but we managed to plan accordingly and we caught on,
+          especially by having managed to be close to our users early on.
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+{/* ───────────────────── IMAGE LIGHTBOX ───────────────────── */}
+<div class="rwc-lightbox" id="dscLightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
+  <button class="rwc-lightbox-close" type="button" aria-label="Close image preview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/>
+    </svg>
+  </button>
+  <img class="rwc-lightbox-img" alt="" />
+</div>
+
+<style>
+  /* ===== Shared placeholder + filled-tile styling ===== */
+  .case-img-ph {
+    border: 2px dashed var(--border-emphasized, var(--border-subtle));
+    border-radius: var(--dimension-radius-lg, 12px);
+    background: var(--surface-muted, rgba(0,0,0,0.03));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--dimension-space-24);
+    text-align: center;
+    color: var(--text-tertiary);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    min-height: 180px;
+  }
+  .case-img-ph[data-ratio="16-9"]  { aspect-ratio: 16 / 9; }
+  .case-img-ph[data-ratio="16-10"] { aspect-ratio: 16 / 10; }
+  .case-img-ph[data-ratio="4-3"]   { aspect-ratio: 4 / 3; }
+  .case-img-ph[data-ratio="3-4"]   { aspect-ratio: 3 / 4; }
+  .case-img-ph[data-ratio="1-1"]   { aspect-ratio: 1 / 1; }
+  .case-img-ph.is-filled {
+    border: 0;
+    padding: 0;
+    background: var(--surface-muted, rgba(0,0,0,0.04));
+    /* Placeholder's 180px min-height was sized for the dashed-empty
+       state; once filled with an image we let the aspect-ratio
+       frame drive height instead so siblings of different ratios
+       don't get force-stretched to match each other. */
+    min-height: 0;
+    height: fit-content;
+    align-self: start;
+  }
+  .case-img-ph.is-filled img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+    cursor: zoom-in;
+  }
+  .case-img-caption {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-align: right;
+    margin-top: var(--dimension-space-8);
+    margin-bottom: var(--dimension-space-48);
+  }
+
+  /* ===== Body wrapper ===== */
+  .rwc-body { color: var(--text-primary); }
+  .rwc-body p {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+    margin-bottom: var(--dimension-space-16);
+  }
+  .rwc-body a { color: var(--text-brand); }
+  .rwc-body h2.rwc-h2 {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: var(--font-letter-spacing-tighter);
+    line-height: var(--font-line-height-heading);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-20);
+  }
+  .rwc-body h3,
+  .rwc-body h3.rwc-h3 {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    color: var(--text-primary);
+    margin-top: var(--dimension-space-32);
+    margin-bottom: var(--dimension-space-12);
+  }
+  .rwc-lead {
+    font-size: var(--font-size-lg) !important;
+    color: var(--text-secondary) !important;
+    margin-bottom: var(--dimension-space-32) !important;
+  }
+  .rwc-caption {
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-tertiary) !important;
+    margin-top: var(--dimension-space-8);
+  }
+  .rwc-body .eyebrow { display: block; margin-bottom: var(--dimension-space-12); }
+
+  .rwc-section {
+    padding-top: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+    border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+  }
+  .rwc-section-tinted {
+    background: color-mix(in srgb, #4ec1e0 12%, var(--surface-default));
+    border-radius: var(--dimension-radius-lg, 12px);
+    padding-left: var(--dimension-space-32);
+    padding-right: var(--dimension-space-32);
+  }
+  .rwc-subsection { margin-top: var(--dimension-space-40); }
+
+  /* ===== Hero ===== */
+  .rwc-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+    margin-bottom: var(--dimension-space-16);
+    border-bottom: var(--dimension-border-width-1) solid var(--border-subtle);
+  }
+  .rwc-hero-img { min-height: 320px; }
+
+  /* Hero right column shrinks to content rather than stretching to
+     the grid row height — the banner sits at its natural size and
+     the mark above it acts as a small fixed badge. */
+  .rwc-hero-right {
+    align-self: start;
+    height: fit-content;
+  }
+  .rwc-hero-right .case-img-ph.rwc-hero-img.is-filled {
+    width: auto;
+    min-height: 0;
+  }
+  .rwc-hero-right .rwc-hero-img img {
+    height: auto;
+    align-self: flex-start;
+  }
+
+  /* Namecheap mark — small fixed badge centered above the banner. */
+  .rwc-hero-mark {
+    display: block;
+    width: var(--dimension-space-80, 80px);
+    height: var(--dimension-size-44, 44px);
+    margin: 0 auto var(--dimension-space-32);
+  }
+
+  .rwc-callout {
+    margin-top: var(--dimension-space-24);
+    /* Super-subtle wash — the border carries most of the visual
+       weight so the callout reads as grouped without sitting on a
+       solid block of color. */
+    background: color-mix(in srgb, var(--text-primary) 4%, var(--surface-default));
+    border: var(--dimension-border-width-1) solid var(--border-subtle);
+    border-radius: var(--dimension-radius-lg, 12px);
+    padding: var(--dimension-space-20) var(--dimension-space-24);
+  }
+  .rwc-callout-title {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-12);
+    display: flex;
+    align-items: center;
+    gap: var(--dimension-space-8);
+  }
+  .rwc-callout-star { color: #e6b800; }
+  .rwc-callout ul { list-style: none; padding: 0; margin: 0; }
+  .rwc-callout li {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+    padding-left: var(--dimension-space-16);
+    position: relative;
+    margin-bottom: var(--dimension-space-6);
+  }
+  .rwc-callout li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--text-brand);
+  }
+
+  /* ===== Role + Keywords ===== */
+  .rwc-role {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--dimension-space-48);
+    padding-top: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+  }
+  .rwc-aside { margin-top: var(--dimension-space-24); display: grid; gap: var(--dimension-space-16); }
+  .rwc-aside dt {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--font-letter-spacing-wider);
+    margin-bottom: var(--dimension-space-4);
+  }
+  .rwc-aside dd {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+  }
+  .rwc-role-right { text-align: center; }
+  .rwc-initiatives-title {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: var(--font-size-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-20);
+  }
+  .rwc-initiatives-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--dimension-space-10);
+  }
+  .rwc-initiatives-list li {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+  }
+
+  /* ===== Challenge / 2-col text+image ===== */
+  .rwc-challenge {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: var(--dimension-space-48);
+    align-items: start;
+    height: auto;
+  }
+  .rwc-challenge-img { display: grid; gap: var(--dimension-space-16); align-items: start; }
+  .rwc-currently-live { font-size: var(--font-size-sm); margin-top: var(--dimension-space-24); }
+
+  /* ===== Multi-column blocks ===== */
+  .rwc-columns {
+    display: grid;
+    gap: var(--dimension-space-32);
+    margin-top: var(--dimension-space-24);
+    margin-bottom: var(--dimension-space-32);
+    /* Don't force columns to a uniform row height — each tile sizes
+       to its own content. Stops a tall image from stretching its
+       short neighbor into wasted whitespace. */
+    align-items: start;
+  }
+  .rwc-columns.cols-2 { grid-template-columns: 1fr 1fr; }
+  .rwc-columns.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .rwc-columns h3 {
+    margin-top: var(--dimension-space-16) !important;
+    font-size: var(--font-size-lg) !important;
+    margin-bottom: var(--dimension-space-10) !important;
+  }
+  .rwc-columns p {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+  }
+
+  /* ===== Discovery layout ===== */
+  .rwc-discovery {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--dimension-space-48);
+    margin-top: var(--dimension-space-16);
+  }
+  .rwc-goal-eyebrow {
+    margin-bottom: var(--dimension-space-8) !important;
+    font-size: var(--font-size-sm);
+  }
+  .rwc-goal-title {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-16);
+  }
+  .rwc-bullets { list-style: none; padding: 0; margin: 0; }
+  .rwc-bullets li {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+    padding-left: var(--dimension-space-16);
+    position: relative;
+    margin-bottom: var(--dimension-space-10);
+  }
+  .rwc-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-brand);
+  }
+
+  /* ===== Sketches grid ===== */
+  .rwc-sketch-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--dimension-space-20);
+    margin-top: var(--dimension-space-24);
+    margin-bottom: var(--dimension-space-16);
+    align-items: start;
+  }
+  /* Photo-of-sketchbook orientation fixes — the source files were
+     scanned at the wrong rotation, so we correct them in CSS rather
+     than re-encoding the assets. transform doesn't affect the
+     element's box, so the rotated tile uses a square frame to give
+     the visually-rotated content a balanced container. */
+  img.rwc-flip-v    { transform: scaleY(-1); }
+  .rwc-rotated-tile { overflow: hidden; }
+  .rwc-rotated-tile img.rwc-rotate-90 {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Rotate around the center; intrinsic landscape source becomes
+       visually-portrait inside the 1:1 frame. */
+    transform: rotate(90deg);
+  }
+
+  /* ===== Error illustration stack ===== */
+  .rwc-error-stack {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--dimension-space-16);
+    height: 100%;
+  }
+
+  /* ===== Annotated chat layout ===== */
+  .rwc-annotated {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr 1fr;
+    gap: var(--dimension-space-32);
+    margin-top: var(--dimension-space-24);
+    align-items: start;
+  }
+  .rwc-annotated-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--dimension-space-20);
+  }
+  .rwc-annotated-list li {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+  }
+  .rwc-annotated-img { max-width: 360px; margin: 0 auto; }
+
+  /* ===== Stats ===== */
+  .rwc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--dimension-space-40);
+    margin: var(--dimension-space-32) 0;
+  }
+  .rwc-stat-n {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    color: var(--text-primary);
+    letter-spacing: var(--font-letter-spacing-tighter);
+    line-height: 1;
+    margin-bottom: var(--dimension-space-12);
+  }
+  .rwc-stat-unit {
+    font-size: 0.6em;
+    margin-left: 2px;
+    color: var(--text-secondary);
+  }
+  .rwc-stat-desc {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    line-height: var(--font-line-height-loose);
+    max-width: 30ch;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 960px) {
+    .rwc-hero,
+    .rwc-role,
+    .rwc-challenge,
+    .rwc-discovery { grid-template-columns: 1fr; }
+    .rwc-role-right { text-align: left; }
+    .rwc-columns.cols-2,
+    .rwc-columns.cols-3,
+    .rwc-sketch-grid { grid-template-columns: 1fr; }
+    .rwc-annotated { grid-template-columns: 1fr; }
+    .rwc-annotated-img { max-width: 100%; }
+    .rwc-stats { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
+  }
+
+  /* ===== Lightbox ===== */
+  .rwc-body img:not(.rwc-lightbox-img) { cursor: zoom-in; }
+
+  .rwc-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--dimension-space-24);
+    opacity: 0;
+    transition: opacity var(--motion-duration-standard, 220ms) var(--motion-easing-standard, ease);
+  }
+  .rwc-lightbox[hidden] { display: none; }
+  .rwc-lightbox.is-open { opacity: 1; }
+
+  .rwc-lightbox-img {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: var(--dimension-radius-md, 8px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    cursor: zoom-out;
+  }
+
+  .rwc-lightbox-close {
+    position: fixed;
+    top: var(--dimension-space-20);
+    right: var(--dimension-space-20);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--motion-duration-short, 140ms) ease, transform var(--motion-duration-short, 140ms) ease;
+  }
+  .rwc-lightbox-close:hover,
+  .rwc-lightbox-close:focus-visible { background: rgba(0, 0, 0, 0.85); transform: scale(1.06); }
+  .rwc-lightbox-close svg { width: 22px; height: 22px; }
+</style>
+
+<script is:inline>
+  /* Lightbox wiring — same pattern as the other case bodies.
+     Own overlay id (dscLightbox) keeps overlays scoped per case. */
+  (function () {
+    function init() {
+      var body = document.querySelector('.rwc-body');
+      var overlay = document.getElementById('dscLightbox');
+      if (!body || !overlay) return;
+      if (overlay.dataset.lbReady === '1') return;
+      overlay.dataset.lbReady = '1';
+
+      var lbImg = overlay.querySelector('.rwc-lightbox-img');
+      var closeBtn = overlay.querySelector('.rwc-lightbox-close');
+      var lastFocus = null;
+
+      function openLb(src, alt) {
+        lastFocus = document.activeElement;
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        overlay.hidden = false;
+        void overlay.offsetWidth;
+        overlay.classList.add('is-open');
+        document.documentElement.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function closeLb() {
+        overlay.classList.remove('is-open');
+        document.documentElement.style.overflow = '';
+        setTimeout(function () {
+          overlay.hidden = true;
+          lbImg.src = '';
+          if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+        }, 220);
+      }
+
+      body.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || t.tagName !== 'IMG') return;
+        if (t.classList && t.classList.contains('rwc-lightbox-img')) return;
+        e.preventDefault();
+        openLb(t.currentSrc || t.src, t.alt);
+      });
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target.closest('.rwc-lightbox-close')) { closeLb(); return; }
+        if (e.target === overlay || e.target === lbImg) closeLb();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !overlay.hidden) closeLb();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

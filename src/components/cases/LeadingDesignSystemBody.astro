@@ -1,0 +1,668 @@
+---
+/* Rich body for the "Leading and managing a design system" case
+   study. The shared [slug].astro template renders this when the
+   slug matches; the default templated layout is bypassed. Layout
+   primitives (.rwc-* classes, .case-img-ph, image lightbox)
+   mirror the other custom-body case components so all three feel
+   consistent. */
+---
+
+<div class="rwc-body">
+
+  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  <section class="rwc-hero" id="case-context">
+    <div class="rwc-hero-left">
+      <div class="case-cat">Case study · StreamYard Design System</div>
+      <h1 class="case-title">Leading and managing a design system</h1>
+      <p class="case-subtitle">
+        Implemented and led a cross-functional design system team across 6
+        teams for enhanced product quality, accessibility, and efficiency.
+      </p>
+
+      <div class="rwc-callout">
+        <div class="rwc-callout-title">
+          <span class="rwc-callout-star" aria-hidden="true">★</span>
+          Core achievements
+        </div>
+        <ul>
+          <li>
+            Coordinated 6 product teams' engineers and designers to
+            continuously contribute to a design system.
+          </li>
+          <li>
+            Enabled improved product accessibility (WCAG AA), refined
+            components' design, and laid the foundations for a dark mode
+            (a top customer request).
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rwc-hero-right">
+      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/sy-ds/hero.webp" alt="StreamYard design system planning overview" loading="eager" fetchpriority="high" />
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── MY ROLE ───────────────────── */}
+  <section class="rwc-role" id="case-role">
+    <div class="rwc-role-left">
+      <div class="eyebrow">My role</div>
+      <h2 class="rwc-h2">Lead designer and design system manager</h2>
+
+      <p>
+        The design system project was driven by a design-focused strategy,
+        led by myself and another designer. We managed the project,
+        coordinating with engineers, project managers, and documenting
+        components thoroughly. Collaboration and reviews ensured high
+        standards and alignment with project goals, showcasing the impact
+        of strategic design leadership. We created foundational design
+        elements and tokens for consistency and a single source of truth
+        across design and engineering.
+      </p>
+
+      <dl class="rwc-aside">
+        <div>
+          <dt>My responsibilities</dt>
+          <dd>Lead designer, Design system manager, Co-project manager, Front-end code reviewer</dd>
+        </div>
+        <div>
+          <dt>The team</dt>
+          <dd>2 design leads, 6 designers, 7 engineers (from 6 separate product teams), 1 engineering manager</dd>
+        </div>
+        <div>
+          <dt>Duration</dt>
+          <dd>10 months</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  {/* ───────────────────── THE CHALLENGE ───────────────────── */}
+  <section class="rwc-section" id="case-challenge">
+    <div class="eyebrow">The challenge</div>
+    <h2 class="rwc-h2">
+      Design deliverables and code built were different. In some cases,
+      there were 5+ variations of a single component.
+    </h2>
+
+    <p>
+      The design team at StreamYard encountered significant hurdles that
+      prompted the development of a robust design system. A notable
+      disparity between designs and their corresponding code resulted in
+      inconsistencies that impacted the final product's cohesion and
+      quality. All designers frequently found themselves redoing components
+      due to discrepancies in dimensions, spacing, and other crucial
+      elements. Similarly, developers often had to reconstruct or adjust
+      existing components, adding to their workload and impeding efficiency.
+    </p>
+
+    <p>
+      Complicating matters was the product's extensive scale, which was
+      already firmly established and operational in the market when the
+      need for a formal design approach arose. This meant there was no
+      existing infrastructure in Figma, forcing the team to construct
+      everything from scratch. Furthermore, the design team operated at
+      full capacity, with limited resources and no budget for expansion,
+      posing challenges in resource allocation for this extensive endeavor.
+    </p>
+
+    <p>
+      The adoption of a design system was viewed as a strategic maneuver to
+      tackle these issues. By centralizing design components and
+      establishing a singular point of truth through the design system, the
+      team aimed to eradicate disparities and streamline both the design
+      and development processes. Despite requiring a coordinated effort to
+      do this, the objective was to build the system efficiently and
+      strategically, ensuring it could address the challenges of aligning
+      design with code, minimizing repetitive tasks, and bolstering overall
+      product coherence without requiring team expansion. This wasn't
+      merely a quick fix but a long-term investment in enhancing the
+      quality and scalability of StreamYard's product design.
+    </p>
+
+    <div class="rwc-columns cols-2">
+      <div>
+        <h3>Engineers and designers were unhappy with the disparity between the design files and our Storybook library. It led us to severe inefficiency.</h3>
+      </div>
+      <div>
+        <h3>By auditing component usage we identified the scale of the problem.</h3>
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── ORGANIZING THE TEAM ───────────────────── */}
+  <section class="rwc-section" id="case-organizing">
+    <div class="eyebrow">Organizing the team</div>
+    <h2 class="rwc-h2">
+      We started by setting goals and our contribution model
+    </h2>
+
+    <p>
+      To guarantee all team members had clarity on what to do, when, and
+      why, we started by drafting OKRs for both design contributors and
+      design system engineers. Design contributor goals were aimed at
+      completing documentation for component proposals and building
+      toolkits to increase design efficiency while ensuring great quality,
+      whereas design system engineer goals targeted component merges and
+      adoption over time in our codebases. We organized our process by
+      setting up a contribution model detailing the required checkpoints
+      each step of the way, starting from the ideation phase all the way
+      to the adoption phase.
+    </p>
+
+    <div class="rwc-options">
+      <div class="rwc-option">
+        <div class="case-img-ph is-filled" data-ratio="4-3">
+          <img src="/assets/images/cases/sy-ds/team-goals.webp" alt="Team Goals (Q1) in Notion — Build lovable products objective and key results" loading="lazy" />
+        </div>
+        <p class="rwc-caption">
+          "Build lovable products" objective and key results, with 2 key
+          results. Tracked weekly.
+        </p>
+      </div>
+      <div class="rwc-option">
+        <div class="case-img-ph is-filled" data-ratio="16-10">
+          <img src="/assets/images/cases/sy-ds/contribution-model.webp" alt="v2 - Contribution model flow diagram from Figma" loading="lazy" />
+        </div>
+        <p class="rwc-caption">
+          Led a series of workshops aimed at agreeing on a contribution
+          model for the design system, which became an integral part of
+          each component's documentation.
+        </p>
+      </div>
+    </div>
+
+    <p>
+      The design system project was driven by a design-focused strategy,
+      highlighting design's pivotal role in shaping project outcomes and
+      product improvements. As design leads, we created core design
+      elements and tokens for consistency across design and development.
+      Using Figma and atomic design principles, we ensured components were
+      adaptable and reusable. Acting as project managers, we collaborated
+      closely with engineers, documenting components thoroughly for
+      seamless handover. Continuous teamwork and reviews maintained high
+      standards, showcasing the power of design leadership in tech
+      development.
+    </p>
+
+    <div class="rwc-subsection">
+      <div class="case-img-ph is-filled" data-ratio="16-9">
+        <img src="/assets/images/cases/sy-ds/component-checklist.webp" alt="Figma Buttons component page with contribution-model checklist embedded in documentation" loading="lazy" />
+      </div>
+      <p class="case-img-caption">
+        Our contribution model then became a core part of our component
+        documentation, where each designer had checkpoints for their
+        component and guideline proposals.
+      </p>
+    </div>
+  </section>
+
+  {/* ───────────────────── ESTABLISHING WEEKLY PRACTICE ───────────────────── */}
+  <section class="rwc-section" id="case-weekly-practice">
+    <h2 class="rwc-h2">Establishing a weekly practice</h2>
+
+    <p>
+      As co-design lead and project manager at StreamYard, I orchestrated
+      collaboration across 6 teams, guiding the project alongside another
+      design lead. We coordinated design and engineering efforts,
+      establishing foundational tokens and applying atomic design
+      principles to create detailed components and guidelines. Our
+      engineering team then transformed these into reusable React
+      components, benefiting all of StreamYard's development and design
+      teams.
+    </p>
+
+    <p>
+      To keep all team members focused on our goal, I hosted a weekly
+      design system sync to track progress week-in, week-out. Facilitating
+      regular meetings among design and engineering leads ensured clear
+      communication and alignment, preempting issues and maintaining
+      momentum.
+    </p>
+
+    <p>
+      My role was crucial in ensuring the design system met technical and
+      aesthetic standards, enhancing workflow and product consistency.
+    </p>
+
+    <div class="rwc-options">
+      <div class="rwc-option">
+        <div class="case-img-ph is-filled" data-ratio="4-3">
+          <img src="/assets/images/cases/sy-ds/cycle.webp" alt="Four-step design system cycle: Define experience specs, Build and adopt, Adopt and promote, Communicate and evolve" loading="lazy" />
+        </div>
+      </div>
+      <div class="rwc-option">
+        <div class="case-img-ph is-filled" data-ratio="4-3">
+          <img src="/assets/images/cases/sy-ds/slack-sync.webp" alt="DS Leads sync — Slack notes and takeaways from a weekly meeting" loading="lazy" />
+        </div>
+      </div>
+    </div>
+
+    <div class="rwc-subsection">
+      <div class="case-img-ph is-filled" data-ratio="16-9">
+        <img src="/assets/images/cases/sy-ds/progress-board.webp" alt="SY Design System Jira board — components in To Do, In Progress, Ready to Publish, Published, and In Adoption columns" loading="lazy" />
+      </div>
+      <p class="case-img-caption">
+        Each week, we looked back at how we were doing to achieve our
+        goals. Component adoption was tracked alongside design and
+        engineering work, so progress stayed visible across both crafts.
+      </p>
+    </div>
+
+    <div class="rwc-subsection">
+      <div class="case-img-ph is-filled" data-ratio="16-9">
+        <img src="/assets/images/cases/sy-ds/quarter-status.webp" alt="This quarter status — 8 components to finalize design, 3 to adopt, plus building and adoption lists" loading="lazy" />
+      </div>
+      <p class="case-img-caption">
+        A quarter-at-a-glance view kept leadership and contributors aligned
+        on what was finishing, what was building, and what was ready to
+        adopt.
+      </p>
+    </div>
+  </section>
+
+  {/* ───────────────────── DESIGN ───────────────────── */}
+  <section class="rwc-section" id="case-design">
+    <h2 class="rwc-h2">Design</h2>
+
+    <p>
+      Components were specified with the full surface area engineers needed
+      to implement them: every type, variant, size, state, icon
+      configuration, spacing token, and usage guideline. Each spec was
+      paired with a contribution checklist so component handover stayed
+      consistent across designers.
+    </p>
+
+    <div class="case-img-ph is-filled" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-ds/button-spec.webp" alt="Button component specification — spacing rules and usage guidance, light and dark variants side-by-side" loading="lazy" />
+    </div>
+
+    <p class="case-img-caption">
+      The tokens and scoped variables allowed the entire theme to be
+      swappable between light and dark modes with a simple setting change.
+    </p>
+
+    <div class="rwc-subsection">
+      <div class="case-img-ph is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/sy-ds/color-tokens.webp" alt="Color token table in Figma — neutral, primary, status with mapped light and dark values" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
+  <section class="rwc-section" id="case-impact">
+    <h2 class="rwc-h2">Outcomes and impact</h2>
+
+    <div class="rwc-stats">
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">6</div>
+        <div class="rwc-stat-desc">
+          Product teams united into a single DS team and roadmap.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">15<span class="rwc-stat-unit">+</span></div>
+        <div class="rwc-stat-desc">
+          Components designed and documented.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">3</div>
+        <div class="rwc-stat-desc">
+          Core product improvements: WCAG AA*, Dark mode (upcoming),
+          Design-to-code sync*. <em>* partial.</em>
+        </div>
+      </div>
+    </div>
+
+    <p>
+      Despite the premature halt of the StreamYard design system project
+      due to our parent company's sale, its initial progress significantly
+      improved product consistency, aesthetics, and usability. Even
+      incomplete, it streamlined workflows for both design and front-end
+      development, reducing redundancy and effort. Despite constraints,
+      our small team achieved remarkable progress in a short time,
+      demonstrating dedication and skill. The partial rollout lays a
+      foundation for future potential under new ownership.
+    </p>
+  </section>
+
+</div>
+
+{/* ───────────────────── IMAGE LIGHTBOX ─────────────────────
+   Click-to-zoom for every <img> inside the case body. Single
+   overlay element + delegated handler so it picks up any future
+   images automatically. */}
+<div class="rwc-lightbox" id="ldsLightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
+  <button class="rwc-lightbox-close" type="button" aria-label="Close image preview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/>
+    </svg>
+  </button>
+  <img class="rwc-lightbox-img" alt="" />
+</div>
+
+<style>
+  /* ===== Shared placeholder styling ===== */
+  .case-img-ph {
+    border: 2px dashed var(--border-emphasized, var(--border-subtle));
+    border-radius: var(--dimension-radius-lg, 12px);
+    background: var(--surface-muted, rgba(0,0,0,0.03));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--dimension-space-24);
+    text-align: center;
+    color: var(--text-tertiary);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    min-height: 180px;
+  }
+  .case-img-ph[data-ratio="16-9"]  { aspect-ratio: 16 / 9; }
+  .case-img-ph[data-ratio="16-10"] { aspect-ratio: 16 / 10; }
+  .case-img-ph[data-ratio="4-3"]   { aspect-ratio: 4 / 3; }
+  .case-img-ph.is-filled {
+    border: 0;
+    padding: 0;
+    background: var(--surface-muted, rgba(0,0,0,0.04));
+  }
+  .case-img-ph.is-filled img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+    cursor: zoom-in;
+  }
+  .case-img-caption {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-align: right;
+    margin-top: var(--dimension-space-8);
+    margin-bottom: var(--dimension-space-48);
+  }
+
+  /* ===== Body wrapper ===== */
+  .rwc-body { color: var(--text-primary); }
+  .rwc-body p {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+    margin-bottom: var(--dimension-space-16);
+  }
+  .rwc-body h2.rwc-h2 {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: var(--font-letter-spacing-tighter);
+    line-height: var(--font-line-height-heading);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-20);
+  }
+  .rwc-body h3,
+  .rwc-body h3.rwc-h3 {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    color: var(--text-primary);
+    margin-top: var(--dimension-space-32);
+    margin-bottom: var(--dimension-space-12);
+  }
+  .rwc-body .eyebrow { display: block; margin-bottom: var(--dimension-space-12); }
+  .rwc-caption {
+    font-size: var(--font-size-sm) !important;
+    color: var(--text-tertiary) !important;
+    margin-top: var(--dimension-space-12);
+  }
+
+  .rwc-section {
+    padding-top: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+    border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+  }
+  .rwc-subsection { margin-top: var(--dimension-space-40); }
+
+  /* ===== Hero ===== */
+  .rwc-hero {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+    margin-bottom: var(--dimension-space-16);
+    border-bottom: var(--dimension-border-width-1) solid var(--border-subtle);
+  }
+  .rwc-hero-img { min-height: 320px; }
+
+  .rwc-callout {
+    margin-top: var(--dimension-space-24);
+    background: color-mix(in srgb, var(--text-primary) 16%, var(--surface-default));
+    border: var(--dimension-border-width-1) solid var(--border-subtle);
+    border-radius: var(--dimension-radius-lg, 12px);
+    padding: var(--dimension-space-20) var(--dimension-space-24);
+  }
+  .rwc-callout-title {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--dimension-space-12);
+    display: flex;
+    align-items: center;
+    gap: var(--dimension-space-8);
+  }
+  .rwc-callout-star { color: #e6b800; }
+  .rwc-callout ul { list-style: none; padding: 0; margin: 0; }
+  .rwc-callout li {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--font-line-height-loose);
+    padding-left: var(--dimension-space-16);
+    position: relative;
+    margin-bottom: var(--dimension-space-6);
+  }
+  .rwc-callout li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--text-brand);
+  }
+
+  /* ===== Role ===== */
+  .rwc-role {
+    padding-top: var(--dimension-space-48);
+    padding-bottom: var(--dimension-space-48);
+  }
+  .rwc-aside { margin-top: var(--dimension-space-24); display: grid; gap: var(--dimension-space-16); max-width: 720px; }
+  .rwc-aside dt {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--font-letter-spacing-wider);
+    margin-bottom: var(--dimension-space-4);
+  }
+  .rwc-aside dd {
+    margin: 0;
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+  }
+
+  /* ===== Multi-column blocks ===== */
+  .rwc-columns {
+    display: grid;
+    gap: var(--dimension-space-32);
+    margin-top: var(--dimension-space-24);
+    margin-bottom: var(--dimension-space-32);
+  }
+  .rwc-columns.cols-2 { grid-template-columns: 1fr 1fr; }
+  .rwc-columns h3 {
+    margin-top: 0 !important;
+    font-size: var(--font-size-base) !important;
+    font-weight: var(--font-weight-bold) !important;
+    margin-bottom: var(--dimension-space-10) !important;
+  }
+
+  /* ===== 2-col option compare ===== */
+  .rwc-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--dimension-space-32);
+    margin-top: var(--dimension-space-24);
+    margin-bottom: var(--dimension-space-32);
+  }
+  .rwc-option h3 { margin-top: var(--dimension-space-20) !important; margin-bottom: var(--dimension-space-12) !important; }
+
+  /* ===== Stats ===== */
+  .rwc-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--dimension-space-40);
+    margin: var(--dimension-space-32) 0;
+  }
+  .rwc-stat-n {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-black);
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    color: var(--text-primary);
+    letter-spacing: var(--font-letter-spacing-tighter);
+    line-height: 1;
+    margin-bottom: var(--dimension-space-12);
+  }
+  .rwc-stat-unit {
+    font-size: 0.6em;
+    margin-left: 2px;
+    color: var(--text-secondary);
+  }
+  .rwc-stat-desc {
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    line-height: var(--font-line-height-loose);
+    max-width: 32ch;
+  }
+  .rwc-stat-desc em { font-style: italic; opacity: 0.75; }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 960px) {
+    .rwc-hero { grid-template-columns: 1fr; }
+    .rwc-columns.cols-2,
+    .rwc-options { grid-template-columns: 1fr; }
+    .rwc-stats { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
+  }
+
+  /* ===== Lightbox ===== */
+  .rwc-body img:not(.rwc-lightbox-img) { cursor: zoom-in; }
+
+  .rwc-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--dimension-space-24);
+    opacity: 0;
+    transition: opacity var(--motion-duration-standard, 220ms) var(--motion-easing-standard, ease);
+  }
+  .rwc-lightbox[hidden] { display: none; }
+  .rwc-lightbox.is-open { opacity: 1; }
+
+  .rwc-lightbox-img {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: var(--dimension-radius-md, 8px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    cursor: zoom-out;
+  }
+
+  .rwc-lightbox-close {
+    position: fixed;
+    top: var(--dimension-space-20);
+    right: var(--dimension-space-20);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--motion-duration-short, 140ms) ease, transform var(--motion-duration-short, 140ms) ease;
+  }
+  .rwc-lightbox-close:hover,
+  .rwc-lightbox-close:focus-visible { background: rgba(0, 0, 0, 0.85); transform: scale(1.06); }
+  .rwc-lightbox-close svg { width: 22px; height: 22px; }
+</style>
+
+<script is:inline>
+  /* Lightbox wiring — same pattern as the other case bodies.
+     Own overlay id (ldsLightbox) keeps the three case studies'
+     overlays from colliding if multiple ever co-existed on a
+     page (they don't today, but cheap insurance). */
+  (function () {
+    function init() {
+      var body = document.querySelector('.rwc-body');
+      var overlay = document.getElementById('ldsLightbox');
+      if (!body || !overlay) return;
+      if (overlay.dataset.lbReady === '1') return;
+      overlay.dataset.lbReady = '1';
+
+      var lbImg = overlay.querySelector('.rwc-lightbox-img');
+      var closeBtn = overlay.querySelector('.rwc-lightbox-close');
+      var lastFocus = null;
+
+      function openLb(src, alt) {
+        lastFocus = document.activeElement;
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        overlay.hidden = false;
+        void overlay.offsetWidth;
+        overlay.classList.add('is-open');
+        document.documentElement.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function closeLb() {
+        overlay.classList.remove('is-open');
+        document.documentElement.style.overflow = '';
+        setTimeout(function () {
+          overlay.hidden = true;
+          lbImg.src = '';
+          if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+        }, 220);
+      }
+
+      body.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || t.tagName !== 'IMG') return;
+        if (t.classList && t.classList.contains('rwc-lightbox-img')) return;
+        e.preventDefault();
+        openLb(t.currentSrc || t.src, t.alt);
+      });
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target.closest('.rwc-lightbox-close')) { closeLb(); return; }
+        if (e.target === overlay || e.target === lbImg) closeLb();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !overlay.hidden) closeLb();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

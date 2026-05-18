@@ -573,9 +573,9 @@
   .rwc-callout {
     margin-top: var(--dimension-space-24);
     /* Solid surface wash + faint border so the callout reads clearly
-       against both light and dark themes. The previous near-zero
-       yellow fallback was invisible on dark. */
-    background: color-mix(in srgb, var(--text-primary) 8%, var(--surface-default));
+       against both light and dark themes. Mix is dialed up so the
+       callout sits clearly above the page background. */
+    background: color-mix(in srgb, var(--text-primary) 16%, var(--surface-default));
     border: var(--dimension-border-width-1) solid var(--border-subtle);
     border-radius: var(--dimension-radius-lg, 12px);
     padding: var(--dimension-space-20) var(--dimension-space-24);

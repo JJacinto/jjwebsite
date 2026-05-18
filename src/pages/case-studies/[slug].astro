@@ -2,6 +2,9 @@
 import Base from '../../layouts/Base.astro';
 import { CASES } from '../../data/cases';
 import RedefiningWebinarBody from '../../components/cases/RedefiningWebinarBody.astro';
+import UnderstandingWebinarOrganizersBody from '../../components/cases/UnderstandingWebinarOrganizersBody.astro';
+import LeadingDesignSystemBody from '../../components/cases/LeadingDesignSystemBody.astro';
+import DesigningSupportChatBody from '../../components/cases/DesigningSupportChatBody.astro';
 
 export function getStaticPaths() {
   return CASES.map(c => ({ params: { slug: c.slug }, props: { caseData: c } }));
@@ -23,7 +26,13 @@ const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 /* Some cases have a hand-built body component (richer layout than
    the default template). Detect them here and skip the templated
    header/sections/outcomes chain when one is present. */
-const hasCustomBody = c.slug === 'redefining-webinar-customization';
+const customBodySlugs = new Set([
+  'redefining-webinar-customization',
+  'understanding-webinar-organizers',
+  'leading-and-managing-a-design-system',
+  'designing-a-support-chat-experience',
+]);
+const hasCustomBody = customBodySlugs.has(c.slug);
 
 /* Side-TOC items.
    - Default cases: fixed journey labels (Context / Problem / Approach /
@@ -31,7 +40,7 @@ const hasCustomBody = c.slug === 'redefining-webinar-customization';
      fewer than three sections, so the TOC adapts without throwing.
    - Custom-body cases: a slug-specific TOC matching the section
      anchors defined inside the body component. */
-const tocItems = hasCustomBody && c.slug === 'redefining-webinar-customization'
+const tocItems = c.slug === 'redefining-webinar-customization'
   ? [
       { id: 'case-context',      label: 'Context' },
       { id: 'case-discovery',    label: 'Discovery' },
@@ -41,6 +50,39 @@ const tocItems = hasCustomBody && c.slug === 'redefining-webinar-customization'
       { id: 'case-step-2',       label: 'Step 2 · Fields' },
       { id: 'case-final-result', label: 'Final result' },
       { id: 'case-impact',       label: 'Impact' },
+    ]
+  : c.slug === 'understanding-webinar-organizers'
+  ? [
+      { id: 'case-context',    label: 'Context' },
+      { id: 'case-role',       label: 'My role' },
+      { id: 'case-challenge',  label: 'The challenge' },
+      { id: 'case-deep-dive',  label: 'Deep-dive' },
+      { id: 'case-validation', label: 'Validation' },
+      { id: 'case-impact',     label: 'Impact' },
+    ]
+  : c.slug === 'leading-and-managing-a-design-system'
+  ? [
+      { id: 'case-context',         label: 'Context' },
+      { id: 'case-role',            label: 'My role' },
+      { id: 'case-challenge',       label: 'The challenge' },
+      { id: 'case-organizing',      label: 'Organizing the team' },
+      { id: 'case-weekly-practice', label: 'Weekly practice' },
+      { id: 'case-design',          label: 'Design' },
+      { id: 'case-impact',          label: 'Impact' },
+    ]
+  : c.slug === 'designing-a-support-chat-experience'
+  ? [
+      { id: 'case-context',             label: 'Context' },
+      { id: 'case-role',                label: 'My role' },
+      { id: 'case-challenge',           label: 'The challenge' },
+      { id: 'case-kickoff',             label: 'Kickoff and research' },
+      { id: 'case-discovery',           label: 'What we discovered' },
+      { id: 'case-design-iterations',   label: 'Design iterations' },
+      { id: 'case-customer-chat',       label: 'Customer-facing chat' },
+      { id: 'case-design-system',       label: 'Design system' },
+      { id: 'case-impact',              label: 'Impact' },
+      { id: 'case-current-state',       label: 'Current state' },
+      { id: 'case-retrospective',       label: 'Retrospective' },
     ]
   : [
       { id: 'case-context', label: 'Context' },
@@ -70,7 +112,15 @@ const tocItems = hasCustomBody && c.slug === 'redefining-webinar-customization'
       <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
 
       {hasCustomBody ? (
-        <RedefiningWebinarBody />
+        c.slug === 'understanding-webinar-organizers' ? (
+          <UnderstandingWebinarOrganizersBody />
+        ) : c.slug === 'leading-and-managing-a-design-system' ? (
+          <LeadingDesignSystemBody />
+        ) : c.slug === 'designing-a-support-chat-experience' ? (
+          <DesigningSupportChatBody />
+        ) : (
+          <RedefiningWebinarBody />
+        )
       ) : (
         <>
           <div class="case-header" id="case-context">
