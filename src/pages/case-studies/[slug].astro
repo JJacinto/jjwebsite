@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { CASES } from '../../data/cases';
+import RedefiningWebinarBody from '../../components/cases/RedefiningWebinarBody.astro';
 
 export function getStaticPaths() {
   return CASES.map(c => ({ params: { slug: c.slug }, props: { caseData: c } }));
@@ -19,18 +20,35 @@ const nextIdx = visIdx === -1 ? 0 : (visIdx + 1) % visibleCases.length;
 const next = visibleCases[nextIdx];
 const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
 
-/* Side-TOC items. Labels are fixed (Context / Problem / Approach /
-   Solution / Impact) — they describe the reader's journey through
-   every case, regardless of the wording used in each section's
-   own h2. Section anchors fall through if a case has fewer than
-   three sections, so the TOC adapts without throwing. */
-const tocItems = [
-  { id: 'case-context', label: 'Context' },
-  c.sections[0] ? { id: 'case-section-0', label: 'Problem' } : null,
-  c.sections[1] ? { id: 'case-section-1', label: 'Approach' } : null,
-  c.sections[2] ? { id: 'case-section-2', label: 'Solution' } : null,
-  { id: 'case-impact', label: 'Impact' },
-].filter(Boolean);
+/* Some cases have a hand-built body component (richer layout than
+   the default template). Detect them here and skip the templated
+   header/sections/outcomes chain when one is present. */
+const hasCustomBody = c.slug === 'redefining-webinar-customization';
+
+/* Side-TOC items.
+   - Default cases: fixed journey labels (Context / Problem / Approach /
+     Solution / Impact). Section anchors fall through if a case has
+     fewer than three sections, so the TOC adapts without throwing.
+   - Custom-body cases: a slug-specific TOC matching the section
+     anchors defined inside the body component. */
+const tocItems = hasCustomBody && c.slug === 'redefining-webinar-customization'
+  ? [
+      { id: 'case-context',      label: 'Context' },
+      { id: 'case-discovery',    label: 'Discovery' },
+      { id: 'case-problem',      label: 'Problem' },
+      { id: 'case-approach',     label: 'Approach' },
+      { id: 'case-step-1',       label: 'Step 1 · Branding' },
+      { id: 'case-step-2',       label: 'Step 2 · Fields' },
+      { id: 'case-final-result', label: 'Final result' },
+      { id: 'case-impact',       label: 'Impact' },
+    ]
+  : [
+      { id: 'case-context', label: 'Context' },
+      c.sections[0] ? { id: 'case-section-0', label: 'Problem' } : null,
+      c.sections[1] ? { id: 'case-section-1', label: 'Approach' } : null,
+      c.sections[2] ? { id: 'case-section-2', label: 'Solution' } : null,
+      { id: 'case-impact', label: 'Impact' },
+    ].filter(Boolean);
 ---
 <Base
   activePage="cases"
@@ -51,52 +69,58 @@ const tocItems = [
     <div class="container">
       <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
 
-      <div class="case-header" id="case-context">
-        <div class="case-cat">{c.cat}</div>
-        <h1 class="case-title">{c.title}</h1>
-        <p class="case-subtitle">{c.subtitle}</p>
+      {hasCustomBody ? (
+        <RedefiningWebinarBody />
+      ) : (
+        <>
+          <div class="case-header" id="case-context">
+            <div class="case-cat">{c.cat}</div>
+            <h1 class="case-title">{c.title}</h1>
+            <p class="case-subtitle">{c.subtitle}</p>
 
-        <div class="case-meta-grid">
-          <div><div class="case-meta-label">Company</div><div class="case-meta-val">{c.company}</div></div>
-          <div><div class="case-meta-label">Role</div><div class="case-meta-val">{c.role}</div></div>
-          <div><div class="case-meta-label">Year</div><div class="case-meta-val">{c.year}</div></div>
-          <div><div class="case-meta-label">Duration</div><div class="case-meta-val">{c.duration}</div></div>
-        </div>
+            <div class="case-meta-grid">
+              <div><div class="case-meta-label">Company</div><div class="case-meta-val">{c.company}</div></div>
+              <div><div class="case-meta-label">Role</div><div class="case-meta-val">{c.role}</div></div>
+              <div><div class="case-meta-label">Year</div><div class="case-meta-val">{c.year}</div></div>
+              <div><div class="case-meta-label">Duration</div><div class="case-meta-val">{c.duration}</div></div>
+            </div>
 
-        <div class="case-keywords">
-          {c.keywords.map(k => <span class="keyword">{k}</span>)}
-        </div>
-      </div>
-
-      <div class="case-hero-img reveal">
-        <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
-      </div>
-
-      <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
-        {c.outcomes.map(o => (
-          <div class="outcome">
-            <div class="outcome-num">{o.n}</div>
-            <div class="outcome-title">{o.title}</div>
-            <div class="outcome-desc">{o.desc}</div>
+            <div class="case-keywords">
+              {c.keywords.map(k => <span class="keyword">{k}</span>)}
+            </div>
           </div>
-        ))}
-      </div>
 
-      <section class="achievements reveal">
-        <span class="eyebrow">Key outcomes</span>
-        <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
-      </section>
-
-      <div class="case-sections">
-        {c.sections.map((s, sIdx) => (
-          <div class="reveal" id={`case-section-${sIdx}`}>
-            <h2>{s.h}</h2>
-            <p>{s.body}</p>
+          <div class="case-hero-img reveal">
+            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
           </div>
-        ))}
-      </div>
 
-      <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>
+          <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
+            {c.outcomes.map(o => (
+              <div class="outcome">
+                <div class="outcome-num">{o.n}</div>
+                <div class="outcome-title">{o.title}</div>
+                <div class="outcome-desc">{o.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <section class="achievements reveal">
+            <span class="eyebrow">Key outcomes</span>
+            <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
+          </section>
+
+          <div class="case-sections">
+            {c.sections.map((s, sIdx) => (
+              <div class="reveal" id={`case-section-${sIdx}`}>
+                <h2>{s.h}</h2>
+                <p>{s.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>
+        </>
+      )}
 
       <div class="next-case-wrap">
         <span class="eyebrow">Next case study</span>
