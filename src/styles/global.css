@@ -2739,3 +2739,308 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   .footer p { text-align: left; }
   .footer-status { white-space: normal; }
 }
+
+/* ============================================================
+   Case-study body (.rwc-body) — shared base layout
+   ============================================================
+   Used by every component in src/components/cases/. Per-case
+   overrides (callout backgrounds, bespoke section layouts,
+   stat-desc widths, breakpoints beyond 960px) stay in the
+   component's own <style> block. The lightbox lives in
+   CaseBodyLightbox.astro. */
+
+/* image tiles — empty placeholder, filled variant, grid wrapper */
+.case-img-ph {
+  border: 2px dashed var(--border-emphasized, var(--border-subtle));
+  border-radius: var(--dimension-radius-lg, 12px);
+  background: var(--surface-muted, rgba(0,0,0,0.03));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--dimension-space-24);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  min-height: 180px;
+}
+.case-img-ph[data-ratio="16-9"]  { aspect-ratio: 16 / 9; }
+.case-img-ph[data-ratio="16-10"] { aspect-ratio: 16 / 10; }
+.case-img-ph[data-ratio="4-3"]   { aspect-ratio: 4 / 3; }
+.case-img-ph[data-ratio="3-4"]   { aspect-ratio: 3 / 4; }
+.case-img-ph[data-ratio="1-1"]   { aspect-ratio: 1 / 1; }
+.case-img-ph.is-filled {
+  border: 0;
+  padding: 0;
+  background: var(--surface-muted, rgba(0,0,0,0.04));
+}
+.case-img-ph.is-filled img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: inherit;
+  cursor: zoom-in;
+}
+.case-img-ph-label {
+  display: inline-block;
+  max-width: 36ch;
+  line-height: var(--font-line-height-snug);
+}
+.case-img-ph-grid {
+  display: grid;
+  gap: var(--dimension-space-20);
+  margin-top: var(--dimension-space-32);
+  margin-bottom: var(--dimension-space-16);
+}
+.case-img-ph-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.case-img-caption {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-align: right;
+  margin-top: var(--dimension-space-8);
+  margin-bottom: var(--dimension-space-48);
+}
+
+/* body wrapper + typography */
+.rwc-body { color: var(--text-primary); }
+.rwc-body p {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--font-line-height-loose);
+  margin-bottom: var(--dimension-space-16);
+}
+.rwc-body h2.rwc-h2 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-black);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  letter-spacing: var(--font-letter-spacing-tighter);
+  line-height: var(--font-line-height-heading);
+  color: var(--text-primary);
+  margin-bottom: var(--dimension-space-20);
+}
+.rwc-body h3,
+.rwc-body h3.rwc-h3 {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  color: var(--text-primary);
+  margin-top: var(--dimension-space-32);
+  margin-bottom: var(--dimension-space-12);
+}
+.rwc-body .eyebrow { display: block; margin-bottom: var(--dimension-space-12); }
+.rwc-lead {
+  font-size: var(--font-size-lg) !important;
+  color: var(--text-secondary) !important;
+  margin-bottom: var(--dimension-space-32) !important;
+}
+.rwc-caption {
+  font-size: var(--font-size-sm) !important;
+  color: var(--text-tertiary) !important;
+  margin-top: var(--dimension-space-12);
+}
+
+/* sections */
+.rwc-section {
+  padding-top: var(--dimension-space-48);
+  padding-bottom: var(--dimension-space-48);
+  border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+}
+.rwc-subsection { margin-top: var(--dimension-space-40); }
+
+/* hero — two-column with image right (single column on mobile) */
+.rwc-hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--dimension-space-48);
+  padding-bottom: var(--dimension-space-48);
+  margin-bottom: var(--dimension-space-16);
+  border-bottom: var(--dimension-border-width-1) solid var(--border-subtle);
+}
+.rwc-hero-img { min-height: 320px; }
+
+/* callout — default surface; case-specific backgrounds can override */
+.rwc-callout {
+  margin-top: var(--dimension-space-24);
+  background: color-mix(in srgb, var(--text-primary) 16%, var(--surface-default));
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-lg, 12px);
+  padding: var(--dimension-space-20) var(--dimension-space-24);
+}
+.rwc-callout-title {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--dimension-space-12);
+  display: flex;
+  align-items: center;
+  gap: var(--dimension-space-8);
+}
+.rwc-callout-star { color: #e6b800; }
+.rwc-callout ul { list-style: none; padding: 0; margin: 0; }
+.rwc-callout li {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--font-line-height-loose);
+  padding-left: var(--dimension-space-16);
+  position: relative;
+  margin-bottom: var(--dimension-space-6);
+}
+.rwc-callout li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-brand);
+}
+
+/* role + key-initiatives sidebar — three of the four bodies use a
+   1.4fr / 1fr grid; LDS overrides to a single column. */
+.rwc-role {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--dimension-space-48);
+  padding-top: var(--dimension-space-48);
+  padding-bottom: var(--dimension-space-48);
+}
+.rwc-aside {
+  margin-top: var(--dimension-space-24);
+  display: grid;
+  gap: var(--dimension-space-16);
+}
+.rwc-aside dt {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--font-letter-spacing-wider);
+  margin-bottom: var(--dimension-space-4);
+}
+.rwc-aside dd {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+}
+.rwc-role-right { text-align: center; }
+.rwc-initiatives-title {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-black);
+  font-size: var(--font-size-xl);
+  color: var(--text-primary);
+  margin-bottom: var(--dimension-space-20);
+}
+.rwc-initiatives-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--dimension-space-10);
+}
+.rwc-initiatives-list li {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+}
+
+/* multi-column blocks */
+.rwc-columns {
+  display: grid;
+  gap: var(--dimension-space-32);
+  margin-top: var(--dimension-space-24);
+  margin-bottom: var(--dimension-space-32);
+}
+.rwc-columns.cols-2 { grid-template-columns: 1fr 1fr; }
+.rwc-columns.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.rwc-columns.cols-5 { grid-template-columns: repeat(5, 1fr); }
+.rwc-columns h3 {
+  margin-top: 0 !important;
+  font-size: var(--font-size-base) !important;
+  font-weight: var(--font-weight-bold) !important;
+  margin-bottom: var(--dimension-space-10) !important;
+}
+.rwc-columns p {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* 2-col option compare (e.g. step 1 of RWB, screener+interview of UWO) */
+.rwc-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--dimension-space-32);
+  margin-top: var(--dimension-space-24);
+}
+.rwc-option-tag {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--font-letter-spacing-wider);
+  margin-bottom: var(--dimension-space-8);
+}
+.rwc-option h3 { margin-top: 0 !important; margin-bottom: var(--dimension-space-16) !important; }
+.rwc-option .case-img-ph { margin-bottom: var(--dimension-space-16); }
+
+/* bullets */
+.rwc-bullets {
+  list-style: none;
+  padding: 0;
+  margin: var(--dimension-space-12) 0 var(--dimension-space-24);
+}
+.rwc-bullets li {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  line-height: var(--font-line-height-loose);
+  padding-left: var(--dimension-space-20);
+  position: relative;
+  margin-bottom: var(--dimension-space-6);
+}
+.rwc-bullets li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--text-brand);
+}
+
+/* stats — three big numbers in a row */
+.rwc-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--dimension-space-40);
+  margin: var(--dimension-space-32) 0;
+}
+.rwc-stat-n {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-black);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  color: var(--text-primary);
+  letter-spacing: var(--font-letter-spacing-tighter);
+  line-height: 1;
+  margin-bottom: var(--dimension-space-12);
+}
+.rwc-stat-unit {
+  font-size: 0.6em;
+  margin-left: 2px;
+  color: var(--text-secondary);
+}
+.rwc-stat-desc {
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+  line-height: var(--font-line-height-loose);
+  max-width: 28ch;
+}
+
+/* base responsive — every body collapses to a single column at 960px */
+@media (max-width: 960px) {
+  .rwc-hero,
+  .rwc-role { grid-template-columns: 1fr; }
+  .rwc-role-right { text-align: left; }
+  .rwc-columns.cols-2,
+  .rwc-columns.cols-3,
+  .rwc-columns.cols-5 { grid-template-columns: 1fr; }
+  .rwc-options { grid-template-columns: 1fr; }
+  .rwc-stats { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
+  .case-img-ph-grid.cols-2 { grid-template-columns: 1fr; }
+}

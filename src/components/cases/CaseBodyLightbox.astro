@@ -1,0 +1,126 @@
+---
+/* Shared lightbox overlay for case-study bodies.
+   Replaces the per-component lightbox markup, CSS, and script that
+   previously lived inline in each of the four case bodies. Import
+   once near the end of any <div class="rwc-body">. */
+---
+
+<div class="rwc-lightbox" id="caseLightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
+  <button class="rwc-lightbox-close" type="button" aria-label="Close image preview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="6" y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/>
+    </svg>
+  </button>
+  <img class="rwc-lightbox-img" alt="" />
+</div>
+
+<style>
+  .rwc-body img:not(.rwc-lightbox-img) { cursor: zoom-in; }
+
+  .rwc-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--dimension-space-24);
+    opacity: 0;
+    transition: opacity var(--motion-duration-standard, 220ms) var(--motion-easing-standard, ease);
+  }
+  .rwc-lightbox[hidden] { display: none; }
+  .rwc-lightbox.is-open { opacity: 1; }
+
+  .rwc-lightbox-img {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: auto;
+    height: auto;
+    display: block;
+    border-radius: var(--dimension-radius-md, 8px);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    cursor: zoom-out;
+  }
+
+  .rwc-lightbox-close {
+    position: fixed;
+    top: var(--dimension-space-20);
+    right: var(--dimension-space-20);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background var(--motion-duration-short, 140ms) ease, transform var(--motion-duration-short, 140ms) ease;
+  }
+  .rwc-lightbox-close:hover,
+  .rwc-lightbox-close:focus-visible { background: rgba(0, 0, 0, 0.85); transform: scale(1.06); }
+  .rwc-lightbox-close svg { width: 22px; height: 22px; }
+</style>
+
+<script is:inline>
+  (function () {
+    function init() {
+      var body = document.querySelector('.rwc-body');
+      var overlay = document.getElementById('caseLightbox');
+      if (!body || !overlay) return;
+      if (overlay.dataset.lbReady === '1') return;
+      overlay.dataset.lbReady = '1';
+
+      var lbImg = overlay.querySelector('.rwc-lightbox-img');
+      var closeBtn = overlay.querySelector('.rwc-lightbox-close');
+      var lastFocus = null;
+
+      function openLb(src, alt) {
+        lastFocus = document.activeElement;
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        overlay.hidden = false;
+        void overlay.offsetWidth;
+        overlay.classList.add('is-open');
+        document.documentElement.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function closeLb() {
+        overlay.classList.remove('is-open');
+        document.documentElement.style.overflow = '';
+        setTimeout(function () {
+          overlay.hidden = true;
+          lbImg.src = '';
+          if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+        }, 220);
+      }
+
+      body.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t || t.tagName !== 'IMG') return;
+        if (t.classList && t.classList.contains('rwc-lightbox-img')) return;
+        e.preventDefault();
+        openLb(t.currentSrc || t.src, t.alt);
+      });
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target.closest('.rwc-lightbox-close')) { closeLb(); return; }
+        if (e.target === overlay || e.target === lbImg) closeLb();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !overlay.hidden) closeLb();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+</script>

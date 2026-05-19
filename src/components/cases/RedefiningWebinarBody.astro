@@ -2,7 +2,12 @@
 /* Rich body for the "Redefining webinar customization" case study.
    Scaffolds the page structure with image placeholders to be swapped
    in later. The shared [slug].astro template renders this when the
-   slug matches; the default templated layout is bypassed. */
+   slug matches; the default templated layout is bypassed.
+
+   Layout/typography for the .rwc-body family lives in global.css.
+   Only RWB-specific styles (video embed, breakpoint showcase) are
+   kept inline. */
+import CaseBodyLightbox from './CaseBodyLightbox.astro';
 ---
 
 <div class="rwc-body">
@@ -445,323 +450,18 @@
 
 </div>
 
-{/* ───────────────────── IMAGE LIGHTBOX ─────────────────────
-   Click-to-zoom for every <img> inside the case body. Single
-   overlay element + delegated handler so it picks up any future
-   images automatically. */}
-<div class="rwc-lightbox" id="rwcLightbox" role="dialog" aria-modal="true" aria-label="Image preview" hidden>
-  <button class="rwc-lightbox-close" type="button" aria-label="Close image preview">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <line x1="6" y1="6" x2="18" y2="18"/>
-      <line x1="18" y1="6" x2="6" y2="18"/>
-    </svg>
-  </button>
-  <img class="rwc-lightbox-img" alt="" />
-</div>
-
+<CaseBodyLightbox />
 <style>
-  /* ===== Shared placeholder styling ===== */
-  .case-img-ph {
-    border: 2px dashed var(--border-emphasized, var(--border-subtle));
-    border-radius: var(--dimension-radius-lg, 12px);
-    background: var(--surface-muted, rgba(0,0,0,0.03));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--dimension-space-24);
-    text-align: center;
-    color: var(--text-tertiary);
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
-    min-height: 180px;
-  }
-  .case-img-ph[data-ratio="16-9"]  { aspect-ratio: 16 / 9; }
-  .case-img-ph[data-ratio="16-10"] { aspect-ratio: 16 / 10; }
-  .case-img-ph[data-ratio="4-3"]   { aspect-ratio: 4 / 3; }
-  /* Filled variant: keeps the data-ratio frame and border-radius so
-     filled images share a uniform size with placeholders. The image
-     is contained inside (no cropping); when the source aspect ratio
-     doesn't match the frame, the surrounding background shows
-     through as letterboxing. */
-  .case-img-ph.is-filled {
-    border: 0;
-    padding: 0;
-    background: var(--surface-muted, rgba(0,0,0,0.04));
-    /* border-radius and aspect-ratio inherit from .case-img-ph /
-       [data-ratio] so frame size matches every other tile. */
-  }
-  .case-img-ph.is-filled img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: inherit;
-    cursor: zoom-in;
-  }
-  .case-img-ph-label {
-    display: inline-block;
-    max-width: 36ch;
-    line-height: var(--font-line-height-snug);
-  }
-  .case-img-ph-grid {
-    display: grid;
-    gap: var(--dimension-space-20);
-    margin-top: var(--dimension-space-32);
-    margin-bottom: var(--dimension-space-16);
-  }
-  .case-img-ph-grid.cols-2 { grid-template-columns: 1fr 1fr; }
-  .case-img-caption {
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    text-align: right;
-    margin-top: var(--dimension-space-8);
-    margin-bottom: var(--dimension-space-48);
-  }
+  /* RWB-specific overrides — shared .rwc-* layout/typography lives
+     in global.css and the lightbox in CaseBodyLightbox.astro. */
 
-  /* ===== Body wrapper ===== */
-  .rwc-body { color: var(--text-primary); }
-  .rwc-body p {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-base);
-    color: var(--text-secondary);
-    line-height: var(--font-line-height-loose);
-    margin-bottom: var(--dimension-space-16);
-  }
-  .rwc-body h2.rwc-h2 {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-black);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    letter-spacing: var(--font-letter-spacing-tighter);
-    line-height: var(--font-line-height-heading);
-    color: var(--text-primary);
-    margin-bottom: var(--dimension-space-20);
-  }
-  .rwc-body h3,
-  .rwc-body h3.rwc-h3 {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
-    font-size: clamp(1.1rem, 2vw, 1.35rem);
-    color: var(--text-primary);
-    margin-top: var(--dimension-space-32);
-    margin-bottom: var(--dimension-space-12);
-  }
-  .rwc-lead {
-    font-size: var(--font-size-lg) !important;
-    color: var(--text-secondary) !important;
-    margin-bottom: var(--dimension-space-32) !important;
-  }
-  .rwc-body .eyebrow { display: block; margin-bottom: var(--dimension-space-12); }
-
-  .rwc-section {
-    padding-top: var(--dimension-space-48);
-    padding-bottom: var(--dimension-space-48);
-    border-top: var(--dimension-border-width-1) solid var(--border-subtle);
-  }
-  .rwc-subsection { margin-top: var(--dimension-space-40); }
-
-  /* ===== Hero ===== */
-  .rwc-hero {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: var(--dimension-space-48);
-    padding-bottom: var(--dimension-space-48);
-    margin-bottom: var(--dimension-space-16);
-    border-bottom: var(--dimension-border-width-1) solid var(--border-subtle);
-  }
-  .rwc-hero-img { min-height: 320px; }
-
-  .rwc-callout {
-    margin-top: var(--dimension-space-24);
-    /* Solid surface wash + faint border so the callout reads clearly
-       against both light and dark themes. Mix is dialed up so the
-       callout sits clearly above the page background. */
-    background: color-mix(in srgb, var(--text-primary) 16%, var(--surface-default));
-    border: var(--dimension-border-width-1) solid var(--border-subtle);
-    border-radius: var(--dimension-radius-lg, 12px);
-    padding: var(--dimension-space-20) var(--dimension-space-24);
-  }
-  .rwc-callout-title {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
-    color: var(--text-primary);
-    margin-bottom: var(--dimension-space-12);
-    display: flex;
-    align-items: center;
-    gap: var(--dimension-space-8);
-  }
-  .rwc-callout-star { color: #e6b800; }
-  .rwc-callout ul { list-style: none; padding: 0; margin: 0; }
-  .rwc-callout li {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    line-height: var(--font-line-height-loose);
-    padding-left: var(--dimension-space-16);
-    position: relative;
-    margin-bottom: var(--dimension-space-6);
-  }
-  .rwc-callout li::before {
-    content: '•';
-    position: absolute;
-    left: 0;
-    color: var(--text-brand);
-  }
-
-  /* ===== Role + Key initiatives ===== */
-  .rwc-role {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: var(--dimension-space-48);
-    padding-top: var(--dimension-space-48);
-    padding-bottom: var(--dimension-space-48);
-  }
-  .rwc-aside { margin-top: var(--dimension-space-24); display: grid; gap: var(--dimension-space-16); }
-  .rwc-aside dt {
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: var(--font-letter-spacing-wider);
-    margin-bottom: var(--dimension-space-4);
-  }
-  .rwc-aside dd {
-    margin: 0;
-    font-size: var(--font-size-base);
-    color: var(--text-primary);
-  }
-  .rwc-role-right { text-align: center; }
-  .rwc-initiatives-title {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-black);
-    font-size: var(--font-size-xl);
-    color: var(--text-primary);
-    margin-bottom: var(--dimension-space-20);
-  }
-  .rwc-initiatives-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: grid;
-    gap: var(--dimension-space-10);
-  }
-  .rwc-initiatives-list li {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-base);
-    color: var(--text-secondary);
-  }
-
-  /* ===== Multi-column blocks ===== */
-  .rwc-columns {
-    display: grid;
-    gap: var(--dimension-space-32);
-    margin-top: var(--dimension-space-24);
-    margin-bottom: var(--dimension-space-32);
-  }
-  .rwc-columns.cols-3 { grid-template-columns: repeat(3, 1fr); }
-  .rwc-columns.cols-5 { grid-template-columns: repeat(5, 1fr); }
-  .rwc-columns h3 {
-    margin-top: 0 !important;
-    font-size: var(--font-size-base) !important;
-    font-weight: var(--font-weight-bold) !important;
-    margin-bottom: var(--dimension-space-10) !important;
-  }
-  .rwc-columns p {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
-    margin: 0;
-  }
-
-  /* ===== Step 1 — option comparison ===== */
-  .rwc-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--dimension-space-32);
-    margin-top: var(--dimension-space-24);
-  }
-  .rwc-option-tag {
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: var(--font-letter-spacing-wider);
-    margin-bottom: var(--dimension-space-8);
-  }
-  .rwc-option h3 { margin-top: 0 !important; margin-bottom: var(--dimension-space-16) !important; }
-  .rwc-option .case-img-ph { margin-bottom: var(--dimension-space-16); }
-
-  /* ===== Bullets ===== */
-  .rwc-bullets {
-    list-style: none;
-    padding: 0;
-    margin: var(--dimension-space-12) 0 var(--dimension-space-24);
-  }
-  .rwc-bullets li {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-base);
-    color: var(--text-secondary);
-    line-height: var(--font-line-height-loose);
-    padding-left: var(--dimension-space-20);
-    position: relative;
-    margin-bottom: var(--dimension-space-6);
-  }
-  .rwc-bullets li::before {
-    content: '—';
-    position: absolute;
-    left: 0;
-    color: var(--text-brand);
-  }
-
-  /* ===== Breakpoint showcase ===== */
-  .rwc-breakpoints {
-    margin: var(--dimension-space-32) 0;
-    display: grid;
-    gap: var(--dimension-space-20);
-  }
-  .rwc-breakpoint-tag {
-    font-family: var(--font-family-mono, monospace);
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: var(--font-letter-spacing-wider);
-    margin-bottom: var(--dimension-space-8);
-  }
-
-  /* ===== Stats ===== */
-  .rwc-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--dimension-space-40);
-    margin: var(--dimension-space-32) 0;
-  }
-  .rwc-stat-n {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-black);
-    font-size: clamp(2.2rem, 5vw, 3.6rem);
-    color: var(--text-primary);
-    letter-spacing: var(--font-letter-spacing-tighter);
-    line-height: 1;
-    margin-bottom: var(--dimension-space-12);
-  }
-  .rwc-stat-unit {
-    font-size: 0.6em;
-    margin-left: 2px;
-    color: var(--text-secondary);
-  }
-  .rwc-stat-desc {
-    font-family: var(--font-family-body);
-    font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
-    line-height: var(--font-line-height-loose);
-    max-width: 28ch;
-  }
-
-  /* ===== Video placeholder accent ===== */
+  /* ===== Video placeholder + responsive YouTube embed =====
+     16:9 frame that scales to any width. The iframe absolutely fills
+     the wrapper so we don't depend on intrinsic iframe sizing. */
   .rwc-video-ph {
     min-height: 360px;
     background: linear-gradient(135deg, rgba(120, 80, 200, 0.08), rgba(80, 50, 160, 0.04));
   }
-
-  /* ===== Responsive YouTube embed =====
-     16:9 frame that scales to any width. The iframe absolutely fills
-     the wrapper so we don't depend on intrinsic iframe sizing. */
   .rwc-video-embed {
     position: relative;
     width: 100%;
@@ -779,146 +479,30 @@
     border: 0;
   }
 
-  /* ===== Responsive ===== */
+  /* Breakpoint showcase — tagged frames stacked vertically. */
+  .rwc-breakpoints {
+    margin: var(--dimension-space-32) 0;
+    display: grid;
+    gap: var(--dimension-space-20);
+  }
+  .rwc-breakpoint-tag {
+    font-family: var(--font-family-mono, monospace);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: var(--font-letter-spacing-wider);
+    margin-bottom: var(--dimension-space-8);
+  }
+
+  /* RWB tightens the responsive ramp for cols-3/cols-5: 2 cols at
+     960px, single col only at 560px. Overrides global.css's single
+     960px breakpoint. */
   @media (max-width: 960px) {
-    .rwc-hero,
-    .rwc-role { grid-template-columns: 1fr; }
-    .rwc-role-right { text-align: left; }
     .rwc-columns.cols-3,
     .rwc-columns.cols-5 { grid-template-columns: 1fr 1fr; }
-    .rwc-options { grid-template-columns: 1fr; }
-    .rwc-stats { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
-    .case-img-ph-grid.cols-2 { grid-template-columns: 1fr; }
   }
   @media (max-width: 560px) {
     .rwc-columns.cols-3,
     .rwc-columns.cols-5 { grid-template-columns: 1fr; }
   }
-
-  /* ===== Lightbox =====
-     Visual: 50% black backdrop, image rendered at natural size
-     (capped to 95vw/95vh so the X button stays reachable). The
-     close button anchors to the viewport's top-right, not the
-     image, so it never drifts off-screen on tall portraits. */
-  /* Force zoom-in cursor on every body image, even when more
-     specific rules (e.g., .case-img-ph.is-filled img) win. The
-     lightbox img itself is excluded since it gets zoom-out. */
-  .rwc-body img:not(.rwc-lightbox-img) { cursor: zoom-in; }
-
-  .rwc-lightbox {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--dimension-space-24);
-    opacity: 0;
-    transition: opacity var(--motion-duration-standard, 220ms) var(--motion-easing-standard, ease);
-  }
-  .rwc-lightbox[hidden] { display: none; }
-  .rwc-lightbox.is-open { opacity: 1; }
-
-  .rwc-lightbox-img {
-    max-width: 95vw;
-    max-height: 95vh;
-    width: auto;
-    height: auto;
-    display: block;
-    border-radius: var(--dimension-radius-md, 8px);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-    cursor: zoom-out;
-  }
-
-  .rwc-lightbox-close {
-    position: fixed;
-    top: var(--dimension-space-20);
-    right: var(--dimension-space-20);
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 0;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    padding: 0;
-    transition: background var(--motion-duration-short, 140ms) ease, transform var(--motion-duration-short, 140ms) ease;
-  }
-  .rwc-lightbox-close:hover,
-  .rwc-lightbox-close:focus-visible { background: rgba(0, 0, 0, 0.85); transform: scale(1.06); }
-  .rwc-lightbox-close svg { width: 22px; height: 22px; }
 </style>
-
-<script is:inline>
-  /* Lightbox wiring: any <img> inside .rwc-body opens the overlay
-     with that image's source. Closes on backdrop click, X button,
-     or Escape. Body scroll is locked while open. */
-  (function () {
-    function init() {
-      var body = document.querySelector('.rwc-body');
-      var overlay = document.getElementById('rwcLightbox');
-      if (!body || !overlay) return;
-      /* Guard against double-init when HMR re-runs the script. */
-      if (overlay.dataset.lbReady === '1') return;
-      overlay.dataset.lbReady = '1';
-
-      var lbImg = overlay.querySelector('.rwc-lightbox-img');
-      var closeBtn = overlay.querySelector('.rwc-lightbox-close');
-      var lastFocus = null;
-
-      function openLb(src, alt) {
-        lastFocus = document.activeElement;
-        lbImg.src = src;
-        lbImg.alt = alt || '';
-        overlay.hidden = false;
-        /* Force a reflow so the opacity transition runs from 0 → 1. */
-        void overlay.offsetWidth;
-        overlay.classList.add('is-open');
-        document.documentElement.style.overflow = 'hidden';
-        closeBtn.focus();
-      }
-
-      function closeLb() {
-        overlay.classList.remove('is-open');
-        document.documentElement.style.overflow = '';
-        /* Wait for the fade-out before hiding, so we don't snap. */
-        setTimeout(function () {
-          overlay.hidden = true;
-          lbImg.src = '';
-          if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
-        }, 220);
-      }
-
-      /* Click delegation on the case body. Skip the lightbox's own
-         image (it would re-open itself) and any nav-card thumbnails
-         outside .rwc-body (handler is scoped to body anyway). */
-      body.addEventListener('click', function (e) {
-        var t = e.target;
-        if (!t || t.tagName !== 'IMG') return;
-        if (t.classList && t.classList.contains('rwc-lightbox-img')) return;
-        e.preventDefault();
-        openLb(t.currentSrc || t.src, t.alt);
-      });
-
-      /* Close handlers. closest() makes the X button reliable even
-         when the click lands on the inner <svg> or <line>. */
-      overlay.addEventListener('click', function (e) {
-        if (e.target.closest('.rwc-lightbox-close')) { closeLb(); return; }
-        if (e.target === overlay || e.target === lbImg) closeLb();
-      });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape' && !overlay.hidden) closeLb();
-      });
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
-    } else {
-      init();
-    }
-  })();
-</script>

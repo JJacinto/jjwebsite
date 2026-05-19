@@ -1,7 +1,7 @@
 import { test, expect } from './fixtures';
 
 const CASE_URL = '/case-studies/designing-a-support-chat-experience';
-const OVERLAY = '#dscLightbox';
+const OVERLAY = '#caseLightbox';
 
 async function htmlOverflow(page: import('@playwright/test').Page) {
   return page.evaluate(() => document.documentElement.style.overflow);
