@@ -176,7 +176,7 @@
   /* Display headings. Maps to legacy --font-display */
   --font-family-display: 'Hanken Grotesk', 'DM Sans', -apple-system, system-ui, sans-serif;
   /* Body text. Maps to legacy --font-body */
-  --font-family-body: 'DM Sans', 'Mona Sans', -apple-system, system-ui, sans-serif;
+  --font-family-body: 'DM Sans', -apple-system, system-ui, sans-serif;
   --font-family-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-weight-regular: 400;
   --font-weight-medium: 500;

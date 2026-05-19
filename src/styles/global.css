@@ -1,13 +1,5 @@
 @import './tokens.css';
 
-@font-face {
-  font-family: 'Mona Sans';
-  src: url('https://github.githubassets.com/assets/mona-sans.woff2') format('woff2');
-  font-weight: var(--font-weight-regular);
-  font-style: normal;
-  font-display: swap;
-}
-
 /* ============================================================
    Reset & Base
    ============================================================ */
