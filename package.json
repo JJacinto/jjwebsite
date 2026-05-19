@@ -5,7 +5,10 @@
     "prebuild": "node design-system/scripts/build-tokens.js",
     "build": "astro build",
     "preview": "astro preview",
-    "tokens": "node design-system/scripts/build-tokens.js"
+    "tokens": "node design-system/scripts/build-tokens.js",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed"
   },
   "dependencies": {
     "astro": "^6.1.9"
@@ -13,6 +16,7 @@
   "devDependencies": {
     "@astrojs/react": "^5.0.4",
     "@astrojs/sitemap": "^3.7.2",
+    "@playwright/test": "^1.60.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "react": "^19.2.6",

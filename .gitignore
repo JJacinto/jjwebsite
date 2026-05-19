@@ -2,6 +2,11 @@ node_modules
 dist
 .astro
 
+# Playwright
+playwright-report
+test-results
+/playwright/.cache
+
 # Local env vars (PUBLIC_UMAMI_* etc.) — never commit. .env.example is tracked.
 .env
 .env.local
