@@ -1263,7 +1263,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 
 .cases-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
 .cases-marquee { margin-bottom: var(--dimension-space-64); }
-.cases-marquee .marquee-track { animation-duration: 22s; }
+.cases-marquee .marquee-track { animation-duration: 40s; }
 .cases-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
 .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-24); margin-bottom: var(--dimension-space-24); }
 .cases-grid-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--dimension-space-24); }
@@ -1273,7 +1273,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    ============================================================ */
 .about-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
 .about-marquee { margin-bottom: var(--dimension-space-80); }
-.about-marquee .marquee-track { animation-duration: 28s; }
+.about-marquee .marquee-track { animation-duration: 46s; }
 .about-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
 
 .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(var(--dimension-space-32), 6vw, var(--dimension-space-80)); margin-bottom: var(--dimension-space-80); align-items: start; }
