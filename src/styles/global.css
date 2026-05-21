@@ -655,8 +655,8 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .hero .hero-inner {
   width: 100%;
-  /* Sit above .hero-bg (z 0) and .hero-particles (z 1) so headline
-     and CTAs read crisply over both the fractal and the dot field. */
+  /* Sit above .hero-particles (z 1) so the headline and CTAs read
+     crisply over the drifting dot field. */
   position: relative;
   z-index: var(--z-elevated);
   /* Column flow with a small consistent gap on top of each child's
@@ -667,18 +667,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   flex-direction: column;
   gap: var(--dimension-space-8);
 }
-.hero-bg {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  display: block;
-}
-/* Particle overlay paired with .hero-bg — rendered by the same
-   compose-modal init (queried by the .hero-particles class), but
-   with bgImage skipped so the underlying WebGL fractal shows
-   through. Clipped by .hero { overflow: hidden } so it never
-   bleeds into the brands strip below.
+/* Particle overlay — rendered by the same compose-modal init (queried
+   by the .hero-particles class), with bgImage skipped so the particle
+   canvas stays transparent. Clipped by .hero { overflow: hidden } so
+   it never bleeds into the brands strip below.
    - The CSS background reproduces the same top-fading gradient that
      page-particles paints on its canvas (lighter --surface-default
      at top → fully transparent by 50%), so the home hero gets the
@@ -735,6 +727,22 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   letter-spacing: var(--font-letter-spacing-normal);
   line-height: var(--font-line-height-snug);
   margin-bottom: var(--dimension-space-12);
+}
+/* Small circular headshot sitting inline just before the word "Hey"
+   in the hero greeting — a little taller than the line height (1.3lh),
+   with a small gap to the text. An inline-block ornament (not a flex
+   wrapper) keeps "Hey" on the same baseline as ", I'm João." so it
+   reads as one continuous sentence; white-space:nowrap keeps the
+   avatar glued to the word. */
+.hero-hey { white-space: nowrap; }
+.hero-hey::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  width: 1.3lh; height: 1.3lh;
+  margin-right: var(--dimension-space-12);
+  border-radius: 50%;
+  background: url('/assets/images/photo.webp') center / cover no-repeat;
 }
 .hero-role {
   font-family: var(--font-family-display);
@@ -2140,7 +2148,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   /* WCAG 2.5.5 (AAA) — 44×44 minimum touch target. */
   width: var(--target-min); height: var(--target-min);
   display: inline-flex; align-items: center; justify-content: center;
-  background: transparent; border: none; border-radius: var(--dimension-radius-sm);
+  background: transparent; border: none;
+  /* All four corners use the radius that's concentric with the modal's
+     --dimension-radius-xl corner — the button is inset --dimension-space-8
+     from it, so xl - 8px contours the modal corner while keeping the
+     modal-header close button uniformly rounded. */
+  border-radius: calc(var(--dimension-radius-xl) - var(--dimension-space-8));
   color: var(--text-inverse-muted); cursor: pointer; padding: 0;
   transition: background var(--motion-duration-short), color var(--motion-duration-short);
 }

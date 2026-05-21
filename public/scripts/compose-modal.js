@@ -778,10 +778,9 @@
        fades everything out at the 50% mark. */
     var isPageParticles = wrap.classList.contains('page-particles');
     /* hero-particles is the home-page variant: same drifting dot
-       field as page-particles, but paired with the WebGL fractal
-       behind it. We skip the gradient bgImage entirely so the
-       fractal underneath remains visible and only the particles
-       are layered on top. */
+       field as page-particles. We skip the gradient bgImage entirely
+       so the particle canvas stays transparent and the hero's own
+       CSS wash gradient shows through. */
     var isHeroParticles = wrap.classList.contains('hero-particles');
 
     var readPalette = function () {
@@ -1053,10 +1052,10 @@
       H = Math.max(1, Math.floor(h * dpr));
       canvas.width = W; canvas.height = H;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      /* Hero-particles intentionally skips buildBackground — the
-         WebGL fractal beneath is already painting the gradient.
-         Leaving bgImage null makes frame() clearRect each tick so
-         the canvas stays transparent and the fractal shows through. */
+      /* Hero-particles intentionally skips buildBackground — the hero
+         already shows its own CSS wash gradient. Leaving bgImage null
+         makes frame() clearRect each tick so the canvas stays
+         transparent over that gradient. */
       bgImage = isHeroParticles ? null : buildBackground(w, h, dpr);
       generate();
     }
