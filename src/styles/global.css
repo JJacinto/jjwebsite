@@ -263,6 +263,16 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   padding-top: var(--dimension-space-8);
   padding-bottom: var(--dimension-space-8);
 }
+/* Mobile: inset the scrolled nav so the floating pill keeps a small
+   gap from the viewport edges instead of spanning edge-to-edge. On
+   wider screens the centred .container max-width already leaves side
+   gutters; below it the pill would otherwise touch both edges. */
+@media (max-width: 720px) {
+  .nav.scrolled {
+    padding-left: var(--dimension-space-12);
+    padding-right: var(--dimension-space-12);
+  }
+}
 
 .logo-outer {
   width: 44px; height: 44px;
@@ -2368,14 +2378,25 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
      would be clipped by the group's overflow:hidden. */
   outline: 2px solid var(--border-focus); outline-offset: -2px;
 }
-/* Narrow modals: the segmented groups fill the row and segments share
-   it equally so the 4-5 budget options can't overflow. */
-@media (max-width: 480px) {
-  .form-radio-group, .form-check-group { display: flex; width: 100%; }
-  .form-radio, .form-check {
-    flex: 1; font-size: var(--font-size-xs);
-    padding-left: var(--dimension-space-4); padding-right: var(--dimension-space-4);
+/* Narrow modals: the engagement/budget segmented groups stack
+   vertically so every option stays visible and tappable — a
+   horizontal row of 3-5 segments can't fit a phone-width modal, and
+   nowrap segments can't shrink past their text (they'd be clipped by
+   the group's overflow:hidden). 600px matches the .compose-modal
+   narrow breakpoint above, so there's no gap where it overflows. */
+@media (max-width: 600px) {
+  .form-radio-group, .form-check-group {
+    flex-direction: column;
+    width: 100%;
   }
+  .form-radio, .form-check {
+    justify-content: flex-start;
+    padding: var(--dimension-space-12);
+    /* Divider runs along the bottom now that segments stack. */
+    border-right: none;
+    border-bottom: var(--dimension-border-width-1) solid var(--border-inverse);
+  }
+  .form-radio:last-child, .form-check:last-child { border-bottom: none; }
 }
 
 .form-slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--dimension-space-10); }
