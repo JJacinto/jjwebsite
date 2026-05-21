@@ -162,7 +162,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 @media (prefers-reduced-motion: reduce) {
   .reveal { transition: none; opacity: 1; transform: none; }
   .marquee-track { animation: none !important; }
-  .compose-backdrop, .compose-modal { transition: none; }
+  .compose-backdrop, .compose-modal { transition: none; animation: none; }
+  .form-slider { transition: none; }
+  .form-slider::-webkit-slider-thumb,
+  .form-slider::-moz-range-thumb { animation: none; }
 }
 
 /* ============================================================
@@ -171,51 +174,23 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .nav {
   position: fixed; top: 0; left: 0; right: 0; z-index: var(--z-sticky);
   padding: var(--dimension-space-16) 0;
-  transition: background var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-expressive), padding 0.3s;
+}
+/* Nav transitions are gated behind .nav-anim (added by nav.js once the
+   page has settled — load + scroll restoration). A page opened
+   mid-scroll therefore snaps straight to the solid floating-pill state
+   instead of jarringly animating the background/border/shadow in. */
+.nav.nav-anim {
+  transition: padding 0.3s;
 }
 .nav.scrolled {
+  /* 12px padding doubles as the small gap between the floating nav
+     pill and the top of the viewport. */
   padding: var(--dimension-space-12) 0;
-  /* Theme-aware blurred bg — light translucent on light page, dark
-     translucent on dark page. color-mix avoids hand-rolling a per-theme
-     rgba string. */
-  background: color-mix(in srgb, var(--background-page) 88%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 1px 0 var(--border-subtle);
 }
-/* Two refraction layers with mismatched periods → combined pattern
-   feels sporadic (effective repeat ~9 minutes), no visible cycle.
-   Soft tapered gradients hide the cut-off at the spot edges. */
-.nav.scrolled::before,
-.nav.scrolled::after {
-  content: '';
-  position: absolute;
-  left: 0; right: 0; bottom: -1px;
-  height: 1px;
-  pointer-events: none;
-  background-repeat: no-repeat;
-}
-.nav.scrolled::before {
-  background-image: linear-gradient(90deg,
-    transparent 0%, transparent 18%,
-    var(--component-form-input-bg-light) 32%,
-    var(--component-nav-refract-stop-2) 50%,
-    var(--component-form-input-bg-light) 68%,
-    transparent 82%, transparent 100%);
-  background-size: 28% 100%;
-  animation: line-refract-a 19s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-}
-.nav.scrolled::after {
-  background-image: linear-gradient(90deg,
-    transparent 0%, transparent 12%,
-    var(--component-nav-refract-stop-4) 28%,
-    var(--component-nav-refract-stop-3) 50%,
-    var(--component-nav-refract-stop-4) 72%,
-    transparent 88%, transparent 100%);
-  background-size: 56% 100%;
-  animation: line-refract-b 33s cubic-bezier(0.6, 0, 0.4, 1) infinite;
-  animation-delay: -11s;
-}
+/* line-refract-a / -b keyframes are kept below — they still drive the
+   section-divider refraction lines further down this file. The nav's
+   own full-width bottom refraction line was removed when the scrolled
+   nav became a floating pill: a full-bleed line can't sit under it. */
 @keyframes line-refract-a {
   0%   { background-position: -120% 0; }
   100% { background-position: 220% 0; }
@@ -249,11 +224,44 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   95%  { background-position: -159% 0,   120% 0; }
   100% { background-position: -180% 0,   120% 0; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .nav.scrolled::before, .nav.scrolled::after { animation: none; }
-}
 .nav .container {
   display: flex; align-items: center; justify-content: space-between;
+  /* Tighter 12px side padding — overrides the global .container's
+     40px --spacing-container-pad so the floating pill hugs its
+     content. */
+  padding-left: var(--dimension-space-12);
+  padding-right: var(--dimension-space-12);
+  /* Transparent border reserved here so the scrolled state can colour
+     it in (the floating-pill stroke) without a layout shift. */
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+}
+/* Floating-pill transitions — gated behind .nav-anim so the pill's
+   fill, stroke and shadow don't fade in when the page loads already
+   scrolled (see the .nav.nav-anim note above). */
+.nav.nav-anim .container {
+  transition:
+    background var(--motion-duration-expressive) var(--motion-easing-emphasized),
+    border-color var(--motion-duration-expressive),
+    box-shadow var(--motion-duration-expressive),
+    padding var(--motion-duration-expressive);
+}
+/* Scrolled → the nav background detaches from the viewport edges and
+   becomes a floating pill: the translucent blurred fill, the subtle
+   stroke and a soft drop shadow ride on the centred .container instead
+   of the full-width <nav>. The 12px .nav.scrolled padding above sets
+   the small margin from the top of the viewport. */
+.nav.scrolled .container {
+  /* Frosted glass: a fairly opaque fill keeps nav text legible when
+     light page content scrolls behind it, while the heavy blur +
+     saturation still diffuse the background for the glassy look. */
+  background: color-mix(in srgb, var(--background-page) 80%, transparent);
+  backdrop-filter: blur(22px) saturate(1.7);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  border-color: var(--border-subtle);
+  box-shadow: 0 12px 32px -18px rgba(0, 0, 0, 0.5);
+  padding-top: var(--dimension-space-8);
+  padding-bottom: var(--dimension-space-8);
 }
 
 .logo-outer {
@@ -325,7 +333,9 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(28,26,23,0.08);
+  /* Solid, subdued scroll-progress fill — a single translucent
+     neutral wash, no gradient or motion. */
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
   transform-origin: left;
   transform: scaleX(var(--nav-scroll-progress, 0));
   pointer-events: none;
@@ -342,9 +352,9 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .nav.nav-dark .nav-toggle span::before,
 .nav.nav-dark .nav-toggle span::after { background: var(--text-inverse); }
 .nav.nav-dark .nav-toggle.open span { background: transparent; }
-.nav.nav-dark.scrolled {
+.nav.nav-dark.scrolled .container {
   background: var(--component-nav-scrolled-bg);
-  box-shadow: 0 1px 0 var(--component-nav-scrolled-hairline);
+  border-color: var(--component-nav-scrolled-hairline);
 }
 /* Logo invert — naturally black SVG, lifted to light wherever the
    nav sits on a dark surface. Triggers either by nav-dark variant
@@ -2087,10 +2097,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   display: flex; align-items: flex-start; justify-content: center;
   padding: clamp(var(--dimension-space-48), 10vh, var(--dimension-space-128)) var(--spacing-container-pad) var(--spacing-container-pad);
   opacity: 0; pointer-events: none;
-  transition: opacity 180ms ease-out;
+  /* Base (no .is-open) transition = the CLOSE fade — held a little
+     longer than the modal's collapse so the scrim covers it fully. */
+  transition: opacity 320ms ease;
   overflow-y: auto;
 }
-.compose-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.compose-backdrop.is-open { opacity: 1; pointer-events: auto; transition: opacity 160ms ease; }
 
 .compose-modal {
   --compose-gap: calc(var(--spacing-container-pad) / 2);
@@ -2105,8 +2117,16 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   box-shadow: var(--shadow-md);
   color: var(--text-inverse);
   display: flex; flex-direction: column;
-  transform: scale(0.96); opacity: 0;
-  transition: transform 180ms ease-out, opacity 180ms ease-out;
+  /* Closed state = the gravitational-collapse target: the modal is
+     sucked down into a point. This base transition is the CLOSE
+     animation — an accelerating ease-in, like falling into a well.
+     The OPEN animation is the modal-gravity-in keyframes .is-open
+     layers on top. Transform + opacity only — both composite on the
+     GPU, so open/close stays smooth with no blur-induced lag. */
+  transform: scale(0.4); opacity: 0;
+  transition:
+    transform 260ms cubic-bezier(0.7, 0, 0.84, 0),
+    opacity   240ms ease-in;
 }
 .compose-modal-top {
   flex: 0 0 auto;
@@ -2134,7 +2154,17 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   padding: var(--compose-gap) var(--spacing-container-pad);
   display: flex; flex-direction: column; gap: var(--compose-gap);
 }
-.compose-backdrop.is-open .compose-modal { transform: scale(1); opacity: 1; }
+.compose-backdrop.is-open .compose-modal {
+  transform: scale(1); opacity: 1;
+  /* Gravitational pull-together: the modal condenses inward from a
+     slightly oversized state and snaps into focus. */
+  animation: modal-gravity-in 380ms cubic-bezier(0.34, 1.3, 0.64, 1) both;
+}
+@keyframes modal-gravity-in {
+  0%   { transform: scale(1.06); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: scale(1);    opacity: 1; }
+}
 
 .compose-header { display: flex; flex-direction: column; gap: var(--dimension-space-8); }
 .compose-modal .eyebrow { color: var(--text-inverse); }
@@ -2272,7 +2302,18 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .form-toggle-btn.is-selected { background: var(--component-form-toggle-fill-active); color: var(--text-inverse); }
 .form-toggle-btn:hover:not(.is-selected) { background: var(--component-form-toggle-fill); color: var(--text-inverse); }
 
-.form-radio-group, .form-check-group { display: flex; flex-wrap: wrap; gap: var(--dimension-space-8); align-items: flex-start; justify-content: flex-start; align-self: flex-start; }
+/* Segmented toggle group — engagement type & budget fields. Same
+   component as the .intent-toggle above, in its "hug" variant: an
+   inline-flex group that sizes to its content, with connected
+   segments and hairline dividers inside a rounded border. */
+.form-radio-group, .form-check-group {
+  display: inline-flex;
+  align-self: flex-start;
+  max-width: 100%;
+  border: var(--dimension-border-width-1) solid var(--border-inverse);
+  border-radius: var(--dimension-radius-sm);
+  overflow: hidden;
+}
 #compose-fields-work, #compose-fields-mentor { display: flex; flex-direction: column; gap: var(--dimension-space-24); }
 #compose-fields-project { display: flex; flex-direction: column; gap: var(--dimension-space-28); }
 #compose-fields-chat, #compose-fields-book { display: flex; flex-direction: column; gap: var(--dimension-space-20); }
@@ -2288,45 +2329,94 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   .compose-shared-row { grid-template-columns: 1fr; }
 }
 .form-radio, .form-check {
-  display: inline-flex; align-items: center;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex: 0 1 auto;
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-inverse-muted); cursor: pointer;
-  padding: var(--dimension-space-6) var(--dimension-space-12);
-  border: var(--dimension-border-width-1) solid var(--border-inverse); border-radius: var(--radius-pill);
-  transition: background var(--motion-duration-short), color var(--motion-duration-short), border-color var(--motion-duration-short);
+  color: var(--text-inverse-muted); cursor: pointer; white-space: nowrap;
+  padding: var(--dimension-space-8) var(--dimension-space-12);
+  /* Hairline divider between segments — dropped on the last one so it
+     sits flush inside the group's rounded border. */
+  border-right: var(--dimension-border-width-1) solid var(--border-inverse);
+  transition: background var(--motion-duration-short), color var(--motion-duration-short);
 }
+.form-radio:last-child, .form-check:last-child { border-right: none; }
 .form-radio input, .form-check input {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 .form-radio:has(input:checked), .form-check:has(input:checked) {
   background: var(--component-form-toggle-fill-active); color: var(--text-inverse);
-  border-color: rgba(240,237,232,0.28);
 }
 .form-radio:hover:not(:has(input:checked)), .form-check:hover:not(:has(input:checked)) {
   background: var(--component-form-toggle-fill); color: var(--text-inverse);
 }
 .form-radio:has(input:focus-visible), .form-check:has(input:focus-visible) {
-  outline: 2px solid var(--border-focus); outline-offset: 2px;
+  /* Inset focus ring — segments are connected, so an outset ring
+     would be clipped by the group's overflow:hidden. */
+  outline: 2px solid var(--border-focus); outline-offset: -2px;
+}
+/* Narrow modals: the segmented groups fill the row and segments share
+   it equally so the 4-5 budget options can't overflow. */
+@media (max-width: 480px) {
+  .form-radio-group, .form-check-group { display: flex; width: 100%; }
+  .form-radio, .form-check {
+    flex: 1; font-size: var(--font-size-xs);
+    padding-left: var(--dimension-space-4); padding-right: var(--dimension-space-4);
+  }
 }
 
 .form-slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--dimension-space-10); }
 .form-slider-val { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-inverse); }
+/* --slider-frac is registered so it can be transitioned — animating
+   it (instead of snapping) is what lets the gradient glide along the
+   track to each newly selected step. */
+@property --slider-frac {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0.333;
+}
 .form-slider {
-  width: 100%; height: 3px; border-radius: var(--dimension-radius-xs);
+  width: 100%; height: 4px; border-radius: var(--dimension-radius-xs);
   -webkit-appearance: none; appearance: none;
-  background: var(--border-inverse); outline: none; cursor: pointer;
+  /* Primary-colour glow that originates exactly under the thumb and
+     fades over a short distance to the neutral track tone on both
+     sides. --slider-frac (0–1, the selected step) is set live by
+     compose-modal.js as the user drags. The 16px thumb is inset half
+     its width at each end, so its centre travels [8px, 100%-8px] —
+     --slider-origin maps the fraction onto that real travel so the
+     gradient stays locked to the thumb, including at the extremes.
+     Transitioning --slider-frac drags the gradient smoothly to the
+     newly selected step instead of jumping. */
+  --slider-origin: calc(8px + var(--slider-frac, 0.333) * (100% - 16px));
+  transition: --slider-frac 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  background: linear-gradient(90deg,
+    var(--border-inverse) 0%,
+    var(--border-inverse) calc(var(--slider-origin) - 17%),
+    var(--color-primary-40) var(--slider-origin),
+    var(--border-inverse) calc(var(--slider-origin) + 17%),
+    var(--border-inverse) 100%);
+  outline: none; cursor: pointer;
 }
 .form-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px; height: 16px; border-radius: 50%;
   background: var(--text-inverse); cursor: pointer;
   transition: transform var(--motion-duration-short);
+  /* Pulse radiating out of the thumb. --slider-pulse-dur is set per
+     timeline step by compose-modal.js: a slow, calm beat at
+     "Exploring" accelerating to an urgent flicker at "ASAP". */
+  animation: slider-pulse var(--slider-pulse-dur, 1.7s) ease-out infinite;
 }
 .form-slider::-webkit-slider-thumb:hover { transform: scale(1.2); }
 .form-slider::-moz-range-thumb {
   width: 16px; height: 16px; border-radius: 50%;
   background: var(--text-inverse); border: none; cursor: pointer;
+  animation: slider-pulse var(--slider-pulse-dur, 1.7s) ease-out infinite;
+}
+/* Brand-tinted ring expanding out of the timeline slider thumb. */
+@keyframes slider-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(128, 128, 240, 0.45); }
+  100% { box-shadow: 0 0 0 9px rgba(128, 128, 240, 0); }
 }
 .form-slider-ticks {
   display: flex; justify-content: space-between;
@@ -2503,7 +2593,9 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .pw-gate { max-width: 400px; margin: var(--dimension-space-80) auto; text-align: center; padding: var(--dimension-space-48) var(--dimension-space-40); background: var(--surface-default); border-radius: var(--dimension-radius-xl); border: var(--dimension-border-width-1) solid var(--border-subtle); box-shadow: var(--shadow-lg); }
 .pw-gate-lock {
   width: 56px; height: 56px;
-  background: var(--color-primary-10); border-radius: var(--radius-card);
+  /* Icon/bg combo matched to the contact page's .contact-card-icon —
+     --fill-brand-muted background with a --text-brand icon. */
+  background: var(--fill-brand-muted); border-radius: var(--radius-card);
   display: flex; align-items: center; justify-content: center;
   margin: 0 auto var(--dimension-space-24); color: var(--text-brand);
   perspective: 220px;

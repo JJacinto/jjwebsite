@@ -1,11 +1,29 @@
 /* Nav scroll + active link progress fill */
 const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
+
+/* Toggle the solid/scrolled nav state and update the active link's
+   scroll-progress fill. */
+function syncNavScroll() {
   nav.classList.toggle('scrolled', window.scrollY > 40);
   const progress = Math.min(1, window.scrollY / Math.max(1, document.body.scrollHeight - window.innerHeight));
   const activeLink = document.querySelector('.pill-nav a.active');
   if (activeLink) activeLink.style.setProperty('--nav-scroll-progress', progress);
-}, { passive: true });
+}
+
+/* Apply the scrolled state right away so a page opened mid-scroll
+   paints the solid nav immediately. The .nav-anim class — which
+   carries the nav's background/border/shadow transitions — is added
+   only once the page has fully settled (load + scroll restoration),
+   so this initial sync lands instantly with no jarring fade-in. */
+syncNavScroll();
+function enableNavAnim() {
+  syncNavScroll();
+  requestAnimationFrame(() => nav.classList.add('nav-anim'));
+}
+if (document.readyState === 'complete') enableNavAnim();
+else window.addEventListener('load', enableNavAnim, { once: true });
+
+window.addEventListener('scroll', syncNavScroll, { passive: true });
 
 /* Pill indicator */
 const pillNav  = document.getElementById('pillNav');

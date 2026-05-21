@@ -1,6 +1,6 @@
 /* Compose modal */
 (function () {
-  var INTENTS = ["Let’s chat", "Start a project"];
+  var INTENTS = ["Let’s chat", "Start project"];
   var mounted   = false;
   var intentIdx = 0;
   var selectIntent = null;
@@ -44,15 +44,17 @@
         '<span class="eyebrow">Engagement type</span>' +
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time" required checked><span>One-time</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Recurring project" required><span>Recurring project</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Fractional" required><span>Fractional</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Full-time" required><span>Full-time</span></label>' +
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
         '<span class="eyebrow" id="proj-budget-label">Budget</span>' +
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$3k-$5k" required><span>$3k–$5k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$10k" required><span>$5k–$10k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$10k-$25k" required><span>$10k–$25k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$8k" required><span>$5k–$8k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$8k-$12k" required><span>$8k–$12k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$12k-$25k" required><span>$12k–$25k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$25k+" required><span>$25k+</span></label>' +
         '</div>' +
       '</div>' +
@@ -196,25 +198,40 @@
     var slider = container.querySelector('#proj-timeline');
     var val    = container.querySelector('#proj-timeline-val');
     var labels = ['Exploring', 'Flexible', 'Soon (1–3 mo)', 'ASAP'];
-    if (slider && val) {
-      slider.addEventListener('input', function () {
-        var label = labels[+slider.value - 1];
-        val.textContent = label;
-        slider.setAttribute('aria-valuetext', label);
-      });
-    }
+    /* Pulse cadence per timeline step — a slow, calm beat at
+       "Exploring" accelerating to an urgent flicker at "ASAP".
+       Drives the slider thumb's --slider-pulse-dur in global.css. */
+    var pulseDur = ['2.8s', '1.7s', '1.05s', '0.55s'];
+    if (!slider || !val) return;
+    var sync = function () {
+      var v   = +slider.value;
+      var min = +slider.min || 1;
+      var max = +slider.max || 4;
+      /* Thumb position as a 0–1 fraction — global.css maps it onto the
+         thumb's real pixel travel so the primary-colour gradient
+         originates exactly under the thumb and tracks it as it moves.
+         Fires on every 'input' event, so it follows the thumb live. */
+      slider.style.setProperty('--slider-frac', String((v - min) / (max - min)));
+      slider.style.setProperty('--slider-pulse-dur', pulseDur[v - 1] || '1.7s');
+      var label = labels[v - 1] || labels[0];
+      val.textContent = label;
+      slider.setAttribute('aria-valuetext', label);
+    };
+    slider.addEventListener('input', sync);
+    sync();
   };
 
   /* Budget label tracks the engagement type — one-time work is a flat
-     "Budget", a recurring engagement reads as "Monthly budget" so the
-     same $3k/$5k/$10k brackets parse as a monthly rate. */
+     "Budget", while the ongoing engagements (Fractional, Full-time)
+     read as "Monthly budget" so the same $3k/$5k/$10k brackets parse
+     as a monthly rate. */
   var bindBudgetLabel = function (container) {
     var label = container.querySelector('#proj-budget-label');
     var radios = container.querySelectorAll('input[name="proj-engagement"]');
     if (!label || !radios.length) return;
     var update = function () {
       var checked = container.querySelector('input[name="proj-engagement"]:checked');
-      label.textContent = (checked && checked.value === 'Recurring project') ? 'Monthly budget' : 'Budget';
+      label.textContent = (checked && checked.value !== 'One-time') ? 'Monthly budget' : 'Budget';
     };
     radios.forEach(function (r) { r.addEventListener('change', update); });
     update();
@@ -304,7 +321,8 @@
           '</div>' +
           '<div class="compose-footer" id="compose-footer">' +
             '<button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">' +
-              '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+              '<svg class="compose-copy-icon compose-copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
+              '<svg class="compose-copy-icon compose-copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>' +
               '<span id="compose-copy-hint">Copy my email address</span>' +
             '</button>' +
             '<div class="compose-footer-actions">' +
@@ -426,12 +444,23 @@
     });
 
     if (copyBtn) {
+      var copyIconDefault = copyBtn.querySelector('.compose-copy-icon-default');
+      var copyIconSuccess = copyBtn.querySelector('.compose-copy-icon-success');
+      var copyResetTimer;
       copyBtn.addEventListener('click', function () {
         var addr = ['contact', '\x40', 'joaojacinto.com'].join('');
         navigator.clipboard && navigator.clipboard.writeText(addr).then(function () {
-          if (!copyHint) return;
-          copyHint.textContent = 'Copied!';
-          setTimeout(function () { copyHint.textContent = 'Copy my email address'; }, 2000);
+          /* Momentary "copied" state — swap the copy icon for a check
+             and the label for "Copied!", reverting both after 2s. */
+          if (copyHint) copyHint.textContent = 'Copied!';
+          if (copyIconDefault) copyIconDefault.style.display = 'none';
+          if (copyIconSuccess) copyIconSuccess.style.display = '';
+          clearTimeout(copyResetTimer);
+          copyResetTimer = setTimeout(function () {
+            if (copyHint) copyHint.textContent = 'Copy my email address';
+            if (copyIconDefault) copyIconDefault.style.display = '';
+            if (copyIconSuccess) copyIconSuccess.style.display = 'none';
+          }, 2000);
         });
       });
     }
@@ -575,6 +604,10 @@
     var bd = document.getElementById('compose-backdrop');
     if (!bd) return;
     bd.removeAttribute('aria-hidden');
+    /* Force a reflow so a freshly-mounted backdrop has a committed
+       start state — guarantees the gravity-well + modal-collapse
+       animation plays on the very first open, not just reopens. */
+    void bd.offsetWidth;
     bd.classList.add('is-open');
     document.body.style.overflow = 'hidden';
     if (typeof targetIdx === 'number' && selectIntent) selectIntent(targetIdx);
@@ -891,7 +924,11 @@
     }
 
     function measureButton(which) {
-      var sel = which === 'video' ? '.btn-dark-outline'
+      /* 'video' = the secondary CTA: .btn-dark-outline on the about-cta,
+         or the contact page's "Book a call" (.contact-ctas .btn-ghost).
+         Selector kept in sync with secondaryBtn so the gravitational
+         pull resolves a button zone on the contact page too. */
+      var sel = which === 'video' ? '.btn-dark-outline, .contact-ctas .btn-ghost'
               : which === 'chat'  ? '.btn-accent'
               : '.btn';
       var btn = card && card.querySelector(sel);
