@@ -202,7 +202,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   };
 
   document.addEventListener('mousemove', function(e) {
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
     if (tiltCard && tiltCard !== card) {
       clearTilt(tiltCard);
       tiltCard = null;
@@ -254,7 +254,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     }
   }
   document.addEventListener('pointerdown', function (e) {
-    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .btn, .logo-outer, .about-cta-avatar-stack');
+    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled, .btn, .logo-outer, .about-cta-avatar-stack');
     if (!t) return;
     pressedBtn = t;
     setPressed(t, true);
@@ -320,25 +320,29 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const ball = document.createElement('div');
   ball.id = 'cursor-ball';
   ball.setAttribute('aria-hidden', 'true');
-  ball.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg><span class="cursor-ball-label">View testimonials on Linkedin</span>';
+  ball.innerHTML =
+    '<svg class="cursor-ball-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>' +
+    '<svg class="cursor-ball-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>' +
+    '<span class="cursor-ball-label">View LinkedIn</span>';
   document.body.appendChild(ball);
   let activeCard = null;
   document.addEventListener('mousemove', function(e) {
     ball.style.left = e.clientX + 'px';
     ball.style.top  = e.clientY + 'px';
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case');
+    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled');
     if (card !== activeCard) {
       activeCard = card;
       if (card) {
         const isTestimonial = card.classList.contains('testimonial-card');
-        if (isTestimonial) {
-          ball.classList.add('is-linkedin');
-        } else {
-          ball.classList.remove('is-linkedin');
-          const svg = ball.querySelector('svg');
-          svg.style.animation = 'none';
-          svg.getBoundingClientRect();
-          svg.style.animation = '';
+        const isImage = card.classList.contains('case-img-ph');
+        ball.classList.toggle('is-linkedin', isTestimonial);
+        ball.classList.toggle('is-image', isImage);
+        if (!isTestimonial && !isImage) {
+          /* Replay the arrow nudge when entering a case card. */
+          const arrow = ball.querySelector('.cursor-ball-arrow');
+          arrow.style.animation = 'none';
+          arrow.getBoundingClientRect();
+          arrow.style.animation = '';
         }
         ball.classList.add('is-active');
       } else {

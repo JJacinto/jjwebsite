@@ -243,8 +243,18 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
   }
   if (ok) {
     sessionStorage.setItem('jj-case-unlocked', '1');
-    document.getElementById('pw-overlay').style.display = 'none';
-    document.getElementById('case-content').style.display = '';
+    const overlay = document.getElementById('pw-overlay');
+    const content = document.getElementById('case-content');
+    /* Reveal the page underneath, then break the gate away over it so
+       the content fades up slowly from behind as the lock dissolves. */
+    content.style.display = '';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      overlay.style.display = 'none';
+    } else {
+      content.classList.add('pw-revealing');
+      overlay.classList.add('pw-breaking');
+      setTimeout(function () { overlay.style.display = 'none'; }, 700);
+    }
   } else {
     error.textContent = 'Incorrect password — try again.';
     input.classList.add('pw-shake');

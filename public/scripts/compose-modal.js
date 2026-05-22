@@ -53,7 +53,7 @@
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$3k-$5k" required><span>$3k–$5k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$8k" required><span>$5k–$8k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$8k-$12k" required><span>$8k–$12k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$8k-$12k" required checked><span>$8k–$12k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$12k-$25k" required><span>$12k–$25k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$25k+" required><span>$25k+</span></label>' +
         '</div>' +
@@ -61,14 +61,14 @@
       '<div class="compose-field">' +
         '<div class="form-slider-row">' +
           '<span class="eyebrow" id="proj-timeline-label">Timeline</span>' +
-          '<span class="form-slider-val" id="proj-timeline-val">Flexible</span>' +
+          '<span class="form-slider-val" id="proj-timeline-val">Flexible (3–6 mo)</span>' +
         '</div>' +
-        '<input class="form-slider" type="range" id="proj-timeline" min="1" max="4" value="2" step="1" aria-labelledby="proj-timeline-label" aria-valuetext="Flexible">' +
-        '<div class="form-slider-ticks"><span>Exploring</span><span>Flexible</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>' +
+        '<input class="form-slider" type="range" id="proj-timeline" min="1" max="4" value="2" step="1" aria-labelledby="proj-timeline-label" aria-valuetext="Flexible (3–6 mo)">' +
+        '<div class="form-slider-ticks"><span>Exploring</span><span>Flexible (3–6 mo)</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>' +
       '</div>' +
       '<div class="compose-field">' +
         '<label class="eyebrow" for="proj-context">Tell me about the project</label>' +
-        '<textarea class="compose-textarea" id="proj-context" rows="3" required autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the biggest challenge?"></textarea>' +
+        '<textarea class="compose-textarea" id="proj-context" rows="3" required autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the challenge?"></textarea>' +
       '</div>' +
       '<div class="compose-field">' +
         '<label class="eyebrow" for="proj-links">Relevant links <span class="compose-optional">(optional)</span></label>' +
@@ -197,11 +197,14 @@
   var bindProjectSlider = function (container) {
     var slider = container.querySelector('#proj-timeline');
     var val    = container.querySelector('#proj-timeline-val');
-    var labels = ['Exploring', 'Flexible', 'Soon (1–3 mo)', 'ASAP'];
+    var labels = ['Exploring', 'Flexible (3–6 mo)', 'Soon (1–3 mo)', 'ASAP'];
     /* Pulse cadence per timeline step — a slow, calm beat at
        "Exploring" accelerating to an urgent flicker at "ASAP".
        Drives the slider thumb's --slider-pulse-dur in global.css. */
     var pulseDur = ['2.8s', '1.7s', '1.05s', '0.55s'];
+    /* Pulse-ring diameter per step — grows with urgency, biggest at
+       "ASAP". Drives the thumb's --slider-pulse-spread in global.css. */
+    var pulseSpread = ['10px', '14px', '17px', '21px'];
     if (!slider || !val) return;
     var sync = function () {
       var v   = +slider.value;
@@ -213,6 +216,7 @@
          Fires on every 'input' event, so it follows the thumb live. */
       slider.style.setProperty('--slider-frac', String((v - min) / (max - min)));
       slider.style.setProperty('--slider-pulse-dur', pulseDur[v - 1] || '1.7s');
+      slider.style.setProperty('--slider-pulse-spread', pulseSpread[v - 1] || '14px');
       var label = labels[v - 1] || labels[0];
       val.textContent = label;
       slider.setAttribute('aria-valuetext', label);
@@ -782,6 +786,11 @@
        so the particle canvas stays transparent and the hero's own
        CSS wash gradient shows through. */
     var isHeroParticles = wrap.classList.contains('hero-particles');
+    /* Scope for the CTA buttons the particles gravitate to on hover.
+       For the footer/contact wraps the buttons live inside `card`; the
+       hero's CTAs sit in a sibling .hero-inner, so for the hero we
+       widen the scope to the whole .hero section. */
+    var btnScope = isHeroParticles ? wrap.closest('.hero') : card;
 
     var readPalette = function () {
       var rs = getComputedStyle(document.documentElement);
@@ -924,13 +933,13 @@
 
     function measureButton(which) {
       /* 'video' = the secondary CTA: .btn-dark-outline on the about-cta,
-         or the contact page's "Book a call" (.contact-ctas .btn-ghost).
-         Selector kept in sync with secondaryBtn so the gravitational
-         pull resolves a button zone on the contact page too. */
-      var sel = which === 'video' ? '.btn-dark-outline, .contact-ctas .btn-ghost'
+         the contact page's "Book a call" (.contact-ctas .btn-ghost), or
+         the hero's "View work" (.hero-ctas .btn-ghost). Kept in sync
+         with secondaryBtn so the pull resolves a zone for each. */
+      var sel = which === 'video' ? '.btn-dark-outline, .contact-ctas .btn-ghost, .hero-ctas .btn-ghost'
               : which === 'chat'  ? '.btn-accent'
               : '.btn';
-      var btn = card && card.querySelector(sel);
+      var btn = btnScope && btnScope.querySelector(sel);
       if (!btn) return null;
       var wrapR = wrap.getBoundingClientRect();
       var btnR  = btn.getBoundingClientRect();
@@ -1122,15 +1131,14 @@
     var btnHover = false;
     var activeShape = 'chat';
     var hoverProg = 0;
-    var primaryBtn   = card && card.querySelector('.btn-accent');
-    /* Secondary CTA: the about-cta variant uses .btn-dark-outline,
-       the contact page's .contact-ctas uses .btn-ghost. Both are
-       the "Book a call" action — particles should be drawn toward
-       either one on hover. Scoping the .btn-ghost match to
-       .contact-ctas avoids accidentally targeting the contact-card
-       email/map/social .btn-ghost buttons that live inside the
-       same .contact-inner card. */
-    var secondaryBtn = card && card.querySelector('.btn-dark-outline, .contact-ctas .btn-ghost');
+    var primaryBtn   = btnScope && btnScope.querySelector('.btn-accent');
+    /* Secondary CTA: .btn-dark-outline on the about-cta, .btn-ghost in
+       the contact page's .contact-ctas, or the hero's .hero-ctas
+       .btn-ghost ("View work") — particles are drawn to whichever is
+       hovered. The .btn-ghost matches stay scoped (.contact-ctas /
+       .hero-ctas) so the contact card's email/map/social ghost
+       buttons aren't accidentally targeted. */
+    var secondaryBtn = btnScope && btnScope.querySelector('.btn-dark-outline, .contact-ctas .btn-ghost, .hero-ctas .btn-ghost');
     var hoverStart = 0;
     if (primaryBtn) {
       primaryBtn.addEventListener('mouseenter', function () {
@@ -1468,13 +1476,35 @@
             pull = 0;
           }
         } else if (p.orbitT) {
-          /* Hover ended — release the particle. The default drift +
-             velocity-damping physics below will pull it home to
-             (ox, oy) smoothly. */
+          /* Hover ended — begin a gentle release. Rather than dropping
+             the particle into the spring physics below (which yanks it
+             home fast and overshoots into a bounce), mark the release
+             time; the easing branch lerps it back progressively,
+             mirroring the slow ramp of the hover-in orbit follow. */
           p.orbitT = 0;
+          p.releaseT = now;
+          p.vx = 0; p.vy = 0;
         }
 
-        if (!inOrbit) {
+        /* Gentle release ease — runs after avatar hover ends, in place
+           of the spring physics, so particles revolve back to rest
+           slowly and progressively instead of snapping/bouncing. The
+           lerp starts soft and ramps up, like the hover-in follow. */
+        var releasing = false;
+        if (!inOrbit && p.releaseT) {
+          releasing = true;
+          var releaseAge = (now - p.releaseT) * 0.001;
+          var relLerp = Math.min(0.12, 0.03 + releaseAge * 0.035);
+          p.x += (tx - p.x) * relLerp;
+          p.y += (ty - p.y) * relLerp;
+          p.vx = 0; p.vy = 0;
+          /* End the release once home (hand off to drift) or after a
+             safety timeout. */
+          var relDX = tx - p.x, relDY = ty - p.y;
+          if (releaseAge > 4 || (relDX * relDX + relDY * relDY) < 4) p.releaseT = 0;
+        }
+
+        if (!inOrbit && !releasing) {
           if (hoverProg > 0.001 && btnZone) {
             var ddx = p.ox - btnZone.cx, ddy = p.oy - btnZone.cy;
             var dToBtn = Math.sqrt(ddx * ddx + ddy * ddy);

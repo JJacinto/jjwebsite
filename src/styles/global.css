@@ -303,6 +303,9 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 
 .pill-nav {
   position: relative; display: flex;
+  /* 44px tall to match the Start project button (--target-min). The
+     4px padding insets the links to 36px; flex stretch sizes them. */
+  min-height: var(--target-min);
   border-radius: var(--radius-pill); padding: var(--dimension-space-4);
   background: transparent;
 }
@@ -331,6 +334,9 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .pill-indicator.is-positioned { opacity: 1; }
 .pill-nav a {
   position: relative; z-index: var(--z-raised);
+  /* Flex-centre the label — each link stretches to the pill-nav's
+     full inner height (36px within the 44px nav). */
+  display: flex; align-items: center;
   font-size: var(--font-size-sm); color: var(--text-secondary);
   padding: var(--dimension-space-8) var(--dimension-space-16); border-radius: var(--radius-pill);
   overflow: hidden;
@@ -619,7 +625,9 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   border: var(--dimension-border-width-2) solid var(--border-strong);
   color: var(--text-primary);
 }
-.btn-dark-outline::before { background: var(--fill-brand-muted); }
+/* Neutral hover-fill circle — no brand tint (matches the outline
+   button's restrained styling). */
+.btn-dark-outline::before { background: color-mix(in srgb, var(--text-primary) 12%, transparent); }
 .btn-dark-outline:hover {
   border-color: var(--text-primary);
   color: var(--text-primary);
@@ -681,14 +689,12 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    by the .hero-particles class), with bgImage skipped so the particle
    canvas stays transparent. Clipped by .hero { overflow: hidden } so
    it never bleeds into the brands strip below.
-   - The CSS background reproduces the same top-fading gradient that
-     page-particles paints on its canvas (lighter --surface-default
-     at top → fully transparent by 50%), so the home hero gets the
-     same "lifted" wash visitors see on about / work above the fold.
-     The transparent particle canvas sits on top of this background,
-     and the mask-image fades both gradient and particles out at
-     50% — same fade curve as .page-particles, so the page→hero
-     transition matches across routes. */
+   - The CSS background is a lighter --surface-default wash at the top
+     fading out lower down, giving the hero the same "lifted" feel
+     visitors see on about / work above the fold.
+   - The mask keeps the particle field fully visible well past the CTA
+     buttons (to ~70%), then fades it out gently by the bottom of the
+     hero — so plenty of the field shows below the buttons. */
 .hero-particles {
   position: absolute; inset: 0;
   z-index: 1;
@@ -696,19 +702,19 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   background: linear-gradient(
     to bottom,
     var(--surface-default) 0%,
-    transparent 50%
+    transparent 65%
   );
   mask-image: linear-gradient(
     to bottom,
     var(--component-marquee-fade-edge) 0%,
-    var(--component-marquee-fade-edge) 30%,
-    transparent 50%
+    var(--component-marquee-fade-edge) 70%,
+    transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     var(--component-marquee-fade-edge) 0%,
-    var(--component-marquee-fade-edge) 30%,
-    transparent 50%
+    var(--component-marquee-fade-edge) 70%,
+    transparent 100%
   );
 }
 .hero-particles canvas {
@@ -737,22 +743,6 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   letter-spacing: var(--font-letter-spacing-normal);
   line-height: var(--font-line-height-snug);
   margin-bottom: var(--dimension-space-12);
-}
-/* Small circular headshot sitting inline just before the word "Hey"
-   in the hero greeting — a little taller than the line height (1.3lh),
-   with a small gap to the text. An inline-block ornament (not a flex
-   wrapper) keeps "Hey" on the same baseline as ", I'm João." so it
-   reads as one continuous sentence; white-space:nowrap keeps the
-   avatar glued to the word. */
-.hero-hey { white-space: nowrap; }
-.hero-hey::before {
-  content: '';
-  display: inline-block;
-  vertical-align: middle;
-  width: 1.3lh; height: 1.3lh;
-  margin-right: var(--dimension-space-12);
-  border-radius: 50%;
-  background: url('/assets/images/photo.webp') center / cover no-repeat;
 }
 .hero-role {
   font-family: var(--font-family-display);
@@ -1121,7 +1111,11 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 #cursor-ball.is-active { opacity: 1; }
 #cursor-ball svg { width: 18px; height: 18px; stroke: white; flex-shrink: 0; }
-#cursor-ball.is-active svg { animation: cursor-nudge 3s ease-in-out 2; }
+/* Eye icon — shown over case-study images; the arrow is the default. */
+#cursor-ball .cursor-ball-eye { display: none; }
+#cursor-ball.is-image .cursor-ball-arrow { display: none; }
+#cursor-ball.is-image .cursor-ball-eye { display: block; }
+#cursor-ball.is-active .cursor-ball-arrow { animation: cursor-nudge 3s ease-in-out 2; }
 .cursor-ball-label { display: none; font-family: var(--font-family-body); font-size: var(--font-size-xs); font-weight: var(--font-weight-medium); color: var(--color-neutral-0); white-space: nowrap; letter-spacing: var(--font-letter-spacing-normal); }
 #cursor-ball.is-linkedin { width: auto; height: 32px; padding: 0 var(--dimension-space-12); border-radius: var(--radius-pill); }
 #cursor-ball.is-linkedin svg { display: none; }
@@ -1133,7 +1127,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    hover behaviour, which we don't want hidden behind the
    cursor-ball overlay. */
 .tilt-active:not(.btn):not(.logo-outer):not(.about-cta-avatar-stack) { cursor: none; }
-.case-card:hover, .testimonial-card:hover, .next-case:hover { cursor: none; }
+.case-card:hover, .testimonial-card:hover, .next-case:hover, .case-img-ph.is-filled:hover { cursor: none; }
 @keyframes cursor-nudge {
   0%    { transform: translateX(0); }
   6%    { transform: translateX(6px); }
@@ -1181,16 +1175,19 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
 }
 .case-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
-.case-card::before {
+.case-card::before,
+.case-img-ph.is-filled::before {
   content: ''; position: absolute; inset: 0;
   background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
   pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
   border-radius: var(--dimension-radius-md);
 }
-.case-card:hover::before { opacity: 1; }
+.case-card:hover::before,
+.case-img-ph.is-filled:hover::before { opacity: 1; }
 .case-card::after,
 .testimonial-card::after,
-.next-case::after {
+.next-case::after,
+.case-img-ph.is-filled::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit;
   background: radial-gradient(
     circle at calc(var(--tilt-mx, 50) * 1%) calc(var(--tilt-my, 50) * 1%),
@@ -1198,7 +1195,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   );
   pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
 }
-.case-card.tilt-active::after, .testimonial-card.tilt-active::after, .next-case.tilt-active::after { opacity: 1; }
+.case-card.tilt-active::after, .testimonial-card.tilt-active::after, .next-case.tilt-active::after, .case-img-ph.is-filled.tilt-active::after { opacity: 1; }
 .case-card-featured img { height: 224px; }
 .case-card img { width: 100%; height: 180px; object-fit: cover; display: block; transition: transform 0.5s var(--motion-easing-emphasized); }
 .case-card:hover img { transform: scale(1.08); }
@@ -2075,7 +2072,8 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
    stay visible (overriding the default hover-reveal behavior). */
 .btn.contact-card-btn {
   padding: var(--dimension-space-6) var(--dimension-space-12);
-  font-size: var(--font-size-xs);
+  /* One step up from --font-size-xs so the button copy reads clearly. */
+  font-size: var(--font-size-sm);
   border-width: var(--dimension-border-width-2);
   flex-shrink: 0;
   height: auto;
@@ -2447,10 +2445,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
   background: var(--text-inverse); border: none; cursor: pointer;
   animation: slider-pulse var(--slider-pulse-dur, 1.7s) ease-out infinite;
 }
-/* Brand-tinted ring expanding out of the timeline slider thumb. */
+/* Brand-tinted ring expanding out of the timeline slider thumb. The
+   spread (--slider-pulse-spread, set per step by compose-modal.js)
+   grows with the timeline urgency — largest at "ASAP". */
 @keyframes slider-pulse {
-  0%   { box-shadow: 0 0 0 0   rgba(128, 128, 240, 0.45); }
-  100% { box-shadow: 0 0 0 9px rgba(128, 128, 240, 0); }
+  0%   { box-shadow: 0 0 0 0 rgba(128, 128, 240, 0.45); }
+  100% { box-shadow: 0 0 0 var(--slider-pulse-spread, 14px) rgba(128, 128, 240, 0); }
 }
 .form-slider-ticks {
   display: flex; justify-content: space-between;
@@ -2645,6 +2645,28 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 }
 @media (prefers-reduced-motion: reduce) {
   .pw-gate-lock svg { animation: none; }
+}
+/* Unlock — the gate pins itself over the page and breaks away (scales
+   out + blurs + fades) while #case-content is revealed underneath,
+   fading up slowly from behind. Kept just below the nav (z 90) so the
+   nav stays put. JS removes the gate once the break finishes, and
+   gives reduced-motion users an instant swap instead. */
+#pw-overlay.pw-breaking {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--background-page);
+  overflow: hidden;
+  animation: pw-gate-break 0.7s var(--motion-easing-emphasized) forwards;
+}
+@keyframes pw-gate-break {
+  to { opacity: 0; transform: scale(1.1); filter: blur(18px); }
+}
+#case-content.pw-revealing {
+  animation: pw-content-reveal 1s var(--motion-easing-emphasized) 0.1s both;
+}
+@keyframes pw-content-reveal {
+  from { opacity: 0; transform: scale(0.97); }
 }
 .pw-gate h2 { font-size: var(--font-size-xl); margin-bottom: var(--dimension-space-10); }
 .pw-gate > p { margin-bottom: var(--dimension-space-28); font-size: var(--font-size-base); }
@@ -2887,19 +2909,43 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 .case-img-ph[data-ratio="4-3"]   { aspect-ratio: 4 / 3; }
 .case-img-ph[data-ratio="3-4"]   { aspect-ratio: 3 / 4; }
 .case-img-ph[data-ratio="1-1"]   { aspect-ratio: 1 / 1; }
+/* Filled image tiles are treated like the work-page case cards —
+   same 6px stroke, radius, shadow and hover lift, plus the shared
+   ::before / ::after card effects and the JS-driven 3D tilt + cursor
+   ball (see nav.js). The img cursor falls through to the cursor-ball
+   overlay once .tilt-active sets cursor:none on the tile. */
 .case-img-ph.is-filled {
-  border: 0;
   padding: 0;
+  overflow: hidden;
   background: var(--surface-muted, rgba(0,0,0,0.04));
+  border: 6px solid var(--border-subtle);
+  border-radius: var(--dimension-radius-xl);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  cursor: pointer;
+  will-change: transform;
+  transition:
+    transform var(--motion-duration-expressive) var(--motion-easing-emphasized),
+    box-shadow var(--motion-duration-standard),
+    border-color var(--motion-duration-expressive) var(--motion-easing-standard);
+}
+.case-img-ph.is-filled:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: rgba(61, 61, 181, 0.30);
 }
 .case-img-ph.is-filled img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  /* Fill the tile (cropping as needed) — consistent with the work
+     cards, which also use cover. Anchored top-left so any crop falls
+     on the right/bottom edges. */
+  object-fit: cover;
+  object-position: top left;
   border-radius: inherit;
-  cursor: zoom-in;
+  transition: transform 0.5s var(--motion-easing-emphasized);
 }
+.case-img-ph.is-filled:hover img { transform: scale(1.08); }
 .case-img-ph-label {
   display: inline-block;
   max-width: 36ch;
@@ -2981,7 +3027,12 @@ a.journey-co:focus-visible { outline: 2px solid var(--border-focus); outline-off
 /* callout — default surface; case-specific backgrounds can override */
 .rwc-callout {
   margin-top: var(--dimension-space-24);
-  background: color-mix(in srgb, var(--text-primary) 16%, var(--surface-default));
+  /* Transparent frosted glass — a translucent wash that's almost the
+     page background colour, with a blur so anything behind reads soft.
+     The subtle border carries the delineation. */
+  background: color-mix(in srgb, var(--background-page) 70%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
   border: var(--dimension-border-width-1) solid var(--border-subtle);
   border-radius: var(--dimension-radius-lg, 12px);
   padding: var(--dimension-space-20) var(--dimension-space-24);

@@ -12,37 +12,76 @@
       <line x1="18" y1="6" x2="6" y2="18"/>
     </svg>
   </button>
-  <img class="rwc-lightbox-img" alt="" />
+  <figure class="rwc-lightbox-figure">
+    <img class="rwc-lightbox-img" alt="" />
+    <figcaption class="rwc-lightbox-caption" aria-hidden="true"></figcaption>
+  </figure>
 </div>
 
 <style>
-  .rwc-body img:not(.rwc-lightbox-img) { cursor: zoom-in; }
-
+  /* Case-study images are styled as tilt cards (see .case-img-ph
+     .is-filled in global.css); the cursor-ball overlay replaces the
+     pointer, so no zoom-in cursor is set here. */
   .rwc-lightbox {
     position: fixed;
     inset: 0;
     z-index: 1000;
+    /* Tinted frosted glass — the dark scrim still dims the page while
+       the blur lets the light and colour of items behind show through
+       softly. */
     background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: var(--dimension-space-24);
     opacity: 0;
-    transition: opacity var(--motion-duration-standard, 220ms) var(--motion-easing-standard, ease);
+    transition: opacity 0.4s var(--motion-easing-standard, ease);
   }
   .rwc-lightbox[hidden] { display: none; }
   .rwc-lightbox.is-open { opacity: 1; }
 
+  /* Image + its caption, stacked and centred. */
+  .rwc-lightbox-figure {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--dimension-space-12, 12px);
+    max-width: 95vw;
+  }
   .rwc-lightbox-img {
     max-width: 95vw;
-    max-height: 95vh;
+    max-height: 85vh;
     width: auto;
     height: auto;
     display: block;
     border-radius: var(--dimension-radius-md, 8px);
     box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
     cursor: zoom-out;
+    /* The script FLIP-grows the image from the clicked thumbnail's
+       rect to here on open (a top-left origin keeps the translate +
+       scale maths simple); on close it just scales down + fades. */
+    transform-origin: top left;
+    will-change: transform;
+    transition: transform 0.4s var(--motion-easing-emphasized, cubic-bezier(0.22, 1, 0.36, 1));
   }
+  @media (prefers-reduced-motion: reduce) {
+    .rwc-lightbox-img { transition: none; }
+  }
+  /* Simple, small, muted label below the image — the clicked image's
+     alt text, which describes its content and context. */
+  .rwc-lightbox-caption {
+    margin: 0;
+    max-width: min(60ch, 90vw);
+    font-family: var(--font-family-body);
+    font-size: var(--font-size-xs);
+    line-height: var(--font-line-height-snug, 1.35);
+    color: rgba(255, 255, 255, 0.62);
+    text-align: center;
+  }
+  .rwc-lightbox-caption:empty { display: none; }
 
   .rwc-lightbox-close {
     position: fixed;
@@ -75,29 +114,87 @@
       if (overlay.dataset.lbReady === '1') return;
       overlay.dataset.lbReady = '1';
 
+      /* Portal the overlay to <body>. Nested in the case body, an
+         ancestor transform (e.g. a .reveal animation) traps it in a
+         stacking context that paints below the sticky nav — so the
+         fixed close button sits behind the navbar and can't be
+         clicked. As a direct child of <body> its z-index is honoured
+         against the nav. */
+      if (overlay.parentNode !== document.body) document.body.appendChild(overlay);
+
       var lbImg = overlay.querySelector('.rwc-lightbox-img');
+      var lbCaption = overlay.querySelector('.rwc-lightbox-caption');
       var closeBtn = overlay.querySelector('.rwc-lightbox-close');
       var lastFocus = null;
+      var flipTransform = '';
+      var closeTimer = 0;
+      var LB_DUR = 400;   /* matches the .rwc-lightbox-img transform transition */
 
-      function openLb(src, alt) {
+      /* FLIP open — grow the lightbox image from the clicked image's
+         on-page rect to its full lightbox rect. */
+      function openLb(srcEl) {
+        clearTimeout(closeTimer);
         lastFocus = document.activeElement;
-        lbImg.src = src;
-        lbImg.alt = alt || '';
+        var first = srcEl.getBoundingClientRect();
+        lbImg.src = srcEl.currentSrc || srcEl.src;
+        lbImg.alt = srcEl.alt || '';
+        /* Surface the image's alt text as a small caption below it. */
+        lbCaption.textContent = srcEl.alt || '';
         overlay.hidden = false;
-        void overlay.offsetWidth;
-        overlay.classList.add('is-open');
         document.documentElement.style.overflow = 'hidden';
+
+        var play = function () {
+          var last = lbImg.getBoundingClientRect();
+          if (!last.width || !last.height) {
+            /* Image not measurable — open without the FLIP. */
+            overlay.classList.add('is-open');
+            return;
+          }
+          /* First → Last → Invert: jump the image onto the clicked
+             thumbnail's rect, commit, then release to the CSS
+             transition so it grows into place. */
+          flipTransform = 'translate(' + (first.left - last.left) + 'px,' +
+            (first.top - last.top) + 'px) scale(' +
+            (first.width / last.width) + ',' + (first.height / last.height) + ')';
+          lbImg.style.transformOrigin = 'top left';
+          lbImg.style.transition = 'none';
+          lbImg.style.transform = flipTransform;
+          void lbImg.offsetWidth;
+          lbImg.style.transition = '';
+          lbImg.style.transform = 'none';
+          overlay.classList.add('is-open');
+        };
+        var start = function () { requestAnimationFrame(play); };
+        if (lbImg.complete && lbImg.naturalWidth) start();
+        else {
+          lbImg.addEventListener('load', start, { once: true });
+          lbImg.addEventListener('error', function () {
+            overlay.classList.add('is-open');
+          }, { once: true });
+        }
         closeBtn.focus();
       }
 
+      /* Dismiss — a simple in-place shrink + fade: the image scales
+         down slightly while the overlay opacity fades it out with the
+         backdrop. It does not travel back to the thumbnail the way the
+         open FLIP grows from it. */
       function closeLb() {
         overlay.classList.remove('is-open');
         document.documentElement.style.overflow = '';
-        setTimeout(function () {
+        lbImg.style.transition = '';
+        lbImg.style.transformOrigin = '50% 50%';
+        lbImg.style.transform = 'scale(0.9)';
+        closeTimer = setTimeout(function () {
           overlay.hidden = true;
           lbImg.src = '';
+          lbImg.style.transition = 'none';
+          lbImg.style.transform = 'none';
+          lbImg.style.transformOrigin = '';
+          lbCaption.textContent = '';
+          flipTransform = '';
           if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
-        }, 220);
+        }, LB_DUR);
       }
 
       body.addEventListener('click', function (e) {
@@ -105,13 +202,12 @@
         if (!t || t.tagName !== 'IMG') return;
         if (t.classList && t.classList.contains('rwc-lightbox-img')) return;
         e.preventDefault();
-        openLb(t.currentSrc || t.src, t.alt);
+        openLb(t);
       });
 
-      overlay.addEventListener('click', function (e) {
-        if (e.target.closest('.rwc-lightbox-close')) { closeLb(); return; }
-        if (e.target === overlay || e.target === lbImg) closeLb();
-      });
+      /* A click anywhere in the overlay — backdrop, image, caption or
+         the close button — dismisses the lightbox. */
+      overlay.addEventListener('click', function () { closeLb(); });
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !overlay.hidden) closeLb();
       });
