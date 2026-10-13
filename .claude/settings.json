@@ -1,0 +1,10 @@
+{
+  "enabledMcpjsonServers": [
+    "retune"
+  ],
+  "permissions": {
+    "allow": [
+      "mcp__retune__retune_status"
+    ]
+  }
+}

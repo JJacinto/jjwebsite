@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "retune": {
+      "command": "node",
+      "args": ["node_modules/retune/dist/cli.js"]
+    }
+  }
+}
