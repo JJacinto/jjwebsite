@@ -2,7 +2,6 @@
   "scripts": {
     "predev": "node design-system/scripts/build-tokens.js",
     "dev": "astro dev",
-    "dev:up": "node scripts/dev-up.mjs",
     "prebuild": "node design-system/scripts/build-tokens.js",
     "build": "astro build",
     "preview": "astro preview",

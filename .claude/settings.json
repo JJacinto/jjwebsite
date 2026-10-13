@@ -1,11 +1,9 @@
 {
-  "enabledMcpjsonServers": ["retune"],
+  "enabledMcpjsonServers": [
+    "retune"
+  ],
   "permissions": {
     "allow": [
-      "Bash(node scripts/dev-up.mjs)",
-      "Bash(node scripts/dev-up.mjs *)",
-      "Bash(npm run dev:up)",
-      "Bash(npm run dev:up *)",
       "mcp__retune__retune_status"
     ]
   }
