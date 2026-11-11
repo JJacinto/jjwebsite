@@ -4,7 +4,7 @@ import Base from '../layouts/Base.astro';
 <Base
   activePage="about"
   title="About — João Jacinto"
-  description="I design products that make things genuinely easier for the people who use them. Senior Product Designer based in Aveiro, Portugal."
+  description="I design products that make complicated things easier for the people who use them. Senior Product Designer based in Aveiro, Portugal."
   showCta={true}
 >
 
@@ -19,13 +19,64 @@ import Base from '../layouts/Base.astro';
 
     <div class="container">
 
+      <!-- Story hero: a tangle is pulled apart, mapped, cut down and
+           shipped as one step. The SVG's resting markup is the final
+           frame, so no-JS and reduced-motion visitors see the outcome
+           and all five steps. The script at the bottom of this file
+           plays it once on load. -->
+      <section class="about-story" data-about-story>
+        <h1 class="about-story-title">I turn tangled problems into products people don't have to think about.</h1>
+
+        <div class="about-story-stage" aria-hidden="true">
+          <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
+            <path class="st-tangle" pathLength="1" d="M92,196C120,96 236,70 286,128C332,182 250,262 190,222C128,180 196,86 276,98C366,112 398,214 330,258C262,302 150,280 150,206C150,138 236,118 276,160C312,198 286,250 240,244C196,238 190,186 228,170C262,156 300,186 284,214C330,236 380,206 392,160"/>
+
+            <g class="st-edges">
+              <line class="st-edge" data-keep pathLength="1" x1="240" y1="80" x2="160" y2="170"/>
+              <line class="st-edge" pathLength="1" x1="240" y1="80" x2="320" y2="170"/>
+              <line class="st-edge" data-keep pathLength="1" x1="160" y1="170" x2="110" y2="260"/>
+              <line class="st-edge" pathLength="1" x1="160" y1="170" x2="210" y2="260"/>
+              <line class="st-edge" pathLength="1" x1="320" y1="170" x2="270" y2="260"/>
+              <line class="st-edge" pathLength="1" x1="320" y1="170" x2="370" y2="260"/>
+            </g>
+            <line class="st-row" x1="180" y1="170" x2="300" y2="170"/>
+
+            <!-- data-s = scattered position, data-m = mapped position,
+                 data-r = position in the final row (kept nodes only). -->
+            <g class="st-nodes">
+              <g class="st-node" data-s="236,150" data-m="240,80"  data-r="180,170"><circle r="8"/></g>
+              <g class="st-node" data-s="96,188"  data-m="160,170" data-r="240,170"><circle r="8"/></g>
+              <g class="st-node" data-s="372,172" data-m="320,170" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="132,84"  data-m="110,260" data-r="300,170"><circle r="8"/></g>
+              <g class="st-node" data-s="178,286" data-m="210,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="300,292" data-m="270,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="330,72"  data-m="370,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+            </g>
+
+            <rect class="st-pill" x="180" y="142" width="120" height="56" rx="28"/>
+            <circle class="st-ball" r="20"/>
+          </svg>
+          <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay">Replay</button>
+        </div>
+
+        <div class="about-story-copy">
+          <ol class="about-story-steps">
+            <li>Take the tangle as it is.</li>
+            <li>Pull it apart into pieces.</li>
+            <li>Map how the pieces relate.</li>
+            <li>Cut what nobody would miss.</li>
+            <li>Ship the one step that's left.</li>
+          </ol>
+          <p class="about-story-note">At Anchorage Digital, this turned a 40-step admin flow into a single configuration step.</p>
+        </div>
+      </section>
+
       <section class="why-grid reveal">
         <div>
-          <h2>I turn tangled problems into products people don't have to think about.</h2>
+          <p>I design products where the complexity can't be removed: dense rule sets, layered permissions, workflows that operations teams run all day. I think about the system first and the screens second. I map how things relate, make the logic visible, then cut whatever nobody would miss.</p>
         </div>
         <div>
-          <p>I design for the moments where complexity is non-negotiable — products built on dense rule sets, layered permissions, or workflows that have to hold up under real operational weight. My approach is to systems-think first and design second: map the relationships, expose the logic, then strip away everything that isn't load-bearing.</p>
-          <p>None of that works without staying close to the people using the product — learning from them, sitting with their feedback, and letting it shape the next decision. The goal is always the same: the person using the product should feel like the hard part was solved before they arrived. I work async by default, write things down, and share context early so the rest of the team isn't left chasing it.</p>
+          <p>None of that works without staying close to the people using the product: learning from them, taking their feedback seriously, and letting it shape the next decision. The aim is that they never have to think about the complicated part. I work async by default, write things down, and share context early so the rest of the team isn't left chasing it.</p>
         </div>
       </section>
 
@@ -37,7 +88,7 @@ import Base from '../layouts/Base.astro';
             <h3>Principles</h3>
             <ul>
               <li>Make the invisible visible</li>
-              <li>Cut what isn't load-bearing</li>
+              <li>Cut what nobody would miss</li>
               <li>Stay close to the people using it</li>
               <li>Optimise for the next designer</li>
               <li>Strong opinions, written down</li>
@@ -210,15 +261,15 @@ import Base from '../layouts/Base.astro';
 
         <div class="how-i-work-grid">
           <div class="how-i-work-body">
-          <p class="reveal">I've spent 10+ years shipping product, and the through-line isn't a tool — it's a habit: find the smallest version of the real problem, then build the smallest version of a real answer. Everything below is in service of that.</p>
+          <p class="reveal">Over 10+ years of shipping product, one habit has stuck: find the smallest version of the real problem, then build the smallest version of a real answer. Everything below is in service of that.</p>
 
           <p class="reveal">I start in conversation, not Figma. Most design mistakes I've watched ship started with someone opening a blank canvas before the problem was understood. So I spend more time than feels comfortable in FigJam, Dovetail, and Maze.</p>
 
-          <p class="reveal">Figma is the contract. Not the deliverable — the contract between design, engineering, and product. When the dev opens a file and finds nothing surprising, I've done my job.</p>
+          <p class="reveal">Figma is the contract between design, engineering, and product. When the dev opens a file and finds nothing surprising, I've done my job.</p>
 
           <p class="reveal">Shipped isn't done. Fullstory, Mixpanel, and Looker are how I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.</p>
 
-          <p class="reveal">The rest is leverage. Claude and Gemini compress hours of writing and reviewing into minutes. Raycast and Wisprflow strip friction from the parts of the day that aren't design.</p>
+          <p class="reveal">The rest saves time. Claude and Gemini turn hours of writing and reviewing into minutes. Raycast and Wisprflow take the friction out of the parts of the day that aren't design.</p>
 
           <p class="reveal">The tools change. The habit doesn't. Five years ago this list had Sketch, Principle, and InVision. In five years it'll have things that don't exist yet. What stays: small problems, small answers, motion early, ship, measure, repeat.</p>
           </div>
@@ -240,3 +291,169 @@ import Base from '../layouts/Base.astro';
   </div>
 
 </Base>
+
+<script is:inline>
+/* About story. One ball (the problem) drops onto a tangle, breaks into
+   pieces, the pieces get mapped, four are cut, the three left merge
+   back into the ball, and the ball becomes the knob of a single
+   switch. Flipping it turns the paper sketch into the finished, dark
+   product state, which is also the SVG's resting markup. Click the
+   stage to skip; Replay runs it again. */
+(function () {
+  const story = document.querySelector('[data-about-story]');
+  if (!story || !story.animate) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const stage = story.querySelector('.about-story-stage');
+  const $ = (s) => stage.querySelector(s);
+  const $$ = (s) => Array.from(stage.querySelectorAll(s));
+  const pt = (v) => v.split(',').map(Number);
+  const tangle = $('.st-tangle'), pill = $('.st-pill'), ball = $('.st-ball'), row = $('.st-row');
+  const replay = $('.about-story-replay');
+  const edges = $$('.st-edge');
+  const steps = Array.from(story.querySelectorAll('.about-story-steps li'));
+  const nodes = $$('.st-node').map((el) => ({
+    el,
+    s: pt(el.dataset.s),
+    m: pt(el.dataset.m),
+    r: el.dataset.r ? pt(el.dataset.r) : null,
+    cut: el.hasAttribute('data-cut'),
+    slash: el.querySelector('.st-slash'),
+  }));
+  const cut = nodes.filter((n) => n.cut);
+  const keep = nodes.filter((n) => !n.cut);
+
+  const css = getComputedStyle(document.documentElement);
+  const ease = (name, fallback) => (css.getPropertyValue(name) || '').trim() || fallback;
+  const EMPH   = ease('--motion-easing-emphasized', 'cubic-bezier(0.22,1,0.36,1)');
+  const STD    = ease('--motion-easing-standard', 'cubic-bezier(0.4,0,0.2,1)');
+  const EXIT   = ease('--motion-easing-exit', 'cubic-bezier(0.4,0,1,1)');
+  const ENTER  = ease('--motion-easing-enter', 'cubic-bezier(0,0,0.2,1)');
+  const SPRING = ease('--motion-easing-spring', 'cubic-bezier(0.34,1.56,0.64,1)');
+
+  const C = [240, 170];           /* centre of the stage */
+  const OFF = [208, 170], ON = [272, 170]; /* knob positions in the switch */
+  const T = (p, s) => 'translate(' + p[0] + 'px,' + p[1] + 'px) scale(' + s + ')';
+  const a = (el, frames, opts) => el.animate(frames, Object.assign({ fill: 'forwards', easing: EMPH }, opts));
+  const set = (el, props) => el.animate([props, props], { duration: 1, fill: 'forwards' });
+
+  let run = 0;
+  let playing = false;
+  let timers = [];
+  const wait = (ms) => new Promise((resolve) => { timers.push(setTimeout(resolve, ms)); });
+
+  function clear() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    story.getAnimations({ subtree: true }).forEach((x) => x.cancel());
+  }
+  function step(i) {
+    steps.forEach((li, n) => {
+      li.classList.toggle('is-active', n === i);
+      li.classList.toggle('is-done', n < i);
+    });
+  }
+  /* Back to the resting markup: the finished state. */
+  function settle() {
+    run++;
+    playing = false;
+    clear();
+    stage.classList.remove('is-paper');
+    story.classList.remove('is-playing');
+    steps.forEach((li) => li.classList.remove('is-active', 'is-done'));
+    replay.hidden = false;
+  }
+
+  async function play() {
+    clear();
+    const me = ++run;
+    const live = () => me === run;
+    playing = true;
+    story.classList.add('is-playing');
+    stage.classList.add('is-paper');
+
+    set(pill, { opacity: 0 });
+    set(ball, { transform: T([240, -30], 0.45) });
+    nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(C, 0) }));
+    stage.classList.remove('is-pending');
+
+    /* 1. Take the tangle as it is. */
+    step(0);
+    a(tangle, [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], { duration: 1000, easing: STD });
+    a(ball, [
+      { transform: T([240, -30], 0.45), easing: EXIT },
+      { transform: T(C, 0.45), offset: 0.55, easing: ENTER },
+      { transform: T([240, 142], 0.45), offset: 0.78, easing: EXIT },
+      { transform: T(C, 0.45) },
+    ], { duration: 800, delay: 500, easing: 'linear' });
+    await wait(1700); if (!live()) return;
+
+    /* 2. Pull it apart into pieces. */
+    step(1);
+    a(tangle, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: STD });
+    a(ball, [{ transform: T(C, 0.45) }, { transform: T(C, 0) }], { duration: 220, easing: EXIT });
+    nodes.forEach((n, i) => a(n.el,
+      [{ opacity: 1, transform: T(C, 0) }, { opacity: 1, transform: T(n.s, 1) }],
+      { duration: 600, delay: 120 + i * 45, easing: SPRING }));
+    await wait(1300); if (!live()) return;
+
+    /* 3. Map how the pieces relate. */
+    step(2);
+    nodes.forEach((n, i) => a(n.el,
+      [{ opacity: 1, transform: T(n.s, 1) }, { opacity: 1, transform: T(n.m, 1) }],
+      { duration: 650, delay: i * 30 }));
+    edges.forEach((e, i) => a(e,
+      [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }],
+      { duration: 380, delay: 450 + i * 70, easing: STD }));
+    await wait(1700); if (!live()) return;
+
+    /* 4. Cut what nobody would miss. */
+    step(3);
+    cut.forEach((n, i) => {
+      a(n.slash, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 160, delay: i * 110, easing: STD });
+      a(n.el,
+        [{ opacity: 1, transform: T(n.m, 1) + ' rotate(0deg)' },
+         { opacity: 0, transform: T([n.m[0], n.m[1] + 150], 1) + ' rotate(25deg)' }],
+        { duration: 520, delay: 560 + i * 60, easing: EXIT });
+    });
+    edges.filter((e) => !e.hasAttribute('data-keep')).forEach((e) =>
+      a(e, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: 560, easing: STD }));
+    await wait(1250); if (!live()) return;
+    keep.forEach((n) => a(n.el,
+      [{ opacity: 1, transform: T(n.m, 1) }, { opacity: 1, transform: T(n.r, 1) }], { duration: 550 }));
+    edges.filter((e) => e.hasAttribute('data-keep')).forEach((e) =>
+      a(e, [{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: STD }));
+    a(row, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 300, easing: STD });
+    await wait(1000); if (!live()) return;
+
+    /* 5. Ship the one step that's left. */
+    step(4);
+    keep.forEach((n) => a(n.el,
+      [{ opacity: 1, transform: T(n.r, 1) }, { opacity: 0, transform: T(C, 0.6) }], { duration: 380 }));
+    a(row, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: STD });
+    a(ball, [{ transform: T(C, 0) }, { transform: T(C, 0.6) }], { duration: 380, delay: 150, easing: SPRING });
+    await wait(600); if (!live()) return;
+    a(pill, [{ opacity: 0, transform: 'scale(0.7)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 450 });
+    a(ball, [{ transform: T(C, 0.6) }, { transform: T(OFF, 1) }], { duration: 450 });
+    await wait(800); if (!live()) return;
+
+    /* Switch on: the sketch flips to the finished state in one frame. */
+    stage.classList.remove('is-paper');
+    a(ball, [{ transform: T(OFF, 1) }, { transform: T(ON, 1) }], { duration: 280, easing: SPRING });
+    await wait(600); if (!live()) return;
+    settle();
+  }
+
+  stage.addEventListener('click', (e) => {
+    if (e.target === replay) return;
+    if (playing) settle();
+  });
+  replay.addEventListener('click', play);
+
+  /* Show the empty paper card from the first paint, so the finished
+     state never flashes before the story starts. */
+  story.classList.add('is-playing');
+  stage.classList.add('is-paper', 'is-pending');
+  setTimeout(play, 300);
+})();
+</script>

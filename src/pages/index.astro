@@ -4,7 +4,13 @@ import Base from '../layouts/Base.astro';
 <Base activePage="home" showCta={true} disablePageParticles={true}>
 
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero" data-hero-intro>
+    <!-- Decide the intro mode before first paint. Full intro once per
+         session, a short word-rise on later visits, nothing at all for
+         reduced motion. Without JS the hero is simply visible. -->
+    <script is:inline>
+    (function(){try{var d=document.documentElement;if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add(sessionStorage.getItem('jj-intro')?'intro-short':'intro-run');}catch(e){}})();
+    </script>
     <!-- Particle overlay — the drifting dot field that greets visitors
          on work / about / case pages, also present on the home hero.
          The compose-modal init picks this up via the .hero-particles
@@ -14,13 +20,9 @@ import Base from '../layouts/Base.astro';
       <canvas class="cta-footer-bg"></canvas>
     </div>
     <div class="container hero-inner">
-      <h1 class="hero-greeting reveal">Hey, I'm João.</h1>
-      <p class="hero-role reveal reveal-d1" aria-label="I design the parts users don't see, so the parts they do see feel inevitable">
-        <span class="role-item">I design the parts users don't see, so the parts they do see feel inevitable.</span>
-        <span class="role-item">A product designer who builds. The work starts before the pixels.</span>
-        <span class="role-item">Ten years of work where one decision shapes a thousand others.</span>
-      </p>
-      <div class="hero-ctas reveal reveal-d3">
+      <h1 class="hero-greeting">Hey, I'm João. A product designer who builds.</h1>
+      <p class="hero-role"><span class="hero-line">I design the parts users don't see, so the parts they do see feel inevitable.</span></p>
+      <div class="hero-ctas">
         <button class="btn btn-accent" type="button" data-umami-event="hero-start-project" onclick="openComposeModal(1)">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
           <span>Start project</span>
@@ -29,6 +31,26 @@ import Base from '../layouts/Base.astro';
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
           <span>View work</span>
         </a>
+      </div>
+
+      <!-- Intro stage: the logo draws itself, flies to the nav, then the
+           keywords play in the headline's place. Decorative only; the
+           real copy above is what stays on screen. Keywords live in
+           data-keywords so they can be edited without touching the JS. -->
+      <div class="hero-stage" aria-hidden="true" data-keywords="Product designer|Who builds|Ten years in">
+        <svg class="hero-logo" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+          <g transform="matrix(1.20499,0,0,1.20469,-1150.09,-2581.94)">
+            <mask id="jjIntroM1"><path class="hero-logo-draw" pathLength="1" d="M1108,2767C1092,2820 1090,2900 1157,2924C1215,2940 1262,2900 1297,2791L1433,2268C1490,2285 1560,2290 1621,2256"/></mask>
+            <path mask="url(#jjIntroM1)" d="M1468.5,2314.5C1439.63,2429.03 1365.6,2721.15 1340.63,2804.28C1299.23,2942.15 1221.67,2989.38 1144.62,2967.52C1076.63,2948.24 1029.01,2878.62 1064.42,2754.18C1071.3,2730.03 1096.48,2716.01 1120.62,2722.89C1144.76,2729.76 1158.78,2754.94 1151.9,2779.09C1143.99,2806.88 1141.6,2830.08 1144.94,2848.7C1147.87,2865.03 1156.11,2876.22 1169.43,2880C1186.93,2884.96 1201.96,2876.29 1215.43,2859.34C1230.49,2840.4 1243.01,2813.11 1253.52,2778.11C1284.56,2674.74 1391.99,2245.82 1391.99,2245.82C1395.13,2233.26 1403.23,2223.24 1413.67,2217.31C1427.34,2208.36 1445.39,2207.09 1460.66,2215.55C1460.66,2215.55 1529.91,2253.82 1599.98,2215.75C1622.04,2203.77 1649.67,2211.95 1661.65,2234.02C1673.62,2256.08 1665.44,2283.72 1643.39,2295.7C1577.48,2331.5 1512.03,2325.74 1468.5,2314.5Z"/>
+            <mask id="jjIntroM2"><path class="hero-logo-draw" pathLength="1" d="M1574,2452L1483,2791C1465,2850 1445,2895 1425,2910C1410,2922 1398,2927 1385,2925"/></mask>
+            <path mask="url(#jjIntroM2)" d="M1392.08,2879.85C1399.28,2869.7 1423.21,2833.42 1439.82,2778.11C1483.13,2633.9 1530.2,2440.99 1530.2,2440.99C1536.15,2416.6 1560.78,2401.63 1585.17,2407.59C1609.55,2413.54 1624.51,2438.17 1618.56,2462.56C1618.56,2462.56 1570.83,2658.11 1526.93,2804.28C1504.59,2878.69 1480.11,2921.48 1456.11,2945.35C1406.45,2994.74 1361.63,2963.16 1361.63,2963.16C1340.57,2949.52 1334.54,2921.33 1348.18,2900.26C1357.98,2885.11 1375.3,2877.73 1392.08,2879.85Z"/>
+          </g>
+          <g transform="matrix(1.20499,0,0,1.20469,-1229.74,-2381.85)">
+            <mask id="jjIntroM3"><path class="hero-logo-draw" pathLength="1" d="M1707,2653L1678,2761"/></mask>
+            <path mask="url(#jjIntroM3)" d="M1722.17,2773.11C1715.66,2797.35 1690.7,2811.76 1666.46,2805.26C1642.22,2798.75 1627.82,2773.79 1634.32,2749.54L1663.35,2641.27C1669.85,2617.02 1694.81,2602.61 1719.05,2609.12C1743.3,2615.62 1757.7,2640.58 1751.2,2664.83L1722.17,2773.11Z"/>
+          </g>
+        </svg>
+        <div class="hero-keyword"><span></span></div>
       </div>
     </div>
   </section>
@@ -101,7 +123,7 @@ import Base from '../layouts/Base.astro';
         <div class="stat reveal reveal-d3">
           <div class="stat-num">10<sup>+</sup></div>
           <div class="stat-title">Years of experience</div>
-          <div class="stat-desc">Working with innovative startups and established global companies</div>
+          <div class="stat-desc">Working with startups and established global companies</div>
         </div>
       </div>
     </div>
@@ -157,19 +179,114 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <script is:inline>
+/* Hero intro. Full run: logo draws, flies to the nav, three keywords
+   play, then the headline rises word by word and stays still. Short
+   run (later visits in the same session): the word rise only. Any
+   click, key, scroll or touch skips straight to the final state. */
 (function() {
-  const items = document.querySelectorAll('.role-item');
-  if (!items.length) return;
-  let idx = 0;
-  items[0].classList.add('is-active');
-  setInterval(() => {
-    const prev = idx;
-    idx = (idx + 1) % items.length;
-    items[prev].classList.remove('is-active');
-    items[prev].classList.add('is-prev');
-    items[idx].classList.add('is-active');
-    setTimeout(() => items[prev].classList.remove('is-prev'), 600);
-  }, 5000);
+  const root = document.documentElement;
+  const hero = document.querySelector('[data-hero-intro]');
+  if (!hero) return;
+  const full = root.classList.contains('intro-run');
+  const short = root.classList.contains('intro-short');
+  if (!full && !short) return;
+
+  const role = hero.querySelector('.hero-role');
+  const line = hero.querySelector('.hero-line');
+  const stage = hero.querySelector('.hero-stage');
+  const logo = stage.querySelector('.hero-logo');
+  const kw = stage.querySelector('.hero-keyword span');
+  const navLogo = document.querySelector('.nav .logo-mark');
+  const css = getComputedStyle(root);
+  const ease = (name, fallback) => (css.getPropertyValue(name) || '').trim() || fallback;
+  const EMPH = ease('--motion-easing-emphasized', 'cubic-bezier(0.22,1,0.36,1)');
+  const STD  = ease('--motion-easing-standard', 'cubic-bezier(0.4,0,0.2,1)');
+  const EXIT = ease('--motion-easing-exit', 'cubic-bezier(0.4,0,1,1)');
+
+  /* Split the headline into words so they can rise one after another.
+     Spaces stay as text nodes, so it still reads as one sentence. */
+  const words = line.textContent.trim().split(/\s+/);
+  line.textContent = '';
+  words.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.className = 'hw';
+    s.style.setProperty('--i', i);
+    s.textContent = w;
+    line.appendChild(s);
+    if (i < words.length - 1) line.appendChild(document.createTextNode(' '));
+  });
+  role.classList.add('is-split');
+
+  let done = false;
+  const timers = [];
+  const wait = (ms) => new Promise((resolve) => {
+    timers.push({ id: setTimeout(resolve, ms), resolve });
+  });
+  const skipEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
+
+  function finish() {
+    if (done) return;
+    done = true;
+    timers.forEach((t) => { clearTimeout(t.id); t.resolve(); });
+    skipEvents.forEach((e) => window.removeEventListener(e, finish));
+    try { sessionStorage.setItem('jj-intro', '1'); } catch (_) {}
+    stage.style.display = 'none';
+    root.classList.remove('intro-run', 'intro-short', 'intro-logo-landed');
+    root.classList.add('intro-done');
+    void role.offsetWidth; /* commit the hidden word state before the rise */
+    role.classList.add('is-in');
+  }
+  skipEvents.forEach((e) => window.addEventListener(e, finish, { passive: true }));
+
+  async function play() {
+    /* 1. The logo draws itself: long stroke, short stroke, then the dot. */
+    const strokes = stage.querySelectorAll('.hero-logo-draw');
+    const timing = [[0, 520], [380, 360], [720, 160]];
+    strokes.forEach((p, i) => {
+      p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
+        { delay: timing[i][0], duration: timing[i][1], easing: STD, fill: 'both' });
+    });
+    await wait(1000);
+    if (done) return;
+
+    /* 2. It flies to its place in the nav and becomes the real logo. */
+    if (navLogo) {
+      const from = logo.getBoundingClientRect();
+      const to = navLogo.getBoundingClientRect();
+      const fly = logo.animate(
+        [{ transform: 'none' },
+         { transform: 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) + 'px) scale(' + (to.width / from.width) + ')' }],
+        { duration: 600, easing: EMPH, fill: 'forwards' });
+      fly.finished.then(() => {
+        if (done) return;
+        root.classList.add('intro-logo-landed');
+        logo.style.visibility = 'hidden';
+      }).catch(() => {});
+    }
+    await wait(380); /* let the logo clear the spot the keywords use */
+
+    /* 3. Keywords, one at a time, long enough to read. */
+    const list = (stage.dataset.keywords || '').split('|').filter(Boolean);
+    for (const word of list) {
+      if (done) return;
+      kw.textContent = word;
+      const dot = document.createElement('i');
+      dot.textContent = '.';
+      kw.appendChild(dot);
+      kw.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }],
+        { duration: 350, easing: EMPH, fill: 'both' });
+      await wait(640);
+      if (done) return;
+      kw.animate([{ transform: 'none' }, { transform: 'translateY(-105%)' }],
+        { duration: 180, easing: EXIT, fill: 'both' });
+      await wait(170);
+    }
+
+    /* 4. The headline rises and stays. */
+    finish();
+  }
+
+  if (full) play(); else requestAnimationFrame(finish);
 })();
 
 (function() {
