@@ -99,7 +99,7 @@ export const CASES: Case[] = [
     ],
     sections: [
       { h: 'The challenge', body: 'StreamYard had grown fast. Design patterns had diverged across features, and engineers were implementing the same component six different ways. The design system existed in name only — a Figma file nobody fully trusted.' },
-      { h: 'What I did', body: 'I audited the product, identified the 20 highest-leverage components, and rebuilt them from scratch with proper variants, states, and documentation. Then I worked directly with the lead engineer to establish a token system that bridged Figma and the codebase.' },
+      { h: 'What I did', body: 'I audited the product, identified the 20 components that mattered most, and rebuilt them from scratch with proper variants, states, and documentation. Then I worked directly with the lead engineer to establish a token system that bridged Figma and the codebase.' },
     ],
     quote: 'The design system became the single source of truth — reducing design debt and letting the team move faster with confidence.',
   },
