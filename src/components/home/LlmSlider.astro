@@ -1,0 +1,340 @@
+---
+// Before / after slider: the same plan, built at one bench versus a factory.
+// Markup is built client-side as SVG (two layers, the AFTER layer clipped by the handle).
+---
+<div class="llm-slider">
+  <div class="ls-stage reveal reveal-d1" id="lsStage" role="group" aria-label="Before and after comparison of how I work">
+    <span class="ls-corner l"><i></i>Before LLMs · one bench</span>
+    <span class="ls-corner r"><i></i>After LLMs · a factory</span>
+    <div class="ls-handle" id="lsHandle" role="slider" tabindex="0" aria-label="Compare before and after" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-umami-event="home-llm-slider">
+      <div class="ls-knob" aria-hidden="true"><span>&lsaquo;</span><span>&rsaquo;</span></div>
+    </div>
+    <button class="ls-ctl" id="lsPause" type="button" aria-pressed="false">Pause</button>
+  </div>
+  <p class="ls-hint reveal reveal-d2">Drag the handle, or use the arrow keys</p>
+  <p class="ls-sr">Left of the handle: a workbench where one narrow slice of the plan is built and shipped at a time. Right of the handle: a factory with three parallel lanes of stations, each with a quality gate. In both, the big-scope piece of the plan is cut and left out.</p>
+</div>
+
+<style is:global>
+.llm-slider { --ls-line: color-mix(in srgb, var(--text-primary) 24%, transparent); --ls-glass: color-mix(in srgb, var(--surface-default) 84%, transparent); }
+.llm-slider .ls-stage {
+  position: relative; max-width: 960px; margin: 0 auto; overflow: hidden; line-height: 0;
+  border-radius: var(--radius-card); background: var(--surface-default); border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-sm); user-select: none; -webkit-user-select: none; touch-action: pan-y;
+}
+.llm-slider .ls-layer { display: block; width: 100%; }
+.llm-slider .ls-layer.base { height: auto; }
+.llm-slider .ls-layer.over { position: absolute; inset: 0; height: 100%; clip-path: inset(0 0 0 50%); }
+.llm-slider .ls-corner {
+  position: absolute; top: 12px; z-index: 4; pointer-events: none; display: flex; gap: 8px; align-items: center; white-space: nowrap;
+  font: var(--font-weight-medium) 11px/1 var(--font-family-mono); letter-spacing: var(--font-letter-spacing-wide);
+  color: var(--text-primary); padding: 8px 13px; border-radius: var(--radius-pill);
+  background: var(--ls-glass); border: 1px solid var(--border-subtle); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.llm-slider .ls-corner i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-secondary); display: block; }
+.llm-slider .ls-corner.l { left: 12px; }
+.llm-slider .ls-corner.r { right: 12px; }
+.llm-slider .ls-corner.r i { background: var(--fill-brand-default); }
+@media (max-width: 480px) {
+  .llm-slider .ls-corner { font-size: 8.5px; padding: 7px 8px; gap: 5px; top: 10px; letter-spacing: 0; }
+  .llm-slider .ls-corner.l { left: 10px; }
+  .llm-slider .ls-corner.r { right: 10px; }
+}
+.llm-slider .ls-handle { position: absolute; top: 0; bottom: 0; left: 50%; width: 44px; margin-left: -22px; z-index: 5; cursor: ew-resize; touch-action: none; outline: none; }
+.llm-slider .ls-handle::before { content: ""; position: absolute; left: 21px; top: 0; bottom: 0; width: 2px; background: var(--text-primary); opacity: .9; }
+.llm-slider .ls-knob {
+  position: absolute; top: 50%; left: 0; width: 44px; height: 44px; margin-top: -22px; border-radius: 50%;
+  background: var(--text-primary); color: var(--surface-default); display: flex; align-items: center; justify-content: center; gap: 2px;
+  font: var(--font-weight-medium) 20px/1 var(--font-family-body); box-shadow: var(--shadow-md);
+  transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized);
+}
+.llm-slider .ls-handle:hover .ls-knob, .llm-slider .ls-handle.drag .ls-knob { transform: scale(1.08); }
+.llm-slider .ls-handle:focus-visible .ls-knob, .llm-slider .ls-ctl:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 3px; }
+.llm-slider .ls-ctl {
+  position: absolute; left: 12px; bottom: 12px; z-index: 4; cursor: pointer;
+  font: var(--font-weight-medium) 10.5px/1 var(--font-family-mono); letter-spacing: var(--font-letter-spacing-wider);
+  color: var(--text-secondary); background: var(--ls-glass); border: 1px solid var(--border-subtle); border-radius: var(--radius-pill);
+  padding: 7px 11px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.llm-slider .ls-ctl:hover { color: var(--text-primary); }
+.llm-slider .ls-hint { max-width: 960px; margin: var(--dimension-space-16) auto 0; font: 400 var(--font-size-xs)/1.4 var(--font-family-mono); color: var(--text-secondary); text-align: center; letter-spacing: var(--font-letter-spacing-wide); }
+.llm-slider .ls-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* svg art */
+.llm-slider svg .bg-b { fill: var(--surface-default); }
+.llm-slider svg .bg-a { fill: color-mix(in srgb, var(--fill-brand-default) 7%, var(--surface-default)); }
+.llm-slider svg text { font-family: var(--font-family-body); }
+.llm-slider svg .lbl { font-weight: 500; font-size: 14px; fill: var(--text-primary); }
+.llm-slider svg .lbl.big { font-size: 15px; }
+.llm-slider svg .m { font-family: var(--font-family-mono); font-weight: 500; font-size: 11px; letter-spacing: .06em; fill: var(--text-secondary); }
+.llm-slider svg .end { text-anchor: end; }
+.llm-slider svg .mid { text-anchor: middle; }
+.llm-slider svg .card { fill: var(--surface-sunken); stroke: var(--text-secondary); stroke-width: 1.3; }
+.llm-slider svg .card.a { fill: var(--surface-default); stroke: color-mix(in srgb, var(--fill-brand-default) 42%, transparent); stroke-width: 1.2; }
+.llm-slider svg .card.cut, .llm-slider svg .card.a.cut { fill: none; stroke: var(--text-secondary); stroke-dasharray: 4 4; opacity: .55; }
+.llm-slider svg .axl { stroke: var(--text-secondary); stroke-width: 1.2; opacity: .65; }
+.llm-slider svg .bus { stroke: var(--ls-line); stroke-width: 1.3; fill: none; }
+.llm-slider svg .track { stroke: var(--ls-line); stroke-width: 1.3; stroke-dasharray: 3 4; fill: none; }
+.llm-slider svg .bench { fill: var(--surface-sunken); stroke: var(--text-secondary); stroke-width: 1.6; }
+.llm-slider svg .chip { fill: var(--surface-default); stroke: color-mix(in srgb, var(--fill-brand-default) 48%, transparent); stroke-width: 1.1; }
+.llm-slider svg .ico { fill: none; stroke: var(--text-brand); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.llm-slider svg .chiplbl { font-family: var(--font-family-mono); font-weight: 500; font-size: 11px; fill: var(--text-primary); }
+.llm-slider svg .gate { fill: var(--fill-brand-default); }
+.llm-slider svg .gchk { stroke: var(--surface-default); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.llm-slider svg .bar-b { fill: var(--surface-sunken); stroke: var(--text-secondary); stroke-width: 1.3; }
+.llm-slider svg .bar-a { fill: color-mix(in srgb, var(--fill-brand-default) 22%, var(--surface-default)); stroke: var(--fill-brand-default); stroke-width: 1.2; }
+.llm-slider svg .mk-b { fill: var(--surface-default); stroke: var(--text-primary); stroke-width: 1.5; }
+.llm-slider svg .mk-a { fill: var(--fill-brand-default); }
+.llm-slider svg .fac { fill: color-mix(in srgb, var(--fill-brand-default) 10%, var(--surface-default)); stroke: var(--fill-brand-default); stroke-width: 1.4; }
+.llm-slider svg .scis { stroke: var(--text-secondary); stroke-width: 1.5; stroke-dasharray: 6 5; fill: none; }
+.llm-slider svg .scg { stroke: var(--text-secondary); fill: var(--surface-default); stroke-width: 1.3; stroke-linecap: round; }
+</style>
+
+<script>
+(function () {
+  var NS = 'http://www.w3.org/2000/svg';
+  var stage = document.getElementById('lsStage');
+  var handle = document.getElementById('lsHandle');
+  var pauseBtn = document.getElementById('lsPause');
+  if (!stage || !handle || !pauseBtn) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var LOOP = 9500;
+
+  function el(tag, attrs, parent) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) { if (attrs[k] != null) e.setAttribute(k, attrs[k]); }
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(parent, s, x, y, cls) { var t = el('text', { x: x, y: y, 'class': cls }, parent); t.textContent = s; return t; }
+
+  var LANE_OF = [0, 1, 2, 0, 1];
+  function makeCfg(m) {
+    var c = { m: m };
+    if (!m) {
+      c.W = 960; c.H = 420; c.axisY = 380; c.axisX0 = 24; c.axisX1 = 936; c.timeLbl = [936, 404];
+      c.cards = [80, 136, 192].map(function (y) { return { x: 24, y: y, w: 90, h: 44 }; });
+      c.cut = { x: 24, y: 268, w: 90, h: 44 }; c.scisY = 254; c.planLbl = [24, 66];
+      c.busX = 146; c.bx0 = 176; c.bx1 = 440; c.mid = 158; c.beforeH = 48; c.afterH = 88;
+      c.lanes = [118, 158, 198]; c.xEnd = 600; c.gateX = 520; c.dy = 270;
+      c.shipB = [700, 800, 900]; c.shipA = [640, 700, 760, 820, 880]; c.barW = 34; c.barH = 64; c.mk = { w: 24, h: 14 };
+      c.chip = { w: 72, h: 28, gap: 8 };
+    } else {
+      c.W = 360; c.H = 440; c.axisY = 410; c.axisX0 = 16; c.axisX1 = 344; c.timeLbl = [344, 432];
+      c.cards = [74, 122, 170].map(function (y) { return { x: 16, y: y, w: 52, h: 40 }; });
+      c.cut = { x: 16, y: 236, w: 52, h: 40 }; c.scisY = 222; c.planLbl = [16, 62];
+      c.busX = 76; c.bx0 = 84; c.bx1 = 258; c.mid = 142; c.beforeH = 40; c.afterH = 76;
+      c.lanes = [110, 142, 174]; c.xEnd = 332; c.gateX = 296; c.dy = 292;
+      c.shipB = [200, 252, 304]; c.shipA = [140, 184, 228, 272, 316]; c.barW = 28; c.barH = 56; c.mk = { w: 18, h: 12 };
+      c.chip = { w: 54, h: 24, gap: 4 };
+    }
+    return c;
+  }
+  function route(c, k, A, ship, barTop) {
+    var r = c.cards[Math.min(k, 2)], cy = r.y + r.h / 2, ly = A ? c.lanes[LANE_OF[k]] : c.mid;
+    var p = [[r.x + r.w, cy], [c.busX, cy], [c.busX, c.mid], [c.bx0, c.mid], [c.bx1, c.mid]];
+    if (A) p.push([c.bx1, ly]);
+    p.push([c.xEnd, ly], [c.xEnd, c.dy], [ship, c.dy], [ship, barTop - c.mk.h / 2 - 2]);
+    return p;
+  }
+  function prep(pts) { var cum = [0]; for (var i = 1; i < pts.length; i++) { cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); } return { pts: pts, cum: cum, len: cum[cum.length - 1] }; }
+  function at(r, f) { var d = f * r.len, i = 1; while (i < r.cum.length - 1 && r.cum[i] < d) i++; var a = r.pts[i - 1], b = r.pts[i], t = (d - r.cum[i - 1]) / ((r.cum[i] - r.cum[i - 1]) || 1); return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
+
+  function drawLayer(kind, c) {
+    var A = kind === 'after', m = c.m;
+    var svg = el('svg', { viewBox: '0 0 ' + c.W + ' ' + c.H, 'class': 'ls-layer ' + (A ? 'over' : 'base'), 'aria-hidden': 'true', preserveAspectRatio: 'xMidYMid meet' });
+    var defs = el('defs', {}, svg);
+    if (!A) {
+      var f = el('filter', { id: 'lsPencil', x: '-3%', y: '-3%', width: '106%', height: '106%' }, defs);
+      el('feTurbulence', { type: 'fractalNoise', baseFrequency: '0.025', numOctaves: '1', seed: '4', result: 'n' }, f);
+      el('feDisplacementMap', { 'in': 'SourceGraphic', in2: 'n', scale: '1.6', xChannelSelector: 'R', yChannelSelector: 'G' }, f);
+    }
+    var PF = A ? null : 'url(#lsPencil)';
+    el('rect', { width: c.W, height: c.H, 'class': A ? 'bg-a' : 'bg-b' }, svg);
+    var shipX = A ? c.shipA : c.shipB, n = shipX.length;
+
+    var ax = el('g', {}, svg);
+    el('line', { x1: c.axisX0, x2: c.axisX1, y1: c.axisY, y2: c.axisY, 'class': 'axl' }, ax);
+    txt(svg, 'time →', c.timeLbl[0], c.timeLbl[1], 'm end');
+    txt(svg, 'plan', c.planLbl[0], c.planLbl[1], 'm');
+
+    var lines = el('g', { filter: PF }, svg);
+    var laneYs = A ? c.lanes : [c.mid];
+    var cys = c.cards.map(function (r) { return r.y + r.h / 2; });
+    cys.forEach(function (y, i) { el('path', { d: 'M' + (c.cards[i].x + c.cards[i].w) + ' ' + y + 'H' + c.busX, 'class': 'bus' }, lines); });
+    el('path', { d: 'M' + c.busX + ' ' + cys[0] + 'V' + cys[2], 'class': 'bus' }, lines);
+    el('path', { d: 'M' + c.busX + ' ' + c.mid + 'H' + c.bx0, 'class': 'bus' }, lines);
+    laneYs.forEach(function (y) { el('path', { d: 'M' + c.bx1 + ' ' + y + 'H' + c.xEnd, 'class': 'bus' }, lines); });
+    el('path', { d: 'M' + c.xEnd + ' ' + laneYs[0] + 'V' + c.dy + 'H' + shipX[n - 1], 'class': 'track' }, lines);
+
+    var cg = el('g', { filter: PF }, svg), tg = el('g', {}, svg);
+    c.cards.forEach(function (r, i) {
+      el('rect', { x: r.x, y: r.y, width: r.w, height: r.h, rx: 9, 'class': 'card' + (A ? ' a' : '') }, cg);
+      txt(tg, 'ABC'.charAt(i), r.x + r.w / 2, r.y + r.h / 2 + 5, 'lbl mid');
+    });
+    var q = c.cut;
+    el('rect', { x: q.x, y: q.y, width: q.w, height: q.h, rx: 9, 'class': 'card cut' + (A ? ' a' : '') }, cg);
+    txt(tg, 'cut', q.x + q.w / 2, q.y + q.h / 2 + 4, 'm mid');
+    var sg = el('g', {}, svg);
+    el('line', { x1: q.x - 8, x2: q.x + q.w + 4, y1: c.scisY, y2: c.scisY, 'class': 'scis' }, sg);
+    var sc = el('g', { transform: 'translate(' + (q.x + q.w - 8) + ',' + (c.scisY - 7) + ')' }, sg);
+    el('circle', { cx: 3, cy: 3, r: 2.4, 'class': 'scg' }, sc); el('circle', { cx: 3, cy: 11, r: 2.4, 'class': 'scg' }, sc);
+    el('path', { d: 'M5 4.3L14 10.4M5 9.7L14 3.6', 'class': 'scg', fill: 'none' }, sc);
+
+    var mg = el('g', { filter: PF }, svg), w = c.bx1 - c.bx0;
+    if (!A) {
+      el('rect', { x: c.bx0, y: c.mid - c.beforeH / 2, width: w, height: c.beforeH, rx: 10, 'class': 'bench' }, mg);
+      txt(svg, 'Build', c.bx0 + w / 2, c.mid + 5, 'lbl big mid');
+    } else {
+      el('rect', { x: c.bx0, y: c.mid - c.afterH / 2, width: w, height: c.afterH, rx: 12, 'class': 'fac' }, svg);
+      txt(svg, 'Skills + plugins', c.bx0 + w / 2, c.mid - c.afterH / 2 + (m ? 18 : 22), 'lbl mid').style.fontSize = (m ? 12 : 13) + 'px';
+      var cw = c.chip.w, tot = 3 * cw + 2 * c.chip.gap, x0 = c.bx0 + (w - tot) / 2, cy0 = c.mid - c.afterH / 2 + (m ? 30 : 40);
+      ['spec', 'build', 'review'].forEach(function (s, i) {
+        var x = x0 + i * (cw + c.chip.gap);
+        el('rect', { x: x, y: cy0, width: cw, height: c.chip.h, rx: 7, 'class': 'chip' }, svg);
+        txt(svg, s, x + cw / 2, cy0 + c.chip.h / 2 + 4, 'chiplbl mid');
+      });
+      c.lanes.forEach(function (y) {
+        var g = el('g', { transform: 'translate(' + c.gateX + ',' + y + ')' }, svg);
+        el('circle', { r: 10, 'class': 'gate' }, g); el('path', { d: 'M-4 .3L-1.2 3L4.2 -3', 'class': 'gchk' }, g);
+      });
+    }
+
+    // Shipped boxes: all the same height, so they read as units, not a growth chart.
+    var h = c.barH, bars = [], bg2 = el('g', { filter: PF }, svg), routes = [];
+    for (var k = 0; k < n; k++) {
+      var g = el('g', { transform: 'translate(' + shipX[k] + ',' + c.axisY + ')', opacity: 0 }, bg2);
+      el('rect', { x: 0, y: -h, width: c.barW, height: h, rx: 3, 'class': A ? 'bar-a' : 'bar-b' }, g);
+      if (A) { var tt = el('g', { transform: 'translate(' + (c.barW / 2) + ',' + (-h + 11) + ')' }, g); el('path', { d: 'M-4.5 0L-1.2 3.4L4.5 -3.2', 'class': 'ico' }, tt); }
+      bars.push(g);
+      routes.push(prep(route(c, k, A, shipX[k], c.axisY - h)));
+    }
+    txt(svg, 'shipped', shipX[n - 1] + c.barW / 2, c.axisY - h - 10, 'm mid');
+
+    var mkg = el('g', {}, svg), mk = [];
+    for (var j = 0; j < n; j++) {
+      var g2 = el('g', { opacity: 0 }, mkg);
+      el('rect', { x: -c.mk.w / 2, y: -c.mk.h / 2, width: c.mk.w, height: c.mk.h, rx: 3.5, 'class': A ? 'mk-a' : 'mk-b' }, g2);
+      mk.push(g2);
+    }
+    return { svg: svg, mk: mk, bars: bars, routes: routes, ship: shipX, c: c, n: n,
+      start: A ? [0, .04, .08, .2, .24] : [0, .27, .54], dur: .3 };
+  }
+
+  var state = null, running = true, visible = true, clock = LOOP * .15, last = null, pct = 50, nudgeId = null, rafId = null;
+  var mq = window.matchMedia('(max-width: 560px)');
+  function build() {
+    var m = mq.matches;
+    if (state && state.m === m) return;
+    [].slice.call(stage.querySelectorAll('svg.ls-layer')).forEach(function (n) { n.remove(); });
+    var c = makeCfg(m);
+    var b = drawLayer('before', c), a = drawLayer('after', c);
+    stage.insertBefore(b.svg, stage.firstChild);
+    stage.insertBefore(a.svg, b.svg.nextSibling);
+    state = { m: m, before: b, after: a, over: a.svg };
+    setPct(pct);
+    render(clock / LOOP % 1);
+  }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function ease(t) { return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+  // Reduced motion: no loop, show the final state (everything shipped, markers parked).
+  var STATIC = { before: { 2: .45 }, after: { 4: .45 } };
+  function renderLayer(L, P, isA) {
+    for (var k = 0; k < L.n; k++) {
+      var mk = L.mk[k], bar = L.bars[k], o = 0, pos = null;
+      if (P == null) {
+        bar.setAttribute('opacity', 1);
+        bar.setAttribute('transform', 'translate(' + L.ship[k] + ',' + L.c.axisY + ')');
+      } else {
+        var f = (P - L.start[k]) / L.dur;
+        if (f >= 0 && f < 1) { pos = at(L.routes[k], isA ? f : ease(f)); o = Math.min(1, f / .07, (1 - f) / .05); }
+        var a = clamp((P - (L.start[k] + L.dur)) / .035, 0, 1);
+        if (P > .93) a *= clamp(1 - (P - .93) / .05, 0, 1);
+        bar.setAttribute('opacity', a.toFixed(3));
+        if (a > 0 && a < 1) { var s = .9 + .1 * a; bar.setAttribute('transform', 'translate(' + L.ship[k] + ',' + L.c.axisY + ') scale(1,' + s.toFixed(3) + ')'); }
+        else bar.setAttribute('transform', 'translate(' + L.ship[k] + ',' + L.c.axisY + ')');
+      }
+      mk.setAttribute('opacity', o.toFixed(3));
+      if (pos) mk.setAttribute('transform', 'translate(' + pos[0].toFixed(1) + ',' + pos[1].toFixed(1) + ')');
+    }
+  }
+  function render(P) { renderLayer(state.before, reduce ? null : P, false); renderLayer(state.after, reduce ? null : P, true); }
+
+  function frame(now) {
+    rafId = null;
+    if (!visible) { last = null; return; }
+    if (last == null) last = now;
+    var dt = now - last; last = now;
+    if (running) clock += dt;
+    if (state) render((clock / LOOP) % 1);
+    rafId = requestAnimationFrame(frame);
+  }
+  function startLoop() { if (!reduce && !rafId && visible) { last = null; rafId = requestAnimationFrame(frame); } }
+
+  pauseBtn.addEventListener('click', function () {
+    running = !running; pauseBtn.textContent = running ? 'Pause' : 'Play'; pauseBtn.setAttribute('aria-pressed', String(!running));
+  });
+  if (reduce) pauseBtn.style.display = 'none';
+
+  /* slider */
+  function setPct(p) {
+    pct = clamp(p, 0, 100);
+    if (state) state.over.style.clipPath = 'inset(0 0 0 ' + pct + '%)';
+    handle.style.left = 'clamp(22px, ' + pct + '%, calc(100% - 22px))';
+    var r = Math.round(pct);
+    handle.setAttribute('aria-valuenow', r);
+    handle.setAttribute('aria-valuetext', r <= 8 ? 'Showing the factory (after)' : r >= 92 ? 'Showing the bench (before)' : r + '% before, ' + (100 - r) + '% after');
+  }
+  function fromEvent(e) { var rc = stage.getBoundingClientRect(); return (e.clientX - rc.left) / rc.width * 100; }
+  function stopNudge() { if (nudgeId) { cancelAnimationFrame(nudgeId); nudgeId = null; } }
+  var tracked = false;
+  function track() {
+    if (tracked) return; tracked = true;
+    handle.removeAttribute('data-umami-event'); // fire once, not on every click
+    try { (window as any).umami && (window as any).umami.track('home-llm-slider'); } catch (_) {}
+  }
+  var dragging = false;
+  function down(e) {
+    stopNudge(); track(); dragging = true; handle.classList.add('drag');
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+    setPct(fromEvent(e)); e.preventDefault(); handle.focus({ preventScroll: true });
+  }
+  handle.addEventListener('pointerdown', down);
+  stage.addEventListener('pointerdown', function (e: any) {
+    if (e.pointerType === 'mouse' && e.target !== handle && !handle.contains(e.target) && !e.target.closest('.ls-ctl')) down(e);
+  });
+  stage.addEventListener('pointermove', function (e) { if (dragging) setPct(fromEvent(e)); });
+  function up() { dragging = false; handle.classList.remove('drag'); }
+  stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+  handle.addEventListener('keydown', function (e) {
+    var k = e.key, v = null;
+    if (k === 'ArrowLeft' || k === 'ArrowDown') v = pct - 5; else if (k === 'ArrowRight' || k === 'ArrowUp') v = pct + 5;
+    else if (k === 'Home') v = 0; else if (k === 'End') v = 100;
+    if (v != null) { stopNudge(); track(); setPct(v); e.preventDefault(); }
+  });
+
+  /* first-view nudge (skipped for reduced motion) */
+  function nudge() {
+    var t0: number | null = null, D = 1700;
+    function step(now: number) {
+      if (t0 == null) t0 = now; var t = Math.min(1, (now - t0) / D);
+      setPct(50 - 11 * Math.sin(t * Math.PI * 2) * (1 - t * .25));
+      if (t < 1) nudgeId = requestAnimationFrame(step); else { setPct(50); nudgeId = null; }
+    }
+    nudgeId = requestAnimationFrame(step);
+  }
+  var nudged = false;
+  build();
+  mq.addEventListener('change', build);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        visible = en.isIntersecting;
+        if (visible) startLoop();
+        if (en.isIntersecting && !nudged && !reduce) { nudged = true; setTimeout(function () { if (!dragging && pct === 50) nudge(); }, 500); }
+      });
+    }, { threshold: .55 }).observe(stage);
+  } else { startLoop(); }
+})();
+</script>

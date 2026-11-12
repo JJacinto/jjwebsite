@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import XraySwitch from '../components/XraySwitch.astro';
 import WorkWall from '../components/home/WorkWall.astro';
+import LlmSlider from '../components/home/LlmSlider.astro';
 ---
 <Base
   activePage="home"
@@ -138,6 +139,18 @@ import WorkWall from '../components/home/WorkWall.astro';
           <p>At StreamYard I specified tokens and 15+ components so design and code could share one source. This site is hand-built too.</p>
         </li>
       </ol>
+    </div>
+  </section>
+
+  <!-- THEN AND NOW -->
+  <section class="home-then">
+    <div class="container home-block" data-xray>
+      <aside class="xray-note" data-xray-note>One idea, two ways of working. Drag it and the picture explains itself.</aside>
+      <div class="home-head" data-xray-gap="48">
+        <p class="eyebrow home-eyebrow reveal">Then and now</p>
+        <h2 class="home-h2 reveal reveal-d1">Same plan, a different factory.</h2>
+      </div>
+      <LlmSlider />
     </div>
   </section>
 

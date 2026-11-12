@@ -4195,6 +4195,7 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 /* ---- Section heads --------------------------------------------- */
 .home-work { padding: clamp(var(--dimension-space-64), 8vw, var(--dimension-space-96)) 0 clamp(var(--dimension-space-80), 10vw, 120px); }
 .home-how { padding: clamp(var(--dimension-space-80), 10vw, 120px) 0; }
+.home-then { padding: 0 0 clamp(var(--dimension-space-80), 10vw, 120px); }
 .home-head { position: relative; margin-bottom: var(--dimension-space-48); }
 .home-eyebrow { display: block; color: var(--text-brand); margin-bottom: var(--dimension-space-16); }
 .home-h2 { font-size: var(--font-size-3xl); max-width: 20ch; }
