@@ -1,0 +1,20 @@
+---
+/* This case was removed (its draft had placeholder numbers). The deploy
+   unpacks over the old files without deleting any, so this page exists
+   to overwrite the stale copy on the server: it sends visitors to the
+   Work index and tells search engines to drop it. */
+const target = '/case-studies/';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <meta http-equiv="refresh" content={`0; url=${target}`}>
+    <link rel="canonical" href={`https://joaojacinto.com${target}`}>
+    <title>Moved — João Jacinto</title>
+  </head>
+  <body>
+    <p>This page has moved. <a href={target}>See the case studies</a>.</p>
+  </body>
+</html>

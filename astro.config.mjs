@@ -9,7 +9,11 @@ const isDev = process.env.NODE_ENV !== 'production';
 
 export default defineConfig({
   site: 'https://joaojacinto.com',
-  integrations: [...(isDev ? [react()] : []), sitemap()],
+  integrations: [
+    ...(isDev ? [react()] : []),
+    /* Removed case: its page only redirects to /case-studies/. */
+    sitemap({ filter: (page) => !page.includes('/reshaping-an-ai-training-platform') }),
+  ],
   outDir: './dist',
   redirects: {
     '/en/':              '/',
