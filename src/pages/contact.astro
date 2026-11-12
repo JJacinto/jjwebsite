@@ -15,7 +15,7 @@ import Base from '../layouts/Base.astro';
     <canvas class="cta-footer-bg" id="contact-canvas" aria-hidden="true"></canvas>
     <div class="contact-inner reveal">
       <h1>Let's talk about<br>what you're building.</h1>
-      <p class="contact-body">Product partnerships, design system work, or 0→1 builds in the AI era. Those are where I do my best work. If that sounds like your project, get in touch.</p>
+      <p class="contact-body">I do my best work on products where the complexity can't be removed: permission systems, dense rule sets, workflows teams run all day. If yours has a tangle like that, tell me about it.</p>
 
       <div class="contact-ctas">
         <button class="btn btn-accent" id="compose-open" type="button" data-umami-event="contact-get-in-touch" onclick="openComposeModal(0)">
@@ -27,7 +27,8 @@ import Base from '../layouts/Base.astro';
           <span>Book a call</span>
         </a>
       </div>
-      <p class="contact-response-time">I usually reply within 24h to 48h on weekdays</p>
+      <p class="contact-status" id="contact-status" aria-live="polite"><span class="contact-status-dot" id="contact-status-dot" aria-hidden="true"></span><span id="contact-status-text">I usually reply within a day or two on weekdays.</span></p>
+      <p class="contact-hint">The most useful first message says what the product is, who uses it, and where it gets tangled.</p>
 
       <div class="contact-info">
         <div class="contact-card">
@@ -110,15 +111,45 @@ function copyEmail(el) {
   });
 }
 
-/* Live Aveiro clock — refreshes every minute, aligned to wall clock. */
+/* Live Aveiro clock + reply status — refreshes every minute, aligned to wall clock. */
 (function () {
   const el = document.getElementById('aveiro-clock');
-  if (!el) return;
+  const stDot = document.getElementById('contact-status-dot');
+  const stText = document.getElementById('contact-status-text');
   const fmt = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Lisbon',
     hour: '2-digit', minute: '2-digit', hour12: false
   });
-  function tick() { el.textContent = fmt.format(new Date()) + ' local time'; }
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Lisbon', weekday: 'short',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+  });
+  const COLORS = { available: '#22c55e', sleeping: '#4b5563', offhours: '#f59e0b' };
+  function status() {
+    if (!stDot || !stText) return;
+    const p = {};
+    parts.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    const hour = parseInt(p.hour, 10);
+    const t = p.hour + ':' + p.minute;
+    const wd = p.weekday;
+    const weekend = wd === 'Sat' || wd === 'Sun';
+    let state, text;
+    if (hour >= 9 && hour < 20) state = 'available';
+    else if (hour >= 1 && hour < 9) state = 'sleeping';
+    else state = 'offhours';
+    if (state === 'sleeping') text = "It's " + t + " in Aveiro and I'm asleep. I'll reply in the morning.";
+    else if (weekend) text = "It's the weekend in Aveiro, so expect a reply on Monday.";
+    else if (state === 'available') text = "It's " + t + " in Aveiro and I'm working, so expect a reply today.";
+    else if (wd === 'Fri') text = "It's " + t + " in Aveiro and I'm done for the week, so expect a reply on Monday.";
+    else text = "It's " + t + " in Aveiro and I'm done for the day, so expect a reply tomorrow.";
+    stDot.className = 'contact-status-dot state-' + state;
+    stDot.style.background = COLORS[state];
+    stText.textContent = text;
+  }
+  function tick() {
+    if (el) el.textContent = fmt.format(new Date()) + ' local time';
+    status();
+  }
   tick();
   const msToNextMinute = (60 - new Date().getSeconds()) * 1000;
   setTimeout(function () {

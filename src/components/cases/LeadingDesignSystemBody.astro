@@ -18,24 +18,6 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
         Implemented and led a cross-functional design system team across 6
         teams for enhanced product quality, accessibility, and efficiency.
       </p>
-
-      <div class="rwc-callout">
-        <div class="rwc-callout-title">
-          <span class="rwc-callout-star" aria-hidden="true">★</span>
-          Core achievements
-        </div>
-        <ul>
-          <li>
-            Coordinated 6 product teams' engineers and designers to
-            continuously contribute to a design system.
-          </li>
-          <li>
-            Enabled improved product accessibility (WCAG AA), refined
-            components' design, and laid the foundations for a dark mode
-            (a top customer request).
-          </li>
-        </ul>
-      </div>
     </div>
 
     <div class="rwc-hero-right">
@@ -45,11 +27,14 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     </div>
   </section>
 
+  {/* Summary + decisions, passed in from [slug].astro */}
+  <slot />
+
   {/* ───────────────────── MY ROLE ───────────────────── */}
   <section class="rwc-role" id="case-role">
     <div class="rwc-role-left">
       <div class="eyebrow">My role</div>
-      <h2 class="rwc-h2">Lead designer and design system manager</h2>
+      <p class="case-role">Lead designer and design system manager</p>
 
       <p>
         The design system project was driven by a design-focused strategy,

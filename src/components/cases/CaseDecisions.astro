@@ -1,0 +1,21 @@
+---
+/* Three decisions, as numbered cards. Sits right under CaseSummary. */
+import type { Case } from '../../data/cases';
+
+interface Props { c: Case; }
+const { c } = Astro.props;
+---
+<section class="case-decisions reveal" id="case-decisions" aria-labelledby="case-decisions-eyebrow">
+  <span class="eyebrow" id="case-decisions-eyebrow">Three decisions</span>
+  <ol class="case-decisions-list">
+    {c.decisions.map((d, i) => (
+      <li class="case-decision">
+        <span class="case-decision-n">{String(i + 1).padStart(2, '0')}</span>
+        <h3 class="case-decision-title">{d.title}</h3>
+        <p class="case-decision-body">{d.body}</p>
+        <span class="case-xnote">// Decision {String(i + 1).padStart(2, '0')}</span>
+      </li>
+    ))}
+  </ol>
+  <p class="case-decisions-foot">The full story follows.</p>
+</section>

@@ -18,24 +18,6 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
         As the lead designer for On-Air webinars, I planned, prepared, and
         co-led a research study aimed at informing the future of our product.
       </p>
-
-      <div class="rwc-callout">
-        <div class="rwc-callout-title">
-          <span class="rwc-callout-star" aria-hidden="true">★</span>
-          Core achievements
-        </div>
-        <ul>
-          <li>
-            Ran the company's first major study to understand webinar
-            organizers, building a foundational knowledge resource for the
-            business unit.
-          </li>
-          <li>
-            Generated critical insights to inform the product's roadmap, and
-            briefed 2 other pods in the process.
-          </li>
-        </ul>
-      </div>
     </div>
 
     <div class="rwc-hero-right">
@@ -46,11 +28,14 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     </div>
   </section>
 
+  {/* Summary + decisions, passed in from [slug].astro */}
+  <slot />
+
   {/* ───────────────────── MY ROLE + KEY INITIATIVES ───────────────────── */}
   <section class="rwc-role" id="case-role">
     <div class="rwc-role-left">
       <div class="eyebrow">My role</div>
-      <h2 class="rwc-h2">Staff Product Designer / Research co-lead</h2>
+      <p class="case-role">Staff Product Designer / Research co-lead</p>
 
       <p>
         Assisted by our research lead, and some of our team's designers

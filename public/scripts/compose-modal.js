@@ -1,6 +1,11 @@
 /* Compose modal */
 (function () {
-  var INTENTS = ["Let’s chat", "Start project"];
+  /* Internal indexes stay stable (0 chat, 1 project, 2 book-call, 3 hiring)
+     so openComposeModal(0|1|2) callers and analytics keep their meaning.
+     INTENT_ORDER is the visual order: hiring first. */
+  var INTENT_LABELS = { 0: "Just saying hi", 1: "I have a project", 2: "Book a call", 3: "I\u2019m hiring" };
+  var INTENT_ORDER  = [3, 0, 1, 2];
+  var INTENT_NAMES  = ['chat', 'project', 'book-call', 'hiring'];
   var mounted   = false;
   var intentIdx = 0;
   var selectIntent = null;
@@ -38,6 +43,23 @@
     );
   };
 
+  var getHiringFieldsHTML = function () {
+    return (
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="hire-role">Role</label>' +
+        '<input class="compose-input" id="hire-role" type="text" required autocomplete="off" placeholder="e.g. Senior Product Designer, fully remote">' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="hire-company">Company or link <span class="compose-optional">(optional)</span></label>' +
+        '<input class="compose-input" id="hire-company" type="text" autocomplete="organization" placeholder="Company name or https://…">' +
+      '</div>' +
+      '<div class="compose-field">' +
+        '<label class="eyebrow" for="hire-body">Message</label>' +
+        '<textarea class="compose-textarea" id="hire-body" rows="4" required autocomplete="off" placeholder="What&#x27;s the product, who uses it, and where does it get tangled?"></textarea>' +
+      '</div>'
+    );
+  };
+
   var getProjectFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
@@ -45,7 +67,6 @@
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time" required checked><span>One-time</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-engagement" value="Fractional" required><span>Fractional</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Full-time" required><span>Full-time</span></label>' +
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
@@ -53,7 +74,7 @@
         '<div class="form-radio-group">' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$3k-$5k" required><span>$3k–$5k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$5k-$8k" required><span>$5k–$8k</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-budget" value="$8k-$12k" required checked><span>$8k–$12k</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-budget" value="$8k-$12k" required><span>$8k–$12k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$12k-$25k" required><span>$12k–$25k</span></label>' +
           '<label class="form-radio"><input type="radio" name="proj-budget" value="$25k+" required><span>$25k+</span></label>' +
         '</div>' +
@@ -245,6 +266,8 @@
     var chatEl = document.getElementById('compose-fields-chat');
     var projEl = document.getElementById('compose-fields-project');
     var bookEl = document.getElementById('compose-fields-book');
+    var hireEl = document.getElementById('compose-fields-hiring');
+    if (hireEl) hireEl.style.display = (idx === 3) ? '' : 'none';
     if (chatEl) chatEl.style.display = (idx === 0) ? '' : 'none';
     if (projEl) projEl.style.display = (idx === 1) ? '' : 'none';
     if (bookEl) bookEl.style.display = (idx === 2) ? '' : 'none';
@@ -290,6 +313,20 @@
                   links ? '\nRelevant links:\n' + links : null].filter(function (l) { return l !== null; }).join('\n')
       };
     }
+    if (intentIdx === 3) {
+      var roleEl = document.getElementById('hire-role');
+      var compEl = document.getElementById('hire-company');
+      var hbEl   = document.getElementById('hire-body');
+      var role   = roleEl ? roleEl.value.trim() : '';
+      var comp   = compEl ? compEl.value.trim() : '';
+      var hmsg   = hbEl ? hbEl.value : '';
+      return {
+        subject: 'Hiring: ' + (shared.name ? 'Message from ' + shared.name : 'New message') + (role ? ' (' + role + ')' : ''),
+        message: [sharedHead, '', 'Role: ' + (role || '—'),
+                  comp ? 'Company or link: ' + comp : null,
+                  '', hmsg].filter(function (l) { return l !== null; }).join('\n')
+      };
+    }
     var bodyEl = document.getElementById('chat-body');
     var msg    = bodyEl ? bodyEl.value : '';
     return {
@@ -299,9 +336,9 @@
   };
 
   var getHTML = function () {
-    var btnsHTML = INTENTS.map(function (label, i) {
+    var btnsHTML = INTENT_ORDER.map(function (i) {
       return '<button class="intent-btn" role="radio" aria-checked="' + (i === 0 ? 'true' : 'false') +
-        '" tabindex="' + (i === 0 ? '0' : '-1') + '" data-idx="' + i + '" type="button">' + label + '</button>';
+        '" tabindex="' + (i === 0 ? '0' : '-1') + '" data-idx="' + i + '" type="button">' + INTENT_LABELS[i] + '</button>';
     }).join('');
     return (
       '<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">' +
@@ -320,6 +357,7 @@
           '<div class="compose-modal-body">' +
             '<div id="compose-fields-shared">' + getSharedFieldsHTML() + '</div>' +
             '<div id="compose-fields-chat">' + getChatFieldsHTML() + '</div>' +
+            '<div id="compose-fields-hiring" style="display:none">' + getHiringFieldsHTML() + '</div>' +
             '<div id="compose-fields-project" style="display:none">' + getProjectFieldsHTML() + '</div>' +
             '<div id="compose-fields-book" style="display:none">' + getBookFieldsHTML() + '</div>' +
           '</div>' +
@@ -415,9 +453,10 @@
     selectIntent = function (idx, fromUserInteraction) {
       var prev = intentIdx;
       intentIdx = idx;
-      btns.forEach(function (b, i) {
-        b.setAttribute('aria-checked', String(i === idx));
-        b.setAttribute('tabindex', i === idx ? '0' : '-1');
+      btns.forEach(function (b) {
+        var bi = +b.getAttribute('data-idx');
+        b.setAttribute('aria-checked', String(bi === idx));
+        b.setAttribute('tabindex', bi === idx ? '0' : '-1');
       });
       showFields(idx);
       /* Track in-modal intent switches (user clicked a different tab
@@ -426,7 +465,7 @@
          openModal's auto-select). Lets the dashboard see "people
          opened to project but switched to chat" patterns. */
       if (fromUserInteraction && prev !== idx && window.umami && typeof window.umami.track === 'function') {
-        var label = ['chat', 'project', 'book-call'][idx] || 'chat';
+        var label = INTENT_NAMES[idx] || 'chat';
         window.umami.track('compose-modal-intent-switch', { intent: label });
       }
     };
@@ -434,15 +473,16 @@
     bd.addEventListener('click', function (e) { if (e.target === bd) closeModal(); });
 
     btns.forEach(function (btn, i) {
-      btn.addEventListener('click', function () { selectIntent(i, true); });
+      var bIdx = +btn.getAttribute('data-idx');
+      btn.addEventListener('click', function () { selectIntent(bIdx, true); });
       btn.addEventListener('keydown', function (e) {
         var len = btns.length;
         if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
           e.preventDefault();
-          var next = (i + 1) % len; selectIntent(next, true); btns[next].focus();
+          var next = (i + 1) % len; selectIntent(+btns[next].getAttribute('data-idx'), true); btns[next].focus();
         } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
           e.preventDefault();
-          var prev = (i - 1 + len) % len; selectIntent(prev, true); btns[prev].focus();
+          var prev = (i - 1 + len) % len; selectIntent(+btns[prev].getAttribute('data-idx'), true); btns[prev].focus();
         }
       });
     });
@@ -484,6 +524,13 @@
         if (body && !body.value.trim()) { body.focus(); body.reportValidity && body.reportValidity(); return false; }
         return true;
       }
+      if (intentIdx === 3) {
+        var hr = document.getElementById('hire-role');
+        var hb = document.getElementById('hire-body');
+        if (hr && !hr.value.trim()) { hr.focus(); hr.reportValidity && hr.reportValidity(); return false; }
+        if (hb && !hb.value.trim()) { hb.focus(); hb.reportValidity && hb.reportValidity(); return false; }
+        return true;
+      }
       if (intentIdx === 1) {
         var eng = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
         var bud = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
@@ -520,8 +567,8 @@
       var data = collectFormData();
       sendBtn.disabled = true;
 
-      /* intentIdx: 0 = chat, 1 = project, 2 = book a call */
-      var intentLabel = ['chat', 'project', 'book-call'][intentIdx] || 'chat';
+      /* intentIdx: 0 = chat, 1 = project, 2 = book a call, 3 = hiring */
+      var intentLabel = INTENT_NAMES[intentIdx] || 'chat';
 
       var trackSubmit = function (transport) {
         if (window.umami && typeof window.umami.track === 'function') {
@@ -622,7 +669,7 @@
        project pre-picks "project", Get in touch pre-picks "chat",
        etc.). Fires every time the modal opens. */
     if (window.umami && typeof window.umami.track === 'function') {
-      var openIntent = ['chat', 'project', 'book-call'][typeof targetIdx === 'number' ? targetIdx : intentIdx] || 'chat';
+      var openIntent = INTENT_NAMES[typeof targetIdx === 'number' ? targetIdx : intentIdx] || 'chat';
       window.umami.track('compose-modal-open', { intent: openIntent });
     }
   };

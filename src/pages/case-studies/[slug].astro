@@ -5,20 +5,21 @@ import RedefiningWebinarBody from '../../components/cases/RedefiningWebinarBody.
 import UnderstandingWebinarOrganizersBody from '../../components/cases/UnderstandingWebinarOrganizersBody.astro';
 import LeadingDesignSystemBody from '../../components/cases/LeadingDesignSystemBody.astro';
 import DesigningSupportChatBody from '../../components/cases/DesigningSupportChatBody.astro';
+import CaseSummary from '../../components/cases/CaseSummary.astro';
+import CaseDecisions from '../../components/cases/CaseDecisions.astro';
+import XraySwitch from '../../components/XraySwitch.astro';
 
+/* Hidden cases are not built: no page, no sitemap entry (see cases.ts). */
 export function getStaticPaths() {
-  return CASES.map(c => ({ params: { slug: c.slug }, props: { caseData: c } }));
+  return CASES.filter(c => !c.hidden).map(c => ({ params: { slug: c.slug }, props: { caseData: c } }));
 }
 
-const { caseData: c } = Astro.props;
-/* "Next case" walks only the visible cases — soft-hidden ones (see
-   the `hidden` flag in cases.ts) are skipped so they don't surface
-   via the case-detail pager. getStaticPaths still builds their
-   pages above, so direct URLs continue to work. */
+/* Look the case up again by slug so a long-running dev server never serves
+   props cached before cases.ts changed. */
+const c = CASES.find(x => x.slug === Astro.params.slug) ?? Astro.props.caseData;
+/* "Next case" walks only the visible cases (hidden ones are not built). */
 const visibleCases = CASES.filter(x => !x.hidden);
 const visIdx = visibleCases.findIndex(x => x.slug === c.slug);
-/* If the current case is itself hidden (deep-linked), fall back to
-   the first visible case rather than NaN-ing the modulo. */
 const nextIdx = visIdx === -1 ? 0 : (visIdx + 1) % visibleCases.length;
 const next = visibleCases[nextIdx];
 const outcomesClass = c.outcomes.length === 2 ? 'cols-2' : 'cols-3';
@@ -43,6 +44,8 @@ const hasCustomBody = customBodySlugs.has(c.slug);
 const tocItems = c.slug === 'redefining-webinar-customization'
   ? [
       { id: 'case-context',      label: 'Context' },
+      { id: 'case-summary',        label: 'Summary' },
+      { id: 'case-decisions',      label: 'Decisions' },
       { id: 'case-discovery',    label: 'Discovery' },
       { id: 'case-problem',      label: 'Problem' },
       { id: 'case-approach',     label: 'Approach' },
@@ -54,6 +57,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   : c.slug === 'understanding-webinar-organizers'
   ? [
       { id: 'case-context',    label: 'Context' },
+      { id: 'case-summary',        label: 'Summary' },
+      { id: 'case-decisions',      label: 'Decisions' },
       { id: 'case-role',       label: 'My role' },
       { id: 'case-challenge',  label: 'The challenge' },
       { id: 'case-deep-dive',  label: 'Deep-dive' },
@@ -63,6 +68,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   : c.slug === 'leading-and-managing-a-design-system'
   ? [
       { id: 'case-context',         label: 'Context' },
+      { id: 'case-summary',        label: 'Summary' },
+      { id: 'case-decisions',      label: 'Decisions' },
       { id: 'case-role',            label: 'My role' },
       { id: 'case-challenge',       label: 'The challenge' },
       { id: 'case-organizing',      label: 'Organizing the team' },
@@ -73,6 +80,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   : c.slug === 'designing-a-support-chat-experience'
   ? [
       { id: 'case-context',             label: 'Context' },
+      { id: 'case-summary',        label: 'Summary' },
+      { id: 'case-decisions',      label: 'Decisions' },
       { id: 'case-role',                label: 'My role' },
       { id: 'case-challenge',           label: 'The challenge' },
       { id: 'case-kickoff',             label: 'Kickoff and research' },
@@ -113,13 +122,25 @@ const tocItems = c.slug === 'redefining-webinar-customization'
 
       {hasCustomBody ? (
         c.slug === 'understanding-webinar-organizers' ? (
-          <UnderstandingWebinarOrganizersBody />
+          <UnderstandingWebinarOrganizersBody>
+            <CaseSummary c={c} />
+            <CaseDecisions c={c} />
+          </UnderstandingWebinarOrganizersBody>
         ) : c.slug === 'leading-and-managing-a-design-system' ? (
-          <LeadingDesignSystemBody />
+          <LeadingDesignSystemBody>
+            <CaseSummary c={c} />
+            <CaseDecisions c={c} />
+          </LeadingDesignSystemBody>
         ) : c.slug === 'designing-a-support-chat-experience' ? (
-          <DesigningSupportChatBody />
+          <DesigningSupportChatBody>
+            <CaseSummary c={c} />
+            <CaseDecisions c={c} />
+          </DesigningSupportChatBody>
         ) : (
-          <RedefiningWebinarBody />
+          <RedefiningWebinarBody>
+            <CaseSummary c={c} />
+            <CaseDecisions c={c} />
+          </RedefiningWebinarBody>
         )
       ) : (
         <>
@@ -144,20 +165,24 @@ const tocItems = c.slug === 'redefining-webinar-customization'
             <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
           </div>
 
-          <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
-            {c.outcomes.map(o => (
-              <div class="outcome">
-                <div class="outcome-num">{o.n}</div>
-                <div class="outcome-title">{o.title}</div>
-                <div class="outcome-desc">{o.desc}</div>
-              </div>
-            ))}
-          </div>
+          {c.outcomes.length > 0 && (
+            <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
+              {c.outcomes.map(o => (
+                <div class="outcome">
+                  <div class="outcome-num">{o.n}</div>
+                  <div class="outcome-title">{o.title}</div>
+                  <div class="outcome-desc">{o.desc}</div>
+                </div>
+              ))}
+            </div>
+          )}
 
-          <section class="achievements reveal">
-            <span class="eyebrow">Key outcomes</span>
-            <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
-          </section>
+          {c.achievements.length > 0 && (
+            <section class="achievements reveal">
+              <span class="eyebrow">Key outcomes</span>
+              <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
+            </section>
+          )}
 
           <div class="case-sections">
             {c.sections.map((s, sIdx) => (
@@ -168,7 +193,7 @@ const tocItems = c.slug === 'redefining-webinar-customization'
             ))}
           </div>
 
-          <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>
+          {c.quote && <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>}
         </>
       )}
 
@@ -185,11 +210,33 @@ const tocItems = c.slug === 'redefining-webinar-customization'
     </div>
   </div>
 
+  <!-- Floating copy of the X-ray switch (appears once the summary switch scrolls away). -->
+  <XraySwitch float wrap="#case-content" />
+
   <!-- Password gate overlay — shown via JS if not unlocked -->
   <div id="pw-overlay" style="display:none">
     <div class="case-wrap">
       <div class="container">
         <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
+
+        <header class="case-gate-head">
+          <div class="case-cat">{c.cat}</div>
+          <h1 class="case-title">{c.title}</h1>
+          <p class="case-subtitle">{c.subtitle}</p>
+        </header>
+
+        <CaseSummary c={c} anchor={false} xray={false} />
+
+        <div class={`outcomes ${outcomesClass} case-gate-outcomes`}>
+          {c.outcomes.map(o => (
+            <div class="outcome">
+              <div class="outcome-num">{o.n}</div>
+              <div class="outcome-title">{o.title}</div>
+              <div class="outcome-desc">{o.desc}</div>
+            </div>
+          ))}
+        </div>
+
         <div class="pw-gate reveal visible">
           <div class="pw-gate-lock">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -197,8 +244,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
           </div>
-          <h2>This case study is private</h2>
-          <p>Enter the password to read it.</p>
+          <h2>The full story is private</h2>
+          <p>It has the decisions, trade-offs and screens. Enter the password, or ask me for it.</p>
           <form class="pw-form" id="pwForm">
             <div class="pw-input-wrap">
               <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="current-password">
@@ -213,6 +260,7 @@ const tocItems = c.slug === 'redefining-webinar-customization'
               <span>Unlock</span>
             </button>
           </form>
+          <button type="button" class="pw-ask" id="pwAsk" data-title={c.title} data-umami-event="case-gate-ask-access" data-umami-event-slug={c.slug}>Ask for access</button>
         </div>
       </div>
     </div>
@@ -261,6 +309,13 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
     input.value = '';
     input.focus();
     input.addEventListener('animationend', () => input.classList.remove('pw-shake'), { once: true });
+  }
+});
+
+document.getElementById('pwAsk')?.addEventListener('click', function () {
+  var title = this.getAttribute('data-title') || '';
+  if (typeof window.jjComposeWith === 'function') {
+    window.jjComposeWith("Hi João, could you send me the password for the case studies? I'd like to read \"" + title + "\".");
   }
 });
 

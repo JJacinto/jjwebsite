@@ -19,23 +19,6 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
         an amazing customer experience, challenged me to build an in-house
         customer support app.
       </p>
-
-      <div class="rwc-callout">
-        <div class="rwc-callout-title">
-          <span class="rwc-callout-star" aria-hidden="true">★</span>
-          Core achievements
-        </div>
-        <ul>
-          <li>
-            Designed a customer support app and widget from scratch,
-            learning from its users, and creating its own design system.
-          </li>
-          <li>
-            Achieved a 97.4% positive feedback rate just 4 months after
-            release, on the new chat and support experience.
-          </li>
-        </ul>
-      </div>
     </div>
 
     <div class="rwc-hero-right">
@@ -47,11 +30,14 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     </div>
   </section>
 
+  {/* Summary + decisions, passed in from [slug].astro */}
+  <slot />
+
   {/* ───────────────────── MY ROLE + KEYWORDS ───────────────────── */}
   <section class="rwc-role" id="case-role">
     <div class="rwc-role-left">
       <div class="eyebrow">My role</div>
-      <h2 class="rwc-h2">UX Designer</h2>
+      <p class="case-role">UX Designer</p>
 
       <p>
         I led the customer support app design from its start, created a

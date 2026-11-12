@@ -1,0 +1,32 @@
+---
+/* The 30-second summary: problem, what was cut, what shipped, the result.
+   Public on the password gate too. `anchor` gives it the TOC id (only the
+   unlocked copy, so the id stays unique); `xray` adds the X-ray switch
+   (only the unlocked copy, because the gate sits on a hidden page). */
+import XraySwitch from '../XraySwitch.astro';
+import type { Case } from '../../data/cases';
+
+interface Props { c: Case; anchor?: boolean; xray?: boolean; }
+const { c, anchor = true, xray = true } = Astro.props;
+const rows = [
+  { label: 'Problem', text: c.problem, cut: false },
+  { label: 'What I cut', text: c.cut, cut: true },
+  { label: 'What shipped', text: c.shipped, cut: false },
+  { label: 'Result', text: c.result, cut: false },
+];
+---
+<section class={anchor ? 'case-summary reveal' : 'case-summary'} id={anchor ? 'case-summary' : undefined} aria-label="The short version">
+  <span class="eyebrow">The short version</span>
+  <div class="case-summary-card">
+    <dl class="case-summary-list">
+      {rows.map(r => (
+        <div class={`case-summary-row${r.cut ? ' case-summary-row--cut' : ''}`}>
+          <dt class="eyebrow">{r.label}</dt>
+          <dd>{r.text}</dd>
+          {r.cut && <span class="case-xnote">// What I left out shapes the product as much as what I put in.</span>}
+        </div>
+      ))}
+    </dl>
+    {xray && <XraySwitch wrap="#case-content" />}
+  </div>
+</section>

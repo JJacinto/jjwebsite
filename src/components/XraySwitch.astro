@@ -1,0 +1,78 @@
+---
+/* X-ray switch, shared by the About page and the case study pages.
+   Render one inline switch where the page wants it, and (optionally) one
+   `float` copy anywhere outside a transformed ancestor. Both point at the
+   page wrapper through `wrap` (a CSS selector); toggling puts `.xray` on
+   that wrapper. The script below is bundled once per page, however many
+   switches there are. Styles live in global.css, "X-RAY (shared)". */
+interface Props {
+  wrap: string;
+  float?: boolean;
+  label?: string;
+}
+const { wrap, float = false, label = "Show the parts you don't see" } = Astro.props;
+---
+{float ? (
+  <button type="button" role="switch" aria-checked="false" aria-label={label} class="xray-switch xray-switch--float" data-xray-switch data-xray-wrap={wrap} hidden>
+    <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
+    <span class="xray-label" aria-hidden="true">X-ray</span>
+  </button>
+) : (
+  <button type="button" role="switch" aria-checked="false" class="xray-switch" data-xray-switch data-xray-wrap={wrap} hidden>
+    <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
+    <span class="xray-label">{label}</span>
+  </button>
+)}
+
+<script>
+  /* Hero/inline switch + floating copy, kept in sync. The `x` key toggles
+     the first wrapper on the page. */
+  const switches = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-xray-switch]'));
+  const wrapOf = (s: HTMLElement) => document.querySelector<HTMLElement>(s.dataset.xrayWrap || '');
+  const wraps = Array.from(new Set(switches.map(wrapOf).filter((w): w is HTMLElement => !!w)));
+
+  function labelGaps(wrap: HTMLElement) {
+    wrap.querySelectorAll<HTMLElement>('[data-xray-gap]').forEach((el) => {
+      const mb = parseFloat(getComputedStyle(el).marginBottom);
+      if (!isNaN(mb)) el.setAttribute('data-xray-gap', String(Math.round(mb)));
+    });
+  }
+  function setXray(wrap: HTMLElement, on: boolean) {
+    wrap.classList.toggle('xray', on);
+    switches.forEach((s) => { if (wrapOf(s) === wrap) s.setAttribute('aria-checked', String(on)); });
+    if (on) labelGaps(wrap);
+  }
+
+  switches.forEach((s) => {
+    const wrap = wrapOf(s);
+    if (!wrap) return;
+    s.hidden = false;
+    s.addEventListener('click', () => setXray(wrap, !wrap.classList.contains('xray')));
+  });
+  window.addEventListener('resize', () => {
+    wraps.forEach((w) => { if (w.classList.contains('xray')) labelGaps(w); });
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'x' && e.key !== 'X') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target as HTMLElement | null;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    /* A wrapper that is display:none (a locked case page) cannot be toggled by key. */
+    const w = wraps.find((x) => x.getClientRects().length > 0);
+    if (w) setXray(w, !w.classList.contains('xray'));
+  });
+
+  /* The floating copy appears only after the inline switch has scrolled
+     out of view (above the viewport), and never while its page is hidden. */
+  wraps.forEach((wrap) => {
+    const mine = switches.filter((s) => wrapOf(s) === wrap);
+    const inline = mine.find((s) => !s.classList.contains('xray-switch--float'));
+    const floating = mine.find((s) => s.classList.contains('xray-switch--float'));
+    if (!inline || !floating || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver((entries) => {
+      const e = entries[entries.length - 1];
+      const visible = inline.getClientRects().length > 0;
+      floating.classList.toggle('is-shown', visible && !e.isIntersecting && e.boundingClientRect.bottom <= 0);
+    }).observe(inline);
+  });
+</script>

@@ -2,11 +2,8 @@
 import Base from '../../layouts/Base.astro';
 import { CASES } from '../../data/cases';
 
-/* Soft-hide via the `hidden` flag in cases.ts — filter the visible
-   list once, then slice into featured/rest from the filtered view. */
-const visible  = CASES.filter(c => !c.hidden);
-const featured = visible.slice(0, 2);
-const rest     = visible.slice(2);
+/* Hidden cases (see cases.ts) are not shown or built. */
+const visible = CASES.filter(c => !c.hidden);
 ---
 <Base
   activePage="cases"
@@ -14,36 +11,57 @@ const rest     = visible.slice(2);
   description="Product design case studies by João Jacinto — webinar UX, research ops, design systems, AI platforms, and support tools."
 >
 
-  <div class="cases-wrap">
-    <div class="marquee cases-marquee">
-      <div class="marquee-track">
-        <span>CASE STUDIES</span><span>·</span><span>WORK</span><span>·</span><span>PORTFOLIO</span><span>·</span>
-        <span>CASE STUDIES</span><span>·</span><span>WORK</span><span>·</span><span>PORTFOLIO</span><span>·</span>
-      </div>
-    </div>
+  <div class="work-wrap">
     <div class="container">
-      <div class="cases-grid-row-2" style="margin-bottom:24px">
-        {featured.map((c, i) => (
-          <a class={`case-card case-card-featured reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`} data-umami-event="case-card-index-featured" data-umami-event-slug={c.slug}>
-            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
-            <div class="case-card-body">
-              <div class="case-card-cat">{c.cat}</div>
-              <div class="case-card-title">{c.title}</div>
+
+      <header class="work-head">
+        <span class="eyebrow">Work</span>
+        <h1>Four problems, untangled.</h1>
+        <p class="work-intro">Each one started messy: components that had drifted from code, support agents buried in tabs, webinars that couldn't look like their hosts. Here's what I cut, and what shipped.</p>
+      </header>
+
+      <div class="work-grid">
+        {visible.map((c, i) => (
+          <a class={`work-card reveal reveal-d${(i % 2) + 1}`} href={`/case-studies/${c.slug}`} data-umami-event={i < 2 ? 'case-card-index-featured' : 'case-card-index'} data-umami-event-slug={c.slug}>
+            <div class="work-card-media">
+              <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading={i < 2 ? 'eager' : 'lazy'} fetchpriority={i < 2 ? 'high' : undefined}>
+            </div>
+            <div class="work-card-body">
+              <div class="work-card-meta">
+                <span class="eyebrow">{c.company} · {c.year}</span>
+                <span class="work-card-lock">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  Private
+                </span>
+              </div>
+              <h2 class="work-card-title">{c.title}</h2>
+              <p class="work-card-problem">{c.problem}</p>
+              <div class="work-card-foot">
+                <span class="work-card-num">{c.cardNum}</span>
+                <span class="work-card-label">{c.cardLabel}</span>
+              </div>
             </div>
           </a>
         ))}
       </div>
-      <div class={rest.length <= 2 ? 'cases-grid-row-2' : 'cases-grid'}>
-        {rest.map((c, i) => (
-          <a class={`case-card reveal reveal-d${i + 1}`} href={`/case-studies/${c.slug}`} data-umami-event="case-card-index" data-umami-event-slug={c.slug}>
-            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="lazy">
-            <div class="case-card-body">
-              <div class="case-card-cat">{c.cat}</div>
-              <div class="case-card-title">{c.title}</div>
-            </div>
-          </a>
-        ))}
-      </div>
+
+      <article class="work-next reveal">
+        <div class="work-next-text">
+          <span class="eyebrow">Anchorage Digital · Writing it up</span>
+          <h2 class="work-next-title">Policies and permissions</h2>
+          <p class="work-next-body">The redesign that turned a 40-step admin flow into one configuration step. The case study is in progress.</p>
+        </div>
+        <div class="work-next-stat">
+          <span class="work-card-num">40 → 1</span>
+          <span class="work-card-label">admin steps</span>
+        </div>
+      </article>
+
+      <p class="work-access">All case studies are private. <button type="button" class="work-ask" data-umami-event="work-ask-access" onclick="jjComposeWith('Hi João, could you send me the password for the case studies?')">Ask me for access</button> and I'll send the password.</p>
+
     </div>
   </div>
 

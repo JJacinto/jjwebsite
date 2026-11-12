@@ -1360,11 +1360,87 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .may-like-cta { text-align: center; margin-top: var(--dimension-space-48); }
 
 .cases-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-80), 10vw, var(--dimension-space-128)); }
-.cases-marquee { margin-bottom: var(--dimension-space-64); }
-.cases-marquee .marquee-track { animation-duration: 40s; }
-.cases-marquee span { font-size: clamp(4rem, 9vw, 7.5rem); color: color-mix(in srgb, var(--text-primary) 5%, transparent); }
 .cases-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-24); margin-bottom: var(--dimension-space-24); }
 .cases-grid-row-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--dimension-space-24); }
+
+/* ---- WORK index ---------------------------------------------------- */
+.work-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-24), 4vw, var(--dimension-space-48)); }
+.work-head { margin-bottom: clamp(var(--dimension-space-40), 6vw, var(--dimension-space-64)); }
+.work-head .eyebrow { display: block; margin-bottom: var(--dimension-space-16); }
+.work-head h1 { margin-bottom: var(--dimension-space-20); max-width: 18ch; }
+.work-intro { font-size: var(--font-size-lg); color: var(--text-secondary); line-height: var(--font-line-height-loose); max-width: 56ch; margin: 0; }
+.work-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--dimension-space-24); margin-bottom: var(--dimension-space-24); }
+.work-card {
+  display: flex; flex-direction: column;
+  background: var(--surface-default);
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  color: inherit; text-decoration: none;
+  transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-standard);
+}
+.work-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: color-mix(in srgb, var(--text-brand) 30%, transparent); }
+.work-card:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
+.work-card-media { overflow: hidden; aspect-ratio: 16 / 9; background: var(--fill-brand-muted); }
+.work-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s var(--motion-easing-emphasized); }
+.work-card:hover .work-card-media img { transform: scale(1.03); }
+.work-card-body { display: flex; flex-direction: column; flex: 1; padding: var(--dimension-space-20) var(--dimension-space-24) var(--dimension-space-24); }
+.work-card-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-10); }
+.work-card-lock {
+  display: inline-flex; align-items: center; gap: var(--dimension-space-4);
+  padding: var(--dimension-space-2) var(--dimension-space-8);
+  border-radius: var(--radius-pill);
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  font-size: var(--font-size-xs); color: var(--text-tertiary);
+}
+.work-card-title { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-xl); letter-spacing: var(--font-letter-spacing-snug); line-height: var(--font-line-height-snug); color: var(--text-primary); margin: 0 0 var(--dimension-space-8); }
+.work-card-problem {
+  font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-snug);
+  margin: 0 0 var(--dimension-space-20);
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.work-card-foot {
+  margin-top: auto;
+  display: flex; align-items: baseline; gap: var(--dimension-space-12);
+  padding-top: var(--dimension-space-16);
+  border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+}
+.work-card-num { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: 2.4rem; line-height: 1; letter-spacing: var(--font-letter-spacing-tighter); color: var(--text-primary); flex: none; }
+.work-card-label { font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-snug); }
+.work-next {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-32);
+  padding: var(--dimension-space-32);
+  border: var(--dimension-border-width-1) dashed color-mix(in srgb, var(--text-primary) 25%, transparent);
+  border-radius: var(--dimension-radius-xl);
+  background: transparent;
+  margin-bottom: var(--dimension-space-32);
+}
+.work-next .eyebrow { display: block; margin-bottom: var(--dimension-space-10); }
+.work-next-title { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-xl); letter-spacing: var(--font-letter-spacing-snug); line-height: var(--font-line-height-snug); color: var(--text-primary); margin: 0 0 var(--dimension-space-8); }
+.work-next-body { font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-snug); max-width: 52ch; margin: 0; }
+.work-next-stat { display: flex; flex-direction: column; align-items: flex-end; gap: var(--dimension-space-4); text-align: right; flex: none; }
+.work-access { font-size: var(--font-size-sm); color: var(--text-secondary); text-align: center; margin: 0; }
+.work-ask {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font: inherit; color: var(--text-brand);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.work-ask:hover { text-decoration-thickness: 2px; }
+.work-ask:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; border-radius: var(--dimension-radius-sm); }
+/* The shared CTA band opens with 280px of padding; on Work that read as a
+   big empty gap under the last line, so tighten it on this page only. */
+body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-space-80), 12vw, 160px); }
+@media (max-width: 768px) {
+  .work-grid { grid-template-columns: 1fr; }
+  .work-next { flex-direction: column; align-items: flex-start; }
+  .work-next-stat { align-items: flex-start; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .work-card, .work-card-media img { transition: none; }
+  .work-card:hover { transform: none; }
+  .work-card:hover .work-card-media img { transform: none; }
+}
 
 /* ============================================================
    ABOUT
@@ -2748,9 +2824,18 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .contact h1 { color: var(--text-primary); font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
 .contact-body { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
 .contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: var(--dimension-space-16); }
-.contact-response-time {
+.contact-status {
+  display: flex; align-items: center; justify-content: center; gap: var(--dimension-space-8);
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-tertiary); margin: var(--dimension-space-24) 0 var(--dimension-space-56);
+  color: var(--text-secondary); margin: var(--dimension-space-24) 0 var(--dimension-space-8);
+}
+.contact-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--text-tertiary); transition: background 0.4s; }
+@media (prefers-reduced-motion: no-preference) {
+  .contact-status-dot.state-available, .contact-status-dot.state-offhours, .contact-status-dot.state-sleeping { animation: dot-breathe 2.4s ease-in-out infinite; }
+}
+.contact-hint {
+  font-family: var(--font-family-body); font-size: var(--font-size-xs);
+  color: var(--text-tertiary); margin: 0 auto var(--dimension-space-56); max-width: 520px;
 }
 .contact-info { border-top: var(--dimension-border-width-1) solid var(--border-subtle); padding-top: var(--dimension-space-32); display: flex; flex-direction: column; gap: var(--dimension-space-8); text-align: left; }
 .contact-card { display: flex; align-items: center; gap: var(--dimension-space-12); padding: var(--dimension-space-12) var(--dimension-space-16); border-radius: var(--dimension-radius-md); border: var(--dimension-border-width-1) solid var(--border-subtle); background: var(--surface-default); transition: background var(--motion-duration-short), border-color var(--motion-duration-short); }
@@ -2768,7 +2853,14 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .contact-card-label-row { display: flex; align-items: baseline; gap: var(--dimension-space-8); margin-bottom: var(--dimension-space-4); }
 .contact-card-label-row .contact-card-label { margin-bottom: 0; }
 .contact-card-label { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-4); }
-.contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-primary); word-break: break-word; }
+.contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-primary); overflow-wrap: normal; word-break: keep-all; }
+.contact-card-sub { white-space: nowrap; }
+@media (max-width: 480px) {
+  .contact-card { flex-wrap: wrap; row-gap: var(--dimension-space-12); }
+  .contact-card-body { flex: 1 1 calc(100% - 52px); }
+  .contact-card > .contact-card-btn, .contact-card > .contact-card-actions { margin-left: 52px; }
+  .contact-card-value { font-size: var(--font-size-xs); }
+}
 .contact-card-sub { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: var(--dimension-space-2); }
 .contact-card-action { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-16); min-height: var(--target-min); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-brand); border: var(--dimension-border-width-1) solid color-mix(in srgb, var(--text-brand) 25%, transparent); background: var(--fill-brand-muted); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
 .contact-card-action:hover { background: color-mix(in srgb, var(--text-brand) 20%, transparent); border-color: color-mix(in srgb, var(--text-brand) 50%, transparent); color: var(--text-brand); }
@@ -2922,6 +3014,14 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   transition: background var(--motion-duration-short), color var(--motion-duration-short);
 }
 .intent-btn:last-child { border-right: none; }
+/* Four intents don't fit in one row of the modal at any width, so
+   they always sit in a 2×2 grid. */
+@media all {
+  .intent-toggle { display: grid; grid-template-columns: 1fr 1fr; }
+  .intent-btn { border-bottom: var(--dimension-border-width-1) solid var(--border-inverse); }
+  .intent-btn:nth-child(2n) { border-right: none; }
+  .intent-btn:nth-last-child(-n+2) { border-bottom: none; }
+}
 .intent-btn[aria-checked="true"] { background: var(--component-form-toggle-fill-active); color: var(--text-inverse); }
 .intent-btn:hover:not([aria-checked="true"]) { background: var(--component-form-toggle-fill); color: var(--text-inverse); }
 .intent-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
@@ -3047,7 +3147,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 #compose-fields-work, #compose-fields-mentor { display: flex; flex-direction: column; gap: var(--dimension-space-24); }
 #compose-fields-project { display: flex; flex-direction: column; gap: var(--dimension-space-28); }
-#compose-fields-chat, #compose-fields-book { display: flex; flex-direction: column; gap: var(--dimension-space-20); }
+#compose-fields-chat, #compose-fields-book, #compose-fields-hiring { display: flex; flex-direction: column; gap: var(--dimension-space-20); }
 
 /* Shared name + email row at the top of the modal body — side by side on
    desktop, stacked on narrow viewports. */
@@ -3292,7 +3392,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .keyword:hover { background: var(--color-primary-10); border-color: rgba(61,61,181,0.4); color: var(--text-brand); }
 .case-hero-img { margin-bottom: var(--dimension-space-64); border-radius: var(--dimension-radius-xl); overflow: hidden; border: var(--dimension-border-width-1) solid var(--border-subtle); }
 .case-hero-img img { width: 100%; max-height: 460px; object-fit: cover; }
-.outcomes { background: var(--color-primary-10); border-radius: var(--radius-card); padding: var(--dimension-space-32) var(--dimension-space-40); margin-bottom: var(--dimension-space-64); display: grid; gap: var(--dimension-space-24); }
+.outcomes { background: color-mix(in srgb, var(--text-brand) 9%, transparent); border: 1px solid color-mix(in srgb, var(--text-brand) 18%, transparent); border-radius: var(--radius-card); padding: var(--dimension-space-32) var(--dimension-space-40); margin-bottom: var(--dimension-space-64); display: grid; gap: var(--dimension-space-24); }
 .outcomes.cols-2 { grid-template-columns: repeat(2, 1fr); }
 .outcomes.cols-3 { grid-template-columns: repeat(3, 1fr); }
 .outcome { text-align: center; }
@@ -3409,6 +3509,103 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .pw-reveal { position: absolute; right: var(--dimension-space-10); top: 50%; transform: translateY(-50%); width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; color: var(--text-tertiary); transition: color var(--motion-duration-short); }
 .pw-reveal:hover { color: var(--text-primary); }
 .pw-reveal svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---- Case: summary, decisions, gate, X-ray notes ------------------- */
+.rwc-body p.case-role {
+  font-family: var(--font-family-display);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--text-primary);
+  line-height: var(--font-line-height-snug);
+  margin-bottom: var(--dimension-space-20);
+}
+.case-summary { margin: var(--dimension-space-40) 0 var(--dimension-space-48); }
+.case-summary > span.eyebrow { display: block; margin-bottom: var(--dimension-space-16); }
+.case-summary-card {
+  background: var(--surface-default);
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-xl);
+  padding: var(--dimension-space-32);
+  box-shadow: var(--shadow-sm);
+}
+.case-summary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--dimension-space-28) var(--dimension-space-40); margin: 0; }
+.case-summary-row {
+  position: relative;
+  display: flex; flex-direction: column; gap: var(--dimension-space-8);
+  outline: 1px dashed transparent; outline-offset: 10px;
+  transition: outline-color var(--motion-duration-standard) var(--motion-easing-standard);
+}
+.case-summary-row dt.eyebrow { margin: 0; }
+.case-summary-row--cut dt.eyebrow { color: var(--text-brand); }
+.case-summary-row dd { margin: 0; font-family: var(--font-family-body); font-size: var(--font-size-md); color: var(--text-primary); line-height: var(--font-line-height-loose); }
+.case-summary-card .xray-switch { margin-top: var(--dimension-space-24); }
+
+.case-decisions { margin: 0 0 var(--dimension-space-48); }
+.case-decisions > span.eyebrow { display: block; margin-bottom: var(--dimension-space-16); }
+.case-decisions-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--dimension-space-20); }
+.case-decision {
+  position: relative;
+  padding: var(--dimension-space-24);
+  background: var(--surface-default);
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-lg);
+}
+.case-decision-n { display: block; font-variant-numeric: tabular-nums; font-size: var(--font-size-sm); color: var(--text-tertiary); margin-bottom: var(--dimension-space-12); }
+.case-decision h3.case-decision-title {
+  font-family: var(--font-family-display); font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg); line-height: var(--font-line-height-snug);
+  color: var(--text-primary);
+  margin: 0 0 var(--dimension-space-8);
+}
+.case-decision p.case-decision-body { font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-loose); margin: 0; }
+.case-decisions p.case-decisions-foot { font-size: var(--font-size-sm); color: var(--text-tertiary); margin: var(--dimension-space-16) 0 0; }
+
+/* X-ray notes on case pages: hidden until the switch is on. */
+.case-xnote {
+  display: none;
+  margin-top: var(--dimension-space-12);
+  font-family: var(--font-family-mono); font-size: var(--font-size-xs);
+  line-height: var(--font-line-height-snug);
+  color: var(--text-brand);
+}
+.xray .case-xnote { display: block; }
+.xray .case-summary-row--cut { outline-color: var(--text-brand); }
+#case-content { counter-reset: xcap; }
+.xray .case-img-caption,
+.xray .rwc-caption { counter-increment: xcap; color: var(--text-brand) !important; }
+.xray .case-img-caption::before,
+.xray .rwc-caption::before {
+  content: counter(xcap);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; margin-right: var(--dimension-space-8);
+  border-radius: 50%;
+  background: var(--fill-brand-default); color: var(--text-on-brand);
+  font-family: var(--font-family-mono); font-size: 10px; line-height: 1;
+  vertical-align: middle;
+}
+
+/* Password gate: public summary above the lock card. */
+.case-gate-head { margin-bottom: var(--dimension-space-8); }
+.case-gate-outcomes { margin-bottom: 0; }
+#pw-overlay .pw-gate { margin: var(--dimension-space-48) auto 0; }
+.pw-ask {
+  display: block; margin: var(--dimension-space-16) auto 0;
+  background: none; border: 0; padding: 0; cursor: pointer;
+  font-family: var(--font-family-body); font-size: var(--font-size-sm);
+  color: var(--text-brand);
+  text-decoration: underline; text-underline-offset: 3px;
+}
+.pw-ask:hover { text-decoration-thickness: 2px; }
+.pw-ask:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; border-radius: var(--dimension-radius-sm); }
+
+@media (max-width: 768px) {
+  .case-summary-list { grid-template-columns: 1fr; }
+  .case-summary-card { padding: var(--dimension-space-24); }
+  .case-decisions-list { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-summary-row { transition: none; }
+}
 
 /* ============================================================
    Footer
@@ -3913,8 +4110,12 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 
 /* base responsive — every body collapses to a single column at 960px */
 @media (max-width: 960px) {
+  /* minmax(0, 1fr) so a wide child (the hero image) can't push the
+     column past the viewport on phones. */
   .rwc-hero,
-  .rwc-role { grid-template-columns: 1fr; }
+  .rwc-role { grid-template-columns: minmax(0, 1fr); }
+  /* min-height + aspect-ratio forced a 427px-wide image on phones. */
+  .rwc-hero-img { min-height: 0; }
   .rwc-role-right { text-align: left; }
   .rwc-columns.cols-2,
   .rwc-columns.cols-3,

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import XraySwitch from '../components/XraySwitch.astro';
 
 /* Equaliser bars for the "Now producing" card. Heights are fixed here so
    the markup is deterministic: --lo/--hi are the scaleY range, --d the
@@ -105,10 +106,7 @@ const loop = [
           </ol>
           <p class="about-story-note">That's the story of the policies and permissions redesign at Anchorage Digital.</p>
 
-          <button type="button" role="switch" aria-checked="false" class="xray-switch" data-xray-switch hidden>
-            <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
-            <span class="xray-label">Show the parts you don't see</span>
-          </button>
+          <XraySwitch wrap=".about-wrap" />
         </div>
       </section>
 
@@ -380,10 +378,7 @@ const loop = [
 
     <!-- Floating copy of the X-ray switch: shows once the hero switch has
          scrolled out of view. -->
-    <button type="button" role="switch" aria-checked="false" aria-label="Show the parts you don't see" class="xray-switch xray-switch--float" data-xray-switch hidden>
-      <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
-      <span class="xray-label" aria-hidden="true">X-ray</span>
-    </button>
+    <XraySwitch float wrap=".about-wrap" />
   </div>
 
 </Base>
@@ -566,51 +561,13 @@ const loop = [
 </script>
 
 <script is:inline>
-/* About page behaviour: X-ray switch, count-ups, in-view hooks. */
+/* About page behaviour: count-ups, in-view hooks. (The X-ray switch lives in
+   components/XraySwitch.astro.) */
 (function () {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const wrap = document.querySelector('.about-wrap');
   if (!wrap) return;
   wrap.classList.add('js');
-
-  /* ---- X-ray switch (hero copy + floating copy, kept in sync) ---- */
-  const switches = Array.from(document.querySelectorAll('[data-xray-switch]'));
-  const heroSwitch = switches.find((s) => !s.classList.contains('xray-switch--float'));
-  const floatSwitch = switches.find((s) => s.classList.contains('xray-switch--float'));
-  const gapEls = Array.from(wrap.querySelectorAll('[data-xray-gap]'));
-
-  function labelGaps() {
-    gapEls.forEach((el) => {
-      const mb = parseFloat(getComputedStyle(el).marginBottom);
-      if (!isNaN(mb)) el.setAttribute('data-xray-gap', String(Math.round(mb)));
-    });
-  }
-  function setXray(on) {
-    wrap.classList.toggle('xray', on);
-    switches.forEach((s) => s.setAttribute('aria-checked', String(on)));
-    if (on) labelGaps();
-  }
-  switches.forEach((s) => {
-    s.hidden = false;
-    s.addEventListener('click', () => setXray(!wrap.classList.contains('xray')));
-  });
-  window.addEventListener('resize', () => { if (wrap.classList.contains('xray')) labelGaps(); });
-  document.addEventListener('keydown', (e) => {
-    if (e.key !== 'x' && e.key !== 'X') return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const t = e.target;
-    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
-    setXray(!wrap.classList.contains('xray'));
-  });
-
-  /* Floating switch appears only after the hero switch has scrolled
-     out of view (above the viewport). */
-  if (heroSwitch && floatSwitch && 'IntersectionObserver' in window) {
-    new IntersectionObserver((entries) => {
-      const e = entries[entries.length - 1];
-      floatSwitch.classList.toggle('is-shown', !e.isIntersecting && e.boundingClientRect.bottom <= 0);
-    }).observe(heroSwitch);
-  }
 
   /* ---- Count-ups: [data-count] with data-from / data-to ---- */
   const counters = Array.from(wrap.querySelectorAll('[data-count]'));

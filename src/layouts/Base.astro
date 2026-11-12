@@ -279,5 +279,26 @@ const umamiOn  = !!(umamiSrc && umamiId);
   }
 </script>
 
+<script is:inline>
+/* Open the compose modal on the chat tab with a prefilled message, then
+   focus the name field. Uses only the public window.openComposeModal. */
+window.jjComposeWith = function (message) {
+  if (typeof window.openComposeModal !== 'function') return;
+  window.openComposeModal(0);
+  var tries = 0;
+  (function fill() {
+    var body = document.getElementById('chat-body');
+    if (body) {
+      body.value = message;
+      body.dispatchEvent(new Event('input', { bubbles: true }));
+      var name = document.getElementById('user-name');
+      if (name) name.focus();
+    } else if (tries++ < 20) {
+      setTimeout(fill, 50);
+    }
+  })();
+};
+</script>
+
 </body>
 </html>

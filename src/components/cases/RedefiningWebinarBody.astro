@@ -22,17 +22,6 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
         webinar customization, enhancing the capabilities and flexibility of the
         tool for organizers customizing their webinars.
       </p>
-
-      <div class="rwc-callout">
-        <div class="rwc-callout-title">
-          <span class="rwc-callout-star" aria-hidden="true">★</span>
-          Core achievements
-        </div>
-        <ul>
-          <li>1 out of every 3 webinars created used custom registration fields, 4 months after release.</li>
-          <li>3× the number of weekly webinars created since releasing webinar customization.</li>
-        </ul>
-      </div>
     </div>
 
     <div class="rwc-hero-right">
@@ -42,11 +31,14 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     </div>
   </section>
 
+  {/* Summary + decisions, passed in from [slug].astro */}
+  <slot />
+
   {/* ───────────────────── MY ROLE + KEY INITIATIVES ───────────────────── */}
   <section class="rwc-role" id="case-role">
     <div class="rwc-role-left">
       <div class="eyebrow">My role</div>
-      <h2 class="rwc-h2">Senior / Staff Product Designer</h2>
+      <p class="case-role">Senior / Staff Product Designer</p>
 
       <p>
         I led the design of the Custom Registration Fields feature, as part of a
