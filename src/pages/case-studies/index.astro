@@ -22,7 +22,7 @@ const visible = CASES.filter(c => !c.hidden);
 
       <div class="work-grid">
         {visible.map((c, i) => (
-          <a class={`work-card reveal reveal-d${(i % 2) + 1}`} href={`/case-studies/${c.slug}`} data-umami-event={i < 2 ? 'case-card-index-featured' : 'case-card-index'} data-umami-event-slug={c.slug}>
+          <a class={`case-card work-card reveal reveal-d${(i % 2) + 1}`} href={`/case-studies/${c.slug}`} data-umami-event={i < 2 ? 'case-card-index-featured' : 'case-card-index'} data-umami-event-slug={c.slug}>
             <div class="work-card-media">
               <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading={i < 2 ? 'eager' : 'lazy'} fetchpriority={i < 2 ? 'high' : undefined}>
             </div>
@@ -37,7 +37,7 @@ const visible = CASES.filter(c => !c.hidden);
                   Private
                 </span>
               </div>
-              <h2 class="work-card-title">{c.title}</h2>
+              <h2 class="case-card-title work-card-title">{c.title}</h2>
               <p class="work-card-problem">{c.problem}</p>
               <div class="work-card-foot">
                 <span class="work-card-num">{c.cardNum}</span>
