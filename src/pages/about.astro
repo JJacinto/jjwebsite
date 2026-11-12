@@ -1,5 +1,31 @@
 ---
 import Base from '../layouts/Base.astro';
+
+/* Equaliser bars for the "Now producing" card. Heights are fixed here so
+   the markup is deterministic: --lo/--hi are the scaleY range, --d the
+   cycle time, --i the delay seed. Static end state is --hi. */
+const bars = Array.from({ length: 24 }, (_, i) => {
+  const hi = 0.35 + ((i * 37) % 61) / 100;
+  const lo = 0.12 + ((i * 17) % 23) / 100;
+  const d = 700 + ((i * 53) % 9) * 70;
+  return { i, hi: Math.min(hi, 1).toFixed(2), lo: lo.toFixed(2), d };
+});
+
+const photos = [
+  { src: '/assets/images/photo-astronaut.webp', cap: 'Trained for zero gravity. Employed for zero margin.', k: -2, rot: -6 },
+  { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', k: -1, rot: 3 },
+  { src: '/assets/images/photo-tickets.webp', cap: 'Itinerary: aspirational. Carry-on: overpacked.', k: 0, rot: -2 },
+  { src: '/assets/images/photo-vr.webp', cap: '911 in VR. EV in the garage. Identity crisis.', k: 1, rot: 5 },
+  { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', k: 2, rot: -4 },
+];
+
+const loop = [
+  { n: '01', name: 'Talk', body: "I start in conversation, not in Figma. Most design mistakes I've seen ship began with a blank canvas before the problem was understood.", tools: ['FigJam', 'Dovetail', 'Maze'] },
+  { n: '02', name: 'Map', body: 'I think about the system first and the screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'] },
+  { n: '03', name: 'Cut', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'] },
+  { n: '04', name: 'Ship', body: "Figma is the contract between design, engineering and product. When the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'] },
+  { n: '05', name: 'Measure', body: "Shipped isn't done. This is where I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'] },
+];
 ---
 <Base
   activePage="about"
@@ -9,11 +35,12 @@ import Base from '../layouts/Base.astro';
 >
 
   <div class="about-wrap">
-    <div class="marquee about-marquee">
-      <div class="marquee-track">
-        <span>ABOUT ME</span><span>·</span><span>MY JOURNEY</span><span>·</span><span>HOW I WORK</span><span>·</span>
-        <span>ABOUT ME</span><span>·</span><span>MY JOURNEY</span><span>·</span><span>HOW I WORK</span><span>·</span>
-        <span>ABOUT ME</span><span>·</span><span>MY JOURNEY</span><span>·</span><span>HOW I WORK</span><span>·</span>
+    <!-- X-ray grid: the 12-column grid of the 1140px container. Only
+         visible while the X-ray switch is on. -->
+    <div class="xray-grid" aria-hidden="true">
+      <div class="xray-grid-inner">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
       </div>
     </div>
 
@@ -24,8 +51,16 @@ import Base from '../layouts/Base.astro';
            frame, so no-JS and reduced-motion visitors see the outcome
            and all five steps. The script at the bottom of this file
            plays it once on load. -->
-      <section class="about-story" data-about-story>
-        <h1 class="about-story-title">I turn tangled problems into products people don't have to think about.</h1>
+      <section class="about-story about-section" data-about-story data-xray data-xray-gap="128">
+        <aside class="xray-note" data-xray-note>The story plays once, then rests on its last frame. Reduced motion or no JavaScript? You get the last frame straight away.</aside>
+
+        <div class="about-story-head">
+          <p class="about-intro">
+            <img class="about-intro-avatar" src="/assets/images/photo.webp" alt="João Jacinto" width="40" height="40">
+            <span>João Jacinto · Senior Product Designer at Anchorage Digital · Aveiro, Portugal</span>
+          </p>
+          <h1 class="about-story-title">I turn tangled problems into products people don't have to think about.</h1>
+        </div>
 
         <div class="about-story-stage" aria-hidden="true">
           <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
@@ -55,6 +90,7 @@ import Base from '../layouts/Base.astro';
 
             <rect class="st-pill" x="180" y="142" width="120" height="56" rx="28"/>
             <circle class="st-ball" r="20"/>
+            <text class="st-result" x="240" y="250" text-anchor="middle">40 steps → 1</text>
           </svg>
           <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay">Replay</button>
         </div>
@@ -67,227 +103,287 @@ import Base from '../layouts/Base.astro';
             <li>Cut what nobody would miss.</li>
             <li>Ship the one step that's left.</li>
           </ol>
-          <p class="about-story-note">At Anchorage Digital, this turned a 40-step admin flow into a single configuration step.</p>
+          <p class="about-story-note">That's the story of the policies and permissions redesign at Anchorage Digital.</p>
+
+          <button type="button" role="switch" aria-checked="false" class="xray-switch" data-xray-switch hidden>
+            <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
+            <span class="xray-label">Show the parts you don't see</span>
+          </button>
         </div>
       </section>
 
-      <section class="why-grid reveal">
-        <div>
-          <p>I design products where the complexity can't be removed: dense rule sets, layered permissions, workflows that operations teams run all day. I think about the system first and the screens second. I map how things relate, make the logic visible, then cut whatever nobody would miss.</p>
+      <!-- Where it started -->
+      <section class="about-section origin" data-xray data-xray-gap="128" aria-labelledby="origin-title">
+        <aside class="xray-note" data-xray-note>The only skeuomorphic thing on the site, on purpose. It's 2006 in there.</aside>
+
+        <div class="origin-copy">
+          <span class="eyebrow reveal">Where it started</span>
+          <h2 id="origin-title" class="reveal reveal-d1">I was shipping front-end code at 15.</h2>
+          <p class="reveal reveal-d2">At 13 I was making logos and profile graphics for friends, before I knew any of it was called design. By 15 I was writing themes for Hi5 and MySpace, and some of them had more than 50,000 people using them at once.</p>
+          <p class="reveal reveal-d3">That loop stuck: make something, watch people use it, learn from what breaks. I studied IT engineering, then switched to multimedia design because that was the half I couldn't stop thinking about. I kept both. I still scope what's buildable, talk trade-offs in engineers' language, and build the real interaction when a mock can't carry the argument.</p>
         </div>
-        <div>
-          <p>None of that works without staying close to the people using the product: learning from them, taking their feedback seriously, and letting it shape the next decision. The aim is that they never have to think about the complicated part. I work async by default, write things down, and share context early so the rest of the team isn't left chasing it.</p>
-        </div>
-      </section>
 
-      <hr class="section-divider">
-
-      <section class="about-me">
-        <div class="about-grid">
-          <div class="about-col reveal reveal-d1">
-            <h3>Principles</h3>
-            <ul>
-              <li>Make the invisible visible</li>
-              <li>Cut what nobody would miss</li>
-              <li>Stay close to the people using it</li>
-              <li>Optimise for the next designer</li>
-              <li>Strong opinions, written down</li>
-            </ul>
-          </div>
-          <div class="about-col reveal reveal-d2">
-            <h3>Passions</h3>
-            <ul>
-              <li>Music production, drums</li>
-              <li>Building with AI</li>
-              <li>RPGs and VR racing</li>
-              <li>Premier league football</li>
-              <li>3D printing</li>
-            </ul>
-          </div>
-          <div class="about-col reveal reveal-d3">
-            <h3>Currently</h3>
-            <ul>
-              <li>Building: <a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a></li>
-              <li>Shipping: <a href="/">joaojacinto.com</a></li>
-              <li>Listening: <a href="https://music.youtube.com/playlist?list=OLAK5uy_mT0JOV9xVWCyrOWBjjfpjAF-0LfyxGVW8" target="_blank" rel="noopener noreferrer">Vulfmon</a>, <a href="https://music.youtube.com/watch?v=I8NzXaIQY54" target="_blank" rel="noopener noreferrer">Oli Howe</a></li>
-              <li>Producing: <a href="https://music.youtube.com/watch?v=80hpbDstlhc&list=OLAK5uy_mex7K9FoXhQBxg8yKviL81Avmz9Xfh4WI" target="_blank" rel="noopener noreferrer">Boreal Haze</a></li>
-              <li>Reading: <a href="https://www.amazon.es/dp/1260474186?ref=ppx_yo2ov_dt_b_fed_asin_title" target="_blank" rel="noopener noreferrer">Crucial Conversations</a></li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <hr class="section-divider">
-
-      <h2 class="stack-title reveal">My journey</h2>
-
-      <div class="timeline">
-      <section class="journey">
-        <div class="journey-row reveal">
-          <div class="journey-year">2024–now</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">Member of Product Design Team (Senior IC)</span>
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="anchorage" href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">at Anchorage Digital</a>
+        <figure class="origin-figure reveal reveal-d2">
+          <span class="sr-only">A reconstructed 2006-era profile theme</span>
+          <div class="theme-card" aria-hidden="true">
+            <span class="theme-spark theme-spark--a">✦</span>
+            <span class="theme-spark theme-spark--b">✦</span>
+            <div class="theme-bar">
+              <span class="theme-name">jo40_design ✦</span>
             </div>
-            <p class="journey-desc">Crypto/web3 infrastructure for institutional clients — Core Experience</p>
-            <ul class="journey-achievements">
-              <li class="journey-achievement">Redesigned the policies and permissions system — collapsed a 40-step admin flow into a single configuration step</li>
-            </ul>
-          </div>
-        </div>
-        <div class="journey-row reveal">
-          <div class="journey-year">2022–2024</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">Senior → Staff Product Designer</span>
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="streamyard" href="https://streamyard.com" target="_blank" rel="noopener noreferrer">at StreamYard</a>
-            </div>
-            <p class="journey-desc">Live streaming SaaS. Webinars product UX, research ops, and the design system.</p>
-            <ul class="journey-achievements">
-              <li class="journey-achievement">Tripled weekly webinar volume after shipping the customisation feature</li>
-            </ul>
-          </div>
-        </div>
-        <div class="journey-row reveal">
-          <div class="journey-year">2021–2022</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">Senior Product Designer</span>
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="talkdesk" href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer">at Talkdesk</a>
-            </div>
-            <p class="journey-desc">AI trainer for customer support — pre-LLM era.</p>
-            <ul class="journey-achievements">
-              <li class="journey-achievement">Redesigned the human-in-the-loop labeling tool that CX teams used to train conversational AI models — pre-LLM era</li>
-            </ul>
-          </div>
-        </div>
-        <div class="journey-row reveal">
-          <div class="journey-year">2017–2021</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">Product Designer</span>
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="namecheap" href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">at Namecheap</a>
-            </div>
-            <p class="journey-desc">Domains & hosting. Internal support tooling, iterating with 200+ agents daily.</p>
-            <ul class="journey-achievements">
-              <li class="journey-achievement">Hit 97.4% positive feedback within 4 months of launching the new chat &amp; support experience</li>
-            </ul>
-          </div>
-        </div>
-        <div class="journey-row reveal">
-          <div class="journey-year">2015–2017</div>
-          <div>
-            <div class="journey-title">
-              <span class="journey-role">UX/UI Designer</span>
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="beubi" href="https://github.com/beubi" target="_blank" rel="noopener noreferrer">at Be.Ubi</a>
-            </div>
-            <p class="journey-desc">3D printing software, plus a land registry system for a Portuguese municipality.</p>
-            <ul class="journey-achievements">
-              <li class="journey-achievement">Rebuilt the 3D printing software after embedding with the team and running client interviews</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="influences">
-        <span class="eyebrow reveal">Roots &amp; Influences</span>
-        <div class="influences-layout reveal reveal-d1">
-
-          <div class="influences-narrative">
-            <p>The line between design and engineering has always been a tool for me, not a fence.</p>
-            <p>I was doing digital branding for friends at 13 — logos, profile graphics, whatever they needed — before I'd even thought of it as design. By 15 I was shipping front-end code: themes for Hi5 and MySpace, some pulling 50,000+ concurrent users. That loop of making something, watching people use it, and learning from what breaks set the pattern early.</p>
-            <p>IT engineering taught me how products work; multimedia design was where I learned how they communicate. I pivoted because the second half was the one I couldn't stop thinking about — but I've kept both halves active. A decade across enterprise SaaS, crypto, live streaming, and AI tooling later, the engineering half still shapes how I design: I scope what's buildable, talk tradeoffs in engineers' language, and ship the real interaction when a mock can't carry the argument. With AI in the loop, that fluency matters more, not less — prompting a model to build something is still an engineering conversation, just at a higher level.</p>
-          </div>
-
-          <div class="influences-right" style="display:none">
-            <div class="influences-block">
-              <h3>Resources I learn from</h3>
-              <div class="avatar-grid">
-                <a class="avatar-item" href="https://www.nngroup.com" target="_blank" rel="noopener noreferrer" aria-label="Nielsen Norman Group">
-                  <img src="/assets/influences/nngroup.png" alt="Nielsen Norman Group" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://stratechery.com" target="_blank" rel="noopener noreferrer" aria-label="Stratechery">
-                  <img src="/assets/influences/stratechery.png" alt="Stratechery" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://www.lennysnewsletter.com" target="_blank" rel="noopener noreferrer" aria-label="Lenny's Newsletter">
-                  <img src="/assets/influences/lennys.png" alt="Lenny's Newsletter" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://paulgraham.com/essays.html" target="_blank" rel="noopener noreferrer" aria-label="Paul Graham Essays">
-                  <img src="/assets/influences/paulgraham.png" alt="Paul Graham Essays" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://www.figma.com/blog/" target="_blank" rel="noopener noreferrer" aria-label="Figma Blog">
-                  <img src="/assets/influences/figma.png" alt="Figma Blog" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://linear.app/blog" target="_blank" rel="noopener noreferrer" aria-label="Linear Blog">
-                  <img src="/assets/influences/linear.png" alt="Linear Blog" width="200" height="200" loading="lazy">
-                </a>
+            <div class="theme-body">
+              <div class="theme-avatar"><img src="/assets/images/photo.webp" alt="" width="48" height="48"></div>
+              <div class="theme-info">
+                <div class="theme-tabs"><span class="is-on">Profile</span><span>Friends</span><span>Scraps</span></div>
+                <div class="theme-online"><span class="theme-online-dot"></span>Online now: <b data-count data-from="0" data-to="50000" data-format="grouped" data-suffix="+" data-duration="1400">50,000+</b></div>
               </div>
             </div>
+            <div class="theme-lines"><i></i><i></i><i></i></div>
+          </div>
+          <figcaption class="origin-caption">Reconstructed from memory. The original is lost to a 2007 hard drive.</figcaption>
+        </figure>
+      </section>
 
-            <div class="influences-block">
-              <h3>People who shape how I think</h3>
-              <div class="avatar-grid">
-                <a class="avatar-item" href="https://en.wikipedia.org/wiki/Dieter_Rams" target="_blank" rel="noopener noreferrer" aria-label="Dieter Rams">
-                  <img src="/assets/influences/dieter-rams.jpg" alt="Dieter Rams" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://jnd.org" target="_blank" rel="noopener noreferrer" aria-label="Don Norman">
-                  <img src="/assets/influences/don-norman.jpg" alt="Don Norman" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://www.juliezhuo.com" target="_blank" rel="noopener noreferrer" aria-label="Julie Zhuo">
-                  <img src="/assets/influences/julie-zhuo.jpg" alt="Julie Zhuo" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://en.wikipedia.org/wiki/Jony_Ive" target="_blank" rel="noopener noreferrer" aria-label="Jony Ive">
-                  <img src="/assets/influences/jony-ive.jpg" alt="Jony Ive" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://en.wikipedia.org/wiki/Paul_Rand" target="_blank" rel="noopener noreferrer" aria-label="Paul Rand">
-                  <img src="/assets/influences/paul-rand.jpg" alt="Paul Rand" width="200" height="200" loading="lazy">
-                </a>
-                <a class="avatar-item" href="https://en.wikipedia.org/wiki/John_Maeda" target="_blank" rel="noopener noreferrer" aria-label="John Maeda">
-                  <img src="/assets/influences/john-maeda.jpg" alt="John Maeda" width="200" height="200" loading="lazy">
-                </a>
+      <!-- How I work -->
+      <section class="about-section loop" data-xray data-xray-gap="128" aria-labelledby="loop-title">
+        <aside class="xray-note" data-xray-note>Same five beats as the story up top. I already told it in motion, so here each step just gets its tools.</aside>
+
+        <div class="about-head">
+          <span class="eyebrow reveal">How I work</span>
+          <h2 id="loop-title" class="about-head-narrow reveal reveal-d1">Find the smallest version of the real problem. Then build the smallest version of a real answer.</h2>
+        </div>
+
+        <div class="loop-track">
+          <span class="loop-line" data-inview aria-hidden="true"></span>
+          <ol class="loop-row">
+            {loop.map((s, i) => (
+              <li class={`loop-card reveal reveal-d${Math.min(i + 1, 4)}`}>
+                <span class="loop-num">{s.n}</span>
+                <h3 class="loop-name">{s.name}</h3>
+                <p class="loop-body">{s.body}</p>
+                <ul class="loop-tools">
+                  {s.tools.map((t) => <li>{t}</li>)}
+                </ul>
+              </li>
+            ))}
+          </ol>
+          <p class="loop-repeat reveal reveal-d4"><span aria-hidden="true">↺</span> repeat</p>
+        </div>
+
+        <p class="loop-foot reveal">The rest saves time: Claude, Gemini, Raycast and Wisprflow. The tools change every few years. The habit doesn't.</p>
+      </section>
+
+      <!-- Principles -->
+      <section class="about-section principles" data-xray data-xray-gap="128" aria-labelledby="principles-title">
+        <aside class="xray-note" data-xray-note>Each card does what it says. Hover it, or tab to it.</aside>
+
+        <div class="about-head">
+          <span class="eyebrow reveal">Principles</span>
+          <h2 id="principles-title" class="about-head-narrow reveal reveal-d1">Five rules I keep coming back to.</h2>
+        </div>
+
+        <div class="p-grid">
+          <article class="p-card reveal reveal-d1" tabindex="0">
+            <div class="p-demo p-demo--grid" aria-hidden="true">
+              <div class="d1-grid"></div>
+              <div class="d1-mock">
+                <i class="d1-bar d1-bar--a"></i>
+                <b class="d1-gap" data-v="16"></b>
+                <i class="d1-bar d1-bar--b"></i>
+                <b class="d1-gap d1-gap--lg" data-v="24"></b>
+                <i class="d1-btn"></i>
               </div>
+            </div>
+            <h3 class="p-title">Make the invisible visible.</h3>
+            <p class="p-body">Rules, permissions and dependencies belong on the screen, not in someone's head.</p>
+          </article>
+
+          <article class="p-card reveal reveal-d2" tabindex="0">
+            <div class="p-demo" aria-hidden="true">
+              <p class="d2-text">This is <span class="d2-fill">really</span><span class="d2-fill">just</span><span class="d2-fill">basically</span>a sentence that <span class="d2-fill">actually</span>says <span class="d2-fill">very</span>little.</p>
+            </div>
+            <h3 class="p-title">Cut what nobody would miss.</h3>
+            <p class="p-body">Every step, field and setting has to earn its place.</p>
+          </article>
+
+          <article class="p-card reveal reveal-d3" tabindex="0">
+            <div class="p-demo" aria-hidden="true">
+              <div class="d3-stage">
+                <span class="d3-line"></span>
+                <span class="d3-dot d3-dot--me"><i></i><em>me</em></span>
+                <span class="d3-dot d3-dot--them"><i></i><em>them</em></span>
+              </div>
+            </div>
+            <h3 class="p-title">Stay close to the people using it.</h3>
+            <p class="p-body">Their feedback shapes the next decision, not the last slide of the deck.</p>
+          </article>
+
+          <article class="p-card reveal reveal-d1" tabindex="0">
+            <div class="p-demo" aria-hidden="true">
+              <div class="d4-panel">
+                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Frame 412</span><span class="d4-new">Card / Header</span></span></div>
+                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Group 87 copy</span><span class="d4-new">Card / Actions</span></span></div>
+                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Rectangle 3</span><span class="d4-new">Card / Surface</span></span></div>
+              </div>
+            </div>
+            <h3 class="p-title">Optimise for the next designer.</h3>
+            <p class="p-body">Name things, document decisions, leave the file better than you found it.</p>
+          </article>
+
+          <article class="p-card reveal reveal-d2" tabindex="0">
+            <div class="p-demo" aria-hidden="true">
+              <div class="d5-doc">
+                <i class="d5-h"></i>
+                <p class="d5-line">Decision: we ship the single step.<span class="d5-caret"></span></p>
+                <i class="d5-sk"></i>
+                <span class="d5-bubble">Pushback welcome ↗</span>
+              </div>
+            </div>
+            <h3 class="p-title">Strong opinions, written down.</h3>
+            <p class="p-body">Opinions go in a doc where people can push back, not just in a meeting.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Journey -->
+      <section class="about-section journey" data-xray data-xray-gap="128" aria-labelledby="journey-title">
+        <aside class="xray-note" data-xray-note>One number per role. Where there was no honest number, there's a word instead of a made-up stat.</aside>
+
+        <div class="about-head">
+          <span class="eyebrow reveal">Journey</span>
+          <h2 id="journey-title" class="reveal reveal-d1">Ten years, one thread.</h2>
+        </div>
+
+        <ol class="journey-list">
+          <li class="journey-item reveal">
+            <div class="journey-years">2024–now</div>
+            <div class="journey-main">
+              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="anchorage" href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a>
+              <p class="journey-role">Senior Product Designer (IC), Core Experience</p>
+              <p class="journey-line">Crypto infrastructure for institutions.</p>
+            </div>
+            <div class="journey-stat">
+              <p class="journey-num">40 → <span data-count data-from="40" data-to="1" data-duration="1100">1</span></p>
+              <p class="journey-label">admin steps after the policies and permissions redesign</p>
+            </div>
+          </li>
+          <li class="journey-item reveal">
+            <div class="journey-years">2022–2024</div>
+            <div class="journey-main">
+              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="streamyard" href="https://streamyard.com" target="_blank" rel="noopener noreferrer">StreamYard</a>
+              <p class="journey-role">Senior → Staff Product Designer</p>
+              <p class="journey-line">Live streaming. Webinars UX, research ops and the design system.</p>
+            </div>
+            <div class="journey-stat">
+              <p class="journey-num"><span data-count data-from="1" data-to="3" data-suffix="×" data-duration="1100">3×</span></p>
+              <p class="journey-label">weekly webinar volume after shipping customisation</p>
+            </div>
+          </li>
+          <li class="journey-item reveal">
+            <div class="journey-years">2021–2022</div>
+            <div class="journey-main">
+              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="talkdesk" href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer">Talkdesk</a>
+              <p class="journey-role">Senior Product Designer</p>
+              <p class="journey-line">AI for customer support, before LLMs.</p>
+            </div>
+            <div class="journey-stat">
+              <p class="journey-num">Pre-LLM</p>
+              <p class="journey-label">redesigned the labelling tool CX teams used to train conversational AI</p>
+            </div>
+          </li>
+          <li class="journey-item reveal">
+            <div class="journey-years">2017–2021</div>
+            <div class="journey-main">
+              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="namecheap" href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">Namecheap</a>
+              <p class="journey-role">Product Designer</p>
+              <p class="journey-line">Domains and hosting. Internal support tools, iterated daily with 200+ agents.</p>
+            </div>
+            <div class="journey-stat">
+              <p class="journey-num"><span data-count data-from="0" data-to="97.4" data-decimals="1" data-suffix="%" data-duration="1100">97.4%</span></p>
+              <p class="journey-label">positive feedback four months after the new chat and support launch</p>
+            </div>
+          </li>
+          <li class="journey-item reveal">
+            <div class="journey-years">2015–2017</div>
+            <div class="journey-main">
+              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="beubi" href="https://github.com/beubi" target="_blank" rel="noopener noreferrer">Be.Ubi</a>
+              <p class="journey-role">UX/UI Designer</p>
+              <p class="journey-line">3D printing software and a land registry system for a Portuguese municipality.</p>
+            </div>
+            <div class="journey-stat">
+              <p class="journey-num">3D</p>
+              <p class="journey-label">rebuilt the printing software after embedding with the team and interviewing clients</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Off the clock -->
+      <section class="about-section board" data-xray data-xray-gap="128" aria-labelledby="board-title">
+        <aside class="xray-note" data-xray-note>The photos are 192px. Small on purpose: this part is about the person, not the portfolio.</aside>
+
+        <div class="about-head">
+          <span class="eyebrow reveal">Off the clock</span>
+          <h2 id="board-title" class="reveal reveal-d1">When I'm not designing.</h2>
+        </div>
+
+        <div class="board-grid">
+          <div class="b-card b-photos reveal">
+            <div class="polaroids" tabindex="0" role="group" aria-label="Photos">
+              {photos.map((p) => (
+                <figure class="polaroid" style={`--k:${p.k};--rot:${p.rot}deg`}>
+                  <img src={p.src} alt="" width="192" height="192" loading="lazy">
+                  <figcaption>{p.cap}</figcaption>
+                </figure>
+              ))}
             </div>
           </div>
 
-        </div>
-      </section>
-      </div>
-
-      <hr class="section-divider">
-
-      <section class="how-i-work" aria-labelledby="how-i-work-title">
-        <h2 id="how-i-work-title" class="stack-title reveal">How I work</h2>
-
-        <div class="how-i-work-grid">
-          <div class="how-i-work-body">
-          <p class="reveal">Over 10+ years of shipping product, one habit has stuck: find the smallest version of the real problem, then build the smallest version of a real answer. Everything below is in service of that.</p>
-
-          <p class="reveal">I start in conversation, not Figma. Most design mistakes I've watched ship started with someone opening a blank canvas before the problem was understood. So I spend more time than feels comfortable in FigJam, Dovetail, and Maze.</p>
-
-          <p class="reveal">Figma is the contract between design, engineering, and product. When the dev opens a file and finds nothing surprising, I've done my job.</p>
-
-          <p class="reveal">Shipped isn't done. Fullstory, Mixpanel, and Looker are how I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.</p>
-
-          <p class="reveal">The rest saves time. Claude and Gemini turn hours of writing and reviewing into minutes. Raycast and Wisprflow take the friction out of the parts of the day that aren't design.</p>
-
-          <p class="reveal">The tools change. The habit doesn't. Five years ago this list had Sketch, Principle, and InVision. In five years it'll have things that don't exist yet. What stays: small problems, small answers, motion early, ship, measure, repeat.</p>
+          <div class="b-card b-music reveal reveal-d1" data-live>
+            <span class="eyebrow b-label">Producing</span>
+            <a class="b-title" data-umami-event="about-music" href="https://music.youtube.com/watch?v=80hpbDstlhc&list=OLAK5uy_mex7K9FoXhQBxg8yKviL81Avmz9Xfh4WI" target="_blank" rel="noopener noreferrer">Boreal Haze</a>
+            <div class="eq" aria-hidden="true">
+              {bars.map((b) => <span style={`--i:${b.i};--hi:${b.hi};--lo:${b.lo};--d:${b.d}ms`}></span>)}
+            </div>
+            <p class="b-sub">Listening to <a href="https://music.youtube.com/playlist?list=OLAK5uy_mT0JOV9xVWCyrOWBjjfpjAF-0LfyxGVW8" target="_blank" rel="noopener noreferrer">Vulfmon</a>, <a href="https://music.youtube.com/watch?v=I8NzXaIQY54" target="_blank" rel="noopener noreferrer">Oli Howe</a></p>
           </div>
 
-          <div class="how-i-work-divider" aria-hidden="true"></div>
+          <div class="b-card b-read reveal reveal-d2">
+            <span class="eyebrow b-label">Reading</span>
+            <div class="b-read-row">
+              <div class="book" aria-hidden="true"><span>Crucial Conversations</span></div>
+              <a class="b-title b-title--sm" href="https://www.amazon.es/dp/1260474186" target="_blank" rel="noopener noreferrer">Crucial Conversations</a>
+            </div>
+          </div>
 
-          <dl class="tool-index reveal">
-          <dt>Research</dt><dd>FigJam · Maze · Dovetail</dd>
-          <dt>Design</dt><dd>Figma · Jitter · Retune.dev</dd>
-          <dt>Measure</dt><dd>Fullstory · Mixpanel · Looker</dd>
-          <dt>Team</dt><dd>Slack · Loom · Linear · Notion</dd>
-          <dt>Daily</dt><dd>Raycast · Wisprflow · Claude · Gemini</dd>
-          <dt>Key hardware</dt><dd>Steelcase Leap v2 · Odyssey G9 · Logitech MX combo · Deltahub Carpio</dd>
-          </dl>
+          <div class="b-card b-build reveal reveal-d3">
+            <span class="eyebrow b-label">Building</span>
+            <p class="b-line"><a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a></p>
+            <p class="b-line"><span class="pulse-dot" aria-hidden="true"></span>joaojacinto.com (you're on it)</p>
+          </div>
+
+          <div class="b-card b-into reveal reveal-d1">
+            <span class="eyebrow b-label">Also into</span>
+            <ul class="chips">
+              <li>Drums</li><li>Music production</li><li>Building with AI</li><li>RPGs</li><li>VR racing</li><li>Premier League</li><li>3D printing</li>
+            </ul>
+          </div>
+
+          <div class="b-card b-desk reveal reveal-d2">
+            <span class="eyebrow b-label">At the desk</span>
+            <p class="b-desk-text">Steelcase Leap v2 · Odyssey G9 · Logitech MX · Deltahub Carpio</p>
+          </div>
         </div>
       </section>
 
     </div>
+
+    <!-- Floating copy of the X-ray switch: shows once the hero switch has
+         scrolled out of view. -->
+    <button type="button" role="switch" aria-checked="false" aria-label="Show the parts you don't see" class="xray-switch xray-switch--float" data-xray-switch hidden>
+      <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
+      <span class="xray-label" aria-hidden="true">X-ray</span>
+    </button>
   </div>
 
 </Base>
@@ -362,6 +458,13 @@ import Base from '../layouts/Base.astro';
     story.classList.remove('is-playing');
     steps.forEach((li) => li.classList.remove('is-active', 'is-done'));
     replay.hidden = false;
+    /* Chromium can keep cancelled fill-forwards values on SVG children
+       (stray dots and the row left on the final frame, mostly at phone
+       widths). Write the final frame as inline styles so it can't. */
+    [tangle, row].concat(edges, nodes.map((n) => n.el)).forEach((el) => { el.style.opacity = '0'; });
+    pill.style.opacity = '1';
+    pill.style.transform = 'none';
+    ball.style.transform = 'translate(' + ON[0] + 'px,' + ON[1] + 'px)';
   }
 
   async function play() {
@@ -371,6 +474,7 @@ import Base from '../layouts/Base.astro';
     playing = true;
     story.classList.add('is-playing');
     stage.classList.add('is-paper');
+    stage.querySelectorAll('svg *').forEach((el) => el.removeAttribute('style'));
 
     set(pill, { opacity: 0 });
     set(ball, { transform: T([240, -30], 0.45) });
@@ -440,6 +544,9 @@ import Base from '../layouts/Base.astro';
     /* Switch on: the sketch flips to the finished state in one frame. */
     stage.classList.remove('is-paper');
     a(ball, [{ transform: T(OFF, 1) }, { transform: T(ON, 1) }], { duration: 280, easing: SPRING });
+    /* The "40 steps → 1" label is hidden by .is-playing and fades in
+       via CSS when settle() removes that class. A WAAPI fill on SVG
+       text left its opacity stale after cancel() in Chromium. */
     await wait(600); if (!live()) return;
     settle();
   }
@@ -455,5 +562,105 @@ import Base from '../layouts/Base.astro';
   story.classList.add('is-playing');
   stage.classList.add('is-paper', 'is-pending');
   setTimeout(play, 300);
+})();
+</script>
+
+<script is:inline>
+/* About page behaviour: X-ray switch, count-ups, in-view hooks. */
+(function () {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wrap = document.querySelector('.about-wrap');
+  if (!wrap) return;
+  wrap.classList.add('js');
+
+  /* ---- X-ray switch (hero copy + floating copy, kept in sync) ---- */
+  const switches = Array.from(document.querySelectorAll('[data-xray-switch]'));
+  const heroSwitch = switches.find((s) => !s.classList.contains('xray-switch--float'));
+  const floatSwitch = switches.find((s) => s.classList.contains('xray-switch--float'));
+  const gapEls = Array.from(wrap.querySelectorAll('[data-xray-gap]'));
+
+  function labelGaps() {
+    gapEls.forEach((el) => {
+      const mb = parseFloat(getComputedStyle(el).marginBottom);
+      if (!isNaN(mb)) el.setAttribute('data-xray-gap', String(Math.round(mb)));
+    });
+  }
+  function setXray(on) {
+    wrap.classList.toggle('xray', on);
+    switches.forEach((s) => s.setAttribute('aria-checked', String(on)));
+    if (on) labelGaps();
+  }
+  switches.forEach((s) => {
+    s.hidden = false;
+    s.addEventListener('click', () => setXray(!wrap.classList.contains('xray')));
+  });
+  window.addEventListener('resize', () => { if (wrap.classList.contains('xray')) labelGaps(); });
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'x' && e.key !== 'X') return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    setXray(!wrap.classList.contains('xray'));
+  });
+
+  /* Floating switch appears only after the hero switch has scrolled
+     out of view (above the viewport). */
+  if (heroSwitch && floatSwitch && 'IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      const e = entries[entries.length - 1];
+      floatSwitch.classList.toggle('is-shown', !e.isIntersecting && e.boundingClientRect.bottom <= 0);
+    }).observe(heroSwitch);
+  }
+
+  /* ---- Count-ups: [data-count] with data-from / data-to ---- */
+  const counters = Array.from(wrap.querySelectorAll('[data-count]'));
+  const fmt = (el, v) => {
+    const dec = Number(el.dataset.decimals || 0);
+    const body = el.dataset.format === 'grouped'
+      ? Math.round(v).toLocaleString('en-US')
+      : v.toFixed(dec);
+    return body + (el.dataset.suffix || '');
+  };
+  function runCount(el) {
+    const from = Number(el.dataset.from), to = Number(el.dataset.to);
+    const dur = Number(el.dataset.duration || 1100);
+    const start = performance.now();
+    function frame(now) {
+      const t = Math.min((now - start) / dur, 1);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = fmt(el, from + (to - from) * eased);
+      if (t < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  if (!reduce && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        io.unobserve(en.target);
+        runCount(en.target);
+      });
+    }, { threshold: 0.6 });
+    counters.forEach((el) => { el.textContent = fmt(el, Number(el.dataset.from)); io.observe(el); });
+  }
+
+  /* ---- In-view hooks: [data-inview] gets .in once; [data-live] toggles .is-live ---- */
+  if ('IntersectionObserver' in window) {
+    const once = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        en.target.classList.add('in');
+        once.unobserve(en.target);
+      });
+    }, { threshold: 0.3 });
+    wrap.querySelectorAll('[data-inview]').forEach((el) => once.observe(el));
+
+    const live = new IntersectionObserver((entries) => {
+      entries.forEach((en) => en.target.classList.toggle('is-live', en.isIntersecting));
+    }, { threshold: 0.2 });
+    wrap.querySelectorAll('[data-live]').forEach((el) => live.observe(el));
+  } else {
+    wrap.querySelectorAll('[data-inview]').forEach((el) => el.classList.add('in'));
+  }
 })();
 </script>
