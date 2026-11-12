@@ -7,14 +7,23 @@ on:
       - 'src/**'
       - 'public/**'
       - 'astro.config.mjs'
+      - 'design-system/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'tsconfig.json'
       - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
+# One deploy at a time; a newer push replaces a queued one.
+concurrency:
+  group: deploy-nas
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # A healthy deploy takes ~2 min. Never sit for hours waiting on a login.
+    timeout-minutes: 10
     env:
       TUNNEL_SERVICE_TOKEN_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
       TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
@@ -69,7 +78,14 @@ jobs:
 
       - name: Test SSH connection
         run: |
-          ssh -F "$HOME/.ssh/config" nas "echo 'SSH connection successful' && whoami && hostname"
+          # With a valid Cloudflare Access service token this takes seconds.
+          # If Access rejects the token, cloudflared prints a browser login URL
+          # and waits forever, so cap it and say what to fix.
+          if ! timeout 90 ssh -F "$HOME/.ssh/config" -o BatchMode=yes -o ConnectTimeout=30 nas \
+               "echo 'SSH connection successful' && whoami && hostname" </dev/null; then
+            echo "::error title=Cloudflare Access recusou o token::O túnel pediu login no browser em vez de aceitar o service token. No Cloudflare Zero Trust: renovar o service token e confirmar que a aplicação ssh.joaojacinto.com tem uma política 'Service Auth' com esse token; depois atualizar os secrets CF_ACCESS_CLIENT_ID e CF_ACCESS_CLIENT_SECRET no GitHub."
+            exit 1
+          fi
 
       - name: Deploy via tar over SSH
         run: |
@@ -90,7 +106,7 @@ jobs:
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CF_ZONE_ID: ${{ secrets.CF_ZONE_ID }}
         run: |
-          curl -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+          curl -sS --fail-with-body -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
             --data '{"purge_everything":true}'
