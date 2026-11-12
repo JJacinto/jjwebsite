@@ -1,0 +1,264 @@
+---
+/* Home page work wall: eight tiles, each a small looping mockup of one
+   decision. Hover, focus or tap shows the decision behind it; with X-ray
+   on, every tile shows it at once. Facts come from src/data/cases.ts.
+   Styles live in global.css, "HOME - Work wall". */
+import { CASES } from '../../data/cases';
+
+const slugOf = (slug: string) => {
+  const c = CASES.find((x) => x.slug === slug);
+  if (!c) throw new Error('WorkWall: unknown case ' + slug);
+  return `/case-studies/${c.slug}`;
+};
+
+type Tile = {
+  id: string; cat: 'ui' | 'ds' | 'rs' | 'ft'; company: string; title: string;
+  href?: string; col: number; span: number;
+  decision: string; resultLabel: string; result: string;
+};
+
+const tiles: Tile[] = [
+  { id: 'a', cat: 'ui', company: 'StreamYard', title: 'One colour, whole palette', href: slugOf('redefining-webinar-customization'), col: 1, span: 32,
+    decision: 'I cut the full page builder. One colour choice generates the whole palette, so hosts get an on-brand webinar without designing one.',
+    resultLabel: 'Result', result: 'Weekly webinars went from about 200 to about 600.' },
+  { id: 'b', cat: 'ui', company: 'StreamYard', title: 'Custom registration fields', href: slugOf('redefining-webinar-customization'), col: 3, span: 48,
+    decision: 'Registration only collected a name and an email. I shipped a settings page with five custom registration fields.',
+    resultLabel: 'Result', result: '32.9% of webinars used custom fields within four months.' },
+  { id: 'c', cat: 'rs', company: 'StreamYard', title: 'Journey map', href: slugOf('understanding-webinar-organizers'), col: 1, span: 30,
+    decision: 'The roadmap came from sales calls and support tickets. I interviewed organisers who paid for competing tools, then mapped five stages for the whole company.',
+    resultLabel: 'Result', result: "The company's first shared knowledge base on webinar organisers. Two other teams briefed." },
+  { id: 'd', cat: 'ds', company: 'StreamYard', title: 'Five versions, one button', href: slugOf('leading-and-managing-a-design-system'), col: 2, span: 32,
+    decision: 'Some components existed in five or more versions. I skipped new headcount and a big-bang rebuild. Designers from six teams proposed components through fixed checkpoints.',
+    resultLabel: 'Result', result: 'Six teams on one roadmap.' },
+  { id: 'e', cat: 'ds', company: 'StreamYard', title: 'Theme from one setting', href: slugOf('leading-and-managing-a-design-system'), col: 2, span: 31,
+    decision: 'Tokens first. Scoped variables mean the whole theme switches between light and dark with one setting.',
+    resultLabel: 'Result', result: 'Tokens and 15+ specified components, with six teams on one roadmap.' },
+  { id: 'f', cat: 'ui', company: 'Namecheap', title: 'Floating chat widget', href: slugOf('designing-a-support-chat-experience'), col: 2, span: 34,
+    decision: 'The old tool opened a separate window. I cut it, and the chat became a floating widget that stays with you while you browse.',
+    resultLabel: 'Result', result: 'Chats grew 28.9% in four months, and 97.4% of feedback was positive.' },
+  { id: 'g', cat: 'ui', company: 'Namecheap', title: 'Agent app', href: slugOf('designing-a-support-chat-experience'), col: 1, span: 34,
+    decision: 'Agents handled five or more chats across 20+ browser tabs. I designed one agent app so they could work from a single place.',
+    resultLabel: 'Result', result: 'An agent app and a white-label design system for namecheap.com and ssls.com.' },
+  { id: 'h', cat: 'ft', company: 'Anchorage', title: '40 steps → 1', col: 3, span: 48,
+    decision: 'A 40-step admin flow for policies and permissions became one configuration step.',
+    resultLabel: 'Status', result: 'Case study in progress.' },
+];
+
+const cats = [
+  { f: 'all', label: 'All' },
+  { f: 'ui', label: 'Product UI' },
+  { f: 'ds', label: 'Design systems' },
+  { f: 'rs', label: 'Research' },
+  { f: 'ft', label: 'Fintech' },
+];
+const count = (f: string) => (f === 'all' ? tiles.length : tiles.filter((t) => t.cat === f).length);
+
+/* Mockup pieces generated here so the markup is static and the resting
+   state is the final frame (no JS needed). */
+const formFields = [['t', 40], ['d', 54], ['t', 34], ['c', 58], ['t', 46]].map(([k, w], i) => ({ k: k as string, w: w as number, i }));
+const journey = [0, 1, 2, 3, 4].map((c) => ({
+  c,
+  notes: [0, 1, 2].map((n) => {
+    const i = c * 3 + n;
+    return {
+      i, s: (4 + i * 2.4).toFixed(1), nh: [95, 285, 165][i % 3],
+      x: ((i * 37) % 11 - 5) * 13, y: ((i * 53) % 9 - 4) * 13, rt: ((i * 29) % 9 - 4) * 5,
+      w1: 70 - (i % 4) * 10, w2: 46 + (i % 3) * 12,
+    };
+  }),
+}));
+const variants = [[-80, -2, 26, 20, 'oklch(.52 .17 270)'], [-40, 1.5, -14, -4, 'oklch(.6 .16 290)'], [0, 0, 0, 0, 'oklch(.5 .15 255)'], [40, -1.5, 12, -6, 'oklch(.58 .13 275)'], [80, 2, -22, 6, 'oklch(.46 .17 262)']];
+const tabs = Array.from({ length: 24 }, (_, i) => {
+  const c = i % 6, r = Math.floor(i / 6);
+  return { i, left: 11 + c * 45, top: 30 + r * 23, s: (10 + c * 1.5).toFixed(1), dx: 144 - (11 + c * 45 + 20), dy: 70 - (30 + r * 23 + 9), th: (i * 47) % 360 };
+});
+const inbox = [210, 25, 150, 300, 80].map((h, i) => ({ h, i, s: 36 + i * 4 }));
+const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy: 138 - (i * 7 + 2), w: [62, 84, 46, 72, 90, 54][i % 6], k: i % 8 === 0 }));
+---
+<div class="wall-controls reveal">
+  <div class="wall-chips" role="group" aria-label="Filter work">
+    {cats.map((c) => (
+      <button type="button" class="wall-chip" data-f={c.f} aria-pressed={c.f === 'all' ? 'true' : 'false'} data-umami-event="home-wall-filter" data-umami-event-filter={c.f}>
+        {c.label} <em>{count(c.f)}</em>
+      </button>
+    ))}
+  </div>
+  <button type="button" class="wall-pause" aria-pressed="false" data-umami-event="home-wall-pause"><span class="wall-sw" aria-hidden="true"></span>Pause previews</button>
+</div>
+
+<div class="wall" id="wall" role="list" aria-label="Selected work">
+  {tiles.map((t) => (
+    <article class="tile" role="listitem" data-cat={t.cat} tabindex="0" style={`--col:${t.col};--span:${t.span}`} aria-label={`${t.company}, ${t.title}`}>
+      <div class="media" aria-hidden="true">
+        {t.id === 'a' && (
+          <div class="mock a">
+            <div class="pick cd"><span class="dot hue"></span><div class="sw"><i style="--sh:265"></i><i style="--sh:165"></i><i style="--sh:25"></i><i style="--sh:320"></i><b class="ring"></b></div></div>
+            <div class="pal"><i class="hue" style="--L:.95;--i:1"></i><i class="hue" style="--L:.86;--i:2"></i><i class="hue" style="--L:.76;--i:3"></i><i class="hue" style="--L:.64;--i:4"></i><i class="hue" style="--L:.5;--i:5"></i><i class="hue" style="--L:.36;--i:6"></i></div>
+            <div class="web cd hue" style="--i:8"><div class="wt"><i class="hue" style="--i:8"></i><span class="sk" style="width:60px"></span></div><div class="wh hue" style="--i:9"><span class="sk" style="width:70%"></span><span class="sk" style="width:44%"></span></div><div class="wb"><span class="sk" style="width:80px"></span><span class="mini hue" style="--i:10"></span></div></div>
+          </div>
+        )}
+        {t.id === 'b' && (
+          <div class="mock tl"><div class="bf cd">
+            <div class="hd"><span class="sk" style="width:84px;height:8px"></span><span class="tag cnt"></span></div>
+            {formFields.map((f) => (
+              <div class="fld r" style={`--s:${6 + 8 * f.i};--w:8`}>
+                <i class="sk" style={`width:${34 + f.i * 7}px`}></i>
+                <div class="inp">
+                  {f.k === 'c' ? (<><b class="cb"></b><i class="sk" style="width:60%"></i></>) : (<i class="sk" style={`width:${f.w}%`}></i>)}
+                  {f.k === 'd' && <u class="chev"></u>}
+                </div>
+              </div>
+            ))}
+          </div></div>
+        )}
+        {t.id === 'c' && (
+          <div class="mock tl"><div class="cm">
+            {journey.map((col) => (
+              <div class="cl">
+                <div class="ch r" style="--s:40;--w:14">0{col.c + 1}</div>
+                {col.notes.map((n) => (
+                  <div class="nt r" style={`--s:${n.s};--w:22;--nh:${n.nh};--x:${n.x};--y:${n.y};--rt:${n.rt}`}><i style={`width:${n.w1}%`}></i><i style={`width:${n.w2}%`}></i></div>
+                ))}
+              </div>
+            ))}
+          </div></div>
+        )}
+        {t.id === 'd' && (
+          <div class="mock dm tl">
+            {variants.map(([y, rt, dw, db, bg], i) => (
+              <div class={`vb r ${i ? 'x' : ''}`} style={`--s:14;--w:24;--y:${y};--rt:${rt};--dw:${dw};--db:${db};--bgv:${bg}`}></div>
+            ))}
+            <span class="tag vc r" style="--s:14;--w:24"></span>
+            <span class="tag tok r" style="--s:38;--w:10">token</span>
+          </div>
+        )}
+        {t.id === 'e' && (
+          <div class="mock tl" style="display:grid;place-items:center"><div class="pn">
+            <div class="hd"><span class="sk" style="width:70px;height:8px"></span><span class="trk"></span></div>
+            <div class="in"><span class="sk"></span></div>
+            <div class="bt"></div>
+            <div class="row"><span class="ch2"></span><span class="ch2"></span><span class="ch2"></span></div>
+            <span class="sk" style="width:88%"></span><span class="sk" style="width:62%"></span>
+          </div></div>
+        )}
+        {t.id === 'f' && (
+          <div class="mock fm cd tl"><div class="pg">
+            <div style="display:flex;gap:6px;align-items:center"><span class="sk" style="width:46px;height:8px"></span><span class="sk" style="width:30px;margin-left:auto"></span><span class="sk" style="width:30px"></span></div>
+            <div class="hero-ph"><span class="sk" style="width:60%;height:8px"></span><span class="sk" style="width:38%"></span></div>
+            <div class="g3"><div></div><div></div><div></div></div>
+            <span class="sk" style="width:80%"></span><span class="sk" style="width:55%"></span>
+            <div class="wd r" style="--s:14;--w:12">
+              <div class="ic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.2 3.6A.6.6 0 0 1 4.8 19V16A2.5 2.5 0 0 1 4 14z"/></svg></div>
+              <div class="in"><div class="top"><i></i><span class="sk"></span></div>
+                <div class="bd">
+                  <div class="ms me r" style="--s:28;--w:6"><span class="sk" style="width:62px"></span><span class="sk" style="width:38px"></span></div>
+                  <div class="ms ag r" style="--s:46;--w:6;min-height:34px"><span class="sk" style="width:84px"></span><span class="sk" style="width:60px"></span></div>
+                  <div class="ms me r" style="--s:58;--w:6"><span class="sk" style="width:44px"></span></div>
+                </div>
+                <div class="dts"><i></i><i></i><i></i></div>
+              </div>
+            </div>
+          </div></div>
+        )}
+        {t.id === 'g' && (
+          <div class="mock gm cd tl">
+            <div class="gb"><i></i><i></i><i></i><span class="sk"></span></div>
+            <div class="gr">
+              <span class="tag gc gc-from r" style="--s:14;--w:18">20+ tabs</span>
+              <span class="tag gc gc-to r" style="--s:36;--w:10">1 app</span>
+              {tabs.map((x) => (
+                <div class="gt r" style={`left:${x.left}px;top:${x.top}px;--s:${x.s};--w:22;--dx:${x.dx};--dy:${x.dy};--th:${x.th}`}><i></i><span class="sk"></span></div>
+              ))}
+              <div class="gi">
+                {inbox.map((r) => (
+                  <div class="r" style={`--s:${r.s};--w:10;--th:${r.h}`}><i></i><span class="sk"></span><span class="sk"></span>{r.i < 2 && <b></b>}</div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        {t.id === 'h' && (
+          <div class="mock hm tl">
+            <span class="tag hc r" style="--s:24;--w:30"></span>
+            <div class="hcol">
+              {steps.map((s) => (
+                <div class={`hr r ${s.k ? 'k' : ''}`} style={`--i:${s.i};--s:${s.s};--w:24;--dy:${s.dy}`}><i></i><b style={`width:${s.w}%`}></b></div>
+              ))}
+            </div>
+            <div class="hcard cd r" style="--s:44;--w:14"><strong>Configure policy</strong><span class="sk" style="width:90%"></span><span class="sk" style="width:62%"></span><span class="tag" style="justify-self:start">1 step</span></div>
+          </div>
+        )}
+      </div>
+
+      <div class="cap">
+        <span class="cap-title"><span class="c">{t.company} · </span><b>{t.title}</b></span>
+        <span class="cap-tags">
+          {t.href && (
+            <span class="priv">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>Private
+            </span>
+          )}
+          <span class="pill">{t.href ? 'Decision' : 'Writing it up'}</span>
+        </span>
+      </div>
+
+      <div class="ov">
+        <span class="mono">The decision behind it</span>
+        <p class="dec">{t.decision}</p>
+        <p class="res"><b>{t.resultLabel}</b>{t.result}</p>
+        {t.href && (
+          <a class="rd" href={t.href} data-umami-event="home-wall-tile" data-umami-event-tile={t.id}>
+            Read the case
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </a>
+        )}
+      </div>
+    </article>
+  ))}
+</div>
+
+<p class="wall-access reveal">The full case studies are private. <button type="button" class="work-ask" data-umami-event="home-ask-access" onclick="jjComposeWith('Hi João, could you send me the password for the case studies?')">Ask me for access</button></p>
+
+<script>
+  const wall = document.getElementById('wall') as HTMLElement | null;
+  if (wall) {
+    const tiles = Array.from(wall.querySelectorAll<HTMLElement>('.tile'));
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.wall-chip'));
+    const pause = document.querySelector<HTMLButtonElement>('.wall-pause');
+
+    /* Pause previews: on by default for reduced motion. */
+    const setPaused = (v: boolean) => {
+      wall.classList.toggle('is-paused', v);
+      pause?.setAttribute('aria-pressed', String(v));
+    };
+    setPaused(matchMedia('(prefers-reduced-motion: reduce)').matches);
+    pause?.addEventListener('click', () => setPaused(!wall.classList.contains('is-paused')));
+
+    /* Filters */
+    chips.forEach((c) => c.addEventListener('click', () => {
+      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      const f = c.dataset.f;
+      tiles.forEach((t) => {
+        const show = f === 'all' || t.dataset.cat === f;
+        if (show) {
+          if (t.hidden) { t.hidden = false; t.classList.add('out'); void t.offsetWidth; }
+          t.classList.remove('out');
+        } else if (!t.hidden) {
+          t.classList.add('out');
+          setTimeout(() => { if (t.classList.contains('out')) t.hidden = true; }, 330);
+        }
+      });
+    }));
+
+    /* Tap to reveal on touch; links inside still navigate. */
+    tiles.forEach((t) => t.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('a') && matchMedia('(hover: none)').matches) t.classList.toggle('open');
+    }));
+
+    /* Previews pause while offscreen. */
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('off', !e.isIntersecting)));
+      tiles.forEach((t) => io.observe(t));
+    }
+  }
+</script>

@@ -1,7 +1,24 @@
 ---
 import Base from '../layouts/Base.astro';
+import XraySwitch from '../components/XraySwitch.astro';
+import WorkWall from '../components/home/WorkWall.astro';
 ---
-<Base activePage="home" showCta={true} disablePageParticles={true}>
+<Base
+  activePage="home"
+  description="João Jacinto, senior product designer in Aveiro, Portugal. I design the parts users don't see, and I build what I design."
+  showCta={true}
+  disablePageParticles={true}
+>
+
+  <div class="home-wrap">
+    <!-- X-ray grid: the 12-column grid of the 1140px container. Only
+         visible while the X-ray switch is on. -->
+    <div class="xray-grid" aria-hidden="true">
+      <div class="xray-grid-inner">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
 
   <!-- HERO -->
   <section class="hero" data-hero-intro>
@@ -19,18 +36,24 @@ import Base from '../layouts/Base.astro';
     <div class="hero-particles" aria-hidden="true">
       <canvas class="cta-footer-bg"></canvas>
     </div>
-    <div class="container hero-inner">
+    <div class="container hero-inner" data-xray>
+      <aside class="xray-note" data-xray-note>One headline, one promise. The line under it carries the proof, so the headline can stay short.</aside>
       <h1 class="hero-greeting">Hey, I'm João. A product designer who builds.</h1>
-      <p class="hero-role"><span class="hero-line">I design the parts users don't see, so the parts they do see feel inevitable.</span></p>
+      <p class="hero-role"><span class="hero-line">I design the parts users don't see.</span></p>
+      <p class="hero-sub">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
       <div class="hero-ctas">
-        <button class="btn btn-accent" type="button" data-umami-event="hero-start-project" onclick="openComposeModal(1)">
+        <button class="btn btn-accent" type="button" data-umami-event="hero-hire" onclick="openComposeModal(3)">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Start project</span>
+          <span>Hiring? Let's talk</span>
         </button>
-        <a class="btn btn-ghost" data-umami-event="hero-view-work" href="/case-studies">
+        <a class="btn btn-ghost" data-umami-event="hero-view-work" href="#work">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>View work</span>
+          <span>See the work</span>
         </a>
+      </div>
+      <div class="hero-xray">
+        <XraySwitch wrap=".home-wrap" />
+        <span class="hero-xray-hint">or press <kbd>X</kbd></span>
       </div>
 
       <!-- Intro stage: the logo draws itself, flies to the nav, then the
@@ -55,40 +78,23 @@ import Base from '../layouts/Base.astro';
     </div>
   </section>
 
-  <!-- WORK HIGHLIGHTS -->
-  <section class="may-like">
-    <div class="container">
-      <p class="eyebrow reveal">Work highlights</p>
-      <div class="may-like-grid">
-        <a class="case-card reveal reveal-d1" data-umami-event="case-card-home" data-umami-event-slug="redefining-webinar-customization" href="/case-studies/redefining-webinar-customization">
-          <img src="/assets/images/case-webinar-redefining.webp" alt="Webinar customization" width="1949" height="1107" loading="eager" fetchpriority="high">
-          <div class="case-card-body">
-            <div class="case-card-cat">Design • StreamYard</div>
-            <div class="case-card-title">Redefining webinar customization</div>
-            <div class="case-card-highlight">Tripled weekly webinar volume after shipping webinar customization</div>
-          </div>
-        </a>
-        <a class="case-card reveal reveal-d2" data-umami-event="case-card-home" data-umami-event-slug="understanding-webinar-organizers" href="/case-studies/understanding-webinar-organizers">
-          <img src="/assets/images/case-research.avif" alt="Research ops" width="1522" height="964" loading="eager" fetchpriority="high">
-          <div class="case-card-body">
-            <div class="case-card-cat">Research Ops • StreamYard</div>
-            <div class="case-card-title">Understanding webinar organizers</div>
-            <div class="case-card-highlight">Informed the product's roadmap, and briefed 2 other teams in the process.</div>
-          </div>
-        </a>
+  <!-- WORK WALL -->
+  <section class="home-work" id="work">
+    <div class="container home-block" data-xray>
+      <aside class="xray-note" data-xray-note>Every tile is a decision, not a screenshot. Flip X-ray on and they all show what I cut.</aside>
+      <div class="home-head" data-xray-gap="48">
+        <p class="eyebrow home-eyebrow reveal">Selected work</p>
+        <h2 class="home-h2 reveal reveal-d1">Every result has a cut behind it.</h2>
       </div>
-      <div class="may-like-cta reveal">
-        <a class="btn btn-ghost" data-umami-event="home-view-more" href="/case-studies">
-          <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>View more</span>
-        </a>
-      </div>
+      <WorkWall />
     </div>
   </section>
 
   <!-- BRANDS -->
   <section class="brands reveal">
-    <div class="container">
+    <div class="brands-xray" data-xray>
+    <div class="container home-block">
+      <aside class="xray-note" data-xray-note>Logos only, no claims. The work above says what I did there.</aside>
       <p class="eyebrow brands-label">Worked with</p>
     </div>
     <div class="brands-marquee">
@@ -102,36 +108,43 @@ import Base from '../layouts/Base.astro';
         </div>
       </div>
     </div>
+    </div>
   </section>
   <div id="brandsTooltip" class="brands-tooltip" aria-hidden="true" role="tooltip"></div>
 
-  <!-- STATS -->
-  <section class="stats">
-    <div class="container">
-      <p class="eyebrow reveal">My career in numbers</p>
-      <div class="stats-grid">
-        <div class="stat reveal reveal-d1">
-          <div class="stat-num">5</div>
-          <div class="stat-title">Products launched</div>
-          <div class="stat-desc">Anchorage Digital Policies, StreamYard On-Air, Talkdesk AI Trainer, and more</div>
-        </div>
-        <div class="stat reveal reveal-d2">
-          <div class="stat-num">25M<sup>+</sup></div>
-          <div class="stat-title">Users reached</div>
-          <div class="stat-desc">Across 8 industries: AI, crypto banking, streaming, CX contact center, and more</div>
-        </div>
-        <div class="stat reveal reveal-d3">
-          <div class="stat-num">10<sup>+</sup></div>
-          <div class="stat-title">Years of experience</div>
-          <div class="stat-desc">Working with startups and established global companies</div>
-        </div>
+  <!-- HOW I WORK -->
+  <section class="home-how">
+    <div class="container home-block" data-xray>
+      <aside class="xray-note" data-xray-note>Three steps, not seven. If it doesn't fit on one screen, it isn't a process, it's a wish list.</aside>
+      <div class="home-head" data-xray-gap="48">
+        <p class="eyebrow home-eyebrow reveal">How I work</p>
+        <h2 class="home-h2 reveal reveal-d1">Three steps, in this order.</h2>
       </div>
+      <ol class="how-steps">
+        <li class="how-step reveal reveal-d1">
+          <span class="how-n">01</span>
+          <h3>Find the real problem</h3>
+          <p>At StreamYard the roadmap came from sales calls and support tickets. So I interviewed organisers who paid for competing tools.</p>
+        </li>
+        <li class="how-step reveal reveal-d2">
+          <span class="how-n">02</span>
+          <h3>Cut what doesn't earn its place</h3>
+          <p>I skipped the page builder. Templates where one colour makes the whole palette shipped instead.</p>
+          <span class="how-chip">Anchorage · <b>40 → 1</b> step</span>
+        </li>
+        <li class="how-step reveal reveal-d3">
+          <span class="how-n">03</span>
+          <h3>Build it, in code when it helps</h3>
+          <p>At StreamYard I specified tokens and 15+ components so design and code could share one source. This site is hand-built too.</p>
+        </li>
+      </ol>
     </div>
   </section>
 
   <!-- TESTIMONIALS -->
   <section class="testimonials">
-    <div class="container">
+    <div class="container home-block" data-xray>
+      <aside class="xray-note" data-xray-note>Only people I worked with directly. Each one says how we worked together.</aside>
       <p class="eyebrow reveal">What people I've worked with say</p>
       <div class="testimonials-masonry">
         <a class="testimonial-card reveal reveal-d1" data-umami-event="testimonial" data-umami-event-author="daniel-cardoso" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
@@ -175,6 +188,9 @@ import Base from '../layouts/Base.astro';
       </div>
     </div>
   </section>
+
+  <XraySwitch float wrap=".home-wrap" />
+  </div>
 
 </Base>
 
