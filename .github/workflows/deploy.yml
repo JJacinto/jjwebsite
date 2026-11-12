@@ -80,12 +80,22 @@ jobs:
         run: |
           # With a valid Cloudflare Access service token this takes seconds.
           # If Access rejects the token, cloudflared prints a browser login URL
-          # and waits forever, so cap it and say what to fix.
-          if ! timeout 90 ssh -F "$HOME/.ssh/config" -o BatchMode=yes -o ConnectTimeout=30 nas \
-               "echo 'SSH connection successful' && whoami && hostname" </dev/null; then
-            echo "::error title=Cloudflare Access recusou o token::O túnel pediu login no browser em vez de aceitar o service token. No Cloudflare Zero Trust: renovar o service token e confirmar que a aplicação ssh.joaojacinto.com tem uma política 'Service Auth' com esse token; depois atualizar os secrets CF_ACCESS_CLIENT_ID e CF_ACCESS_CLIENT_SECRET no GitHub."
-            exit 1
+          # and waits, so cap each try and say what to fix. One retry covers
+          # short blips (e.g. right after a token secret is rotated).
+          try_ssh() {
+            timeout 90 ssh -F "$HOME/.ssh/config" -o BatchMode=yes -o ConnectTimeout=30 nas \
+              "echo 'SSH connection successful' && whoami && hostname" </dev/null 2>&1 | tee /tmp/ssh.log
+            return "${PIPESTATUS[0]}"
+          }
+          try_ssh && exit 0
+          echo "First try failed, retrying in 15 s"; sleep 15
+          try_ssh && exit 0
+          if grep -q "browser window should have opened" /tmp/ssh.log; then
+            echo "::error title=Cloudflare Access recusou o token::O túnel pediu login no browser em vez de aceitar o service token. Ver docs/deploy.md: no Cloudflare Zero Trust, Service Tokens > github-actions-joaojacinto-main > Rotate secret, e atualizar CF_ACCESS_CLIENT_ID e CF_ACCESS_CLIENT_SECRET no GitHub."
+          else
+            echo "::error title=Túnel não chegou ao SSH do NAS::O Access aceitou o token, mas a ligação ao NAS falhou. Ver o túnel nas-home (Networking > Tunnels): está Healthy e a rota ssh.joaojacinto.com aponta para ssh://host.docker.internal:22? O SSH do NAS está ligado?"
           fi
+          exit 1
 
       - name: Deploy via tar over SSH
         run: |

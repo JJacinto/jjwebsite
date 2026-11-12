@@ -6,15 +6,16 @@
 
 Para seguir um deploy: `node scripts/watch-deploy.mjs <commit>`.
 
-## Se o deploy falhar com "Cloudflare Access recusou o token"
+## Se o deploy falhar
 
-O túnel só deixa entrar o GitHub com o service token. Se o token expirou ou deixou de estar numa política, a Cloudflare pede login no browser e o job falha ao fim de 90 segundos (antes ficava horas à espera). Para corrigir, uma vez, no browser do PC:
+O passo "Test SSH connection" tenta duas vezes e depois diz qual destes é o caso.
 
-1. **Cloudflare Zero Trust** (one.dash.cloudflare.com) → Access → Service credentials → **Service Tokens**.
-   - Se o token do deploy aparece expirado: **Refresh**. Mantém o mesmo Client ID e Secret, por isso o GitHub não precisa de mudar e já está. Salta para o passo 3.
-   - Se não existe: **Create Service Token**, nome `github-deploy`, duração **Non-expiring**. Copia o Client ID e o Client Secret (o Secret só aparece uma vez).
-2. Access → **Applications** → a aplicação de `ssh.joaojacinto.com` → Policies: tem de haver uma política com Action **Service Auth** e Include **Service Token = github-deploy**. Se não houver, cria-a.
-3. Só se criaste um token novo: GitHub → `JJacinto/jjwebsite` → Settings → Secrets and variables → Actions → atualiza `CF_ACCESS_CLIENT_ID` e `CF_ACCESS_CLIENT_SECRET`.
-4. Na página do run que falhou, **Re-run jobs**.
+**"Cloudflare Access recusou o token"**: a Cloudflare pediu login no browser porque os secrets do GitHub não batem certo com o token. A política "Github Actions deploy" (Service Auth) da aplicação `ssh.joaojacinto.com` aceita o token `github-actions-joaojacinto-main`.
+1. Cloudflare (dash.cloudflare.com) → Zero Trust → Access controls → Service credentials → Service Tokens → `github-actions-joaojacinto-main` → **⋯ → Rotate secret**. Copia o Client Secret (só aparece uma vez) e o Client ID (**⋯ → Edit**).
+2. GitHub → `JJacinto/jjwebsite` → Settings → Secrets and variables → Actions → atualiza `CF_ACCESS_CLIENT_SECRET` e `CF_ACCESS_CLIENT_ID`. Sem espaços nem Enter no fim.
+3. No run que falhou, **Re-run failed jobs**. Logo a seguir a rodar o secret pode falhar uma vez com `websocket: bad handshake`; um segundo re-run passa.
+O token expira a 22 abr 2027: antes disso, **⋯ → Refresh token** (mantém as credenciais, o GitHub não muda).
+
+**"Túnel não chegou ao SSH do NAS"**: o token passou, mas o túnel `nas-home` não ligou ao SSH. Em Networking → Tunnels → `nas-home`: tem de estar Healthy e a rota `ssh.joaojacinto.com` tem de apontar para `ssh://host.docker.internal:22` (o `cloudflared` corre em Docker no NAS). Se estiver, confirma que o SSH do NAS está ligado (`/nas`).
 
 Os outros secrets do workflow: `SSH_PRIVATE_KEY` (chave do utilizador `jjacinto8` no NAS), `CF_API_TOKEN` e `CF_ZONE_ID` (purge da cache).
