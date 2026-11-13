@@ -1,6 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import XraySwitch from '../components/XraySwitch.astro';
+import Journey from '../components/about/Journey.astro';
 
 /* Equaliser bars for the "Now producing" card. Heights are fixed here so
    the markup is deterministic: --lo/--hi are the scaleY range, --d the
@@ -110,38 +111,6 @@ const loop = [
         </div>
       </section>
 
-      <!-- Where it started -->
-      <section class="about-section origin" data-xray data-xray-gap="128" aria-labelledby="origin-title">
-        <aside class="xray-note" data-xray-note>The only skeuomorphic thing on the site, on purpose. It's 2006 in there.</aside>
-
-        <div class="origin-copy">
-          <span class="eyebrow reveal">Where it started</span>
-          <h2 id="origin-title" class="reveal reveal-d1">I was shipping front-end code at 15.</h2>
-          <p class="reveal reveal-d2">At 13 I was making logos and profile graphics for friends, before I knew any of it was called design. By 15 I was writing themes for Hi5 and MySpace, and some of them had more than 50,000 people using them at once.</p>
-          <p class="reveal reveal-d3">That loop stuck: make something, watch people use it, learn from what breaks. I studied IT engineering, then switched to multimedia design because that was the half I couldn't stop thinking about. I kept both. I still scope what's buildable, talk trade-offs in engineers' language, and build the real interaction when a mock can't carry the argument.</p>
-        </div>
-
-        <figure class="origin-figure reveal reveal-d2">
-          <span class="sr-only">A reconstructed 2006-era profile theme</span>
-          <div class="theme-card" aria-hidden="true">
-            <span class="theme-spark theme-spark--a">✦</span>
-            <span class="theme-spark theme-spark--b">✦</span>
-            <div class="theme-bar">
-              <span class="theme-name">jo40_design ✦</span>
-            </div>
-            <div class="theme-body">
-              <div class="theme-avatar"><img src="/assets/images/photo.webp" alt="" width="48" height="48"></div>
-              <div class="theme-info">
-                <div class="theme-tabs"><span class="is-on">Profile</span><span>Friends</span><span>Scraps</span></div>
-                <div class="theme-online"><span class="theme-online-dot"></span>Online now: <b data-count data-from="0" data-to="50000" data-format="grouped" data-suffix="+" data-duration="1400">50,000+</b></div>
-              </div>
-            </div>
-            <div class="theme-lines"><i></i><i></i><i></i></div>
-          </div>
-          <figcaption class="origin-caption">Reconstructed from memory. The original is lost to a 2007 hard drive.</figcaption>
-        </figure>
-      </section>
-
       <!-- How I work -->
       <section class="about-section loop" data-xray data-xray-gap="128" aria-labelledby="loop-title">
         <aside class="xray-note" data-xray-note>Same five beats as the story up top. I already told it in motion, so here each step just gets its tools.</aside>
@@ -183,6 +152,7 @@ const loop = [
         <div class="p-grid">
           <article class="p-card reveal reveal-d1" tabindex="0">
             <div class="p-demo p-demo--grid" aria-hidden="true">
+              <span class="tap-hint"></span>
               <div class="d1-grid"></div>
               <div class="d1-mock">
                 <i class="d1-bar d1-bar--a"></i>
@@ -198,6 +168,7 @@ const loop = [
 
           <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo" aria-hidden="true">
+              <span class="tap-hint"></span>
               <p class="d2-text">This is <span class="d2-fill">really</span><span class="d2-fill">just</span><span class="d2-fill">basically</span>a sentence that <span class="d2-fill">actually</span>says <span class="d2-fill">very</span>little.</p>
             </div>
             <h3 class="p-title">Cut what nobody would miss.</h3>
@@ -206,6 +177,7 @@ const loop = [
 
           <article class="p-card reveal reveal-d3" tabindex="0">
             <div class="p-demo" aria-hidden="true">
+              <span class="tap-hint"></span>
               <div class="d3-stage">
                 <span class="d3-line"></span>
                 <span class="d3-dot d3-dot--me"><i></i><em>me</em></span>
@@ -218,6 +190,7 @@ const loop = [
 
           <article class="p-card reveal reveal-d1" tabindex="0">
             <div class="p-demo" aria-hidden="true">
+              <span class="tap-hint"></span>
               <div class="d4-panel">
                 <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Frame 412</span><span class="d4-new">Card / Header</span></span></div>
                 <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Group 87 copy</span><span class="d4-new">Card / Actions</span></span></div>
@@ -230,6 +203,7 @@ const loop = [
 
           <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo" aria-hidden="true">
+              <span class="tap-hint"></span>
               <div class="d5-doc">
                 <i class="d5-h"></i>
                 <p class="d5-line">Decision: we ship the single step.<span class="d5-caret"></span></p>
@@ -245,75 +219,14 @@ const loop = [
 
       <!-- Journey -->
       <section class="about-section journey" data-xray data-xray-gap="128" aria-labelledby="journey-title">
-        <aside class="xray-note" data-xray-note>One number per role. Where there was no honest number, there's a word instead of a made-up stat.</aside>
+        <aside class="xray-note" data-xray-note>Solid line for the career, dashed for the years I was still learning. A number only where there's an honest one.</aside>
 
         <div class="about-head">
           <span class="eyebrow reveal">Journey</span>
-          <h2 id="journey-title" class="reveal reveal-d1">Ten years, one thread.</h2>
+          <h2 id="journey-title" class="reveal reveal-d1">One thread since I was 13.</h2>
         </div>
 
-        <ol class="journey-list">
-          <li class="journey-item reveal">
-            <div class="journey-years">2024–now</div>
-            <div class="journey-main">
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="anchorage" href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a>
-              <p class="journey-role">Senior Product Designer (IC), Core Experience</p>
-              <p class="journey-line">Crypto infrastructure for institutions.</p>
-            </div>
-            <div class="journey-stat">
-              <p class="journey-num">40 → <span data-count data-from="40" data-to="1" data-duration="1100">1</span></p>
-              <p class="journey-label">admin steps after the policies and permissions redesign</p>
-            </div>
-          </li>
-          <li class="journey-item reveal">
-            <div class="journey-years">2022–2024</div>
-            <div class="journey-main">
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="streamyard" href="https://streamyard.com" target="_blank" rel="noopener noreferrer">StreamYard</a>
-              <p class="journey-role">Senior → Staff Product Designer</p>
-              <p class="journey-line">Live streaming. Webinars UX, research ops and the design system.</p>
-            </div>
-            <div class="journey-stat">
-              <p class="journey-num"><span data-count data-from="1" data-to="3" data-suffix="×" data-duration="1100">3×</span></p>
-              <p class="journey-label">weekly webinar volume after shipping customisation</p>
-            </div>
-          </li>
-          <li class="journey-item reveal">
-            <div class="journey-years">2021–2022</div>
-            <div class="journey-main">
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="talkdesk" href="https://www.talkdesk.com" target="_blank" rel="noopener noreferrer">Talkdesk</a>
-              <p class="journey-role">Senior Product Designer</p>
-              <p class="journey-line">AI for customer support, before LLMs.</p>
-            </div>
-            <div class="journey-stat">
-              <p class="journey-num">Pre-LLM</p>
-              <p class="journey-label">redesigned the labelling tool CX teams used to train conversational AI</p>
-            </div>
-          </li>
-          <li class="journey-item reveal">
-            <div class="journey-years">2017–2021</div>
-            <div class="journey-main">
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="namecheap" href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">Namecheap</a>
-              <p class="journey-role">Product Designer</p>
-              <p class="journey-line">Domains and hosting. Internal support tools, iterated daily with 200+ agents.</p>
-            </div>
-            <div class="journey-stat">
-              <p class="journey-num"><span data-count data-from="0" data-to="97.4" data-decimals="1" data-suffix="%" data-duration="1100">97.4%</span></p>
-              <p class="journey-label">positive feedback four months after the new chat and support launch</p>
-            </div>
-          </li>
-          <li class="journey-item reveal">
-            <div class="journey-years">2015–2017</div>
-            <div class="journey-main">
-              <a class="journey-co" data-umami-event="about-company" data-umami-event-co="beubi" href="https://github.com/beubi" target="_blank" rel="noopener noreferrer">Be.Ubi</a>
-              <p class="journey-role">UX/UI Designer</p>
-              <p class="journey-line">3D printing software and a land registry system for a Portuguese municipality.</p>
-            </div>
-            <div class="journey-stat">
-              <p class="journey-num">3D</p>
-              <p class="journey-label">rebuilt the printing software after embedding with the team and interviewing clients</p>
-            </div>
-          </li>
-        </ol>
+        <Journey />
       </section>
 
       <!-- Off the clock -->
@@ -327,14 +240,15 @@ const loop = [
 
         <div class="board-grid">
           <div class="b-card b-photos reveal">
-            <div class="polaroids" tabindex="0" role="group" aria-label="Photos">
+            <div class="polaroids" role="group" aria-label="Photos" data-polaroids>
               {photos.map((p) => (
-                <figure class="polaroid" style={`--k:${p.k};--rot:${p.rot}deg`}>
+                <figure class="polaroid" tabindex="0" style={`--k:${p.k};--rot:${p.rot}deg`}>
                   <img src={p.src} alt="" width="192" height="192" loading="lazy">
                   <figcaption>{p.cap}</figcaption>
                 </figure>
               ))}
             </div>
+            <span class="tap-hint" aria-hidden="true"></span>
           </div>
 
           <div class="b-card b-music reveal reveal-d1" data-live>
@@ -349,15 +263,22 @@ const loop = [
           <div class="b-card b-read reveal reveal-d2">
             <span class="eyebrow b-label">Reading</span>
             <div class="b-read-row">
-              <div class="book" aria-hidden="true"><span>Crucial Conversations</span></div>
-              <a class="b-title b-title--sm" href="https://www.amazon.es/dp/1260474186" target="_blank" rel="noopener noreferrer">Crucial Conversations</a>
+              <div class="book" aria-hidden="true"><span>Crucial</span><span>Conver&shy;sations</span></div>
+              <div class="b-read-text">
+                <a class="b-title b-title--sm" href="https://www.amazon.es/dp/1260474186" target="_blank" rel="noopener noreferrer">Crucial Conversations</a>
+                <p class="b-sub">Patterson, Grenny, McMillan &amp; Switzler</p>
+              </div>
             </div>
           </div>
 
           <div class="b-card b-build reveal reveal-d3">
             <span class="eyebrow b-label">Building</span>
-            <p class="b-line"><a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a></p>
-            <p class="b-line"><span class="pulse-dot" aria-hidden="true"></span>joaojacinto.com (you're on it)</p>
+            <ul class="b-projects">
+              <li><a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a><span>Day job</span></li>
+              <li>Home Assistant mod<span>Our smart home</span></li>
+              <li>Local AI server<span>LLMs + a sovereign agent</span></li>
+              <li class="is-live">joaojacinto.com<span>You're on it</span></li>
+            </ul>
           </div>
 
           <div class="b-card b-into reveal reveal-d1">
@@ -568,6 +489,26 @@ const loop = [
   const wrap = document.querySelector('.about-wrap');
   if (!wrap) return;
   wrap.classList.add('js');
+
+  /* ---- Polaroids: tap (or Enter) brings one to the front; tap it again,
+     tap elsewhere or press Escape to put it back. Hover does the same on
+     a mouse, in CSS. ---- */
+  const stack = wrap.querySelector('[data-polaroids]');
+  if (stack) {
+    const cards = Array.from(stack.querySelectorAll('.polaroid'));
+    const focusOn = (card) => {
+      const on = card && !card.classList.contains('is-focus');
+      cards.forEach((c) => c.classList.toggle('is-focus', on && c === card));
+      stack.classList.toggle('has-focus', on);
+    };
+    stack.addEventListener('click', (e) => focusOn(e.target.closest('.polaroid')));
+    stack.addEventListener('keydown', (e) => {
+      const card = e.target.closest('.polaroid');
+      if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); focusOn(card); }
+      if (e.key === 'Escape') focusOn(null);
+    });
+    document.addEventListener('click', (e) => { if (!stack.contains(e.target)) focusOn(null); });
+  }
 
   /* ---- Count-ups: [data-count] with data-from / data-to ---- */
   const counters = Array.from(wrap.querySelectorAll('[data-count]'));
