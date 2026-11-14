@@ -193,11 +193,26 @@ const loop = [
 
         <div class="about-head">
           <span class="eyebrow reveal" data-pt="Princípios">Principles</span>
-          <h2 id="principles-title" class="about-head-narrow reveal reveal-d1" data-pt="Cinco regras a que volto sempre.">Five rules I keep coming back to.</h2>
+          <h2 id="principles-title" class="about-head-narrow reveal reveal-d1" data-pt="Quatro regras a que volto sempre.">Four rules I keep coming back to.</h2>
         </div>
 
+        <!-- One card per step of the loop above: Talk (and Measure),
+             Map, Cut, Ship. -->
         <div class="p-grid">
           <article class="p-card reveal reveal-d1" tabindex="0">
+            <div class="p-demo" aria-hidden="true">
+              <span class="tap-hint"></span>
+              <div class="d3-stage">
+                <span class="d3-line"></span>
+                <span class="d3-dot d3-dot--me"><i></i><em data-pt="eu">me</em></span>
+                <span class="d3-dot d3-dot--them"><i></i><em data-pt="eles">them</em></span>
+              </div>
+            </div>
+            <h3 class="p-title" data-pt="Ficar perto de quem usa.">Stay close to the people using it.</h3>
+            <p class="p-body" data-pt="Começo pelas palavras deles e volto aos números deles. O que dizem decide o próximo passo, não o último slide da apresentação.">I start with their words and come back to their numbers. What they say shapes the next decision, not the last slide of the deck.</p>
+          </article>
+
+          <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo p-demo--grid" aria-hidden="true">
               <span class="tap-hint"></span>
               <div class="d1-grid"></div>
@@ -210,56 +225,44 @@ const loop = [
               </div>
             </div>
             <h3 class="p-title" data-pt="Tornar o invisível visível.">Make the invisible visible.</h3>
-            <p class="p-body" data-pt="Regras, permissões e dependências pertencem ao ecrã, não à cabeça de alguém.">Rules, permissions and dependencies belong on the screen, not in someone's head.</p>
-          </article>
-
-          <article class="p-card reveal reveal-d2" tabindex="0">
-            <div class="p-demo" aria-hidden="true">
-              <span class="tap-hint"></span>
-              <p class="d2-text" data-pt={'Isto é <span class="d2-fill">realmente</span><span class="d2-fill">apenas</span><span class="d2-fill">basicamente</span>uma frase que <span class="d2-fill">na verdade</span>diz <span class="d2-fill">muito</span>pouco.'}>This is <span class="d2-fill">really</span><span class="d2-fill">just</span><span class="d2-fill">basically</span>a sentence that <span class="d2-fill">actually</span>says <span class="d2-fill">very</span>little.</p>
-            </div>
-            <h3 class="p-title" data-pt="Cortar o que ninguém daria por falta.">Cut what nobody would miss.</h3>
-            <p class="p-body" data-pt="Cada passo, campo e definição tem de merecer o seu lugar.">Every step, field and setting has to earn its place.</p>
-          </article>
-
-          <article class="p-card reveal reveal-d3" tabindex="0">
-            <div class="p-demo" aria-hidden="true">
-              <span class="tap-hint"></span>
-              <div class="d3-stage">
-                <span class="d3-line"></span>
-                <span class="d3-dot d3-dot--me"><i></i><em data-pt="eu">me</em></span>
-                <span class="d3-dot d3-dot--them"><i></i><em data-pt="eles">them</em></span>
-              </div>
-            </div>
-            <h3 class="p-title" data-pt="Ficar perto de quem usa.">Stay close to the people using it.</h3>
-            <p class="p-body" data-pt="O feedback deles molda a decisão seguinte, não o último slide da apresentação.">Their feedback shapes the next decision, not the last slide of the deck.</p>
+            <p class="p-body" data-pt="Se uma regra decide o que acontece, tem de estar no ecrã. Permissões, limites e dependências não devem viver na cabeça de alguém.">If a rule decides what happens, it belongs on the screen. Permissions, limits and dependencies shouldn't live in someone's head.</p>
           </article>
 
           <article class="p-card reveal reveal-d1" tabindex="0">
             <div class="p-demo" aria-hidden="true">
               <span class="tap-hint"></span>
-              <div class="d4-panel">
-                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Frame 412</span><span class="d4-new">Card / Header</span></span></div>
-                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Group 87 copy</span><span class="d4-new">Card / Actions</span></span></div>
-                <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Rectangle 3</span><span class="d4-new">Card / Surface</span></span></div>
+              <div class="d2-form">
+                <span class="d2-field"><i></i><b></b></span>
+                <span class="d2-field d2-field--cut"><i></i><b></b></span>
+                <span class="d2-field d2-field--cut"><i></i><b></b></span>
+                <span class="d2-field"><i></i><b></b></span>
+                <span class="d2-field d2-field--cut"><i></i><b></b></span>
+                <span class="d2-field d2-field--cut"><i></i><b></b></span>
               </div>
+              <span class="d2-count" data-pt="6 campos → 2">6 fields → 2</span>
             </div>
-            <h3 class="p-title" data-pt="Pensar no próximo designer.">Optimise for the next designer.</h3>
-            <p class="p-body" data-pt="Dar nomes às coisas, documentar decisões, deixar o ficheiro melhor do que o encontrámos.">Name things, document decisions, leave the file better than you found it.</p>
+            <h3 class="p-title" data-pt="Cada passo tem de merecer o lugar.">Every step earns its place.</h3>
+            <p class="p-body" data-pt="Se ninguém dá por falta, sai. O que tem de ficar, torno visível.">If nobody would miss it, it goes. What has to stay, I make visible.</p>
           </article>
 
           <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo" aria-hidden="true">
               <span class="tap-hint"></span>
-              <div class="d5-doc">
-                <i class="d5-h"></i>
-                <p class="d5-line"><span data-pt="Decisão: lançamos um único passo.">Decision: we ship the single step.</span><span class="d5-caret"></span></p>
-                <i class="d5-sk"></i>
-                <span class="d5-bubble" data-pt="Contestar à vontade ↗">Pushback welcome ↗</span>
+              <div class="d4-wrap">
+                <div class="d4-panel">
+                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Frame 412</span><span class="d4-new">Card / Header</span></span></div>
+                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Group 87 copy</span><span class="d4-new">Card / Actions</span></span></div>
+                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Rectangle 3</span><span class="d4-new">Card / Surface</span></span></div>
+                </div>
+                <div class="d5-doc">
+                  <i class="d5-h"></i>
+                  <p class="d5-line"><span data-pt="Porquê: um passo, menos erros.">Why: one step, fewer mistakes.</span><span class="d5-caret"></span></p>
+                  <span class="d5-bubble" data-pt="Contestar ↗">Push back ↗</span>
+                </div>
               </div>
             </div>
-            <h3 class="p-title" data-pt="Opiniões fortes, por escrito.">Strong opinions, written down.</h3>
-            <p class="p-body" data-pt="As opiniões vão para um documento onde se pode contestar, não ficam só numa reunião.">Opinions go in a doc where people can push back, not just in a meeting.</p>
+            <h3 class="p-title" data-pt="Não deixar surpresas.">Leave no surprises.</h3>
+            <p class="p-body" data-pt="Dou nome às camadas, escrevo a decisão e o porquê. Quem abrir o ficheiro a seguir, developer ou designer, consegue segui-lo e contestá-lo.">Name the layers, write down the decision and why. Whoever opens the file next, dev or designer, can follow it, and push back.</p>
           </article>
         </div>
       </section>
