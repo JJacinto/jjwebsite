@@ -5073,9 +5073,13 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   position: relative; display: flex; flex-direction: column;
   margin: 0;
   padding: 0 var(--dimension-space-8);
+  /* Layers inside the border (overlay, cursor light) sit in the padding
+     box, so their corner is the outer radius minus the border. */
+  --tile-bw: 6px;
+  --tile-inner-r: calc(var(--radius-card-lg) - var(--tile-bw));
   border-radius: var(--radius-card-lg);
   background: var(--surface-default);
-  border: 6px solid var(--border-subtle);
+  border: var(--tile-bw) solid var(--border-subtle);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
   transition: opacity 0.32s var(--motion-easing-emphasized), transform 0.4s var(--motion-easing-emphasized), border-color 0.3s, box-shadow 0.3s;
@@ -5120,7 +5124,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .ov {
   position: absolute; inset: 0;
   padding: var(--dimension-space-24) var(--dimension-space-20) var(--dimension-space-16);
-  border-radius: inherit;
+  border-radius: var(--tile-inner-r);
   z-index: 2;
   /* Brand-tinted and see-through, so the preview keeps playing behind
      the decision text instead of being frosted out. */
@@ -5158,7 +5162,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 /* Tilt on hover comes from nav.js (same as .testimonial-card); this is
    the light that follows the cursor, between the preview and the overlay. */
 .wall .tile::after {
-  content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit;
+  content: ''; position: absolute; inset: 0; z-index: 1; border-radius: var(--tile-inner-r);
   background: radial-gradient(
     circle at calc(var(--tilt-mx, 50) * 1%) calc(var(--tilt-my, 50) * 1%),
     var(--component-footer-gradient-stop-4) 0%, var(--component-footer-gradient-stop-1) 40%, transparent 70%
@@ -5279,22 +5283,6 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .dts i{width:4px;height:4px;border-radius:50%;background:var(--w-mut);animation:bo 1s infinite}
 .wall .dts i:nth-child(2){animation-delay:.12s}
 .wall .dts i:nth-child(3){animation-delay:.24s}
-.wall .gm{overflow:hidden}
-.wall .gb{display:flex;align-items:center;gap:5px;padding:9px 12px;border-bottom:1px solid var(--w-line)}
-.wall .gb i{width:7px;height:7px;border-radius:50%;background:var(--w-wash2)}
-.wall .gb .sk{margin-left:8px;width:90px}
-.wall .gr{position:relative;height:166px}
-.wall .gt{position:absolute;width:40px;height:18px;border-radius:5px 5px 0 0;background:var(--w-wash);border:1px solid var(--w-line);display:flex;align-items:center;gap:4px;padding:0 5px;
- opacity:calc(1 - clamp(0,calc((var(--eo) - .5)*2),1));transform:translate(calc(var(--eo)*var(--dx)*1px),calc(var(--eo)*var(--dy)*1px)) scale(calc(1 - .7*var(--eo)))}
-.wall .gt i{width:5px;height:5px;border-radius:50%;background:oklch(.65 .14 var(--th));flex:none}
-.wall .gt .sk{height:4px;flex:1}
-.wall .gc{position:absolute;left:12px;top:5px}
-.wall .gi{position:absolute;left:12px;right:12px;top:30px;display:grid;gap:4px}
-.wall .gi div{height:24px;border-radius:7px;display:flex;align-items:center;gap:8px;padding:0 8px;background:var(--w-wash);opacity:var(--eo);transform:translateY(calc((1 - var(--eo))*6px))}
-.wall .gi div i{width:14px;height:14px;border-radius:50%;flex:none;background:oklch(.7 .12 var(--th))}
-.wall .gi div .sk{flex:1;height:5px}
-.wall .gi div .sk+.sk{flex:none;width:30px}
-.wall .gi div b{width:6px;height:6px;border-radius:50%;background:var(--text-brand);margin-left:auto}
 .wall .hm{height:330px}
 .wall .hcol{position:absolute;left:40px;top:30px;width:210px;height:280px}
 .wall .hr{position:absolute;left:0;right:0;top:calc(var(--i)*7px);height:5px;display:flex;align-items:center;gap:7px;
@@ -5309,8 +5297,6 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .hc:after{content:"steps " counter(n)}
 
 .wall .fm .pg .hero-ph { height: 56px; border-radius: 8px; background: var(--w-wash); display: grid; align-content: center; gap: 7px; padding: 0 12px; }
-.wall .gc-from { opacity: calc(1 - var(--eo)); }
-.wall .gc-to { opacity: var(--eo); }
 /* Lead loops start at different points so the three never move in step. */
 .wall .tile--lead:nth-child(2) .tl { animation-delay: -2.2s; }
 .wall .tile--lead:nth-child(3) .tl { animation-delay: -4.4s; }

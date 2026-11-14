@@ -1,7 +1,7 @@
 ---
-/* Home page work wall: eight tiles, each a small mockup of one decision.
+/* Home page work wall: seven tiles, each a small mockup of one decision.
    Three lead tiles (lead: true) sit large on top and loop all the time;
-   the other five sit small below and rest on their final frame, playing
+   the other four sit small below and rest on their final frame, playing
    only on hover or focus. Hover, focus or tap shows the decision behind
    it; with X-ray on, every tile shows it at once. Facts come from
    src/data/cases.ts. Styles live in global.css, "Work wall". */
@@ -63,12 +63,6 @@ const tiles: Tile[] = [
     titlePt: 'Widget de chat flutuante',
     decisionPt: 'A ferramenta antiga abria uma janela à parte. Cortei isso, e o chat passou a ser um widget flutuante que acompanha quem está a navegar.',
     resultLabelPt: 'Resultado', resultPt: 'As conversas cresceram 28,9% em quatro meses, e 97,4% do feedback foi positivo.' },
-  { id: 'g', cat: 'ui', company: 'Namecheap', title: 'Agent app', href: slugOf('designing-a-support-chat-experience'),
-    decision: 'Agents handled five or more chats across 20+ browser tabs. I designed one agent app so they could work from a single place.',
-    resultLabel: 'Result', result: 'An agent app and a white-label design system for namecheap.com and ssls.com.',
-    titlePt: 'App para agentes',
-    decisionPt: 'Os agentes geriam cinco ou mais chats em mais de 20 separadores do browser. Desenhei uma única app para agentes, para trabalharem num só sítio.',
-    resultLabelPt: 'Resultado', resultPt: 'Uma app para agentes e um design system white-label para namecheap.com e ssls.com.' },
 ];
 
 const cats = [
@@ -95,11 +89,6 @@ const journey = [0, 1, 2, 3, 4].map((c) => ({
   }),
 }));
 const variants = [[-80, -2, 26, 20, 'oklch(.52 .17 270)'], [-40, 1.5, -14, -4, 'oklch(.6 .16 290)'], [0, 0, 0, 0, 'oklch(.5 .15 255)'], [40, -1.5, 12, -6, 'oklch(.58 .13 275)'], [80, 2, -22, 6, 'oklch(.46 .17 262)']];
-const tabs = Array.from({ length: 24 }, (_, i) => {
-  const c = i % 6, r = Math.floor(i / 6);
-  return { i, left: 11 + c * 45, top: 30 + r * 23, s: (10 + c * 1.5).toFixed(1), dx: 144 - (11 + c * 45 + 20), dy: 70 - (30 + r * 23 + 9), th: (i * 47) % 360 };
-});
-const inbox = [210, 25, 150, 300, 80].map((h, i) => ({ h, i, s: 36 + i * 4 }));
 const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy: 138 - (i * 7 + 2), w: [62, 84, 46, 72, 90, 54][i % 6], k: i % 8 === 0 }));
 ---
 <div class="wall-controls reveal">
@@ -186,23 +175,6 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
               </div>
             </div>
           </div></div>
-        )}
-        {t.id === 'g' && (
-          <div class="mock gm cd tl">
-            <div class="gb"><i></i><i></i><i></i><span class="sk"></span></div>
-            <div class="gr">
-              <span class="tag gc gc-from r" style="--s:14;--w:18" data-pt="20+ separadores">20+ tabs</span>
-              <span class="tag gc gc-to r" style="--s:36;--w:10">1 app</span>
-              {tabs.map((x) => (
-                <div class="gt r" style={`left:${x.left}px;top:${x.top}px;--s:${x.s};--w:22;--dx:${x.dx};--dy:${x.dy};--th:${x.th}`}><i></i><span class="sk"></span></div>
-              ))}
-              <div class="gi">
-                {inbox.map((r) => (
-                  <div class="r" style={`--s:${r.s};--w:10;--th:${r.h}`}><i></i><span class="sk"></span><span class="sk"></span>{r.i < 2 && <b></b>}</div>
-                ))}
-              </div>
-            </div>
-          </div>
         )}
         {t.id === 'h' && (
           <div class="mock hm tl">
