@@ -1715,6 +1715,13 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 .xray-note::before { content: "// "; }
 /* The hero's note hangs below it, clear of the fixed nav. */
 .about-story > .xray-note { top: auto; bottom: -12px; transform: translateY(100%); }
+/* On one column the gap below the story is too short for both that note
+   and the next section's, so the story's drops into flow under its copy. */
+@media (max-width: 768px) {
+  /* Leave the left edge to the gap label that shares the note's line. */
+  .xray-note { max-width: min(280px, calc(100% - 64px)); }
+  .about-story > .xray-note { position: relative; bottom: auto; transform: none; margin-top: var(--dimension-space-16); max-width: 100%; }
+}
 .xray .xray-note { display: block; opacity: 1; }
 @starting-style {
   .xray .xray-note { opacity: 0; }
@@ -1771,6 +1778,15 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
   border: 1px solid var(--color-primary-30);
 }
 .theme-avatar img { display: block; width: 48px; height: 48px; object-fit: cover; image-rendering: pixelated; }
+/* Mini preview of the Blue Dreams theme: gradient header bar over a dotted page with content lines */
+.theme-swatch {
+  display: flex; flex-direction: column; gap: 4px;
+  width: 48px; height: 48px; padding: 0 0 4px;
+  background: radial-gradient(color-mix(in srgb, var(--color-primary-60) 25%, transparent) 1px, transparent 1px) 0 0 / 5px 5px, var(--color-primary-10);
+}
+.theme-swatch i { display: block; height: 4px; margin: 0 5px; background: var(--color-primary-30); }
+.theme-swatch i:first-child { height: 12px; margin: 0 0 2px; background: linear-gradient(180deg, var(--color-primary-50), var(--color-primary-70)); }
+.theme-swatch i:last-child { width: 55%; }
 .theme-info { min-width: 0; }
 .theme-tabs { display: flex; flex-wrap: wrap; gap: var(--dimension-space-8); }
 .theme-tabs span { color: var(--color-primary-60); text-decoration: underline; }
