@@ -70,7 +70,7 @@ const loop = [
         <div class="about-story-head">
           <p class="about-intro">
             <img class="about-intro-avatar" src="/assets/images/photo.webp" alt="João Jacinto" width="40" height="40">
-            <span data-pt="João Jacinto · Senior Product Designer na Anchorage Digital · Aveiro, Portugal">João Jacinto · Senior Product Designer at Anchorage Digital · Aveiro, Portugal</span>
+            <span data-pt="João Jacinto · Design and Product Engineer na Anchorage Digital">João Jacinto · Design and Product Engineer at Anchorage Digital</span>
           </p>
           <h1 class="about-story-title" data-pt="Transformo problemas emaranhados em produtos em que ninguém precisa de pensar.">I turn tangled problems into products people don't have to think about.</h1>
         </div>
@@ -296,7 +296,7 @@ const loop = [
           </div>
 
           <div class="b-card b-music reveal reveal-d1" data-live>
-            <span class="eyebrow b-label" data-pt="A produzir">Producing</span>
+            <span class="eyebrow b-label" data-pt="A produzir com amigos">Producing with friends</span>
             <a class="b-title" data-umami-event="about-music" href="https://music.youtube.com/watch?v=80hpbDstlhc&list=OLAK5uy_mex7K9FoXhQBxg8yKviL81Avmz9Xfh4WI" target="_blank" rel="noopener noreferrer">Boreal Haze</a>
             <div class="eq" aria-hidden="true">
               {bars.map((b) => <span style={`--i:${b.i};--hi:${b.hi};--lo:${b.lo};--d:${b.d}ms`}></span>)}
@@ -327,9 +327,76 @@ const loop = [
 
           <div class="b-card b-into reveal reveal-d1">
             <span class="eyebrow b-label" data-pt="Também gosto de">Also into</span>
+            {/* Chips with a trailing chevron open a small popover with the detail.
+                The script at the bottom of this card handles open/close. */}
             <ul class="chips">
-              <li data-pt="Bateria">Drums</li><li data-pt="Produção musical">Music production</li><li data-pt="Construir com IA">Building with AI</li><li>RPGs</li><li data-pt="Corridas em VR">VR racing</li><li>Premier League</li><li data-pt="Impressão 3D">3D printing</li>
+              {[
+                { en: 'Drums', pt: 'Bateria',
+                  dEn: 'Always watching Gavin Harrison, Larnell Lewis, Theo Katzman and Mike Portnoy. At home it’s a Roland kit plus Addictive Drums 2.',
+                  dPt: 'Sempre a ver Gavin Harrison, Larnell Lewis, Theo Katzman e Mike Portnoy. Em casa é uma bateria Roland mais o Addictive Drums 2.' },
+                { en: 'Music production', pt: 'Produção musical',
+                  dEn: 'Wannabe producer. I open Ableton or Fruity Loops, make one loop I love, and never finish the track.',
+                  dPt: 'Produtor wannabe. Abro o Ableton ou o Fruity Loops, faço um loop de que gosto muito e nunca acabo a música.' },
+                { en: 'Building with AI', pt: 'Construir com IA',
+                  dEn: 'Local models, automations, Home Assistant running the house, and home servers that look after themselves.',
+                  dPt: 'Modelos locais, automações, o Home Assistant a gerir a casa e servidores caseiros que tomam conta de si próprios.' },
+                { en: 'Gaming', pt: 'Videojogos',
+                  dEn: 'Fallout, Final Fantasy X, Terraria, Half-Life: Alyx, Slay the Spire 2, FIFA and Rocket League.',
+                  dPt: 'Fallout, Final Fantasy X, Terraria, Half-Life: Alyx, Slay the Spire 2, FIFA e Rocket League.' },
+                { en: 'VR racing', pt: 'Corridas em VR',
+                  dEn: 'A 911 around the Nürburgring in Assetto Corsa EVO.',
+                  dPt: 'Um 911 à volta do Nürburgring no Assetto Corsa EVO.' },
+                { en: 'Premier League', pt: 'Premier League',
+                  dEn: 'Red, and from the Merseyside part of the map. Matchdays are not negotiable.',
+                  dPt: 'Vermelho, e do lado de Merseyside. Dia de jogo não se negoceia.' },
+                { en: '3D printing', pt: 'Impressão 3D' },
+              ].map((c, i) => c.dEn ? (
+                <li class="chip-pop">
+                  <button type="button" class="chip-btn" aria-expanded="false" aria-controls={`into-pop-${i}`} data-umami-event={`about-into-${c.en.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
+                    <span data-pt={c.pt}>{c.en}</span>
+                    <svg class="chip-chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </button>
+                  <div class="chip-panel" id={`into-pop-${i}`} role="region" hidden><p data-pt={c.dPt}>{c.dEn}</p></div>
+                </li>
+              ) : (
+                <li data-pt={c.pt}>{c.en}</li>
+              ))}
             </ul>
+            <script>
+              const chips = document.querySelectorAll<HTMLButtonElement>('.b-into .chip-btn');
+              const closeAll = (except?: HTMLButtonElement) => chips.forEach((b) => {
+                if (b === except) return;
+                b.setAttribute('aria-expanded', 'false');
+                (b.nextElementSibling as HTMLElement).hidden = true;
+              });
+              chips.forEach((btn) => btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const open = btn.getAttribute('aria-expanded') !== 'true';
+                closeAll(btn);
+                btn.setAttribute('aria-expanded', String(open));
+                const panel = btn.nextElementSibling as HTMLElement;
+                panel.hidden = !open;
+                if (open) {
+                  // Keep the panel inside the card: slide it left when the chip
+                  // sits near the card's right edge (mostly on phones).
+                  const li = btn.parentElement!.getBoundingClientRect();
+                  const card = btn.closest('.b-card')!.getBoundingClientRect();
+                  const pad = 12;
+                  const maxLeft = card.right - pad - panel.offsetWidth;
+                  const left = Math.max(card.left + pad, Math.min(li.left, maxLeft));
+                  panel.style.setProperty('--shift', `${Math.round(left - li.left)}px`);
+                }
+              }));
+              document.addEventListener('click', (e) => {
+                if (!(e.target as Element).closest('.b-into .chip-panel')) closeAll();
+              });
+              document.addEventListener('keydown', (e) => {
+                if (e.key !== 'Escape') return;
+                const open = document.querySelector<HTMLButtonElement>('.b-into .chip-btn[aria-expanded="true"]');
+                closeAll();
+                open?.focus();
+              });
+            </script>
           </div>
 
           <div class="b-card b-desk reveal reveal-d2">
@@ -561,14 +628,51 @@ const loop = [
   if (loopEl) {
     const btns = Array.from(loopEl.querySelectorAll('[data-loop-mode]'));
     let touched = false;
-    const setMode = (mode) => {
+    const chips = Array.from(loopEl.querySelectorAll('.loop-tools li'));
+    const shown = (li) => getComputedStyle(li).display !== 'none';
+    const apply = (mode) => {
       loopEl.dataset.mode = mode;
       btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.loopMode === mode)));
+    };
+    /* FLIP the chips: the ones leaving fall and fade from where they were,
+       the ones staying slide down to their new spot, new ones pop in. */
+    const setMode = (mode, animate = true) => {
+      if (reduce || !animate || loopEl.dataset.mode === mode) { apply(mode); return; }
+      chips.forEach((li) => { li.getAnimations().forEach((an) => an.finish()); });
+      const first = new Map(chips.filter(shown).map((li) => [li, li.getBoundingClientRect()]));
+      apply(mode);
+      let enterN = 0;
+      chips.forEach((li) => {
+        const was = first.get(li);
+        const is = shown(li);
+        if (was && is) {
+          const now = li.getBoundingClientRect();
+          const dx = was.left - now.left, dy = was.top - now.top;
+          if (dx || dy) li.animate(
+            [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+            { duration: 520, delay: 140, easing: 'cubic-bezier(.2,.9,.25,1.15)', fill: 'backwards' });
+        } else if (was) {
+          const box = li.parentElement.getBoundingClientRect();
+          li.classList.add('loop-leaving');
+          Object.assign(li.style, { left: `${was.left - box.left}px`, top: `${was.top - box.top}px`, width: `${was.width}px` });
+          li.animate(
+            [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(18px) scale(0.85)' }],
+            { duration: 280, easing: 'cubic-bezier(.4,0,1,1)' }
+          ).finished.catch(() => {}).then(() => {
+            li.classList.remove('loop-leaving');
+            li.style.left = li.style.top = li.style.width = '';
+          });
+        } else if (is) {
+          li.animate(
+            [{ opacity: 0, transform: 'scale(0.6)' }, { opacity: 1, transform: 'none' }],
+            { duration: 420, delay: 380 + enterN++ * 60, easing: 'cubic-bezier(.2,.9,.25,1.3)', fill: 'backwards' });
+        }
+      });
     };
     btns.forEach((b) => b.addEventListener('click', () => { touched = true; setMode(b.dataset.loopMode); }));
     const first = loopEl.querySelector('.loop-card');
     if (!reduce && first && 'IntersectionObserver' in window) {
-      setMode('before');
+      setMode('before', false);
       const io = new IntersectionObserver((entries) => {
         if (!entries.some((en) => en.isIntersecting)) return;
         io.disconnect();

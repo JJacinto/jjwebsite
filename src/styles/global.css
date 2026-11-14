@@ -1866,13 +1866,30 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 }
 .loop-name { margin-bottom: var(--dimension-space-8); font-size: var(--font-size-xl); }
 .loop-body { font-size: var(--font-size-sm); line-height: var(--font-line-height-relaxed); }
+/* Chips sit on the card's floor: margin-top:auto pushes the list down,
+   and only the current side's chips take up room, so every card's last
+   row lines up along the bottom edge. */
 .loop-tools {
+  position: relative;
   list-style: none;
   display: flex;
   flex-wrap: wrap;
+  align-content: flex-end;
   gap: var(--dimension-space-6);
   margin-top: auto;
   padding-top: var(--dimension-space-16);
+}
+.loop .loop-tools li { transition: none; }
+.loop[data-mode="before"] .loop-tools [data-when="now"],
+.loop[data-mode="now"] .loop-tools [data-when="before"] { display: none; }
+/* A chip on its way out: pinned where it was while it falls and fades. */
+.loop[data-mode] .loop-tools li.loop-leaving {
+  display: block;
+  position: absolute;
+  margin: 0;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: none;
 }
 .loop-tools li {
   padding: 2px var(--dimension-space-10);
@@ -1909,9 +1926,7 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 }
 .loop[data-mode="before"] .loop-body[data-when="now"] { transform: translateY(8px); }
 .loop[data-mode="now"] .loop-body[data-when="before"] { transform: translateY(-8px); }
-/* Tools the Now stack no longer uses leave the row entirely, so the chips close up. */
-.loop[data-mode="now"] .loop-drop { display: none; }
-.loop[data-mode="before"] :is(.loop-plus, .loop-runner)[data-when="now"] { transform: scale(0.5); }
+.loop[data-mode="before"] .loop-runner[data-when="now"] { transform: scale(0.5); }
 
 .loop-switch {
   display: flex;
@@ -2832,6 +2847,42 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   transition: transform var(--motion-duration-short) var(--motion-easing-emphasized), border-color var(--motion-duration-short) var(--motion-easing-standard);
 }
 .chips li:hover { transform: translateY(-2px); border-color: var(--text-brand); }
+
+/* Chips that open a detail popover */
+.chips li.chip-pop { position: relative; padding: 0; }
+.b-into:has(.chip-btn[aria-expanded="true"]) { z-index: 10; }
+.chips li.chip-pop:has(.chip-btn[aria-expanded="true"]) { transform: none; border-color: var(--text-brand); z-index: 5; }
+.chip-btn {
+  display: inline-flex; align-items: center; gap: var(--dimension-space-6);
+  padding: var(--dimension-space-6) var(--dimension-space-12) var(--dimension-space-6) var(--dimension-space-16);
+  border: 0; border-radius: inherit; background: none;
+  font: inherit; color: inherit; cursor: pointer;
+}
+.chip-btn:focus-visible { outline: 2px solid var(--text-brand); outline-offset: 2px; }
+.chip-chev {
+  width: 12px; height: 12px; flex: none;
+  color: var(--text-secondary); opacity: 0.7;
+  transition: transform var(--motion-duration-short) var(--motion-easing-standard), opacity var(--motion-duration-short) var(--motion-easing-standard);
+}
+.chip-btn:hover .chip-chev { opacity: 1; }
+.chip-btn[aria-expanded="true"] .chip-chev { transform: rotate(180deg); opacity: 1; color: var(--text-brand); }
+.chip-panel {
+  position: absolute; top: calc(100% + var(--dimension-space-8)); left: 0;
+  transform: translateX(var(--shift, 0px));
+  width: max-content; max-width: min(300px, calc(100vw - 32px));
+  padding: var(--dimension-space-12) var(--dimension-space-16);
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+  background: color-mix(in srgb, var(--surface-default) 94%, var(--text-primary));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-line-height-normal);
+  color: var(--text-primary);
+  animation: chip-pop-in var(--motion-duration-short) var(--motion-easing-emphasized);
+}
+.chip-panel[hidden] { display: none; }
+@keyframes chip-pop-in { from { opacity: 0; translate: 0 -4px; } }
+@media (prefers-reduced-motion: reduce) { .chip-panel { animation: none; } }
 
 /* ---- Breakpoints --------------------------------------------------- */
 @media (max-width: 1023px) {
@@ -4894,7 +4945,9 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .hero-role {
   min-height: 0;
   font-size: clamp(2.25rem, 5.2vw, 4rem);
-  max-width: 18ch;
+  /* Wide enough that the PT line ("Desenho as partes que os utilizadores
+     não veem.") sets in two lines, not three. */
+  max-width: 25ch;
 }
 .hero-sub {
   font-size: clamp(var(--font-size-md), 1.6vw, 1.3rem);
