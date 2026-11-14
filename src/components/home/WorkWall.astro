@@ -240,13 +240,11 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
       const f = c.dataset.f;
       tiles.forEach((t) => {
         const show = f === 'all' || t.dataset.cat === f;
-        if (show) {
-          if (t.hidden) { t.hidden = false; t.classList.add('out'); void t.offsetWidth; }
-          t.classList.remove('out');
-        } else if (!t.hidden) {
-          t.classList.add('out');
-          setTimeout(() => { if (t.classList.contains('out')) t.hidden = true; }, 330);
-        }
+        /* Filtered-out tiles stay as ghosts so the wall keeps its shape. */
+        t.classList.toggle('ghost', !show);
+        t.classList.remove('open');
+        if (show) { t.removeAttribute('aria-hidden'); t.tabIndex = 0; }
+        else { t.setAttribute('aria-hidden', 'true'); t.tabIndex = -1; }
       });
     }));
 

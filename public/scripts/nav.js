@@ -202,7 +202,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   };
 
   document.addEventListener('mousemove', function(e) {
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
+    const card = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost), .j-scene.has-case, .next-case, .case-img-ph.is-filled, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
     if (tiltCard && tiltCard !== card) {
       clearTilt(tiltCard);
       tiltCard = null;
@@ -254,7 +254,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     }
   }
   document.addEventListener('pointerdown', function (e) {
-    var t = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled, .btn, .logo-outer, .about-cta-avatar-stack');
+    var t = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost), .j-scene.has-case, .next-case, .case-img-ph.is-filled, .btn, .logo-outer, .about-cta-avatar-stack');
     if (!t) return;
     pressedBtn = t;
     setPressed(t, true);
@@ -325,11 +325,12 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     '<svg class="cursor-ball-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>' +
     '<span class="cursor-ball-label">View LinkedIn</span>';
   document.body.appendChild(ball);
+  const ballLabel = ball.querySelector('.cursor-ball-label');
   let activeCard = null;
   document.addEventListener('mousemove', function(e) {
     ball.style.left = e.clientX + 'px';
     ball.style.top  = e.clientY + 'px';
-    const card = e.target.closest('.case-card, .testimonial-card, .next-case, .case-img-ph.is-filled');
+    const card = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost):has(.rd), .j-scene.has-case, .next-case, .case-img-ph.is-filled');
     if (card !== activeCard) {
       activeCard = card;
       if (card) {
@@ -337,6 +338,10 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         const isImage = card.classList.contains('case-img-ph');
         ball.classList.toggle('is-linkedin', isTestimonial);
         ball.classList.toggle('is-image', isImage);
+        /* Cards can name their action on the ball, e.g. "View case study". */
+        const label = !isTestimonial && !isImage ? card.dataset.cursorLabel : '';
+        ball.classList.toggle('is-labelled', !!label);
+        ballLabel.textContent = label || 'View LinkedIn';
         if (!isTestimonial && !isImage) {
           /* Replay the arrow nudge when entering a case card. */
           const arrow = ball.querySelector('.cursor-ball-arrow');
@@ -362,5 +367,6 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     activeCard = null;
     ball.classList.remove('is-active');
     ball.classList.remove('is-linkedin');
+    ball.classList.remove('is-labelled');
   });
 })();

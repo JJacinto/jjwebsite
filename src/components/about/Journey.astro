@@ -4,12 +4,23 @@
    dots. Every step has a small looping scene of what the work was, built
    on the same --p timeline engine as the home Work wall (resting state is
    the final frame, so reduced motion needs no JS).
+   Steps with a published case study link their scene to it.
    Styles live in global.css, "Journey". */
+import { CASES } from '../../data/cases';
 
 type Win = { pre?: string; from: number; to: number; decimals?: number; suffix?: string; text: string; label: string };
 type Step = {
   id: 'anchorage' | 'streamyard' | 'talkdesk' | 'namecheap' | 'beubi' | 'aveiro' | 'ubi' | 'self';
   years: string; name: string; href?: string; role: string; line: string; win?: Win;
+  caseSlug?: string;
+};
+
+/* Only cases that are built (not hidden) get a link. */
+const caseHref = (slug?: string) => {
+  if (!slug) return undefined;
+  const c = CASES.find((x) => x.slug === slug);
+  if (!c) throw new Error('Journey: unknown case ' + slug);
+  return c.hidden ? undefined : `/case-studies/${c.slug}`;
 };
 
 const career: Step[] = [
@@ -18,12 +29,14 @@ const career: Step[] = [
     win: { pre: '40 → ', from: 40, to: 1, text: '1', label: 'admin steps after the policies and permissions redesign' } },
   { id: 'streamyard', years: '2022–2024', name: 'StreamYard', href: 'https://streamyard.com',
     role: 'Senior → Staff Product Designer', line: 'Live streaming. Webinars UX, research ops and the design system.',
-    win: { from: 1, to: 3, suffix: '×', text: '3×', label: 'weekly webinar volume after shipping customisation' } },
+    win: { from: 1, to: 3, suffix: '×', text: '3×', label: 'weekly webinar volume after shipping customisation' },
+    caseSlug: 'redefining-webinar-customization' },
   { id: 'talkdesk', years: '2021–2022', name: 'Talkdesk', href: 'https://www.talkdesk.com',
     role: 'Senior Product Designer', line: 'AI for customer support, before LLMs. I redesigned the labelling tool CX teams used to train conversational AI.' },
   { id: 'namecheap', years: '2017–2021', name: 'Namecheap', href: 'https://www.namecheap.com',
     role: 'Product Designer', line: 'Domains and hosting. Internal support tools, iterated daily with 200+ agents.',
-    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch' } },
+    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch' },
+    caseSlug: 'designing-a-support-chat-experience' },
   { id: 'beubi', years: '2015–2017', name: 'Be.Ubi', href: 'https://github.com/beubi',
     role: 'UX/UI Designer', line: '3D printing software and a land registry system for a Portuguese municipality. I rebuilt the printing software after embedding with the team and interviewing clients.' },
 ];
@@ -52,7 +65,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
         <h3>{track.title}</h3>
         <span>{track.span}</span>
       </li>
-      {track.steps.map((s) => (
+      {track.steps.map((s) => { const cs = caseHref(s.caseSlug); return (
         <li class={`journey-item journey-item--${track.key} reveal`} data-step={s.id}>
           <div class="journey-years">{s.years}</div>
           <div class="journey-main">
@@ -69,7 +82,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
             )}
           </div>
 
-          <figure class="j-scene">
+          <figure class={`j-scene${cs ? ' has-case' : ''}`} data-cursor-label={cs ? 'View case study' : undefined}>
             {s.id === 'self' && <span class="sr-only">A reconstructed 2006-era profile theme with 50,000+ people online</span>}
             <div class="j-media" aria-hidden="true">
               {s.id === 'anchorage' && (
@@ -185,9 +198,14 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
               )}
             </div>
             {s.id === 'self' && <figcaption class="j-caption">Reconstructed from memory. The original is lost to a 2007 hard drive.</figcaption>}
+            {cs && (
+              <a class="j-case" href={cs} aria-label={`View the ${s.name} case study`} data-umami-event="about-journey-case" data-umami-event-co={s.id}>
+                <span class="j-case-tag" aria-hidden="true">Case study<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+              </a>
+            )}
           </figure>
         </li>
-      ))}
+      ); })}
     </>
   ))}
 </ol>
