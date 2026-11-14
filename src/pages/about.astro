@@ -21,12 +21,20 @@ const photos = [
   { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', k: 2, rot: -4 },
 ];
 
+/* How I work. `body` and `tools` are the stack before LLMs; `now` and
+   `plus` are what the same step looks like today. The section's switch
+   flips between the two. */
 const loop = [
-  { n: '01', name: 'Talk', body: "I start in conversation, not in Figma. Most design mistakes I've seen ship began with a blank canvas before the problem was understood.", tools: ['FigJam', 'Dovetail', 'Maze'] },
-  { n: '02', name: 'Map', body: 'I think about the system first and the screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'] },
-  { n: '03', name: 'Cut', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'] },
-  { n: '04', name: 'Ship', body: "Figma is the contract between design, engineering and product. When the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'] },
-  { n: '05', name: 'Measure', body: "Shipped isn't done. This is where I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'] },
+  { n: '01', name: 'Talk', body: "I start in conversation, not in Figma. Most design mistakes I've seen ship began with a blank canvas before the problem was understood.", tools: ['FigJam', 'Dovetail', 'Maze'],
+    now: 'Still a conversation. Most of it happens in Slack now, and the thread becomes the brief instead of something I retype.', plus: 'Slack' },
+  { n: '02', name: 'Map', body: 'I think about the system first and the screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'],
+    now: 'Same thinking, better wiring. MCPs connect the tools to each other, so the map comes from the real system, not from my memory of it.', plus: 'MCPs' },
+  { n: '03', name: 'Cut', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'],
+    now: "The cutting is still mine. Skills hold the rules I'd otherwise repeat, so every pass is checked against the same standard.", plus: 'Skills' },
+  { n: '04', name: 'Ship', body: "Figma is the contract between design, engineering and product. When the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'],
+    now: 'Figma is still the contract. Plugins and Claude Code take the repeatable parts of the handoff, and I review what goes out.', plus: 'Plugins' },
+  { n: '05', name: 'Measure', body: "Shipped isn't done. This is where I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'],
+    now: "Automations bring the numbers to me, so I look every week, not only when I remember. Being wrong shows up sooner. That's the loop.", plus: 'Automations' },
 ];
 ---
 <Base
@@ -112,32 +120,68 @@ const loop = [
       </section>
 
       <!-- How I work -->
-      <section class="about-section loop" data-xray data-xray-gap="128" aria-labelledby="loop-title">
-        <aside class="xray-note" data-xray-note>Same five beats as the story up top. I already told it in motion, so here each step just gets its tools.</aside>
+      <!-- The markup rests on "now", so no-JS and reduced-motion visitors
+           get today's stack. With JS it opens on "before" and flips to
+           "now" once the cards are in view; the switch flips it back. -->
+      <section class="about-section loop" data-loop data-mode="now" data-live data-xray data-xray-gap="128" aria-labelledby="loop-title">
+        <aside class="xray-note" data-xray-note>Same five steps on both sides of the switch. Only the tools change, and what runs underneath them.</aside>
 
         <div class="about-head">
           <span class="eyebrow reveal">How I work</span>
           <h2 id="loop-title" class="about-head-narrow reveal reveal-d1">Find the smallest version of the real problem. Then build the smallest version of a real answer.</h2>
         </div>
 
+        <div class="loop-switch reveal reveal-d2">
+          <div class="loop-seg" role="group" aria-label="Which stack to show">
+            <span class="loop-seg-thumb" aria-hidden="true"></span>
+            <button type="button" data-loop-mode="before" aria-pressed="false" data-umami-event="about-stack-before">Before</button>
+            <button type="button" data-loop-mode="now" aria-pressed="true" data-umami-event="about-stack-now">Now</button>
+          </div>
+          <p class="loop-caption" aria-live="polite">
+            <span data-when="before">My stack before LLMs. Every step by hand.</span>
+            <span data-when="now">My stack now. Same five steps, with the legwork automated.</span>
+          </p>
+        </div>
+
         <div class="loop-track">
           <span class="loop-line" data-inview aria-hidden="true"></span>
           <ol class="loop-row">
             {loop.map((s, i) => (
-              <li class={`loop-card reveal reveal-d${Math.min(i + 1, 4)}`}>
+              <li class={`loop-card reveal reveal-d${Math.min(i + 1, 4)}`} style={`--i:${i}`}>
                 <span class="loop-num">{s.n}</span>
                 <h3 class="loop-name">{s.name}</h3>
-                <p class="loop-body">{s.body}</p>
+                <div class="loop-bodies">
+                  <p class="loop-body" data-when="before">{s.body}</p>
+                  <p class="loop-body" data-when="now">{s.now}</p>
+                </div>
                 <ul class="loop-tools">
                   {s.tools.map((t) => <li>{t}</li>)}
+                  <li class="loop-plus" data-when="now">{s.plus}</li>
                 </ul>
+                <span class="loop-feed" aria-hidden="true"></span>
               </li>
             ))}
           </ol>
-          <p class="loop-repeat reveal reveal-d4"><span aria-hidden="true">↺</span> repeat</p>
+
+          <div class="loop-bus reveal reveal-d4">
+            <span class="loop-bus-label">Run by</span>
+            <ul class="loop-runners">
+              <li class="loop-runner">Me</li>
+              <li class="loop-runner" data-when="now" style="--i:1">Claude Code</li>
+              <li class="loop-runner" data-when="now" style="--i:2">Gemini</li>
+              <li class="loop-runner loop-runner--home" data-when="now" style="--i:3">
+                <svg class="loop-home" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                  <path d="M2 7.5 8 2.5l6 5V14H2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+                  <circle class="loop-home-led" cx="8" cy="10.2" r="1.6"/>
+                </svg>
+                Local LLMs <small>at home</small>
+              </li>
+            </ul>
+            <p class="loop-repeat"><span aria-hidden="true">↺</span> repeat</p>
+          </div>
         </div>
 
-        <p class="loop-foot reveal">The rest saves time: Claude, Gemini, Raycast and Wisprflow. The tools change every few years. The habit doesn't.</p>
+        <p class="loop-foot reveal">Claude Code and Gemini do most of the lifting. Some of it runs on local models, on a machine I keep at home. The tools change every few years. The habit doesn't.</p>
       </section>
 
       <!-- Principles -->
@@ -508,6 +552,30 @@ const loop = [
       if (e.key === 'Escape') focusOn(null);
     });
     document.addEventListener('click', (e) => { if (!stack.contains(e.target)) focusOn(null); });
+  }
+
+  /* ---- How I work: Before / Now switch. Opens on "before", flips to
+     "now" once the first card is in view, unless the visitor got to the
+     switch first. Reduced motion stays on "now" and only flips on click. ---- */
+  const loopEl = wrap.querySelector('[data-loop]');
+  if (loopEl) {
+    const btns = Array.from(loopEl.querySelectorAll('[data-loop-mode]'));
+    let touched = false;
+    const setMode = (mode) => {
+      loopEl.dataset.mode = mode;
+      btns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.loopMode === mode)));
+    };
+    btns.forEach((b) => b.addEventListener('click', () => { touched = true; setMode(b.dataset.loopMode); }));
+    const first = loopEl.querySelector('.loop-card');
+    if (!reduce && first && 'IntersectionObserver' in window) {
+      setMode('before');
+      const io = new IntersectionObserver((entries) => {
+        if (!entries.some((en) => en.isIntersecting)) return;
+        io.disconnect();
+        setTimeout(() => { if (!touched) setMode('now'); }, 1400);
+      }, { threshold: 0.6 });
+      io.observe(first);
+    }
   }
 
   /* ---- Count-ups: [data-count] with data-from / data-to ---- */

@@ -1869,35 +1869,232 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
   line-height: var(--font-line-height-normal);
   color: var(--text-secondary);
 }
-.loop-repeat {
+.loop-bodies { display: grid; }
+.loop-bodies > .loop-body { grid-area: 1 / 1; }
+
+/* Before / Now. Anything tagged data-when belongs to one side of the
+   switch. Both sides stay in the layout (stacked or reserved), so the
+   flip never moves the page. The hidden side is visibility:hidden, so
+   it is out of the accessibility tree too. */
+.loop { --loop-cycle: 5s; --loop-brand: var(--fill-brand-default); }
+.loop .about-head { margin-bottom: var(--dimension-space-32); }
+.loop [data-when] {
+  transition:
+    opacity 350ms var(--motion-easing-standard),
+    transform 500ms var(--motion-easing-spring),
+    visibility 0s;
+  transition-delay: calc(var(--i, 0) * 70ms + 120ms);
+}
+.loop[data-mode="before"] [data-when="now"],
+.loop[data-mode="now"] [data-when="before"] {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 200ms var(--motion-easing-standard),
+    transform 200ms var(--motion-easing-standard),
+    visibility 0s linear 200ms;
+}
+.loop[data-mode="before"] .loop-body[data-when="now"] { transform: translateY(8px); }
+.loop[data-mode="now"] .loop-body[data-when="before"] { transform: translateY(-8px); }
+.loop[data-mode="before"] :is(.loop-plus, .loop-runner)[data-when="now"] { transform: scale(0.5); }
+
+.loop-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dimension-space-12) var(--dimension-space-16);
+  margin-bottom: var(--dimension-space-32);
+}
+.loop-seg {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 4%, transparent);
+}
+.about-wrap:not(.js) .loop-seg { display: none; }
+.loop-seg-thumb {
+  position: absolute;
+  top: 3px; bottom: 3px; left: 3px;
+  width: calc(50% - 3px);
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+  transition: transform 450ms var(--motion-easing-spring);
+}
+.loop[data-mode="now"] .loop-seg-thumb { transform: translateX(100%); }
+.loop-seg button {
+  position: relative;
+  z-index: 1;
+  padding: var(--dimension-space-6) var(--dimension-space-16);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  line-height: var(--font-line-height-normal);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-duration-short) var(--motion-easing-standard);
+}
+.loop-seg button[aria-pressed="true"] { color: var(--surface-default); }
+.loop-seg button:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.loop-caption { display: grid; font-size: var(--font-size-sm); color: var(--text-secondary); }
+.loop-caption > span { grid-area: 1 / 1; }
+
+/* The chip each step gained. */
+.loop-tools li.loop-plus {
+  border-color: color-mix(in srgb, var(--loop-brand) 50%, transparent);
+  background: color-mix(in srgb, var(--loop-brand) 10%, transparent);
+  color: var(--text-brand);
+}
+.loop-plus::before { content: '+ '; }
+
+/* A comet runs along the line behind the cards, so it shows in the gaps
+   and each card lights up while the work is "inside" it. */
+.loop-line::after {
+  content: '';
+  position: absolute;
+  inset: -1px 0;
+  background: linear-gradient(90deg, transparent calc(100% - 72px), var(--loop-brand));
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: opacity 400ms var(--motion-easing-standard);
+}
+.loop[data-mode="now"] .loop-line::after { opacity: 1; }
+
+/* Feed: the short wire from the rail up into each card. */
+.loop-feed {
+  position: absolute;
+  top: 100%; left: 50%;
+  width: 1px; height: var(--dimension-space-24);
+  background: color-mix(in srgb, var(--loop-brand) 55%, transparent);
+  transform-origin: bottom center;
+  transition: transform 450ms var(--motion-easing-emphasized) calc(var(--i, 0) * 70ms + 200ms);
+}
+.loop[data-mode="before"] .loop-feed { transform: scaleY(0); transition-delay: 0s; }
+.loop-feed::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 50%;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--loop-brand);
+  transform: translate(-50%, 0);
+  opacity: 0;
+}
+
+/* The rail: who runs the loop. "Me" on both sides of the switch. */
+.loop-bus {
   position: relative;
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dimension-space-12) var(--dimension-space-16);
+  margin-top: var(--dimension-space-24);
+  padding: var(--dimension-space-12) var(--dimension-space-20);
+  border-radius: var(--radius-card);
+  background: var(--surface-default);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
+  overflow: hidden;
+}
+.loop-bus::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(270deg, transparent calc(100% - 96px), var(--loop-brand));
+  transform: translateX(100%);
+  opacity: 0;
+  transition: opacity 400ms var(--motion-easing-standard);
+}
+.loop[data-mode="now"] .loop-bus::before { opacity: 1; }
+.loop-bus-label {
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--font-letter-spacing-wider);
+  color: var(--text-tertiary);
+}
+.loop-runners { list-style: none; display: flex; flex-wrap: wrap; gap: var(--dimension-space-8); }
+.loop-runner {
+  display: inline-flex;
+  align-items: center;
   gap: var(--dimension-space-6);
-  padding-top: var(--dimension-space-24);
+  padding: var(--dimension-space-4) var(--dimension-space-12);
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-line-height-normal);
+  color: var(--text-primary);
+}
+.loop-runner[data-when="now"] {
+  border-color: color-mix(in srgb, var(--loop-brand) 45%, transparent);
+  background: color-mix(in srgb, var(--loop-brand) 8%, transparent);
+}
+.loop-runner[data-when="now"]:not(.loop-runner--home)::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--loop-brand);
+}
+.loop-runner small { font-size: var(--font-size-xs); color: var(--text-secondary); }
+.loop-home { flex: none; color: var(--text-brand); }
+.loop-home-led { fill: var(--loop-brand); }
+.loop-repeat {
+  display: flex;
+  gap: var(--dimension-space-6);
+  margin-left: auto;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
-.loop-repeat::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: calc((100% - 96px) / 10);
-  right: calc((100% - 96px) / 10);
-  height: 14px;
-  border: 1px solid color-mix(in srgb, var(--text-primary) 30%, transparent);
-  border-top: 0;
-  border-radius: 0 0 var(--dimension-radius-sm) var(--dimension-radius-sm);
+.loop-repeat span { display: inline-block; }
+
+/* Motion, only on "now" and only while the section is on screen
+   (.is-live comes from the page's data-live hook). One cycle is one
+   trip round the loop: the comet crosses the five cards left to right,
+   each card lights for its fifth, and the rail carries it back. */
+@media (prefers-reduced-motion: no-preference) {
+  .loop.is-live[data-mode="now"] .loop-line::after { animation: loop-comet var(--loop-cycle) linear infinite; }
+  .loop.is-live[data-mode="now"] .loop-bus::before { animation: loop-return var(--loop-cycle) linear infinite; }
+  .loop.is-live[data-mode="now"] .loop-card { animation: loop-pass var(--loop-cycle) linear infinite; }
+  .loop.is-live[data-mode="now"] .loop-num { animation: loop-num var(--loop-cycle) linear infinite; }
+  .loop.is-live[data-mode="now"] .loop-feed::after { animation: loop-feed var(--loop-cycle) linear infinite; }
+  .loop.is-live[data-mode="now"] :is(.loop-card, .loop-num),
+  .loop.is-live[data-mode="now"] .loop-feed::after { animation-delay: calc(var(--i, 0) * var(--loop-cycle) / 5); }
+  .loop.is-live[data-mode="now"] .loop-repeat span { animation: loop-spin var(--loop-cycle) var(--motion-easing-emphasized) infinite; }
+  .loop.is-live[data-mode="now"] .loop-runner[data-when="now"]::before { animation: about-pulse 2.4s ease-in-out infinite; animation-delay: calc(var(--i, 0) * 300ms); }
+  .loop.is-live[data-mode="now"] .loop-home-led { animation: loop-led 1.6s steps(1, end) infinite; }
 }
-.loop-repeat::after {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: calc((100% - 96px) / 10 - 3px);
-  width: 7px; height: 7px;
-  border-top: 1px solid color-mix(in srgb, var(--text-primary) 45%, transparent);
-  border-left: 1px solid color-mix(in srgb, var(--text-primary) 45%, transparent);
-  transform: rotate(45deg);
+@keyframes loop-comet { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes loop-comet-y { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes loop-return { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes loop-pass {
+  0%, 26%, 100% {
+    border-color: color-mix(in srgb, var(--text-primary) 12%, transparent);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  3%, 18% {
+    border-color: color-mix(in srgb, var(--loop-brand) 70%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--loop-brand) 14%, transparent);
+  }
+}
+@keyframes loop-num {
+  0%, 26%, 100% { color: var(--text-tertiary); }
+  3%, 18% { color: var(--text-brand); }
+}
+@keyframes loop-feed {
+  0% { transform: translate(-50%, 0); opacity: 0; }
+  2% { opacity: 1; }
+  9% { transform: translate(-50%, -24px); opacity: 1; }
+  12%, 100% { transform: translate(-50%, -24px); opacity: 0; }
+}
+@keyframes loop-spin {
+  0%, 78% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+@keyframes loop-led {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
 }
 .loop-foot { margin-top: var(--dimension-space-40); max-width: 64ch; font-size: var(--font-size-sm); color: var(--text-tertiary); }
 
@@ -2618,8 +2815,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 /* ---- Breakpoints --------------------------------------------------- */
 @media (max-width: 1023px) {
   .loop-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .loop-line, .loop-card + .loop-card::before, .loop-repeat::before, .loop-repeat::after { display: none; }
-  .loop-repeat { justify-content: flex-start; padding-top: var(--dimension-space-16); }
+  .loop-line, .loop-card + .loop-card::before, .loop-feed { display: none; }
   .p-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .p-card, .p-card:nth-child(n+4) { grid-column: span 1; }
   .p-card:last-child { grid-column: span 2; }
@@ -2647,6 +2843,13 @@ a.journey-co:hover { text-decoration-color: currentColor; }
     transform-origin: top center;
   }
   .js .loop-line:not(.in) { transform: scaleY(0); }
+  .loop-line::after {
+    inset: 0 -1px;
+    background: linear-gradient(180deg, transparent calc(100% - 72px), var(--loop-brand));
+    transform: translateY(-100%);
+  }
+  .loop.is-live[data-mode="now"] .loop-line::after { animation-name: loop-comet-y; }
+  .loop-repeat { margin-left: 0; }
   .loop-card + .loop-card::before {
     display: block;
     top: -16px; left: calc(50% - 4px);
@@ -2688,6 +2891,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 @media (prefers-reduced-motion: reduce) {
   .xray-grid, [data-xray], .xray-note, .xray-track, .xray-knob, .xray-switch--float { transition: none; }
   .loop-line, .loop-card + .loop-card::before { transition: none; }
+  .loop [data-when], .loop-seg-thumb, .loop-feed, .loop-line::after, .loop-bus::before { transition: none; }
+  .loop-line::after, .loop-bus::before { display: none; }
   .js .loop-line:not(.in) { transform: none; }
   .js .loop-line:not(.in) ~ .loop-row .loop-card::before { opacity: 1; }
   .journey-list > li::after { clip-path: none; transition: none; }
@@ -3314,14 +3519,9 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   transition: background var(--motion-duration-short), color var(--motion-duration-short);
 }
 .intent-btn:last-child { border-right: none; }
-/* Four intents don't fit in one row of the modal at any width, so
-   they always sit in a 2×2 grid. */
-@media all {
-  .intent-toggle { display: grid; grid-template-columns: 1fr 1fr; }
-  .intent-btn { border-bottom: var(--dimension-border-width-1) solid var(--border-inverse); }
-  .intent-btn:nth-child(2n) { border-right: none; }
-  .intent-btn:nth-last-child(-n+2) { border-bottom: none; }
-}
+/* Three intents share one row at every width: equal columns, and on
+   phones the labels may wrap to two lines rather than clip. */
+.intent-toggle { display: grid; grid-template-columns: repeat(3, 1fr); }
 .intent-btn[aria-checked="true"] { background: var(--component-form-toggle-fill-active); color: var(--text-inverse); }
 .intent-btn:hover:not([aria-checked="true"]) { background: var(--component-form-toggle-fill); color: var(--text-inverse); }
 .intent-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
@@ -3407,11 +3607,47 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .compose-copy-email:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--dimension-radius-xs); }
 .compose-footer-actions { display: flex; gap: var(--dimension-space-10); flex-shrink: 0; align-items: center; }
 
+/* Phones: the modal becomes a full-screen sheet. No scrim margin, no
+   floating card — the whole viewport is the form. Header pinned at the
+   top, footer pinned at the bottom (thumb zone, above the home
+   indicator), only the fields scroll. It slides up from the bottom
+   instead of the desktop gravity scale. */
 @media (max-width: 600px) { /* near --bp-sm (480px) */
-  .compose-backdrop { padding-top: var(--dimension-space-80); align-items: flex-start; }
-  .compose-modal { width: calc(100vw - 32px); height: auto; max-height: calc(100svh - 120px); }
-  .compose-footer { flex-direction: column; align-items: stretch; }
-  .compose-footer-actions { justify-content: flex-end; }
+  .compose-backdrop { padding: 0; align-items: stretch; overflow: hidden; }
+  .compose-modal {
+    --compose-gap: var(--dimension-space-16);
+    width: 100%; height: 100dvh; max-height: none;
+    border: none; border-radius: 0; box-shadow: none;
+    transform: translateY(100%); opacity: 1;
+    transition: transform 260ms cubic-bezier(0.4, 0, 1, 1);
+  }
+  .compose-backdrop.is-open .compose-modal {
+    transform: translateY(0);
+    animation: none;
+    transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .compose-modal-top {
+    padding: calc(var(--dimension-space-16) + env(safe-area-inset-top)) var(--dimension-space-16) var(--dimension-space-16);
+    gap: var(--dimension-space-16);
+  }
+  .compose-close { top: calc(var(--dimension-space-8) + env(safe-area-inset-top)); right: var(--dimension-space-8); border-radius: var(--dimension-radius-sm); }
+  .compose-modal h2 { font-size: var(--font-size-2xl); }
+  .intent-btn {
+    min-height: var(--target-min);
+    padding: var(--dimension-space-6) var(--dimension-space-4);
+    white-space: normal; line-height: 1.2;
+  }
+  .compose-modal-body { padding: var(--dimension-space-16); gap: var(--dimension-space-16); }
+  /* 16px stops iOS Safari zooming the page when a field is focused. */
+  .compose-input, .compose-textarea { font-size: 16px; }
+  .compose-textarea { min-height: 160px; }
+  .compose-footer {
+    flex-direction: column-reverse; align-items: stretch; gap: var(--dimension-space-4);
+    padding: var(--dimension-space-12) var(--dimension-space-16) calc(var(--dimension-space-12) + env(safe-area-inset-bottom));
+  }
+  .compose-copy-email { align-self: center; }
+  .compose-footer-actions { display: grid; grid-template-columns: 1fr 2fr; }
+  .compose-footer-actions .btn { width: 100%; justify-content: center; }
 }
 
 /* Compose modal — dynamic form fields (Work together / Mentor me) */
