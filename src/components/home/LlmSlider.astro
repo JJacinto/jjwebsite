@@ -3,16 +3,16 @@
 // Markup is built client-side as SVG (two layers, the AFTER layer clipped by the handle).
 ---
 <div class="llm-slider">
-  <div class="ls-stage reveal reveal-d1" id="lsStage" role="group" aria-label="Before and after comparison of how I work">
-    <span class="ls-corner l"><i></i>Before LLMs · one bench</span>
-    <span class="ls-corner r"><i></i>After LLMs · a factory</span>
-    <div class="ls-handle" id="lsHandle" role="slider" tabindex="0" aria-label="Compare before and after" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-umami-event="home-llm-slider">
+  <div class="ls-stage reveal reveal-d1" id="lsStage" role="group" aria-label="Before and after comparison of how I work" data-pt-aria-label="Comparação antes e depois da forma como trabalho">
+    <span class="ls-corner l"><i></i><span data-pt="Antes dos LLMs · uma bancada">Before LLMs · one bench</span></span>
+    <span class="ls-corner r"><i></i><span data-pt="Depois dos LLMs · uma fábrica">After LLMs · a factory</span></span>
+    <div class="ls-handle" id="lsHandle" role="slider" tabindex="0" aria-label="Compare before and after" data-pt-aria-label="Comparar antes e depois" aria-orientation="horizontal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" data-umami-event="home-llm-slider">
       <div class="ls-knob" aria-hidden="true"><span>&lsaquo;</span><span>&rsaquo;</span></div>
     </div>
     <button class="ls-ctl" id="lsPause" type="button" aria-pressed="false">Pause</button>
   </div>
-  <p class="ls-hint reveal reveal-d2">Drag the handle, or use the arrow keys</p>
-  <p class="ls-sr">Left of the handle: a workbench where one narrow slice of the plan is built and shipped at a time. Right of the handle: a factory with three parallel lanes of stations, each with a quality gate. In both, the big-scope piece of the plan is cut and left out.</p>
+  <p class="ls-hint reveal reveal-d2" data-pt="Arrastar o cursor, ou usar as setas do teclado">Drag the handle, or use the arrow keys</p>
+  <p class="ls-sr" data-pt="À esquerda do cursor: uma bancada onde uma fatia estreita do plano é construída e lançada de cada vez. À direita do cursor: uma fábrica com três linhas paralelas de estações, cada uma com um controlo de qualidade. Nas duas, a parte do plano com maior âmbito é cortada e fica de fora.">Left of the handle: a workbench where one narrow slice of the plan is built and shipped at a time. Right of the handle: a factory with three parallel lanes of stations, each with a quality gate. In both, the big-scope piece of the plan is cut and left out.</p>
 </div>
 
 <style is:global>
@@ -100,6 +100,18 @@
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var LOOP = 9500;
 
+  /* Words drawn inside the SVG and written by this script, in both languages. */
+  var STR = {
+    en: { time: 'time →', plan: 'plan', cut: 'cut', build: 'Build', shipped: 'shipped', pause: 'Pause', play: 'Play',
+          vtFactory: 'Showing the factory (after)', vtBench: 'Showing the bench (before)',
+          vtMix: function (b, a) { return b + '% before, ' + a + '% after'; } },
+    pt: { time: 'tempo →', plan: 'plano', cut: 'cortado', build: 'Construir', shipped: 'lançado', pause: 'Pausar', play: 'Retomar',
+          vtFactory: 'A mostrar a fábrica (depois)', vtBench: 'A mostrar a bancada (antes)',
+          vtMix: function (b, a) { return b + '% antes, ' + a + '% depois'; } }
+  };
+  function lang() { return (window as any).jjLang ? (window as any).jjLang() : 'en'; }
+  function L(k) { return STR[lang() === 'pt' ? 'pt' : 'en'][k]; }
+
   function el(tag, attrs, parent) {
     var e = document.createElementNS(NS, tag);
     for (var k in attrs) { if (attrs[k] != null) e.setAttribute(k, attrs[k]); }
@@ -155,8 +167,8 @@
 
     var ax = el('g', {}, svg);
     el('line', { x1: c.axisX0, x2: c.axisX1, y1: c.axisY, y2: c.axisY, 'class': 'axl' }, ax);
-    txt(svg, 'time →', c.timeLbl[0], c.timeLbl[1], 'm end');
-    txt(svg, 'plan', c.planLbl[0], c.planLbl[1], 'm');
+    txt(svg, L('time'), c.timeLbl[0], c.timeLbl[1], 'm end');
+    txt(svg, L('plan'), c.planLbl[0], c.planLbl[1], 'm');
 
     var lines = el('g', { filter: PF }, svg);
     var laneYs = A ? c.lanes : [c.mid];
@@ -174,7 +186,7 @@
     });
     var q = c.cut;
     el('rect', { x: q.x, y: q.y, width: q.w, height: q.h, rx: 9, 'class': 'card cut' + (A ? ' a' : '') }, cg);
-    txt(tg, 'cut', q.x + q.w / 2, q.y + q.h / 2 + 4, 'm mid');
+    txt(tg, L('cut'), q.x + q.w / 2, q.y + q.h / 2 + 4, 'm mid');
     var sg = el('g', {}, svg);
     el('line', { x1: q.x - 8, x2: q.x + q.w + 4, y1: c.scisY, y2: c.scisY, 'class': 'scis' }, sg);
     var sc = el('g', { transform: 'translate(' + (q.x + q.w - 8) + ',' + (c.scisY - 7) + ')' }, sg);
@@ -184,7 +196,7 @@
     var mg = el('g', { filter: PF }, svg), w = c.bx1 - c.bx0;
     if (!A) {
       el('rect', { x: c.bx0, y: c.mid - c.beforeH / 2, width: w, height: c.beforeH, rx: 10, 'class': 'bench' }, mg);
-      txt(svg, 'Build', c.bx0 + w / 2, c.mid + 5, 'lbl big mid');
+      txt(svg, L('build'), c.bx0 + w / 2, c.mid + 5, 'lbl big mid');
     } else {
       el('rect', { x: c.bx0, y: c.mid - c.afterH / 2, width: w, height: c.afterH, rx: 12, 'class': 'fac' }, svg);
       txt(svg, 'Skills + plugins', c.bx0 + w / 2, c.mid - c.afterH / 2 + (m ? 18 : 22), 'lbl mid').style.fontSize = (m ? 12 : 13) + 'px';
@@ -209,7 +221,7 @@
       bars.push(g);
       routes.push(prep(route(c, k, A, shipX[k], c.axisY - h)));
     }
-    txt(svg, 'shipped', shipX[n - 1] + c.barW / 2, c.axisY - h - 10, 'm mid');
+    txt(svg, L('shipped'), shipX[n - 1] + c.barW / 2, c.axisY - h - 10, 'm mid');
 
     var mkg = el('g', {}, svg), mk = [];
     for (var j = 0; j < n; j++) {
@@ -223,9 +235,9 @@
 
   var state = null, running = true, visible = true, clock = LOOP * .15, last = null, pct = 50, nudgeId = null, rafId = null;
   var mq = window.matchMedia('(max-width: 560px)');
-  function build() {
+  function build(force) {
     var m = mq.matches;
-    if (state && state.m === m) return;
+    if (!force && state && state.m === m) return;
     [].slice.call(stage.querySelectorAll('svg.ls-layer')).forEach(function (n) { n.remove(); });
     var c = makeCfg(m);
     var b = drawLayer('before', c), a = drawLayer('after', c);
@@ -273,8 +285,10 @@
   function startLoop() { if (!reduce && !rafId && visible) { last = null; rafId = requestAnimationFrame(frame); } }
 
   pauseBtn.addEventListener('click', function () {
-    running = !running; pauseBtn.textContent = running ? 'Pause' : 'Play'; pauseBtn.setAttribute('aria-pressed', String(!running));
+    running = !running; setPauseLabel(); pauseBtn.setAttribute('aria-pressed', String(!running));
   });
+  function setPauseLabel() { pauseBtn.textContent = running ? L('pause') : L('play'); }
+  setPauseLabel();
   if (reduce) pauseBtn.style.display = 'none';
 
   /* slider */
@@ -284,7 +298,7 @@
     handle.style.left = 'clamp(22px, ' + pct + '%, calc(100% - 22px))';
     var r = Math.round(pct);
     handle.setAttribute('aria-valuenow', r);
-    handle.setAttribute('aria-valuetext', r <= 8 ? 'Showing the factory (after)' : r >= 92 ? 'Showing the bench (before)' : r + '% before, ' + (100 - r) + '% after');
+    handle.setAttribute('aria-valuetext', r <= 8 ? L('vtFactory') : r >= 92 ? L('vtBench') : L('vtMix')(r, 100 - r));
   }
   function fromEvent(e) { var rc = stage.getBoundingClientRect(); return (e.clientX - rc.left) / rc.width * 100; }
   function stopNudge() { if (nudgeId) { cancelAnimationFrame(nudgeId); nudgeId = null; } }
@@ -326,7 +340,9 @@
   }
   var nudged = false;
   build();
-  mq.addEventListener('change', build);
+  mq.addEventListener('change', function () { build(); });
+  /* Language switch: redraw the SVG labels and re-word the controls. */
+  document.addEventListener('jj:langchange', function () { build(true); setPauseLabel(); setPct(pct); });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(function (es) {
       es.forEach(function (en) {

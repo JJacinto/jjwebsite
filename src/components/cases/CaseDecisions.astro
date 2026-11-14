@@ -6,16 +6,16 @@ interface Props { c: Case; }
 const { c } = Astro.props;
 ---
 <section class="case-decisions reveal" id="case-decisions" aria-labelledby="case-decisions-eyebrow">
-  <span class="eyebrow" id="case-decisions-eyebrow">Three decisions</span>
+  <span class="eyebrow" id="case-decisions-eyebrow" data-pt="Três decisões">Three decisions</span>
   <ol class="case-decisions-list">
     {c.decisions.map((d, i) => (
       <li class="case-decision">
         <span class="case-decision-n">{String(i + 1).padStart(2, '0')}</span>
-        <h3 class="case-decision-title">{d.title}</h3>
-        <p class="case-decision-body">{d.body}</p>
-        <span class="case-xnote">// Decision {String(i + 1).padStart(2, '0')}</span>
+        <h3 class="case-decision-title" data-pt={d.titlePt}>{d.title}</h3>
+        <p class="case-decision-body" data-pt={d.bodyPt}>{d.body}</p>
+        <span class="case-xnote" data-pt={`// Decisão ${String(i + 1).padStart(2, '0')}`}>// Decision {String(i + 1).padStart(2, '0')}</span>
       </li>
     ))}
   </ol>
-  <p class="case-decisions-foot">The full story follows.</p>
+  <p class="case-decisions-foot" data-pt="A história completa vem a seguir.">The full story follows.</p>
 </section>

@@ -299,7 +299,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     link.addEventListener('mouseenter', (e) => {
       clearTimeout(tipTimer);
       tipTimer = setTimeout(() => {
-        tip.textContent = 'Go to ' + host;
+        tip.textContent = ((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Ir para ' : 'Go to ') + host;
         tip.classList.add('visible');
         tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
         tip.style.top  = (e.clientY - 44) + 'px';
@@ -341,7 +341,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         /* Cards can name their action on the ball, e.g. "View case study". */
         const label = !isTestimonial && !isImage ? card.dataset.cursorLabel : '';
         ball.classList.toggle('is-labelled', !!label);
-        ballLabel.textContent = label || 'View LinkedIn';
+        ballLabel.textContent = label || ((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Ver LinkedIn' : 'View LinkedIn');
         if (!isTestimonial && !isImage) {
           /* Replay the arrow nudge when entering a case card. */
           const arrow = ball.querySelector('.cursor-ball-arrow');

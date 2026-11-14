@@ -7,6 +7,8 @@ import LlmSlider from '../components/home/LlmSlider.astro';
 <Base
   activePage="home"
   description="João Jacinto, senior product designer in Aveiro, Portugal. I design the parts users don't see, and I build what I design."
+  titlePt="João Jacinto — Senior Product Designer"
+  descriptionPt="João Jacinto, senior product designer em Aveiro, Portugal. Desenho as partes que os utilizadores não veem, e construo o que desenho."
   showCta={true}
   disablePageParticles={true}
 >
@@ -38,30 +40,30 @@ import LlmSlider from '../components/home/LlmSlider.astro';
       <canvas class="cta-footer-bg"></canvas>
     </div>
     <div class="container hero-inner" data-xray>
-      <aside class="xray-note" data-xray-note>One headline, one promise. The line under it carries the proof, so the headline can stay short.</aside>
-      <h1 class="hero-greeting">Hey, I'm João. A product designer who builds.</h1>
+      <aside class="xray-note" data-xray-note data-pt="Um título, uma promessa. A linha por baixo traz a prova, por isso o título pode ficar curto.">One headline, one promise. The line under it carries the proof, so the headline can stay short.</aside>
+      <h1 class="hero-greeting" data-pt="Olá, sou o João. Um product designer que constrói.">Hey, I'm João. A product designer who builds.</h1>
       <p class="hero-role"><span class="hero-line">I design the parts users don't see.</span></p>
-      <p class="hero-sub">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
+      <p class="hero-sub" data-pt="Para que as que veem pareçam inevitáveis. Dez anos em fintech, vídeo e ferramentas de suporte, e construo o que desenho.">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
       <div class="hero-ctas">
         <button class="btn btn-accent" type="button" data-umami-event="hero-hire" onclick="openComposeModal(3)">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
-          <span>Hiring? Let's talk</span>
+          <span data-pt="A contratar? Vamos falar">Hiring? Let's talk</span>
         </button>
         <a class="btn btn-ghost" data-umami-event="hero-view-work" href="#work">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-          <span>See the work</span>
+          <span data-pt="Ver o trabalho">See the work</span>
         </a>
       </div>
       <div class="hero-xray">
         <XraySwitch wrap=".home-wrap" />
-        <span class="hero-xray-hint">or press <kbd>X</kbd></span>
+        <span class="hero-xray-hint" data-pt="ou prime <kbd>X</kbd>">or press <kbd>X</kbd></span>
       </div>
 
       <!-- Intro stage: the logo draws itself, flies to the nav, then the
            keywords play in the headline's place. Decorative only; the
            real copy above is what stays on screen. Keywords live in
            data-keywords so they can be edited without touching the JS. -->
-      <div class="hero-stage" aria-hidden="true" data-keywords="Product designer|Who builds|Ten years in">
+      <div class="hero-stage" aria-hidden="true" data-keywords="Product designer|Who builds|Ten years in" data-pt-data-keywords="Product designer|Que constrói|Dez anos em">
         <svg class="hero-logo" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
           <g transform="matrix(1.20499,0,0,1.20469,-1150.09,-2581.94)">
             <mask id="jjIntroM1"><path class="hero-logo-draw" pathLength="1" d="M1108,2767C1092,2820 1090,2900 1157,2924C1215,2940 1262,2900 1297,2791L1433,2268C1490,2285 1560,2290 1621,2256"/></mask>
@@ -82,10 +84,10 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <!-- WORK WALL -->
   <section class="home-work" id="work">
     <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note>Every tile is a decision, not a screenshot. Flip X-ray on and they all show what I cut.</aside>
+      <aside class="xray-note" data-xray-note data-pt="Cada tile é uma decisão, não uma captura de ecrã. Com o Raio-X ligado, todos mostram o que cortei.">Every tile is a decision, not a screenshot. Flip X-ray on and they all show what I cut.</aside>
       <div class="home-head" data-xray-gap="48">
-        <p class="eyebrow home-eyebrow reveal">Selected work</p>
-        <h2 class="home-h2 reveal reveal-d1">Every result has a cut behind it.</h2>
+        <p class="eyebrow home-eyebrow reveal" data-pt="Trabalho selecionado">Selected work</p>
+        <h2 class="home-h2 reveal reveal-d1" data-pt="Cada resultado tem um corte por trás.">Every result has a cut behind it.</h2>
       </div>
       <WorkWall />
     </div>
@@ -95,8 +97,8 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <section class="brands reveal">
     <div class="brands-xray" data-xray>
     <div class="container home-block">
-      <aside class="xray-note" data-xray-note>Logos only, no claims. The work above says what I did there.</aside>
-      <p class="eyebrow brands-label">Worked with</p>
+      <aside class="xray-note" data-xray-note data-pt="Só logótipos, sem promessas. O trabalho acima diz o que fiz lá.">Logos only, no claims. The work above says what I did there.</aside>
+      <p class="eyebrow brands-label" data-pt="Trabalhei com">Worked with</p>
     </div>
     <div class="brands-marquee">
       <div class="brands-track">
@@ -116,27 +118,27 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <!-- HOW I WORK -->
   <section class="home-how">
     <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note>Three steps, not seven. If it doesn't fit on one screen, it isn't a process, it's a wish list.</aside>
+      <aside class="xray-note" data-xray-note data-pt="Três passos, não sete. Se não cabe num ecrã, não é um processo, é uma lista de desejos.">Three steps, not seven. If it doesn't fit on one screen, it isn't a process, it's a wish list.</aside>
       <div class="home-head" data-xray-gap="48">
-        <p class="eyebrow home-eyebrow reveal">How I work</p>
-        <h2 class="home-h2 reveal reveal-d1">Three steps, in this order.</h2>
+        <p class="eyebrow home-eyebrow reveal" data-pt="Como trabalho">How I work</p>
+        <h2 class="home-h2 reveal reveal-d1" data-pt="Três passos, por esta ordem.">Three steps, in this order.</h2>
       </div>
       <ol class="how-steps">
         <li class="how-step reveal reveal-d1">
           <span class="how-n">01</span>
-          <h3>Find the real problem</h3>
-          <p>At StreamYard the roadmap came from sales calls and support tickets. So I interviewed organisers who paid for competing tools.</p>
+          <h3 data-pt="Encontrar o problema real">Find the real problem</h3>
+          <p data-pt="Na StreamYard, o roadmap vinha de chamadas de vendas e tickets de suporte. Por isso entrevistei organizadores que pagavam por ferramentas concorrentes.">At StreamYard the roadmap came from sales calls and support tickets. So I interviewed organisers who paid for competing tools.</p>
         </li>
         <li class="how-step reveal reveal-d2">
           <span class="how-n">02</span>
-          <h3>Cut what doesn't earn its place</h3>
-          <p>I skipped the page builder. Templates where one colour makes the whole palette shipped instead.</p>
-          <span class="how-chip">Anchorage · <b>40 → 1</b> step</span>
+          <h3 data-pt="Cortar o que não merece o lugar">Cut what doesn't earn its place</h3>
+          <p data-pt="Dispensei o page builder. Lançámos antes templates em que uma só cor define a paleta inteira.">I skipped the page builder. Templates where one colour makes the whole palette shipped instead.</p>
+          <span class="how-chip" data-pt="Anchorage · <b>40 → 1</b> passo">Anchorage · <b>40 → 1</b> step</span>
         </li>
         <li class="how-step reveal reveal-d3">
           <span class="how-n">03</span>
-          <h3>Build it, in code when it helps</h3>
-          <p>At StreamYard I specified tokens and 15+ components so design and code could share one source. This site is hand-built too.</p>
+          <h3 data-pt="Construir, em código quando ajuda">Build it, in code when it helps</h3>
+          <p data-pt="Na StreamYard especifiquei tokens e 15+ componentes para que design e código partilhassem uma só fonte. Este site também é feito à mão.">At StreamYard I specified tokens and 15+ components so design and code could share one source. This site is hand-built too.</p>
         </li>
       </ol>
     </div>
@@ -145,10 +147,10 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <!-- THEN AND NOW -->
   <section class="home-then">
     <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note>One idea, two ways of working. Drag it and the picture explains itself.</aside>
+      <aside class="xray-note" data-xray-note data-pt="Uma ideia, duas formas de trabalhar. Arrastar o cursor e a imagem explica-se sozinha.">One idea, two ways of working. Drag it and the picture explains itself.</aside>
       <div class="home-head" data-xray-gap="48">
-        <p class="eyebrow home-eyebrow reveal">Then and now</p>
-        <h2 class="home-h2 reveal reveal-d1">Same plan, a different factory.</h2>
+        <p class="eyebrow home-eyebrow reveal" data-pt="Antes e agora">Then and now</p>
+        <h2 class="home-h2 reveal reveal-d1" data-pt="O mesmo plano, outra fábrica.">Same plan, a different factory.</h2>
       </div>
       <LlmSlider />
     </div>
@@ -157,8 +159,8 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <!-- TESTIMONIALS -->
   <section class="testimonials">
     <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note>Only people I worked with directly. Each one says how we worked together.</aside>
-      <p class="eyebrow reveal">What people I've worked with say</p>
+      <aside class="xray-note" data-xray-note data-pt="Só pessoas com quem trabalhei diretamente. Cada uma diz como trabalhámos em conjunto.">Only people I worked with directly. Each one says how we worked together.</aside>
+      <p class="eyebrow reveal" data-pt="O que dizem as pessoas com quem trabalhei">What people I've worked with say</p>
       <div class="testimonials-masonry">
         <a class="testimonial-card reveal reveal-d1" data-umami-event="testimonial" data-umami-event-author="daniel-cardoso" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
           <span class="testimonial-stroke-light" aria-hidden="true"></span>
@@ -166,11 +168,11 @@ import LlmSlider from '../components/home/LlmSlider.astro';
             <div class="testimonial-avatar"><img src="/assets/images/Daniel.avif" alt="Daniel Cardoso" width="512" height="512" loading="lazy"></div>
             <div>
               <div class="testimonial-name">Daniel Cardoso</div>
-              <div class="testimonial-role">Director of Design for AI at Talkdesk</div>
+              <div class="testimonial-role" data-pt="Diretor de Design para IA na Talkdesk">Director of Design for AI at Talkdesk</div>
             </div>
           </div>
-          <p class="testimonial-quote">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
-          <p class="testimonial-relation">Daniel was my manager at Talkdesk</p>
+          <p class="testimonial-quote" data-pt="Tive o privilégio de trabalhar com o João como Senior Product Designer num produto de IA, e fiquei sempre impressionado com a sua experiência e competências. O João tem uma combinação única de proficiência técnica, conhecimento de design e competências de UX excecionais, o que faz dele uma mais-valia para qualquer equipa.">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
+          <p class="testimonial-relation" data-pt="O Daniel foi o meu manager na Talkdesk">Daniel was my manager at Talkdesk</p>
         </a>
 
         <a class="testimonial-card reveal reveal-d2" data-umami-event="testimonial" data-umami-event-author="will-brett-atkin" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
@@ -182,8 +184,8 @@ import LlmSlider from '../components/home/LlmSlider.astro';
               <div class="testimonial-role">Staff Product Designer</div>
             </div>
           </div>
-          <p class="testimonial-quote">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
-          <p class="testimonial-relation">Will was my coworker at StreamYard</p>
+          <p class="testimonial-quote" data-pt="O João tem um talento raro para gerir, em simultâneo e com eficiência, vários projetos de grande prioridade e grande impacto. A capacidade de equilibrar tudo e de se destacar em ambientes tão exigentes é prova da sua experiência e dedicação.">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
+          <p class="testimonial-relation" data-pt="O Will foi meu colega na StreamYard">Will was my coworker at StreamYard</p>
         </a>
 
         <a class="testimonial-card reveal reveal-d3" data-umami-event="testimonial" data-umami-event-author="xavier-gallego" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
@@ -192,11 +194,11 @@ import LlmSlider from '../components/home/LlmSlider.astro';
             <div class="testimonial-avatar"><img src="/assets/images/Xavier.avif" alt="Xavier Gallego" width="91" height="105" loading="lazy"></div>
             <div>
               <div class="testimonial-name">Xavier Gallego</div>
-              <div class="testimonial-role">Sr. Engineer at Synthesia</div>
+              <div class="testimonial-role" data-pt="Engenheiro sénior na Synthesia">Sr. Engineer at Synthesia</div>
             </div>
           </div>
-          <p class="testimonial-quote">João's dedication to maintain high design standards and foster collaboration within our team is top notch. His openness to feedback helps create an environment that greatly enhances our workflow and deliverables.</p>
-          <p class="testimonial-relation">Xavier was my coworker at StreamYard</p>
+          <p class="testimonial-quote" data-pt="A dedicação do João em manter padrões de design elevados e em promover a colaboração na nossa equipa é de primeira. A sua abertura ao feedback ajuda a criar um ambiente que melhora muito o nosso fluxo de trabalho e as nossas entregas.">João's dedication to maintain high design standards and foster collaboration within our team is top notch. His openness to feedback helps create an environment that greatly enhances our workflow and deliverables.</p>
+          <p class="testimonial-relation" data-pt="O Xavier foi meu colega na StreamYard">Xavier was my coworker at StreamYard</p>
         </a>
       </div>
     </div>
@@ -316,6 +318,35 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   }
 
   if (full) play(); else requestAnimationFrame(finish);
+})();
+
+/* Hero headline: the intro script above splits it into word spans, so the
+   Portuguese is handled here rather than with data-pt. Rebuilds the same
+   word spans (or plain text when the intro never split it). */
+(function() {
+  const line = document.querySelector('.hero-line');
+  if (!line) return;
+  const TEXT = { en: line.textContent.trim(), pt: 'Desenho as partes que os utilizadores não veem.' };
+  const lang = () => (window.jjLang ? window.jjLang() : 'en');
+  const set = () => {
+    const t = TEXT[lang() === 'pt' ? 'pt' : 'en'];
+    if (line.querySelector('.hw')) {
+      const words = t.split(/\s+/);
+      line.textContent = '';
+      words.forEach((w, i) => {
+        const s = document.createElement('span');
+        s.className = 'hw';
+        s.style.setProperty('--i', i);
+        s.textContent = w;
+        line.appendChild(s);
+        if (i < words.length - 1) line.appendChild(document.createTextNode(' '));
+      });
+    } else {
+      line.textContent = t;
+    }
+  };
+  if (lang() === 'pt') set();
+  document.addEventListener('jj:langchange', set);
 })();
 
 (function() {

@@ -1,8 +1,10 @@
 ---
-/* Home page work wall: eight tiles, each a small looping mockup of one
-   decision. Hover, focus or tap shows the decision behind it; with X-ray
-   on, every tile shows it at once. Facts come from src/data/cases.ts.
-   Styles live in global.css, "HOME - Work wall". */
+/* Home page work wall: eight tiles, each a small mockup of one decision.
+   Three lead tiles (lead: true) sit large on top and loop all the time;
+   the other five sit small below and rest on their final frame, playing
+   only on hover or focus. Hover, focus or tap shows the decision behind
+   it; with X-ray on, every tile shows it at once. Facts come from
+   src/data/cases.ts. Styles live in global.css, "Work wall". */
 import { CASES } from '../../data/cases';
 
 const slugOf = (slug: string) => {
@@ -13,43 +15,68 @@ const slugOf = (slug: string) => {
 
 type Tile = {
   id: string; cat: 'ui' | 'ds' | 'rs' | 'ft'; company: string; title: string;
-  href?: string; col: number; span: number;
+  href?: string; lead?: boolean;
   decision: string; resultLabel: string; result: string;
+  titlePt?: string; decisionPt?: string; resultLabelPt?: string; resultPt?: string;
 };
 
 const tiles: Tile[] = [
-  { id: 'a', cat: 'ui', company: 'StreamYard', title: 'One colour, whole palette', href: slugOf('redefining-webinar-customization'), col: 1, span: 32,
-    decision: 'I cut the full page builder. One colour choice generates the whole palette, so hosts get an on-brand webinar without designing one.',
-    resultLabel: 'Result', result: 'Weekly webinars went from about 200 to about 600.' },
-  { id: 'b', cat: 'ui', company: 'StreamYard', title: 'Custom registration fields', href: slugOf('redefining-webinar-customization'), col: 3, span: 48,
-    decision: 'Registration only collected a name and an email. I shipped a settings page with five custom registration fields.',
-    resultLabel: 'Result', result: '32.9% of webinars used custom fields within four months.' },
-  { id: 'c', cat: 'rs', company: 'StreamYard', title: 'Journey map', href: slugOf('understanding-webinar-organizers'), col: 1, span: 30,
-    decision: 'The roadmap came from sales calls and support tickets. I interviewed organisers who paid for competing tools, then mapped five stages for the whole company.',
-    resultLabel: 'Result', result: "The company's first shared knowledge base on webinar organisers. Two other teams briefed." },
-  { id: 'd', cat: 'ds', company: 'StreamYard', title: 'Five versions, one button', href: slugOf('leading-and-managing-a-design-system'), col: 2, span: 32,
-    decision: 'Some components existed in five or more versions. I skipped new headcount and a big-bang rebuild. Designers from six teams proposed components through fixed checkpoints.',
-    resultLabel: 'Result', result: 'Six teams on one roadmap.' },
-  { id: 'e', cat: 'ds', company: 'StreamYard', title: 'Theme from one setting', href: slugOf('leading-and-managing-a-design-system'), col: 2, span: 31,
-    decision: 'Tokens first. Scoped variables mean the whole theme switches between light and dark with one setting.',
-    resultLabel: 'Result', result: 'Tokens and 15+ specified components, with six teams on one roadmap.' },
-  { id: 'f', cat: 'ui', company: 'Namecheap', title: 'Floating chat widget', href: slugOf('designing-a-support-chat-experience'), col: 2, span: 34,
-    decision: 'The old tool opened a separate window. I cut it, and the chat became a floating widget that stays with you while you browse.',
-    resultLabel: 'Result', result: 'Chats grew 28.9% in four months, and 97.4% of feedback was positive.' },
-  { id: 'g', cat: 'ui', company: 'Namecheap', title: 'Agent app', href: slugOf('designing-a-support-chat-experience'), col: 1, span: 34,
-    decision: 'Agents handled five or more chats across 20+ browser tabs. I designed one agent app so they could work from a single place.',
-    resultLabel: 'Result', result: 'An agent app and a white-label design system for namecheap.com and ssls.com.' },
-  { id: 'h', cat: 'ft', company: 'Anchorage', title: '40 steps → 1', col: 3, span: 48,
+  { id: 'h', lead: true, cat: 'ft', company: 'Anchorage', title: '40 steps → 1',
     decision: 'A 40-step admin flow for policies and permissions became one configuration step.',
-    resultLabel: 'Status', result: 'Case study in progress.' },
+    resultLabel: 'Status', result: 'Case study in progress.',
+    titlePt: '40 passos → 1',
+    decisionPt: 'Um fluxo de administração de 40 passos, para políticas e permissões, passou a um único passo de configuração.',
+    resultLabelPt: 'Estado', resultPt: 'Caso de estudo em curso.' },
+  { id: 'b', lead: true, cat: 'ui', company: 'StreamYard', title: 'Custom registration fields', href: slugOf('redefining-webinar-customization'),
+    decision: 'Registration only collected a name and an email. I shipped a settings page with five custom registration fields.',
+    resultLabel: 'Result', result: '32.9% of webinars used custom fields within four months.',
+    titlePt: 'Campos de registo personalizados',
+    decisionPt: 'O registo só pedia um nome e um email. Lancei uma página de definições com cinco campos de registo personalizados.',
+    resultLabelPt: 'Resultado', resultPt: '32,9% dos webinars usaram campos personalizados em quatro meses.' },
+  { id: 'c', lead: true, cat: 'rs', company: 'StreamYard', title: 'Journey map', href: slugOf('understanding-webinar-organizers'),
+    decision: 'The roadmap came from sales calls and support tickets. I interviewed organisers who paid for competing tools, then mapped five stages for the whole company.',
+    resultLabel: 'Result', result: "The company's first shared knowledge base on webinar organisers. Two other teams briefed.",
+    titlePt: 'Mapa de jornada',
+    decisionPt: 'O roadmap vinha de chamadas de vendas e tickets de suporte. Entrevistei organizadores que pagavam por ferramentas concorrentes e depois mapeei cinco fases para a empresa toda.',
+    resultLabelPt: 'Resultado', resultPt: 'A primeira base de conhecimento partilhada da empresa sobre organizadores de webinars. Duas outras equipas receberam o briefing.' },
+  { id: 'a', cat: 'ui', company: 'StreamYard', title: 'One colour, whole palette', href: slugOf('redefining-webinar-customization'),
+    decision: 'I cut the full page builder. One colour choice generates the whole palette, so hosts get an on-brand webinar without designing one.',
+    resultLabel: 'Result', result: 'Weekly webinars went from about 200 to about 600.',
+    titlePt: 'Uma cor, a paleta toda',
+    decisionPt: 'Cortei o page builder completo. Uma só escolha de cor gera a paleta inteira, e quem organiza fica com um webinar com a sua marca sem ter de o desenhar.',
+    resultLabelPt: 'Resultado', resultPt: 'Os webinars semanais passaram de cerca de 200 para cerca de 600.' },
+  { id: 'd', cat: 'ds', company: 'StreamYard', title: 'Five versions, one button', href: slugOf('leading-and-managing-a-design-system'),
+    decision: 'Some components existed in five or more versions. I skipped new headcount and a big-bang rebuild. Designers from six teams proposed components through fixed checkpoints.',
+    resultLabel: 'Result', result: 'Six teams on one roadmap.',
+    titlePt: 'Cinco versões, um botão',
+    decisionPt: 'Havia componentes com cinco ou mais versões. Dispensei mais headcount e uma reconstrução de uma só vez. Designers de seis equipas propuseram componentes através de checkpoints fixos.',
+    resultLabelPt: 'Resultado', resultPt: 'Seis equipas num só roadmap.' },
+  { id: 'e', cat: 'ds', company: 'StreamYard', title: 'Theme from one setting', href: slugOf('leading-and-managing-a-design-system'),
+    decision: 'Tokens first. Scoped variables mean the whole theme switches between light and dark with one setting.',
+    resultLabel: 'Result', result: 'Tokens and 15+ specified components, with six teams on one roadmap.',
+    titlePt: 'Tema a partir de uma definição',
+    decisionPt: 'Primeiro os tokens. Com variáveis com âmbito, o tema inteiro passa de claro a escuro com uma só definição.',
+    resultLabelPt: 'Resultado', resultPt: 'Tokens e 15+ componentes especificados, com seis equipas num só roadmap.' },
+  { id: 'f', cat: 'ui', company: 'Namecheap', title: 'Floating chat widget', href: slugOf('designing-a-support-chat-experience'),
+    decision: 'The old tool opened a separate window. I cut it, and the chat became a floating widget that stays with you while you browse.',
+    resultLabel: 'Result', result: 'Chats grew 28.9% in four months, and 97.4% of feedback was positive.',
+    titlePt: 'Widget de chat flutuante',
+    decisionPt: 'A ferramenta antiga abria uma janela à parte. Cortei isso, e o chat passou a ser um widget flutuante que acompanha quem está a navegar.',
+    resultLabelPt: 'Resultado', resultPt: 'As conversas cresceram 28,9% em quatro meses, e 97,4% do feedback foi positivo.' },
+  { id: 'g', cat: 'ui', company: 'Namecheap', title: 'Agent app', href: slugOf('designing-a-support-chat-experience'),
+    decision: 'Agents handled five or more chats across 20+ browser tabs. I designed one agent app so they could work from a single place.',
+    resultLabel: 'Result', result: 'An agent app and a white-label design system for namecheap.com and ssls.com.',
+    titlePt: 'App para agentes',
+    decisionPt: 'Os agentes geriam cinco ou mais chats em mais de 20 separadores do browser. Desenhei uma única app para agentes, para trabalharem num só sítio.',
+    resultLabelPt: 'Resultado', resultPt: 'Uma app para agentes e um design system white-label para namecheap.com e ssls.com.' },
 ];
 
 const cats = [
-  { f: 'all', label: 'All' },
-  { f: 'ui', label: 'Product UI' },
-  { f: 'ds', label: 'Design systems' },
-  { f: 'rs', label: 'Research' },
-  { f: 'ft', label: 'Fintech' },
+  { f: 'all', label: 'All', labelPt: 'Todos' },
+  { f: 'ui', label: 'Product UI', labelPt: undefined },
+  { f: 'ds', label: 'Design systems', labelPt: undefined },
+  { f: 'rs', label: 'Research', labelPt: 'Pesquisa' },
+  { f: 'ft', label: 'Fintech', labelPt: undefined },
 ];
 const count = (f: string) => (f === 'all' ? tiles.length : tiles.filter((t) => t.cat === f).length);
 
@@ -76,19 +103,19 @@ const inbox = [210, 25, 150, 300, 80].map((h, i) => ({ h, i, s: 36 + i * 4 }));
 const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy: 138 - (i * 7 + 2), w: [62, 84, 46, 72, 90, 54][i % 6], k: i % 8 === 0 }));
 ---
 <div class="wall-controls reveal">
-  <div class="wall-chips" role="group" aria-label="Filter work">
+  <div class="wall-chips" role="group" aria-label="Filter work" data-pt-aria-label="Filtrar trabalho">
     {cats.map((c) => (
       <button type="button" class="wall-chip" data-f={c.f} aria-pressed={c.f === 'all' ? 'true' : 'false'} data-umami-event="home-wall-filter" data-umami-event-filter={c.f}>
-        {c.label} <em>{count(c.f)}</em>
+        <span data-pt={c.labelPt}>{c.label}</span> <em>{count(c.f)}</em>
       </button>
     ))}
   </div>
-  <button type="button" class="wall-pause" aria-pressed="false" data-umami-event="home-wall-pause"><span class="wall-sw" aria-hidden="true"></span>Pause previews</button>
+  <button type="button" class="wall-pause" aria-pressed="false" data-umami-event="home-wall-pause"><span class="wall-sw" aria-hidden="true"></span><span data-pt="Pausar pré-visualizações">Pause previews</span></button>
 </div>
 
-<div class="wall" id="wall" role="list" aria-label="Selected work">
+<div class="wall" id="wall" role="list" aria-label="Selected work" data-pt-aria-label="Trabalho selecionado">
   {tiles.map((t) => (
-    <article class="tile" role="listitem" data-cat={t.cat} tabindex="0" style={`--col:${t.col};--span:${t.span}`} aria-label={`${t.company}, ${t.title}`}>
+    <article class={`tile ${t.lead ? 'tile--lead' : 'tile--more'}`} role="listitem" data-cat={t.cat} tabindex="0" aria-label={`${t.company}, ${t.title}`} data-pt-aria-label={`${t.company}, ${t.titlePt ?? t.title}`}>
       <div class="media" aria-hidden="true">
         {t.id === 'a' && (
           <div class="mock a">
@@ -164,7 +191,7 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
           <div class="mock gm cd tl">
             <div class="gb"><i></i><i></i><i></i><span class="sk"></span></div>
             <div class="gr">
-              <span class="tag gc gc-from r" style="--s:14;--w:18">20+ tabs</span>
+              <span class="tag gc gc-from r" style="--s:14;--w:18" data-pt="20+ separadores">20+ tabs</span>
               <span class="tag gc gc-to r" style="--s:36;--w:10">1 app</span>
               {tabs.map((x) => (
                 <div class="gt r" style={`left:${x.left}px;top:${x.top}px;--s:${x.s};--w:22;--dx:${x.dx};--dy:${x.dy};--th:${x.th}`}><i></i><span class="sk"></span></div>
@@ -185,30 +212,30 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
                 <div class={`hr r ${s.k ? 'k' : ''}`} style={`--i:${s.i};--s:${s.s};--w:24;--dy:${s.dy}`}><i></i><b style={`width:${s.w}%`}></b></div>
               ))}
             </div>
-            <div class="hcard cd r" style="--s:44;--w:14"><strong>Configure policy</strong><span class="sk" style="width:90%"></span><span class="sk" style="width:62%"></span><span class="tag" style="justify-self:start">1 step</span></div>
+            <div class="hcard cd r" style="--s:44;--w:14"><strong data-pt="Configurar política">Configure policy</strong><span class="sk" style="width:90%"></span><span class="sk" style="width:62%"></span><span class="tag" style="justify-self:start" data-pt="1 passo">1 step</span></div>
           </div>
         )}
       </div>
 
       <div class="cap">
-        <span class="cap-title"><span class="c">{t.company} · </span><b>{t.title}</b></span>
+        <span class="cap-title"><span class="c">{t.company} · </span><b data-pt={t.titlePt}>{t.title}</b></span>
         <span class="cap-tags">
           {t.href && (
             <span class="priv">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>Private
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg><span data-pt="Privado">Private</span>
             </span>
           )}
-          <span class="pill">{t.href ? 'Decision' : 'Writing it up'}</span>
+          <span class="pill" data-pt={t.href ? 'Decisão' : 'A escrever'}>{t.href ? 'Decision' : 'Writing it up'}</span>
         </span>
       </div>
 
       <div class="ov">
-        <span class="mono">The decision behind it</span>
-        <p class="dec">{t.decision}</p>
-        <p class="res"><b>{t.resultLabel}</b>{t.result}</p>
+        <span class="mono" data-pt="A decisão por trás">The decision behind it</span>
+        <p class="dec" data-pt={t.decisionPt}>{t.decision}</p>
+        <p class="res"><b data-pt={t.resultLabelPt}>{t.resultLabel}</b><span data-pt={t.resultPt}>{t.result}</span></p>
         {t.href && (
           <a class="rd" href={t.href} data-umami-event="home-wall-tile" data-umami-event-tile={t.id}>
-            Read the case
+            <span data-pt="Ler o caso">Read the case</span>
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
           </a>
         )}
@@ -217,7 +244,7 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
   ))}
 </div>
 
-<p class="wall-access reveal">The full case studies are private. <button type="button" class="work-ask" data-umami-event="home-ask-access" onclick="jjComposeWith('Hi João, could you send me the password for the case studies?')">Ask me for access</button></p>
+<p class="wall-access reveal"><span data-pt="Os casos de estudo completos são privados.">The full case studies are private.</span> <button type="button" class="work-ask" data-umami-event="home-ask-access" onclick="jjComposeWith(window.jjLang && window.jjLang() === 'pt' ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?' : 'Hi João, could you send me the password for the case studies?')" data-pt="Pedir acesso">Ask me for access</button></p>
 
 <script>
   const wall = document.getElementById('wall') as HTMLElement | null;

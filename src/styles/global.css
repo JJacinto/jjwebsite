@@ -415,12 +415,25 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
    Same 44px height and 4px inset as the pill nav; the lit segment is
    the language in use (aria-pressed, set by the script in Base.astro). */
 .lang-switch {
-  display: inline-flex; align-items: stretch; flex-shrink: 0;
+  position: relative; isolation: isolate;
+  display: inline-grid; grid-template-columns: 1fr 1fr; flex-shrink: 0;
   min-height: var(--target-min);
   padding: var(--dimension-space-4);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
+/* The lit segment is one thumb that slides between the two halves,
+   so switching reads as one movement rather than a swap. */
+.lang-switch::before {
+  content: ""; position: absolute; z-index: -1;
+  top: var(--dimension-space-4); bottom: var(--dimension-space-4); left: var(--dimension-space-4);
+  width: calc((100% - 2 * var(--dimension-space-4)) / 2);
+  border-radius: var(--radius-pill);
+  /* Soft tint rather than a solid fill, so it doesn't shout in the header. */
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
+  transform: translateX(0);
+}
+.lang-switch:has([data-lang-set="pt"][aria-pressed="true"])::before { transform: translateX(100%); }
 .lang-switch button {
   min-width: 40px;
   padding: 0 var(--dimension-space-12);
@@ -428,14 +441,20 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   background: transparent;
   font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
   color: var(--text-secondary); cursor: pointer; user-select: none;
-  transition: color var(--motion-duration-short) var(--motion-easing-standard), background var(--motion-duration-short) var(--motion-easing-standard);
+  transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .lang-switch button:hover { color: var(--text-primary); }
-.lang-switch button[aria-pressed="true"] {
-  background: var(--text-primary);
-  /* Page colour, so the label always contrasts with the lit segment
-     (--text-inverse stays light in dark mode). */
-  color: var(--background-page);
+.lang-switch button[aria-pressed="true"] { color: var(--text-primary); }
+.lang-switch button:active { transform: scale(0.96); }
+/* Motion only after the first click, so a PT page doesn't slide in on load.
+   Springy ease-out: a short glide with a hint of settle at the end. */
+.lang-switch.is-animated::before {
+  transition: transform 420ms cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .lang-switch.is-animated::before { transition: none; }
+  .lang-switch button { transition: none; }
+  .lang-switch button:active { transform: none; }
 }
 /* In the mobile menu it sits centred above the Start project button. */
 .mobile-menu-secondary .lang-switch { align-self: center; margin-bottom: var(--dimension-space-8); }
@@ -1925,6 +1944,8 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 }
 .loop[data-mode="before"] .loop-body[data-when="now"] { transform: translateY(8px); }
 .loop[data-mode="now"] .loop-body[data-when="before"] { transform: translateY(-8px); }
+/* Tools the Now stack no longer uses leave the row entirely, so the chips close up. */
+.loop[data-mode="now"] .loop-drop { display: none; }
 .loop[data-mode="before"] :is(.loop-plus, .loop-runner)[data-when="now"] { transform: scale(0.5); }
 
 .loop-switch {
@@ -4944,9 +4965,11 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .home-h2 { font-size: var(--font-size-3xl); max-width: 32ch; text-wrap: balance; }
 
 /* ---- Work wall ---------------------------------------------------
-   Under 1080px the tiles flow in CSS columns at their natural height.
-   From 1080px they sit in a three-column grid on 12px rows; each tile
-   spans a fixed number of rows (--span), so the columns end level. */
+   Two tiers. Three lead tiles sit large in the first row and loop all
+   the time; five more sit small in the row below, resting on their
+   final frame and playing only while hovered or focused. One column on
+   phones, a 6-column grid from 700px, a 15-column grid from 1080px
+   (lead = 5 columns, more = 3). */
 .wall-controls {
   display: flex; justify-content: space-between; align-items: center;
   gap: var(--dimension-space-12); flex-wrap: wrap;
@@ -5007,14 +5030,26 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   --w-wash: color-mix(in srgb, var(--text-primary) 6%, transparent);
   --w-wash2: color-mix(in srgb, var(--text-primary) 13%, transparent);
   --w-mut: color-mix(in srgb, var(--text-primary) 72%, var(--surface-sunken));
-  columns: 1;
-  column-gap: var(--dimension-space-20);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--dimension-space-20);
 }
-@media (min-width: 700px) { .wall { columns: 2; } }
+@media (min-width: 700px) {
+  .wall { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .wall .tile--lead { grid-column: span 3; }
+  .wall .tile--lead:first-child { grid-column: span 6; }
+  .wall .tile--more { grid-column: span 2; }
+  .wall .tile--more:nth-last-child(-n+2) { grid-column: span 3; }
+}
+@media (min-width: 1080px) {
+  .wall { grid-template-columns: repeat(15, minmax(0, 1fr)); }
+  .wall .tile--lead, .wall .tile--lead:first-child { grid-column: span 5; }
+  .wall .tile--more, .wall .tile--more:nth-last-child(-n+2) { grid-column: span 3; }
+}
 
 .wall .tile {
-  position: relative; display: block; break-inside: avoid;
-  margin: 0 0 var(--dimension-space-20);
+  position: relative; display: flex; flex-direction: column;
+  margin: 0;
   padding: 0 var(--dimension-space-8);
   border-radius: var(--radius-card-lg);
   background: var(--surface-default);
@@ -5035,7 +5070,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .media {
   position: relative;
   margin-top: var(--dimension-space-8);
-  height: calc(var(--span) * 12px - 122px);
+  height: 380px;
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-inner);
   background: var(--surface-sunken);
@@ -5109,26 +5144,32 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
 }
 .wall .tile.tilt-active::after { opacity: 1; }
+
+/* Lead tiles: bigger stage, bigger mockup, a heavier caption. */
+.wall .tile--lead .media { height: 360px; }
+@media (min-width: 1080px) { .wall .tile--lead .media { height: 420px; } }
+.wall .tile--lead .cap { font-size: var(--font-size-md); padding-block: var(--dimension-space-16); }
+
+/* More tiles: a short stage, the mockup scaled down, a tighter overlay. */
+.wall .tile--more .media { height: 232px; }
+/* Pinned to the centre so the 290px mock scales around the middle of
+   a stage narrower than itself. */
+.wall .tile--more .mock { position: absolute; left: 50%; top: 50%; translate: -50% -50%; scale: 0.68; }
+@media (min-width: 1080px) {
+  .wall .tile--more .media { height: 176px; }
+  .wall .tile--more .mock { scale: 0.6; }
+}
+@media (min-width: 700px) {
+  .wall .tile--more .cap { flex: 1; align-items: flex-start; align-content: space-between; padding-inline: var(--dimension-space-4); }
+  .wall .tile--more .ov { padding: var(--dimension-space-16) var(--dimension-space-12) var(--dimension-space-8); gap: var(--dimension-space-8); }
+  .wall .tile--more .ov .mono { display: none; }
+  .wall .tile--more .ov .dec { font-size: var(--font-size-xs); line-height: 1.4; }
+  .wall .tile--more .ov .res { font-size: var(--font-size-xs); line-height: 1.4; padding-top: var(--dimension-space-8); }
+}
 .xray .wall .tile { border-style: dashed; border-color: color-mix(in srgb, var(--text-brand) 50%, transparent); }
 
 .wall-access { margin: var(--dimension-space-32) 0 0; text-align: center; font-size: var(--font-size-sm); color: var(--text-secondary); }
 
-@media (min-width: 1080px) {
-  .wall {
-    columns: auto;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-rows: 12px;
-    grid-auto-flow: dense;
-  }
-  .wall .tile {
-    grid-column: var(--col);
-    grid-row: span var(--span);
-    display: flex; flex-direction: column;
-    margin: 0 0 var(--dimension-space-20);
-  }
-  .wall .media { flex: 1; height: auto; min-height: 0; margin-bottom: 0; }
-}
 
 /* Mockups: motion engine and screens ------------------------------ */
 @property --p{syntax:'<number>';inherits:true;initial-value:90}
@@ -5248,6 +5289,16 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .fm .pg .hero-ph { height: 56px; border-radius: 8px; background: var(--w-wash); display: grid; align-content: center; gap: 7px; padding: 0 12px; }
 .wall .gc-from { opacity: calc(1 - var(--eo)); }
 .wall .gc-to { opacity: var(--eo); }
+/* Lead loops start at different points so the three never move in step. */
+.wall .tile--lead:nth-child(2) .tl { animation-delay: -2.2s; }
+.wall .tile--lead:nth-child(3) .tl { animation-delay: -4.4s; }
+/* More tiles rest on the final frame (@property initial values) and only
+   play while hovered, focused or tapped open. The loop picks up at 90%,
+   right where the resting frame sits, so nothing jumps on hover. */
+.wall .tile--more:not(:hover, :focus-within, .open) *,
+.wall .tile--more:not(:hover, :focus-within, .open) *::before,
+.wall .tile--more:not(:hover, :focus-within, .open) *::after { animation: none; }
+.wall .tile--more .tl { animation-delay: -5.85s; }
 .wall.is-paused *, .wall.is-paused *::before, .wall.is-paused *::after,
 .wall .tile.off *, .wall .tile.off *::before, .wall .tile.off *::after,
 .wall .tile.ghost *, .wall .tile.ghost *::before, .wall .tile.ghost *::after { animation-play-state: paused !important; }

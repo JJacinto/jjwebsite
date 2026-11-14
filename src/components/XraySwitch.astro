@@ -9,18 +9,22 @@ interface Props {
   wrap: string;
   float?: boolean;
   label?: string;
+  labelPt?: string;
 }
-const { wrap, float = false, label = "Show the parts you don't see" } = Astro.props;
+const DEFAULT_LABEL = "Show the parts you don't see";
+const { wrap, float = false, label = DEFAULT_LABEL, labelPt } = Astro.props;
+/* Portuguese: the default label has one built in; a custom label needs labelPt. */
+const ptLabel = labelPt ?? (label === DEFAULT_LABEL ? 'Mostrar as partes que não se veem' : undefined);
 ---
 {float ? (
-  <button type="button" role="switch" aria-checked="false" aria-label={label} class="xray-switch xray-switch--float" data-xray-switch data-xray-wrap={wrap} hidden>
+  <button type="button" role="switch" aria-checked="false" aria-label={label} data-pt-aria-label={ptLabel} class="xray-switch xray-switch--float" data-xray-switch data-xray-wrap={wrap} hidden>
     <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
-    <span class="xray-label" aria-hidden="true">X-ray</span>
+    <span class="xray-label" aria-hidden="true" data-pt="Raio-X">X-ray</span>
   </button>
 ) : (
   <button type="button" role="switch" aria-checked="false" class="xray-switch" data-xray-switch data-xray-wrap={wrap} hidden>
     <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
-    <span class="xray-label">{label}</span>
+    <span class="xray-label" data-pt={ptLabel}>{label}</span>
   </button>
 )}
 

@@ -8,10 +8,10 @@
    Styles live in global.css, "Journey". */
 import { CASES } from '../../data/cases';
 
-type Win = { pre?: string; from: number; to: number; decimals?: number; suffix?: string; text: string; label: string };
+type Win = { pre?: string; from: number; to: number; decimals?: number; suffix?: string; text: string; label: string; labelPt?: string };
 type Step = {
   id: 'anchorage' | 'streamyard' | 'talkdesk' | 'namecheap' | 'beubi' | 'aveiro' | 'ubi' | 'self';
-  years: string; name: string; href?: string; role: string; line: string; win?: Win;
+  years: string; yearsPt?: string; name: string; namePt?: string; href?: string; role: string; rolePt?: string; line: string; linePt?: string; win?: Win;
   caseSlug?: string;
 };
 
@@ -24,30 +24,34 @@ const caseHref = (slug?: string) => {
 };
 
 const career: Step[] = [
-  { id: 'anchorage', years: '2024–now', name: 'Anchorage Digital', href: 'https://www.anchorage.com',
-    role: 'Senior Product Designer (IC), Core Experience', line: 'Crypto infrastructure for institutions.',
-    win: { pre: '40 → ', from: 40, to: 1, text: '1', label: 'admin steps after the policies and permissions redesign' } },
+  { id: 'anchorage', years: '2024–now', yearsPt: '2024–agora', name: 'Anchorage Digital', href: 'https://www.anchorage.com',
+    role: 'Senior Product Designer (IC), Core Experience', line: 'Crypto infrastructure for institutions.', linePt: 'Infraestrutura cripto para instituições.',
+    win: { pre: '40 → ', from: 40, to: 1, text: '1', label: 'admin steps after the policies and permissions redesign', labelPt: 'passos de administração depois do redesenho das políticas e permissões' } },
   { id: 'streamyard', years: '2022–2024', name: 'StreamYard', href: 'https://streamyard.com',
-    role: 'Senior → Staff Product Designer', line: 'Live streaming. Webinars UX, research ops and the design system.',
-    win: { from: 1, to: 3, suffix: '×', text: '3×', label: 'weekly webinar volume after shipping customisation' },
+    role: 'Senior → Staff Product Designer', line: 'Live streaming. Webinars UX, research ops and the design system.', linePt: 'Live streaming. UX de webinars, research ops e o design system.',
+    win: { from: 1, to: 3, suffix: '×', text: '3×', label: 'weekly webinar volume after shipping customisation', labelPt: 'volume semanal de webinars depois de lançarmos a personalização' },
     caseSlug: 'redefining-webinar-customization' },
   { id: 'talkdesk', years: '2021–2022', name: 'Talkdesk', href: 'https://www.talkdesk.com',
-    role: 'Senior Product Designer', line: 'AI for customer support, before LLMs. I redesigned the labelling tool CX teams used to train conversational AI.' },
+    role: 'Senior Product Designer', line: 'AI for customer support, before LLMs. I redesigned the labelling tool CX teams used to train conversational AI.',
+    linePt: 'IA para suporte ao cliente, antes dos LLMs. Redesenhei a ferramenta de etiquetagem que as equipas de CX usavam para treinar IA conversacional.' },
   { id: 'namecheap', years: '2017–2021', name: 'Namecheap', href: 'https://www.namecheap.com',
-    role: 'Product Designer', line: 'Domains and hosting. Internal support tools, iterated daily with 200+ agents.',
-    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch' },
+    role: 'Product Designer', line: 'Domains and hosting. Internal support tools, iterated daily with 200+ agents.', linePt: 'Domínios e alojamento. Ferramentas internas de suporte, iteradas todos os dias com mais de 200 agentes.',
+    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch', labelPt: 'de feedback positivo quatro meses depois do lançamento do novo chat e suporte' },
     caseSlug: 'designing-a-support-chat-experience' },
   { id: 'beubi', years: '2015–2017', name: 'Be.Ubi', href: 'https://github.com/beubi',
-    role: 'UX/UI Designer', line: '3D printing software and a land registry system for a Portuguese municipality. I rebuilt the printing software after embedding with the team and interviewing clients.' },
+    role: 'UX/UI Designer', line: '3D printing software and a land registry system for a Portuguese municipality. I rebuilt the printing software after embedding with the team and interviewing clients.',
+    linePt: 'Software de impressão 3D e um sistema de registo predial para um município português. Reconstruí o software de impressão depois de me integrar na equipa e de entrevistar clientes.' },
 ];
 
 const education: Step[] = [
   { id: 'aveiro', years: '2013–2015', name: 'Universidade de Aveiro',
-    role: "Master's in Design, Interaction Design specialisation", line: 'Where the instinct for making things got a method behind it.' },
+    role: "Master's in Design, Interaction Design specialisation", rolePt: 'Mestrado em Design, especialização em Design de Interação', line: 'Where the instinct for making things got a method behind it.', linePt: 'Onde o instinto de fazer coisas ganhou um método.' },
   { id: 'ubi', years: '2008–2013', name: 'Universidade da Beira Interior',
-    role: 'IT engineering, then Multimedia Design', line: "I switched to design because that was the half I couldn't stop thinking about. I kept both: I still scope what's buildable and build the real interaction when a mock can't carry the argument." },
-  { id: 'self', years: '2000–2008', name: 'Self-taught',
-    role: 'Shipping front-end code at 15', line: 'Logos and profile graphics for friends at 13, before I knew it was called design. By 15, themes for Hi5 and MySpace. That loop stuck: make something, watch people use it, learn from what breaks.' },
+    role: 'IT engineering, then Multimedia Design', rolePt: 'Engenharia Informática e depois Design Multimédia', line: "I switched to design because that was the half I couldn't stop thinking about. I kept both: I still scope what's buildable and build the real interaction when a mock can't carry the argument.",
+    linePt: 'Mudei para design porque era a metade em que não conseguia deixar de pensar. Fiquei com as duas: continuo a avaliar o que é construível e a construir a interação a sério quando um mockup não chega para sustentar o argumento.' },
+  { id: 'self', years: '2000–2008', name: 'Self-taught', namePt: 'Autodidata',
+    role: 'Shipping front-end code at 15', rolePt: 'A lançar código de front-end aos 15 anos', line: 'Logos and profile graphics for friends at 13, before I knew it was called design. By 15, themes for Hi5 and MySpace. That loop stuck: make something, watch people use it, learn from what breaks.',
+    linePt: 'Logótipos e gráficos de perfil para amigos aos 13, antes de saber que aquilo se chamava design. Aos 15, temas para o Hi5 e o MySpace. O ciclo ficou: fazer algo, ver as pessoas a usá-lo, aprender com o que parte.' },
 ];
 
 /* Scene pieces, generated here so the markup is static. */
@@ -57,33 +61,34 @@ const dots = Array.from({ length: 40 }, (_, i) => {
 });
 const layers = [70, 84, 92, 88, 76, 62, 54, 58, 70, 80].map((w, i) => ({ w, s: 8 + i * 6 }));
 const phases = ['discover', 'define', 'develop', 'deliver'];
+const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
 ---
 <ol class="journey-list">
-  {[{ key: 'career', title: 'Career', span: '2015–now', steps: career }, { key: 'edu', title: 'Education', span: '2000–2015', steps: education }].map((track) => (
+  {[{ key: 'career', title: 'Career', titlePt: 'Carreira', span: '2015–now', spanPt: '2015–agora', steps: career }, { key: 'edu', title: 'Education', titlePt: 'Formação', span: '2000–2015', spanPt: undefined, steps: education }].map((track) => (
     <>
       <li class={`journey-chapter journey-chapter--${track.key} reveal`}>
-        <h3>{track.title}</h3>
-        <span>{track.span}</span>
+        <h3 data-pt={track.titlePt}>{track.title}</h3>
+        <span data-pt={track.spanPt}>{track.span}</span>
       </li>
       {track.steps.map((s) => { const cs = caseHref(s.caseSlug); return (
         <li class={`journey-item journey-item--${track.key} reveal`} data-step={s.id}>
-          <div class="journey-years">{s.years}</div>
+          <div class="journey-years" data-pt={s.yearsPt}>{s.years}</div>
           <div class="journey-main">
             {s.href
-              ? <a class="journey-co" data-umami-event="about-company" data-umami-event-co={s.id} href={s.href} target="_blank" rel="noopener noreferrer">{s.name}</a>
-              : <span class="journey-co">{s.name}</span>}
-            <p class="journey-role">{s.role}</p>
-            <p class="journey-line">{s.line}</p>
+              ? <a class="journey-co" data-umami-event="about-company" data-umami-event-co={s.id} href={s.href} target="_blank" rel="noopener noreferrer" data-pt={s.namePt}>{s.name}</a>
+              : <span class="journey-co" data-pt={s.namePt}>{s.name}</span>}
+            <p class="journey-role" data-pt={s.rolePt}>{s.role}</p>
+            <p class="journey-line" data-pt={s.linePt}>{s.line}</p>
             {s.win && (
               <p class="journey-win">
                 <b>{s.win.pre}<span data-count data-from={s.win.from} data-to={s.win.to} data-decimals={s.win.decimals} data-suffix={s.win.suffix} data-duration="1100">{s.win.text}</span></b>
-                <span>{s.win.label}</span>
+                <span data-pt={s.win.labelPt}>{s.win.label}</span>
               </p>
             )}
           </div>
 
-          <figure class={`j-scene${cs ? ' has-case' : ''}`} data-cursor-label={cs ? 'View case study' : undefined}>
-            {s.id === 'self' && <span class="sr-only">A reconstructed 2006-era profile theme with 50,000+ people online</span>}
+          <figure class={`j-scene${cs ? ' has-case' : ''}`} data-cursor-label={cs ? 'View case study' : undefined} data-pt-data-cursor-label={cs ? 'Ver caso de estudo' : undefined}>
+            {s.id === 'self' && <span class="sr-only" data-pt="Um tema de perfil de 2006, reconstruído, com mais de 50 000 pessoas online">A reconstructed 2006-era profile theme with 50,000+ people online</span>}
             <div class="j-media" aria-hidden="true">
               {s.id === 'anchorage' && (
                 <div class="j-mock j-steps tl">
@@ -93,7 +98,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                   </div>
                   <div class="j-one r" style="--s:52;--w:12">
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5l3 3 6-7"/></svg>
-                    Policy set
+                    <span data-pt="Política definida">Policy set</span>
                   </div>
                 </div>
               )}
@@ -102,7 +107,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                   <div class="j-stage">
                     <div class="j-cam r" style="--s:6;--w:10;--ch:255"><i></i></div>
                     <div class="j-cam r" style="--s:13;--w:10;--ch:195"><i></i></div>
-                    <span class="j-badge r" style="--s:32;--w:5"><i></i>Live</span>
+                    <span class="j-badge r" style="--s:32;--w:5"><i></i><span data-pt="Ao vivo">Live</span></span>
                     <span class="j-crowd"><i class="r" style="--s:40;--w:5"></i><i class="r" style="--s:45;--w:5"></i><i class="r" style="--s:50;--w:5"></i></span>
                     <div class="j-banner r" style="--s:56;--w:9"><b></b><span class="j-sk"></span></div>
                   </div>
@@ -112,14 +117,14 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
               {s.id === 'talkdesk' && (
                 <div class="j-mock j-label tl">
                   <div class="j-utt">
-                    <p>I want <mark class="r" style="--s:8;--w:10">my money back</mark></p>
-                    <span class="j-tag r" style="--s:18;--w:6">intent · refund</span>
+                    <p><span data-pt="Quero ">I want </span><mark class="r" style="--s:8;--w:10" data-pt="o meu dinheiro de volta">my money back</mark></p>
+                    <span class="j-tag r" style="--s:18;--w:6" data-pt="intenção · reembolso">intent · refund</span>
                   </div>
                   <div class="j-utt">
-                    <p>The order is <mark class="r" style="--s:32;--w:10">#4821</mark></p>
-                    <span class="j-tag r" style="--s:42;--w:6">entity · order_id</span>
+                    <p><span data-pt="A encomenda é ">The order is </span><mark class="r" style="--s:32;--w:10">#4821</mark></p>
+                    <span class="j-tag r" style="--s:42;--w:6" data-pt="entidade · order_id">entity · order_id</span>
                   </div>
-                  <div class="j-train r" style="--s:54;--w:26"><span>training</span><i><b></b></i></div>
+                  <div class="j-train r" style="--s:54;--w:26"><span data-pt="treino">training</span><i><b></b></i></div>
                 </div>
               )}
               {s.id === 'namecheap' && (
@@ -131,7 +136,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                   </div>
                   <div class="j-msg me r" style="--s:38;--w:6"><span class="j-sk" style="width:44px"></span></div>
                   <div class="j-fb r" style="--s:50;--w:8">
-                    <span>Was this helpful?</span>
+                    <span data-pt="Isto foi útil?">Was this helpful?</span>
                     <b class="j-up r" style="--s:64;--w:7"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 7h2.4v6.5H2zM5.6 13.5V6.8l2.9-4.6c.9 0 1.5.8 1.3 1.7L9.3 6h3.4c.8 0 1.4.7 1.2 1.5l-1 4.8c-.1.7-.8 1.2-1.5 1.2z"/></svg></b>
                     <b class="j-down"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 7h2.4v6.5H2zM5.6 13.5V6.8l2.9-4.6c.9 0 1.5.8 1.3 1.7L9.3 6h3.4c.8 0 1.4.7 1.2 1.5l-1 4.8c-.1.7-.8 1.2-1.5 1.2z"/></svg></b>
                   </div>
@@ -162,7 +167,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                     <i class="j-dd-dot r" style="--s:6;--w:62"></i>
                   </div>
                   <div class="j-dd-labels">
-                    {phases.map((p, i) => <span class="r" style={`--s:${6 + i * 15.5};--w:8`}>{p}</span>)}
+                    {phases.map((p, i) => <span class="r" style={`--s:${6 + i * 15.5};--w:8`} data-pt={phasesPt[i]}>{p}</span>)}
                   </div>
                 </div>
               )}
@@ -175,8 +180,8 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                     <span class="j-cta"></span>
                   </div>
                   <i class="j-split"></i>
-                  <span class="j-tag j-tag--code">code</span>
-                  <span class="j-tag j-tag--design">design</span>
+                  <span class="j-tag j-tag--code" data-pt="código">code</span>
+                  <span class="j-tag j-tag--design" data-pt="design">design</span>
                 </div>
               )}
               {s.id === 'self' && (
@@ -189,18 +194,18 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
                   <div class="theme-body">
                     <div class="theme-avatar"><img src="/assets/images/photo.webp" alt="" width="48" height="48"></div>
                     <div class="theme-info">
-                      <div class="theme-tabs"><span class="is-on">Profile</span><span>Friends</span><span>Scraps</span></div>
-                      <div class="theme-online"><span class="theme-online-dot"></span>Online now: <b data-count data-from="0" data-to="50000" data-format="grouped" data-suffix="+" data-duration="1400">50,000+</b></div>
+                      <div class="theme-tabs"><span class="is-on" data-pt="Perfil">Profile</span><span data-pt="Amigos">Friends</span><span data-pt="Recados">Scraps</span></div>
+                      <div class="theme-online"><span class="theme-online-dot"></span><span data-pt="Online agora: ">Online now: </span><b data-count data-from="0" data-to="50000" data-format="grouped" data-suffix="+" data-duration="1400">50,000+</b></div>
                     </div>
                   </div>
                   <div class="theme-lines"><i></i><i></i><i></i></div>
                 </div>
               )}
             </div>
-            {s.id === 'self' && <figcaption class="j-caption">Reconstructed from memory. The original is lost to a 2007 hard drive.</figcaption>}
+            {s.id === 'self' && <figcaption class="j-caption" data-pt="Reconstruído de memória. O original perdeu-se num disco rígido de 2007.">Reconstructed from memory. The original is lost to a 2007 hard drive.</figcaption>}
             {cs && (
-              <a class="j-case" href={cs} aria-label={`View the ${s.name} case study`} data-umami-event="about-journey-case" data-umami-event-co={s.id}>
-                <span class="j-case-tag" aria-hidden="true">Case study<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
+              <a class="j-case" href={cs} aria-label={`View the ${s.name} case study`} data-pt-aria-label={`Ver caso de estudo: ${s.namePt ?? s.name}`} data-umami-event="about-journey-case" data-umami-event-co={s.id}>
+                <span class="j-case-tag" aria-hidden="true"><span data-pt="Caso de estudo">Case study</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
               </a>
             )}
           </figure>

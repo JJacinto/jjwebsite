@@ -7,9 +7,14 @@ interface Props {
   body: string;
   pageTitle: string;
   description: string;
+  codePt?: string;
+  titlePt?: string;
+  bodyPt?: string;
+  pageTitlePt?: string;
+  descriptionPt?: string;
 }
 
-const { code, title, body, pageTitle, description } = Astro.props;
+const { code, title, body, pageTitle, description, codePt, titlePt, bodyPt, pageTitlePt, descriptionPt } = Astro.props;
 ---
 <Base
   activePage=""
@@ -19,21 +24,23 @@ const { code, title, body, pageTitle, description } = Astro.props;
   disablePageParticles={true}
   title={pageTitle}
   description={description}
+  titlePt={pageTitlePt}
+  descriptionPt={descriptionPt}
 >
   <section class="error-page contact cta-footer-wrap">
     <canvas class="cta-footer-bg" aria-hidden="true"></canvas>
     <div class="contact-inner reveal">
-      <p class="eyebrow error-code">{code}</p>
-      <h1>{title}</h1>
-      <p class="contact-body" set:html={body}></p>
+      <p class="eyebrow error-code" data-pt={codePt}>{code}</p>
+      <h1 data-pt={titlePt}>{title}</h1>
+      <p class="contact-body" set:html={body} data-pt={bodyPt}></p>
       <div class="contact-ctas">
         <a class="btn btn-accent" href="/">
           <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12L12 3l9 9"/><path d="M5 10v10h14V10"/></svg></span>
-          <span>Back to home</span>
+          <span data-pt="Voltar ao início">Back to home</span>
         </a>
         <a class="btn btn-ghost" href="/case-studies">
           <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h14M11 6l6 6-6 6"/></svg></span>
-          <span>See case studies</span>
+          <span data-pt="Ver casos de estudo">See case studies</span>
         </a>
       </div>
     </div>

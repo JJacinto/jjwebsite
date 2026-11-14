@@ -6,7 +6,18 @@
      no longer offered as a tab \u2014 the cal.eu link covers it \u2014 so it is
      left out of the order and openModal(2) falls back to chat. */
   var INTENT_LABELS = { 0: "Just saying hi", 1: "I have a project", 2: "Book a call", 3: "I\u2019m hiring" };
+  var INTENT_LABELS_PT = { 0: "S\u00f3 a dizer ol\u00e1", 1: "Tenho um projeto", 2: "Marcar chamada", 3: "Estou a contratar" };
   var INTENT_ORDER  = [3, 0, 1];
+  /* Language: the page switch lives in Base.astro (window.jjLang). Static
+     labels carry data-pt and are swapped by it (jjLangRefresh after mount);
+     text this script writes itself picks from T(en, pt) and is redone by
+     the jj:langchange hooks below. */
+  var L = function () { return (window.jjLang && window.jjLang() === 'pt') ? 'pt' : 'en'; };
+  var T = function (en, pt) { return L() === 'pt' ? pt : en; };
+  var langHooks = [];
+  document.addEventListener('jj:langchange', function () {
+    langHooks.forEach(function (fn) { fn(); });
+  });
   var INTENT_NAMES  = ['chat', 'project', 'book-call', 'hiring'];
   var mounted   = false;
   var intentIdx = 0;
@@ -14,7 +25,15 @@
 
   /* Calendar */
   var CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var CAL_MONTHS_PT = ['Janeiro','Fevereiro','Mar\u00e7o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   var CAL_WDAYS  = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  var CAL_WDAYS_PT = ['Seg','Ter','Qua','Qui','Sex','S\u00e1b','Dom'];
+  var calLocale = function () { return L() === 'pt' ? 'pt-PT' : 'en-GB'; };
+  var timeLabel = function (t) {
+    if (L() === 'pt') return t;
+    var h = parseInt(t.split(':')[0], 10);
+    return (h % 12 || 12) + ':' + t.split(':')[1] + ' ' + (h >= 12 ? 'PM' : 'AM');
+  };
   var CAL_TIMES  = ['9:00','9:30','10:00','10:30','11:00','11:30','12:00','12:30',
                     '13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'];
   var calYear  = new Date().getFullYear();
@@ -25,12 +44,12 @@
     return (
       '<div class="compose-shared-row">' +
         '<div class="compose-field">' +
-          '<label class="eyebrow" for="user-name">Your name</label>' +
-          '<input class="compose-input" id="user-name" type="text" required autocomplete="name" placeholder="First name or full name">' +
+          '<label class="eyebrow" for="user-name" data-pt="O teu nome">Your name</label>' +
+          '<input class="compose-input" id="user-name" type="text" required autocomplete="name" placeholder="First name or full name" data-pt-placeholder="Primeiro nome ou nome completo">' +
         '</div>' +
         '<div class="compose-field">' +
-          '<label class="eyebrow" for="user-email">Your email</label>' +
-          '<input class="compose-input" id="user-email" type="email" required autocomplete="email" placeholder="you@example.com">' +
+          '<label class="eyebrow" for="user-email" data-pt="O teu email">Your email</label>' +
+          '<input class="compose-input" id="user-email" type="email" required autocomplete="email" placeholder="you@example.com" data-pt-placeholder="tu@exemplo.pt">' +
         '</div>' +
       '</div>'
     );
@@ -39,8 +58,8 @@
   var getChatFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="chat-body">Message</label>' +
-        '<textarea class="compose-textarea" id="chat-body" rows="5" required autocomplete="off" placeholder="What&#x27;s on your mind?"></textarea>' +
+        '<label class="eyebrow" for="chat-body" data-pt="Mensagem">Message</label>' +
+        '<textarea class="compose-textarea" id="chat-body" rows="5" required autocomplete="off" placeholder="What&#x27;s on your mind?" data-pt-placeholder="Em que est\u00e1s a pensar?"></textarea>' +
       '</div>'
     );
   };
@@ -48,16 +67,16 @@
   var getHiringFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="hire-role">Role</label>' +
-        '<input class="compose-input" id="hire-role" type="text" required autocomplete="off" placeholder="e.g. Senior Product Designer, fully remote">' +
+        '<label class="eyebrow" for="hire-role" data-pt="Fun\u00e7\u00e3o">Role</label>' +
+        '<input class="compose-input" id="hire-role" type="text" required autocomplete="off" placeholder="e.g. Senior Product Designer, fully remote" data-pt-placeholder="ex.: Senior Product Designer, totalmente remoto">' +
       '</div>' +
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="hire-company">Company or link <span class="compose-optional">(optional)</span></label>' +
-        '<input class="compose-input" id="hire-company" type="text" autocomplete="organization" placeholder="Company name or https://…">' +
+        '<label class="eyebrow" for="hire-company" data-pt="Empresa ou link <span class=\'compose-optional\'>(opcional)</span>">Company or link <span class="compose-optional">(optional)</span></label>' +
+        '<input class="compose-input" id="hire-company" type="text" autocomplete="organization" placeholder="Company name or https://…" data-pt-placeholder="Nome da empresa ou https://…">' +
       '</div>' +
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="hire-body">Message</label>' +
-        '<textarea class="compose-textarea" id="hire-body" rows="4" required autocomplete="off" placeholder="What&#x27;s the product, who uses it, and where does it get tangled?"></textarea>' +
+        '<label class="eyebrow" for="hire-body" data-pt="Mensagem">Message</label>' +
+        '<textarea class="compose-textarea" id="hire-body" rows="4" required autocomplete="off" placeholder="What&#x27;s the product, who uses it, and where does it get tangled?" data-pt-placeholder="Qual \u00e9 o produto, quem o usa e onde se complica?"></textarea>' +
       '</div>'
     );
   };
@@ -65,10 +84,10 @@
   var getProjectFieldsHTML = function () {
     return (
       '<div class="compose-field">' +
-        '<span class="eyebrow">Engagement type</span>' +
+        '<span class="eyebrow" data-pt="Tipo de colabora\u00e7\u00e3o">Engagement type</span>' +
         '<div class="form-radio-group">' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time" required checked><span>One-time</span></label>' +
-          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Fractional" required><span>Fractional</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="One-time" required checked><span data-pt="Pontual">One-time</span></label>' +
+          '<label class="form-radio"><input type="radio" name="proj-engagement" value="Fractional" required><span data-pt="Parcial">Fractional</span></label>' +
         '</div>' +
       '</div>' +
       '<div class="compose-field">' +
@@ -83,21 +102,21 @@
       '</div>' +
       '<div class="compose-field">' +
         '<div class="form-slider-row">' +
-          '<span class="eyebrow" id="proj-timeline-label">Timeline</span>' +
+          '<span class="eyebrow" id="proj-timeline-label" data-pt="Prazo">Timeline</span>' +
           '<span class="form-slider-val" id="proj-timeline-val">Flexible (3–6 mo)</span>' +
         '</div>' +
         '<input class="form-slider" type="range" id="proj-timeline" min="1" max="4" value="2" step="1" aria-labelledby="proj-timeline-label" aria-valuetext="Flexible (3–6 mo)">' +
-        '<div class="form-slider-ticks"><span>Exploring</span><span>Flexible (3–6 mo)</span><span>Soon (1–3 mo)</span><span>ASAP</span></div>' +
+        '<div class="form-slider-ticks"><span data-pt="A explorar">Exploring</span><span data-pt="Flex\u00edvel (3–6 meses)">Flexible (3–6 mo)</span><span data-pt="Em breve (1–3 meses)">Soon (1–3 mo)</span><span>ASAP</span></div>' +
       '</div>' +
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="proj-context">Tell me about the project</label>' +
-        '<textarea class="compose-textarea" id="proj-context" rows="3" required autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the challenge?"></textarea>' +
+        '<label class="eyebrow" for="proj-context" data-pt="Fala-me do projeto">Tell me about the project</label>' +
+        '<textarea class="compose-textarea" id="proj-context" rows="3" required autocomplete="off" placeholder="What are you building, for whom, and what&#x27;s the challenge?" data-pt-placeholder="O que est\u00e1s a construir, para quem, e qual \u00e9 o desafio?"></textarea>' +
       '</div>' +
       '<div class="compose-field">' +
-        '<label class="eyebrow" for="proj-links">Relevant links <span class="compose-optional">(optional)</span></label>' +
+        '<label class="eyebrow" for="proj-links" data-pt="Links relevantes <span class=\'compose-optional\'>(opcional)</span>">Relevant links <span class="compose-optional">(optional)</span></label>' +
         '<div class="compose-input-with-icon">' +
           '<svg class="compose-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' +
-          '<input class="compose-input compose-input--has-icon" id="proj-links" type="url" autocomplete="url" placeholder="https://figma.com/…, github.com/…">' +
+          '<input class="compose-input compose-input--has-icon" id="proj-links" type="url" autocomplete="url" placeholder="https://github.com/…, notion.so/…">' +
         '</div>' +
       '</div>'
     );
@@ -109,23 +128,23 @@
       var m    = t.split(':')[1];
       var ampm = h >= 12 ? 'PM' : 'AM';
       var h12  = h % 12 || 12;
-      return '<option value="' + t + '">' + h12 + ':' + m + ' ' + ampm + '</option>';
+      return '<option value="' + t + '">' + timeLabel(t) + '</option>';
     }).join('');
     return (
       '<div class="compose-cal">' +
         '<div class="cal-nav-row">' +
-          '<button class="cal-nav-btn" id="cal-prev" type="button" aria-label="Previous month">&#8592;</button>' +
+          '<button class="cal-nav-btn" id="cal-prev" type="button" aria-label="Previous month" data-pt-aria-label="M\u00eas anterior">&#8592;</button>' +
           '<span class="cal-month-label" id="cal-month-label"></span>' +
-          '<button class="cal-nav-btn" id="cal-next" type="button" aria-label="Next month">&#8594;</button>' +
+          '<button class="cal-nav-btn" id="cal-next" type="button" aria-label="Next month" data-pt-aria-label="M\u00eas seguinte">&#8594;</button>' +
         '</div>' +
         '<div class="cal-weekdays">' +
-          CAL_WDAYS.map(function (d) { return '<span>' + d + '</span>'; }).join('') +
+          (L() === 'pt' ? CAL_WDAYS_PT : CAL_WDAYS).map(function (d) { return '<span>' + d + '</span>'; }).join('') +
         '</div>' +
         '<div class="cal-grid" id="cal-grid"></div>' +
         '<div class="cal-time-wrap" id="cal-time" style="display:none">' +
-          '<label class="eyebrow" for="cal-time-select">Select a time</label>' +
+          '<label class="eyebrow" for="cal-time-select" data-pt="Escolhe uma hora">Select a time</label>' +
           '<select class="compose-select" id="cal-time-select">' +
-            '<option value="">Choose a time…</option>' +
+            '<option value="" data-pt="Escolhe uma hora…">Choose a time…</option>' +
             timeOpts +
           '</select>' +
         '</div>' +
@@ -138,7 +157,7 @@
     var lbl     = document.getElementById('cal-month-label');
     var prevBtn = document.getElementById('cal-prev');
     if (!grid || !lbl) return;
-    lbl.textContent = CAL_MONTHS[mo] + ' ' + yr;
+    lbl.textContent = (L() === 'pt' ? CAL_MONTHS_PT : CAL_MONTHS)[mo] + ' ' + yr;
     var today = new Date(); today.setHours(0, 0, 0, 0);
     if (prevBtn) prevBtn.disabled = (yr === today.getFullYear() && mo === today.getMonth());
     var firstDow = (new Date(yr, mo, 1).getDay() + 6) % 7;
@@ -152,7 +171,7 @@
       if (isDisabled)                       cls += ' is-disabled';
       if (ts === today.getTime())           cls += ' is-today';
       if (calSel && ts === calSel.getTime()) cls += ' is-selected';
-      var dateStr = new Date(yr, mo, d).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      var dateStr = new Date(yr, mo, d).toLocaleDateString(calLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
       var attrs = isDisabled
         ? ' role="button" aria-disabled="true" tabindex="-1"'
         : ' role="button" tabindex="0"';
@@ -191,6 +210,15 @@
     calMonth = today.getMonth();
     calSel   = null;
     buildCalGrid(calYear, calMonth);
+    langHooks.push(function () {
+      var wd = document.querySelectorAll('.cal-weekdays span');
+      var names = L() === 'pt' ? CAL_WDAYS_PT : CAL_WDAYS;
+      wd.forEach(function (el, i) { if (names[i]) el.textContent = names[i]; });
+      document.querySelectorAll('#cal-time-select option[value]:not([value=""])').forEach(function (o) {
+        o.textContent = timeLabel(o.value);
+      });
+      buildCalGrid(calYear, calMonth);
+    });
     var prevBtn = document.getElementById('cal-prev');
     var nextBtn = document.getElementById('cal-next');
     if (prevBtn) prevBtn.addEventListener('click', function () {
@@ -220,7 +248,8 @@
   var bindProjectSlider = function (container) {
     var slider = container.querySelector('#proj-timeline');
     var val    = container.querySelector('#proj-timeline-val');
-    var labels = ['Exploring', 'Flexible (3–6 mo)', 'Soon (1–3 mo)', 'ASAP'];
+    var labelsEN = ['Exploring', 'Flexible (3–6 mo)', 'Soon (1–3 mo)', 'ASAP'];
+    var labelsPT = ['A explorar', 'Flex\u00edvel (3–6 meses)', 'Em breve (1–3 meses)', 'ASAP'];
     /* Pulse cadence per timeline step — a slow, calm beat at
        "Exploring" accelerating to an urgent flicker at "ASAP".
        Drives the slider thumb's --slider-pulse-dur in global.css. */
@@ -240,12 +269,14 @@
       slider.style.setProperty('--slider-frac', String((v - min) / (max - min)));
       slider.style.setProperty('--slider-pulse-dur', pulseDur[v - 1] || '1.7s');
       slider.style.setProperty('--slider-pulse-spread', pulseSpread[v - 1] || '14px');
+      var labels = L() === 'pt' ? labelsPT : labelsEN;
       var label = labels[v - 1] || labels[0];
       val.textContent = label;
       slider.setAttribute('aria-valuetext', label);
     };
     slider.addEventListener('input', sync);
     sync();
+    langHooks.push(sync);
   };
 
   /* Budget label tracks the engagement type — one-time work is a flat
@@ -258,10 +289,12 @@
     if (!label || !radios.length) return;
     var update = function () {
       var checked = container.querySelector('input[name="proj-engagement"]:checked');
-      label.textContent = (checked && checked.value !== 'One-time') ? 'Monthly budget' : 'Budget';
+      var monthly = checked && checked.value !== 'One-time';
+      label.textContent = monthly ? T('Monthly budget', 'Or\u00e7amento mensal') : T('Budget', 'Or\u00e7amento');
     };
     radios.forEach(function (r) { r.addEventListener('change', update); });
     update();
+    langHooks.push(update);
   };
 
   var showFields = function (idx) {
@@ -285,34 +318,37 @@
   };
 
   var collectFormData = function () {
+    var pt = L() === 'pt';
+    var notSpecified = T('Not specified', 'N\u00e3o indicado');
+    var notSelected  = T('Not selected', 'N\u00e3o indicada');
     if (intentIdx === 2) {
       var dateStr = calSel
-        ? calSel.toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
-        : 'Not selected';
+        ? calSel.toLocaleDateString(calLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        : notSelected;
       var timeEl  = document.getElementById('cal-time-select');
-      var timeStr = timeEl && timeEl.value ? timeEl.value : 'Not selected';
-      return { subject: 'Call booking request', message: 'Date: ' + dateStr + '\nTime: ' + timeStr };
+      var timeStr = timeEl && timeEl.value ? timeEl.value : notSelected;
+      return { subject: T('Call booking request', 'Pedido de marca\u00e7\u00e3o de chamada'), message: T('Date: ', 'Data: ') + dateStr + '\n' + T('Time: ', 'Hora: ') + timeStr };
     }
     var shared      = collectSharedFields();
-    var sharedHead  = 'From: ' + (shared.name || '—') + ' <' + (shared.email || '—') + '>';
+    var sharedHead  = T('From: ', 'De: ') + (shared.name || '—') + ' <' + (shared.email || '—') + '>';
     if (intentIdx === 1) {
       var engEl       = document.querySelector('#compose-fields-project input[name="proj-engagement"]:checked');
-      var engagement  = engEl ? engEl.value : 'Not specified';
+      var engagement  = engEl ? (pt ? (engEl.value === 'One-time' ? 'Pontual' : 'Parcial') : engEl.value) : notSpecified;
       var budgetEl    = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
-      var budget      = budgetEl ? budgetEl.value : 'Not specified';
+      var budget      = budgetEl ? budgetEl.value : notSpecified;
       var timelineEl  = document.getElementById('proj-timeline-val');
-      var timeline    = timelineEl ? timelineEl.textContent : 'Not specified';
+      var timeline    = timelineEl ? timelineEl.textContent : notSpecified;
       var ctxEl       = document.getElementById('proj-context');
       var context     = ctxEl ? ctxEl.value : '';
       var linksEl     = document.getElementById('proj-links');
       var links       = linksEl ? linksEl.value.trim() : '';
       return {
-        subject: 'Project inquiry — ' + engagement + (shared.name ? ' (' + shared.name + ')' : ''),
+        subject: T('Project inquiry — ', 'Pedido de projeto — ') + engagement + (shared.name ? ' (' + shared.name + ')' : ''),
         message: [sharedHead, '',
-                  'Engagement: ' + engagement, 'Budget: ' + budget,
-                  'Timeline: ' + timeline,
-                  context ? '\nProject details:\n' + context : null,
-                  links ? '\nRelevant links:\n' + links : null].filter(function (l) { return l !== null; }).join('\n')
+                  T('Engagement: ', 'Colabora\u00e7\u00e3o: ') + engagement, T('Budget: ', 'Or\u00e7amento: ') + budget,
+                  T('Timeline: ', 'Prazo: ') + timeline,
+                  context ? '\n' + T('Project details:', 'Detalhes do projeto:') + '\n' + context : null,
+                  links ? '\n' + T('Relevant links:', 'Links relevantes:') + '\n' + links : null].filter(function (l) { return l !== null; }).join('\n')
       };
     }
     if (intentIdx === 3) {
@@ -323,16 +359,16 @@
       var comp   = compEl ? compEl.value.trim() : '';
       var hmsg   = hbEl ? hbEl.value : '';
       return {
-        subject: 'Hiring: ' + (shared.name ? 'Message from ' + shared.name : 'New message') + (role ? ' (' + role + ')' : ''),
-        message: [sharedHead, '', 'Role: ' + (role || '—'),
-                  comp ? 'Company or link: ' + comp : null,
+        subject: T('Hiring: ', 'Contrata\u00e7\u00e3o: ') + (shared.name ? T('Message from ', 'Mensagem de ') + shared.name : T('New message', 'Nova mensagem')) + (role ? ' (' + role + ')' : ''),
+        message: [sharedHead, '', T('Role: ', 'Fun\u00e7\u00e3o: ') + (role || '—'),
+                  comp ? T('Company or link: ', 'Empresa ou link: ') + comp : null,
                   '', hmsg].filter(function (l) { return l !== null; }).join('\n')
       };
     }
     var bodyEl = document.getElementById('chat-body');
     var msg    = bodyEl ? bodyEl.value : '';
     return {
-      subject: shared.name ? 'Message from ' + shared.name : 'New message',
+      subject: shared.name ? T('Message from ', 'Mensagem de ') + shared.name : T('New message', 'Nova mensagem'),
       message: sharedHead + '\n\n' + msg
     };
   };
@@ -340,21 +376,21 @@
   var getHTML = function () {
     var btnsHTML = INTENT_ORDER.map(function (i) {
       return '<button class="intent-btn" role="radio" aria-checked="' + (i === 0 ? 'true' : 'false') +
-        '" tabindex="' + (i === 0 ? '0' : '-1') + '" data-idx="' + i + '" type="button">' + INTENT_LABELS[i] + '</button>';
+        '" tabindex="' + (i === 0 ? '0' : '-1') + '" data-idx="' + i + '" type="button" data-pt="' + INTENT_LABELS_PT[i] + '">' + INTENT_LABELS[i] + '</button>';
     }).join('');
     return (
       '<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">' +
         '<div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"' +
           ' aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">' +
           '<div class="compose-modal-top">' +
-            '<button class="compose-close" id="compose-close" type="button" aria-label="Close">' +
+            '<button class="compose-close" id="compose-close" type="button" aria-label="Close" data-pt-aria-label="Fechar">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>' +
             '</button>' +
             '<div class="compose-header">' +
-              '<span class="eyebrow" id="compose-eyebrow">Let&#x27;s talk</span>' +
-              '<h2 id="compose-heading">What brings you here?</h2>' +
+              '<span class="eyebrow" id="compose-eyebrow" data-pt="Vamos falar">Let&#x27;s talk</span>' +
+              '<h2 id="compose-heading" data-pt="O que te traz por c\u00e1?">What brings you here?</h2>' +
             '</div>' +
-            '<div class="intent-toggle" role="radiogroup" aria-label="Message intent">' + btnsHTML + '</div>' +
+            '<div class="intent-toggle" role="radiogroup" aria-label="Message intent" data-pt-aria-label="Tipo de mensagem">' + btnsHTML + '</div>' +
           '</div>' +
           '<div class="compose-modal-body">' +
             '<div id="compose-fields-shared">' + getSharedFieldsHTML() + '</div>' +
@@ -364,16 +400,16 @@
             '<div id="compose-fields-book" style="display:none">' + getBookFieldsHTML() + '</div>' +
           '</div>' +
           '<div class="compose-footer" id="compose-footer">' +
-            '<button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address">' +
+            '<button class="compose-copy-email" id="compose-copy-email" type="button" aria-label="Copy email address" data-pt-aria-label="Copiar endere\u00e7o de email">' +
               '<svg class="compose-copy-icon compose-copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>' +
               '<svg class="compose-copy-icon compose-copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>' +
-              '<span id="compose-copy-hint">Copy my email address</span>' +
+              '<span id="compose-copy-hint" data-pt="Copiar o meu email">Copy my email address</span>' +
             '</button>' +
             '<div class="compose-footer-actions">' +
-              '<button class="btn btn-dark-outline" id="compose-cancel" type="button"><span>Cancel</span></button>' +
-              '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message">' +
+              '<button class="btn btn-dark-outline" id="compose-cancel" type="button"><span data-pt="Cancelar">Cancel</span></button>' +
+              '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message" data-pt-aria-label="Enviar mensagem">' +
                 '<span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg></span>' +
-                '<span>Submit</span>' +
+                '<span data-pt="Enviar">Submit</span>' +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -498,12 +534,12 @@
         navigator.clipboard && navigator.clipboard.writeText(addr).then(function () {
           /* Momentary "copied" state — swap the copy icon for a check
              and the label for "Copied!", reverting both after 2s. */
-          if (copyHint) copyHint.textContent = 'Copied!';
+          if (copyHint) copyHint.textContent = T('Copied!', 'Copiado!');
           if (copyIconDefault) copyIconDefault.style.display = 'none';
           if (copyIconSuccess) copyIconSuccess.style.display = '';
           clearTimeout(copyResetTimer);
           copyResetTimer = setTimeout(function () {
-            if (copyHint) copyHint.textContent = 'Copy my email address';
+            if (copyHint) copyHint.textContent = T('Copy my email address', 'Copiar o meu email');
             if (copyIconDefault) copyIconDefault.style.display = '';
             if (copyIconSuccess) copyIconSuccess.style.display = 'none';
           }, 2000);
@@ -558,10 +594,10 @@
       if (!validateCurrentForm()) return;
       var gate     = checkThrottle();
       if (!gate.ok) {
-        btnLabel.textContent = 'Try again in ' + formatRemaining(gate.remainingMs);
+        btnLabel.textContent = T('Try again in ', 'Tenta daqui a ') + formatRemaining(gate.remainingMs);
         sendBtn.disabled = true;
         setTimeout(function () {
-          btnLabel.textContent = 'Submit';
+          btnLabel.textContent = T('Submit', 'Enviar');
           sendBtn.disabled = false;
         }, 3500);
         return;
@@ -585,19 +621,19 @@
         var url = 'mailto:' + CONTACT_EMAIL +
           '?subject=' + encodeURIComponent(data.subject) +
           '&body=' + encodeURIComponent(data.message);
-        btnLabel.textContent = 'Opening mail…';
+        btnLabel.textContent = T('Opening mail…', 'A abrir o email…');
         window.location.href = url;
         recordSubmit();
         trackSubmit('mailto');
         setTimeout(function () {
-          btnLabel.textContent = 'Sent ✓';
+          btnLabel.textContent = T('Sent ✓', 'Enviado ✓');
           setTimeout(function () { closeModal(); }, 1400);
         }, 600);
       };
 
       if (!WEB3FORMS_KEY) { mailtoFallback(); return; }
 
-      btnLabel.textContent = 'Sending…';
+      btnLabel.textContent = T('Sending…', 'A enviar…');
       var shared = collectSharedFields();
       fetch(WEB3FORMS_URL, {
         method: 'POST',
@@ -605,7 +641,7 @@
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
           to: CONTACT_EMAIL,
-          from_name: shared.name || 'Website visitor',
+          from_name: shared.name || T('Website visitor', 'Visitante do site'),
           replyto: shared.email || '',
           subject: data.subject,
           message: data.message,
@@ -618,7 +654,7 @@
         if (!json.success) throw new Error(json.message || 'server');
         recordSubmit();
         trackSubmit('web3forms');
-        btnLabel.textContent = 'Sent ✓';
+        btnLabel.textContent = T('Sent ✓', 'Enviado ✓');
         setTimeout(function () { closeModal(); }, 1800);
       }).catch(function () {
         mailtoFallback();
@@ -651,6 +687,7 @@
       var root = document.getElementById('compose-root');
       if (!root) return;
       root.innerHTML = getHTML();
+      if (window.jjLangRefresh) window.jjLangRefresh(root);
       mounted = true;
       bindEvents();
     }
@@ -687,6 +724,8 @@
   var BOLT = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9 1L3 10h5L7 15l7-9h-5L9 1z"/></svg>';
   var NOTE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM4.5 10.5V4l8-1.5V5l-8 1.5V10.5z"/></svg>';
 
+  var T = function (en, pt) { return (window.jjLang && window.jjLang() === 'pt') ? pt : en; };
+
   function updateStatus() {
     var now      = new Date();
     var lisbonStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: 'numeric', hour12: false });
@@ -697,11 +736,11 @@
     if (!dot || !label) return;
     var color, text, icon, state;
     if (hour >= 9 && hour < 20) {
-      color = '#22c55e'; text = 'Available · Working hours'; icon = ''; state = 'available';
+      color = '#22c55e'; text = T('Available · Working hours', 'Dispon\u00edvel · Hor\u00e1rio de trabalho'); icon = ''; state = 'available';
     } else if (hour >= 1 && hour < 9) {
-      color = '#4b5563'; text = 'Sleeping';                       icon = BOLT; state = 'sleeping';
+      color = '#4b5563'; text = T('Sleeping', 'A dormir');   icon = BOLT; state = 'sleeping';
     } else {
-      color = '#f59e0b'; text = 'Outside working hours';          icon = ''; state = 'offhours';
+      color = '#f59e0b'; text = T('Outside working hours', 'Fora do hor\u00e1rio de trabalho'); icon = ''; state = 'offhours';
     }
     dot.className = 'footer-status-dot state-' + state;
     dot.style.background = color;
@@ -712,13 +751,14 @@
 
   updateStatus();
   setInterval(updateStatus, 60000);
+  document.addEventListener('jj:langchange', updateStatus);
 
   var emailBtn = document.getElementById('footer-email-btn');
   if (emailBtn) {
     var origHTML = emailBtn.innerHTML;
     emailBtn.addEventListener('click', function () {
       navigator.clipboard && navigator.clipboard.writeText('contact@joaojacinto.com').then(function () {
-        emailBtn.innerHTML = 'Copied ✓';
+        emailBtn.innerHTML = (window.jjLang && window.jjLang() === 'pt') ? 'Copiado ✓' : 'Copied ✓';
         emailBtn.classList.add('copied');
         setTimeout(function () {
           emailBtn.innerHTML = origHTML;

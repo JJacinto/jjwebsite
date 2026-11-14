@@ -1,32 +1,29 @@
 ---
 /* The 30-second summary: problem, what was cut, what shipped, the result.
    Public on the password gate too. `anchor` gives it the TOC id (only the
-   unlocked copy, so the id stays unique); `xray` adds the X-ray switch
-   (only the unlocked copy, because the gate sits on a hidden page). */
-import XraySwitch from '../XraySwitch.astro';
+   unlocked copy, so the id stays unique). */
 import type { Case } from '../../data/cases';
 
-interface Props { c: Case; anchor?: boolean; xray?: boolean; }
-const { c, anchor = true, xray = true } = Astro.props;
+interface Props { c: Case; anchor?: boolean; }
+const { c, anchor = true } = Astro.props;
 const rows = [
-  { label: 'Problem', text: c.problem, cut: false },
-  { label: 'What I cut', text: c.cut, cut: true },
-  { label: 'What shipped', text: c.shipped, cut: false },
-  { label: 'Result', text: c.result, cut: false },
+  { label: 'Problem', labelPt: 'Problema', text: c.problem, textPt: c.problemPt, cut: false },
+  { label: 'What I cut', labelPt: 'O que cortei', text: c.cut, textPt: c.cutPt, cut: true },
+  { label: 'What shipped', labelPt: 'O que lancei', text: c.shipped, textPt: c.shippedPt, cut: false },
+  { label: 'Result', labelPt: 'Resultado', text: c.result, textPt: c.resultPt, cut: false },
 ];
 ---
-<section class={anchor ? 'case-summary reveal' : 'case-summary'} id={anchor ? 'case-summary' : undefined} aria-label="The short version">
-  <span class="eyebrow">The short version</span>
+<section class={anchor ? 'case-summary reveal' : 'case-summary'} id={anchor ? 'case-summary' : undefined} aria-label="The short version" data-pt-aria-label="A versão curta">
+  <span class="eyebrow" data-pt="A versão curta">The short version</span>
   <div class="case-summary-card">
     <dl class="case-summary-list">
       {rows.map(r => (
         <div class={`case-summary-row${r.cut ? ' case-summary-row--cut' : ''}`}>
-          <dt class="eyebrow">{r.label}</dt>
-          <dd>{r.text}</dd>
-          {r.cut && <span class="case-xnote">// What I left out shapes the product as much as what I put in.</span>}
+          <dt class="eyebrow" data-pt={r.labelPt}>{r.label}</dt>
+          <dd data-pt={r.textPt}>{r.text}</dd>
+          {r.cut && <span class="case-xnote" data-pt="// O que deixei de fora molda o produto tanto como o que pus lá dentro.">// What I left out shapes the product as much as what I put in.</span>}
         </div>
       ))}
     </dl>
-    {xray && <XraySwitch wrap="#case-content" />}
   </div>
 </section>

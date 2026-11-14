@@ -6,7 +6,6 @@ import UnderstandingWebinarOrganizersBody from '../../components/cases/Understan
 import LeadingDesignSystemBody from '../../components/cases/LeadingDesignSystemBody.astro';
 import DesigningSupportChatBody from '../../components/cases/DesigningSupportChatBody.astro';
 import CaseSummary from '../../components/cases/CaseSummary.astro';
-import XraySwitch from '../../components/XraySwitch.astro';
 
 /* Hidden cases are not built: no page, no sitemap entry (see cases.ts). */
 export function getStaticPaths() {
@@ -212,7 +211,6 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   </div>
 
   <!-- Floating copy of the X-ray switch (appears once the summary switch scrolls away). -->
-  <XraySwitch float wrap="#case-content" />
 
   <!-- Password gate overlay — shown via JS if not unlocked -->
   <div id="pw-overlay" style="display:none">
@@ -230,7 +228,7 @@ const tocItems = c.slug === 'redefining-webinar-customization'
           <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
         </header>
 
-        <CaseSummary c={c} anchor={false} xray={false} />
+        <CaseSummary c={c} anchor={false} />
 
         <div class={`outcomes ${outcomesClass} case-gate-outcomes`}>
           {c.outcomes.map(o => (

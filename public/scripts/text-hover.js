@@ -28,6 +28,9 @@
     }
   }
 
+  /* Used by the language switch to redo the split after it swaps a label. */
+  window.jjWrapChars = wrap;
+
   function setDelays(el, reversed) {
     var wraps = Array.prototype.slice.call(el.querySelectorAll('.sc-wrap'));
     var n = wraps.length;

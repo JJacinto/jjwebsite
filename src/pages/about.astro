@@ -14,33 +14,35 @@ const bars = Array.from({ length: 24 }, (_, i) => {
 });
 
 const photos = [
-  { src: '/assets/images/photo-astronaut.webp', cap: 'Trained for zero gravity. Employed for zero margin.', k: -2, rot: -6 },
-  { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', k: -1, rot: 3 },
-  { src: '/assets/images/photo-tickets.webp', cap: 'Itinerary: aspirational. Carry-on: overpacked.', k: 0, rot: -2 },
-  { src: '/assets/images/photo-vr.webp', cap: '911 in VR. EV in the garage. Identity crisis.', k: 1, rot: 5 },
-  { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', k: 2, rot: -4 },
+  { src: '/assets/images/photo-astronaut.webp', cap: 'Trained for zero gravity. Employed for zero margin.', capPt: 'Treinado para gravidade zero. Contratado para margem zero.', k: -2, rot: -6 },
+  { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', capPt: 'A praticar baixinho. Os vizinhos discordam.', k: -1, rot: 3 },
+  { src: '/assets/images/photo-tickets.webp', cap: 'Itinerary: aspirational. Carry-on: overpacked.', capPt: 'Itinerário: ambicioso. Bagagem de mão: a rebentar pelas costuras.', k: 0, rot: -2 },
+  { src: '/assets/images/photo-vr.webp', cap: '911 in VR. EV in the garage. Identity crisis.', capPt: 'Um 911 em VR. Um elétrico na garagem. Crise de identidade.', k: 1, rot: 5 },
+  { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', capPt: 'Intenção de smash. Resultado: lob.', k: 2, rot: -4 },
 ];
 
 /* How I work. `body` and `tools` are the stack before LLMs; `now` and
    `plus` are what the same step looks like today. The section's switch
    flips between the two. */
 const loop = [
-  { n: '01', name: 'Talk', body: "I start in conversation, not in Figma. Most design mistakes I've seen ship began with a blank canvas before the problem was understood.", tools: ['FigJam', 'Dovetail', 'Maze'],
-    now: 'Still a conversation. Most of it happens in Slack now, and the thread becomes the brief instead of something I retype.', plus: 'Slack' },
-  { n: '02', name: 'Map', body: 'I think about the system first and the screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'],
-    now: 'Same thinking, better wiring. MCPs connect the tools to each other, so the map comes from the real system, not from my memory of it.', plus: 'MCPs' },
-  { n: '03', name: 'Cut', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'],
-    now: "The cutting is still mine. Skills hold the rules I'd otherwise repeat, so every pass is checked against the same standard.", plus: 'Skills' },
-  { n: '04', name: 'Ship', body: "Figma is the contract between design, engineering and product. When the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'],
-    now: 'Figma is still the contract. Plugins and Claude Code take the repeatable parts of the handoff, and I review what goes out.', plus: 'Plugins' },
-  { n: '05', name: 'Measure', body: "Shipped isn't done. This is where I find out if I was right. Most of the time I wasn't, not entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'],
-    now: "Automations bring the numbers to me, so I look every week, not only when I remember. Being wrong shows up sooner. That's the loop.", plus: 'Automations' },
+  { n: '01', name: 'Talk', namePt: 'Conversa', bodyPt: 'Começo pela conversa, não pelo Figma. Os piores erros que vi começaram num ecrã em branco.', nowPt: 'Continua a ser uma conversa. A thread no Slack passa a ser o brief.', body: "I start in conversation, not in Figma. The worst mistakes I've seen began on a blank canvas.", tools: ['FigJam', 'Dovetail', 'Maze'], drop: ['FigJam', 'Dovetail', 'Maze'],
+    now: 'Still a conversation. The Slack thread becomes the brief.', plus: 'Slack' },
+  { n: '02', name: 'Map', namePt: 'Mapear', bodyPt: 'Primeiro o sistema, depois os ecrãs: como as coisas se relacionam, que regras dependem de quais.', nowPt: 'O mesmo raciocínio. Os MCPs ligam as ferramentas, e o mapa vem do sistema real.', body: 'System first, screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'], drop: ['FigJam'],
+    now: 'Same thinking. MCPs link the tools, so the map comes from the real system.', plus: 'MCPs' },
+  { n: '03', name: 'Cut', namePt: 'Cortar', bodyPt: 'Depois corto o que ninguém daria por falta. A complexidade que tem de ficar, torno-a visível.', nowPt: 'Cortar continua a ser comigo. As skills verificam cada passagem com as mesmas regras.', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'], drop: ['Figma', 'Jitter'],
+    now: 'The cutting is still mine. Skills check every pass against the same rules.', plus: 'Skills' },
+  { n: '04', name: 'Ship', namePt: 'Lançar', bodyPt: 'O Figma é o contrato. Se o developer abre o ficheiro e nada o surpreende, fiz o meu trabalho.', nowPt: 'O Figma continua a ser o contrato. Os plugins e o Claude Code tratam do handoff repetível. Eu revejo.', body: "Figma is the contract. If the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'], drop: ['Figma', 'Loom'],
+    now: 'Figma is still the contract. Plugins and Claude Code handle the repeat work of handoff. I review it.', plus: 'Plugins' },
+  { n: '05', name: 'Measure', namePt: 'Medir', bodyPt: 'Lançar não é acabar. É aqui que vejo se tinha razão. Quase nunca por inteiro. Isto é o ciclo.', nowPt: 'As automações trazem-me os números todas as semanas. Vejo mais cedo onde errei. Isto é o ciclo.', body: "Shipped isn't done. This is where I find out if I was right. Rarely entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'], drop: ['Fullstory'],
+    now: "Automations bring me the numbers every week, so I see where I was wrong sooner. That's the loop.", plus: 'Automations', plusPt: 'Automações' },
 ];
 ---
 <Base
   activePage="about"
   title="About — João Jacinto"
+  titlePt="Sobre — João Jacinto"
   description="I design products that make complicated things easier for the people who use them. Senior Product Designer based in Aveiro, Portugal."
+  descriptionPt="Desenho produtos que tornam as coisas complicadas mais fáceis para quem as usa. Senior Product Designer em Aveiro, Portugal."
   showCta={true}
 >
 
@@ -62,14 +64,14 @@ const loop = [
            and all five steps. The script at the bottom of this file
            plays it once on load. -->
       <section class="about-story about-section" data-about-story data-xray data-xray-gap="128">
-        <aside class="xray-note" data-xray-note>The story plays once, then rests on its last frame. Reduced motion or no JavaScript? You get the last frame straight away.</aside>
+        <aside class="xray-note" data-xray-note data-pt="A história passa uma vez e fica parada no último fotograma. Movimento reduzido ou sem JavaScript? Vê-se logo o último fotograma.">The story plays once, then rests on its last frame. Reduced motion or no JavaScript? You get the last frame straight away.</aside>
 
         <div class="about-story-head">
           <p class="about-intro">
             <img class="about-intro-avatar" src="/assets/images/photo.webp" alt="João Jacinto" width="40" height="40">
-            <span>João Jacinto · Senior Product Designer at Anchorage Digital · Aveiro, Portugal</span>
+            <span data-pt="João Jacinto · Senior Product Designer na Anchorage Digital · Aveiro, Portugal">João Jacinto · Senior Product Designer at Anchorage Digital · Aveiro, Portugal</span>
           </p>
-          <h1 class="about-story-title">I turn tangled problems into products people don't have to think about.</h1>
+          <h1 class="about-story-title" data-pt="Transformo problemas emaranhados em produtos em que ninguém precisa de pensar.">I turn tangled problems into products people don't have to think about.</h1>
         </div>
 
         <div class="about-story-stage" aria-hidden="true">
@@ -100,20 +102,20 @@ const loop = [
 
             <rect class="st-pill" x="180" y="142" width="120" height="56" rx="28"/>
             <circle class="st-ball" r="20"/>
-            <text class="st-result" x="240" y="250" text-anchor="middle">40 steps → 1</text>
+            <text class="st-result" x="240" y="250" text-anchor="middle" data-pt="40 passos → 1">40 steps → 1</text>
           </svg>
-          <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay">Replay</button>
+          <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay" data-pt="Repetir">Replay</button>
         </div>
 
         <div class="about-story-copy">
           <ol class="about-story-steps">
-            <li>Take the tangle as it is.</li>
-            <li>Pull it apart into pieces.</li>
-            <li>Map how the pieces relate.</li>
-            <li>Cut what nobody would miss.</li>
-            <li>Ship the one step that's left.</li>
+            <li data-pt="Pegar no emaranhado tal como está.">Take the tangle as it is.</li>
+            <li data-pt="Desfazê-lo em peças.">Pull it apart into pieces.</li>
+            <li data-pt="Mapear a relação entre as peças.">Map how the pieces relate.</li>
+            <li data-pt="Cortar o que ninguém daria por falta.">Cut what nobody would miss.</li>
+            <li data-pt="Lançar o único passo que sobra.">Ship the one step that's left.</li>
           </ol>
-          <p class="about-story-note">That's the story of the policies and permissions redesign at Anchorage Digital.</p>
+          <p class="about-story-note" data-pt="Esta é a história do redesenho das políticas e permissões na Anchorage Digital.">That's the story of the policies and permissions redesign at Anchorage Digital.</p>
 
           <XraySwitch wrap=".about-wrap" />
         </div>
@@ -124,22 +126,22 @@ const loop = [
            get today's stack. With JS it opens on "before" and flips to
            "now" once the cards are in view; the switch flips it back. -->
       <section class="about-section loop" data-loop data-mode="now" data-live data-xray data-xray-gap="128" aria-labelledby="loop-title">
-        <aside class="xray-note" data-xray-note>Same five steps on both sides of the switch. Only the tools change, and what runs underneath them.</aside>
+        <aside class="xray-note" data-xray-note data-pt="Os mesmos cinco passos dos dois lados do interruptor. Só mudam as ferramentas e o que corre por baixo delas.">Same five steps on both sides of the switch. Only the tools change, and what runs underneath them.</aside>
 
         <div class="about-head">
-          <span class="eyebrow reveal">How I work</span>
-          <h2 id="loop-title" class="about-head-narrow reveal reveal-d1">Find the smallest version of the real problem. Then build the smallest version of a real answer.</h2>
+          <span class="eyebrow reveal" data-pt="Como trabalho">How I work</span>
+          <h2 id="loop-title" class="about-head-narrow reveal reveal-d1" data-pt="Encontrar a menor versão do problema real. Depois construir a menor versão de uma resposta a sério.">Find the smallest version of the real problem. Then build the smallest version of a real answer.</h2>
         </div>
 
         <div class="loop-switch reveal reveal-d2">
-          <div class="loop-seg" role="group" aria-label="Which stack to show">
+          <div class="loop-seg" role="group" aria-label="Which stack to show" data-pt-aria-label="Que stack mostrar">
             <span class="loop-seg-thumb" aria-hidden="true"></span>
-            <button type="button" data-loop-mode="before" aria-pressed="false" data-umami-event="about-stack-before">Before</button>
-            <button type="button" data-loop-mode="now" aria-pressed="true" data-umami-event="about-stack-now">Now</button>
+            <button type="button" data-loop-mode="before" aria-pressed="false" data-umami-event="about-stack-before" data-pt="Antes">Before</button>
+            <button type="button" data-loop-mode="now" aria-pressed="true" data-umami-event="about-stack-now" data-pt="Agora">Now</button>
           </div>
           <p class="loop-caption" aria-live="polite">
-            <span data-when="before">My stack before LLMs. Every step by hand.</span>
-            <span data-when="now">My stack now. Same five steps, with the legwork automated.</span>
+            <span data-when="before" data-pt="A minha stack antes dos LLMs. Cada passo à mão.">My stack before LLMs. Every step by hand.</span>
+            <span data-when="now" data-pt="A minha stack agora. Os mesmos cinco passos, com o trabalho braçal automatizado.">My stack now. Same five steps, with the legwork automated.</span>
           </p>
         </div>
 
@@ -149,14 +151,14 @@ const loop = [
             {loop.map((s, i) => (
               <li class={`loop-card reveal reveal-d${Math.min(i + 1, 4)}`} style={`--i:${i}`}>
                 <span class="loop-num">{s.n}</span>
-                <h3 class="loop-name">{s.name}</h3>
+                <h3 class="loop-name" data-pt={s.namePt}>{s.name}</h3>
                 <div class="loop-bodies">
-                  <p class="loop-body" data-when="before">{s.body}</p>
-                  <p class="loop-body" data-when="now">{s.now}</p>
+                  <p class="loop-body" data-when="before" data-pt={s.bodyPt}>{s.body}</p>
+                  <p class="loop-body" data-when="now" data-pt={s.nowPt}>{s.now}</p>
                 </div>
                 <ul class="loop-tools">
-                  {s.tools.map((t) => <li>{t}</li>)}
-                  <li class="loop-plus" data-when="now">{s.plus}</li>
+                  {s.tools.map((t) => <li class={s.drop?.includes(t) ? 'loop-drop' : undefined} data-when={s.drop?.includes(t) ? 'before' : undefined}>{t}</li>)}
+                  <li class="loop-plus" data-when="now" data-pt={s.plusPt}>{s.plus}</li>
                 </ul>
                 <span class="loop-feed" aria-hidden="true"></span>
               </li>
@@ -164,9 +166,9 @@ const loop = [
           </ol>
 
           <div class="loop-bus reveal reveal-d4">
-            <span class="loop-bus-label">Run by</span>
+            <span class="loop-bus-label" data-pt="Feito por">Run by</span>
             <ul class="loop-runners">
-              <li class="loop-runner">Me</li>
+              <li class="loop-runner" data-pt="Eu">Me</li>
               <li class="loop-runner" data-when="now" style="--i:1">Claude Code</li>
               <li class="loop-runner" data-when="now" style="--i:2">Gemini</li>
               <li class="loop-runner loop-runner--home" data-when="now" style="--i:3">
@@ -174,23 +176,23 @@ const loop = [
                   <path d="M2 7.5 8 2.5l6 5V14H2z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
                   <circle class="loop-home-led" cx="8" cy="10.2" r="1.6"/>
                 </svg>
-                Local LLMs <small>at home</small>
+                <span data-pt="LLMs locais">Local LLMs</span> <small data-pt="em casa">at home</small>
               </li>
             </ul>
-            <p class="loop-repeat"><span aria-hidden="true">↺</span> repeat</p>
+            <p class="loop-repeat"><span aria-hidden="true">↺</span> <span data-pt="repetir">repeat</span></p>
           </div>
         </div>
 
-        <p class="loop-foot reveal">Claude Code and Gemini do most of the lifting. Some of it runs on local models, on a machine I keep at home. The tools change every few years. The habit doesn't.</p>
+        <p class="loop-foot reveal" data-pt="O Claude Code e o Gemini fazem a maior parte do trabalho pesado. Parte corre em modelos locais, numa máquina que tenho em casa. As ferramentas mudam de poucos em poucos anos. O hábito não.">Claude Code and Gemini do most of the lifting. Some of it runs on local models, on a machine I keep at home. The tools change every few years. The habit doesn't.</p>
       </section>
 
       <!-- Principles -->
       <section class="about-section principles" data-xray data-xray-gap="128" aria-labelledby="principles-title">
-        <aside class="xray-note" data-xray-note>Each card does what it says. Hover it, or tab to it.</aside>
+        <aside class="xray-note" data-xray-note data-pt="Cada cartão faz o que diz. Basta passar o rato por cima ou chegar lá com o Tab.">Each card does what it says. Hover it, or tab to it.</aside>
 
         <div class="about-head">
-          <span class="eyebrow reveal">Principles</span>
-          <h2 id="principles-title" class="about-head-narrow reveal reveal-d1">Five rules I keep coming back to.</h2>
+          <span class="eyebrow reveal" data-pt="Princípios">Principles</span>
+          <h2 id="principles-title" class="about-head-narrow reveal reveal-d1" data-pt="Cinco regras a que volto sempre.">Five rules I keep coming back to.</h2>
         </div>
 
         <div class="p-grid">
@@ -206,17 +208,17 @@ const loop = [
                 <i class="d1-btn"></i>
               </div>
             </div>
-            <h3 class="p-title">Make the invisible visible.</h3>
-            <p class="p-body">Rules, permissions and dependencies belong on the screen, not in someone's head.</p>
+            <h3 class="p-title" data-pt="Tornar o invisível visível.">Make the invisible visible.</h3>
+            <p class="p-body" data-pt="Regras, permissões e dependências pertencem ao ecrã, não à cabeça de alguém.">Rules, permissions and dependencies belong on the screen, not in someone's head.</p>
           </article>
 
           <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo" aria-hidden="true">
               <span class="tap-hint"></span>
-              <p class="d2-text">This is <span class="d2-fill">really</span><span class="d2-fill">just</span><span class="d2-fill">basically</span>a sentence that <span class="d2-fill">actually</span>says <span class="d2-fill">very</span>little.</p>
+              <p class="d2-text" data-pt={'Isto é <span class="d2-fill">realmente</span><span class="d2-fill">apenas</span><span class="d2-fill">basicamente</span>uma frase que <span class="d2-fill">na verdade</span>diz <span class="d2-fill">muito</span>pouco.'}>This is <span class="d2-fill">really</span><span class="d2-fill">just</span><span class="d2-fill">basically</span>a sentence that <span class="d2-fill">actually</span>says <span class="d2-fill">very</span>little.</p>
             </div>
-            <h3 class="p-title">Cut what nobody would miss.</h3>
-            <p class="p-body">Every step, field and setting has to earn its place.</p>
+            <h3 class="p-title" data-pt="Cortar o que ninguém daria por falta.">Cut what nobody would miss.</h3>
+            <p class="p-body" data-pt="Cada passo, campo e definição tem de merecer o seu lugar.">Every step, field and setting has to earn its place.</p>
           </article>
 
           <article class="p-card reveal reveal-d3" tabindex="0">
@@ -224,12 +226,12 @@ const loop = [
               <span class="tap-hint"></span>
               <div class="d3-stage">
                 <span class="d3-line"></span>
-                <span class="d3-dot d3-dot--me"><i></i><em>me</em></span>
-                <span class="d3-dot d3-dot--them"><i></i><em>them</em></span>
+                <span class="d3-dot d3-dot--me"><i></i><em data-pt="eu">me</em></span>
+                <span class="d3-dot d3-dot--them"><i></i><em data-pt="eles">them</em></span>
               </div>
             </div>
-            <h3 class="p-title">Stay close to the people using it.</h3>
-            <p class="p-body">Their feedback shapes the next decision, not the last slide of the deck.</p>
+            <h3 class="p-title" data-pt="Ficar perto de quem usa.">Stay close to the people using it.</h3>
+            <p class="p-body" data-pt="O feedback deles molda a decisão seguinte, não o último slide da apresentação.">Their feedback shapes the next decision, not the last slide of the deck.</p>
           </article>
 
           <article class="p-card reveal reveal-d1" tabindex="0">
@@ -241,8 +243,8 @@ const loop = [
                 <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Rectangle 3</span><span class="d4-new">Card / Surface</span></span></div>
               </div>
             </div>
-            <h3 class="p-title">Optimise for the next designer.</h3>
-            <p class="p-body">Name things, document decisions, leave the file better than you found it.</p>
+            <h3 class="p-title" data-pt="Pensar no próximo designer.">Optimise for the next designer.</h3>
+            <p class="p-body" data-pt="Dar nomes às coisas, documentar decisões, deixar o ficheiro melhor do que o encontrámos.">Name things, document decisions, leave the file better than you found it.</p>
           </article>
 
           <article class="p-card reveal reveal-d2" tabindex="0">
@@ -250,24 +252,24 @@ const loop = [
               <span class="tap-hint"></span>
               <div class="d5-doc">
                 <i class="d5-h"></i>
-                <p class="d5-line">Decision: we ship the single step.<span class="d5-caret"></span></p>
+                <p class="d5-line"><span data-pt="Decisão: lançamos um único passo.">Decision: we ship the single step.</span><span class="d5-caret"></span></p>
                 <i class="d5-sk"></i>
-                <span class="d5-bubble">Pushback welcome ↗</span>
+                <span class="d5-bubble" data-pt="Contestar à vontade ↗">Pushback welcome ↗</span>
               </div>
             </div>
-            <h3 class="p-title">Strong opinions, written down.</h3>
-            <p class="p-body">Opinions go in a doc where people can push back, not just in a meeting.</p>
+            <h3 class="p-title" data-pt="Opiniões fortes, por escrito.">Strong opinions, written down.</h3>
+            <p class="p-body" data-pt="As opiniões vão para um documento onde se pode contestar, não ficam só numa reunião.">Opinions go in a doc where people can push back, not just in a meeting.</p>
           </article>
         </div>
       </section>
 
       <!-- Journey -->
       <section class="about-section journey" data-xray data-xray-gap="128" aria-labelledby="journey-title">
-        <aside class="xray-note" data-xray-note>Solid line for the career, dashed for the years I was still learning. A number only where there's an honest one.</aside>
+        <aside class="xray-note" data-xray-note data-pt="Linha contínua para a carreira, tracejada para os anos em que ainda estava a aprender. Um número só onde houver um honesto.">Solid line for the career, dashed for the years I was still learning. A number only where there's an honest one.</aside>
 
         <div class="about-head">
-          <span class="eyebrow reveal">Journey</span>
-          <h2 id="journey-title" class="reveal reveal-d1">One thread since I was 13.</h2>
+          <span class="eyebrow reveal" data-pt="Percurso">Journey</span>
+          <h2 id="journey-title" class="reveal reveal-d1" data-pt="Um fio condutor desde os 13 anos.">One thread since I was 13.</h2>
         </div>
 
         <Journey />
@@ -275,20 +277,20 @@ const loop = [
 
       <!-- Off the clock -->
       <section class="about-section board" data-xray data-xray-gap="128" aria-labelledby="board-title">
-        <aside class="xray-note" data-xray-note>The photos are 192px. Small on purpose: this part is about the person, not the portfolio.</aside>
+        <aside class="xray-note" data-xray-note data-pt="As fotos têm 192px. Pequenas de propósito: esta parte é sobre a pessoa, não sobre o portefólio.">The photos are 192px. Small on purpose: this part is about the person, not the portfolio.</aside>
 
         <div class="about-head">
-          <span class="eyebrow reveal">Off the clock</span>
-          <h2 id="board-title" class="reveal reveal-d1">When I'm not designing.</h2>
+          <span class="eyebrow reveal" data-pt="Fora do horário">Off the clock</span>
+          <h2 id="board-title" class="reveal reveal-d1" data-pt="Quando não estou a desenhar.">When I'm not designing.</h2>
         </div>
 
         <div class="board-grid">
           <div class="b-card b-photos reveal">
-            <div class="polaroids" role="group" aria-label="Photos" data-polaroids>
+            <div class="polaroids" role="group" aria-label="Photos" data-pt-aria-label="Fotografias" data-polaroids>
               {photos.map((p) => (
                 <figure class="polaroid" tabindex="0" style={`--k:${p.k};--rot:${p.rot}deg`}>
                   <img src={p.src} alt="" width="192" height="192" loading="lazy">
-                  <figcaption>{p.cap}</figcaption>
+                  <figcaption data-pt={p.capPt}>{p.cap}</figcaption>
                 </figure>
               ))}
             </div>
@@ -296,16 +298,16 @@ const loop = [
           </div>
 
           <div class="b-card b-music reveal reveal-d1" data-live>
-            <span class="eyebrow b-label">Producing</span>
+            <span class="eyebrow b-label" data-pt="A produzir">Producing</span>
             <a class="b-title" data-umami-event="about-music" href="https://music.youtube.com/watch?v=80hpbDstlhc&list=OLAK5uy_mex7K9FoXhQBxg8yKviL81Avmz9Xfh4WI" target="_blank" rel="noopener noreferrer">Boreal Haze</a>
             <div class="eq" aria-hidden="true">
               {bars.map((b) => <span style={`--i:${b.i};--hi:${b.hi};--lo:${b.lo};--d:${b.d}ms`}></span>)}
             </div>
-            <p class="b-sub">Listening to <a href="https://music.youtube.com/playlist?list=OLAK5uy_mT0JOV9xVWCyrOWBjjfpjAF-0LfyxGVW8" target="_blank" rel="noopener noreferrer">Vulfmon</a>, <a href="https://music.youtube.com/watch?v=I8NzXaIQY54" target="_blank" rel="noopener noreferrer">Oli Howe</a></p>
+            <p class="b-sub"><span data-pt="A ouvir">Listening to</span> <a href="https://music.youtube.com/playlist?list=OLAK5uy_mT0JOV9xVWCyrOWBjjfpjAF-0LfyxGVW8" target="_blank" rel="noopener noreferrer">Vulfmon</a>, <a href="https://music.youtube.com/watch?v=I8NzXaIQY54" target="_blank" rel="noopener noreferrer">Oli Howe</a></p>
           </div>
 
           <div class="b-card b-read reveal reveal-d2">
-            <span class="eyebrow b-label">Reading</span>
+            <span class="eyebrow b-label" data-pt="A ler">Reading</span>
             <div class="b-read-row">
               <div class="book" aria-hidden="true"><span>Crucial</span><span>Conver&shy;sations</span></div>
               <div class="b-read-text">
@@ -316,24 +318,24 @@ const loop = [
           </div>
 
           <div class="b-card b-build reveal reveal-d3">
-            <span class="eyebrow b-label">Building</span>
+            <span class="eyebrow b-label" data-pt="A construir">Building</span>
             <ul class="b-projects">
-              <li><a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a><span>Day job</span></li>
-              <li>Home Assistant mod<span>Our smart home</span></li>
-              <li>Local AI server<span>LLMs + a sovereign agent</span></li>
-              <li class="is-live">joaojacinto.com<span>You're on it</span></li>
+              <li><a href="https://www.anchorage.com" target="_blank" rel="noopener noreferrer">Anchorage Digital</a><span data-pt="O emprego">Day job</span></li>
+              <li data-pt="Mod do Home Assistant<span>A nossa casa inteligente</span>">Home Assistant mod<span>Our smart home</span></li>
+              <li data-pt="Servidor de IA local<span>LLMs + um agente soberano</span>">Local AI server<span>LLMs + a sovereign agent</span></li>
+              <li class="is-live" data-pt="joaojacinto.com<span>Estás nele</span>">joaojacinto.com<span>You're on it</span></li>
             </ul>
           </div>
 
           <div class="b-card b-into reveal reveal-d1">
-            <span class="eyebrow b-label">Also into</span>
+            <span class="eyebrow b-label" data-pt="Também gosto de">Also into</span>
             <ul class="chips">
-              <li>Drums</li><li>Music production</li><li>Building with AI</li><li>RPGs</li><li>VR racing</li><li>Premier League</li><li>3D printing</li>
+              <li data-pt="Bateria">Drums</li><li data-pt="Produção musical">Music production</li><li data-pt="Construir com IA">Building with AI</li><li>RPGs</li><li data-pt="Corridas em VR">VR racing</li><li>Premier League</li><li data-pt="Impressão 3D">3D printing</li>
             </ul>
           </div>
 
           <div class="b-card b-desk reveal reveal-d2">
-            <span class="eyebrow b-label">At the desk</span>
+            <span class="eyebrow b-label" data-pt="Na secretária">At the desk</span>
             <p class="b-desk-text">Steelcase Leap v2 · Odyssey G9 · Logitech MX · Deltahub Carpio</p>
           </div>
         </div>
@@ -580,13 +582,21 @@ const loop = [
 
   /* ---- Count-ups: [data-count] with data-from / data-to ---- */
   const counters = Array.from(wrap.querySelectorAll('[data-count]'));
+  const lang = () => (window.jjLang ? window.jjLang() : 'en');
   const fmt = (el, v) => {
+    const pt = lang() === 'pt';
     const dec = Number(el.dataset.decimals || 0);
     const body = el.dataset.format === 'grouped'
-      ? Math.round(v).toLocaleString('en-US')
-      : v.toFixed(dec);
+      ? Math.round(v).toLocaleString(pt ? 'pt-PT' : 'en-US')
+      : (pt ? v.toFixed(dec).replace('.', ',') : v.toFixed(dec));
     return body + (el.dataset.suffix || '');
   };
+  /* Each counter remembers its current value (el._v) so a language switch
+     can redraw it in the other number format, mid-animation or at rest. */
+  counters.forEach((el) => { el._v = Number(el.dataset.to); });
+  const redraw = () => counters.forEach((el) => { el.textContent = fmt(el, el._v); });
+  document.addEventListener('jj:langchange', redraw);
+  if (lang() === 'pt') redraw();
   function runCount(el) {
     const from = Number(el.dataset.from), to = Number(el.dataset.to);
     const dur = Number(el.dataset.duration || 1100);
@@ -594,7 +604,8 @@ const loop = [
     function frame(now) {
       const t = Math.min((now - start) / dur, 1);
       const eased = 1 - Math.pow(1 - t, 3);
-      el.textContent = fmt(el, from + (to - from) * eased);
+      el._v = from + (to - from) * eased;
+      el.textContent = fmt(el, el._v);
       if (t < 1) requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
@@ -607,7 +618,7 @@ const loop = [
         runCount(en.target);
       });
     }, { threshold: 0.6 });
-    counters.forEach((el) => { el.textContent = fmt(el, Number(el.dataset.from)); io.observe(el); });
+    counters.forEach((el) => { el._v = Number(el.dataset.from); el.textContent = fmt(el, el._v); io.observe(el); });
   }
 
   /* ---- In-view hooks: [data-inview] gets .in once; [data-live] toggles .is-live ---- */
