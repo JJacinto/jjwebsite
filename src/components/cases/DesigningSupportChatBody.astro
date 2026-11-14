@@ -1,96 +1,79 @@
 ---
 /* Rich body for the "Designing a support chat experience" case
-   study (Namecheap). The shared [slug].astro template renders
-   this when the slug matches; the default templated layout is
-   bypassed. Shared .rwc-* layout/typography lives in global.css
-   and the image lightbox in CaseBodyLightbox.astro. */
+   study (Namecheap). A 3-minute, decision-led read: context, three
+   decisions, the result, and a short hindsight section. Optional detail
+   sits behind CaseDetail expanders. The shared [slug].astro template
+   renders this when the slug matches and passes the summary through
+   the slot. Shared .rwc-* layout/typography lives in global.css and
+   the image lightbox in CaseBodyLightbox.astro. */
 import CaseBodyLightbox from './CaseBodyLightbox.astro';
+import CaseDetail from './CaseDetail.astro';
+import CaseReadBar from './CaseReadBar.astro';
 ---
 
 <div class="rwc-body">
 
-  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  {/* HERO */}
   <section class="rwc-hero" id="case-context">
     <div class="rwc-hero-left">
-      <div class="case-cat">Case study · Platform for Namecheap's customer support</div>
-      <h1 class="case-title">Designing a support chat experience</h1>
-      <p class="case-subtitle">
-        One of the biggest domain providers in the world, driven to pursue
-        an amazing customer experience, challenged me to build an in-house
-        customer support app.
+      <div class="case-cat" data-pt={'Caso de estudo · Plataforma de suporte ao cliente da Namecheap'}>Case study · Platform for Namecheap's customer support</div>
+      <h1 class="case-title" data-pt={'Desenhar uma experiência de chat de suporte'}>Designing a support chat experience</h1>
+      <p class="case-subtitle" data-pt={'Um chat de suporte e uma app para agentes feitos de raiz para a Namecheap, com um design system próprio. 97,4% de feedback positivo quatro meses após o lançamento.'}>
+        An in-house support chat and agent app for Namecheap, designed from
+        scratch with its own design system. 97.4% positive feedback four months
+        after launch.
       </p>
-    </div>
-
-    <div class="rwc-hero-right">
-      <img class="rwc-hero-mark" src="/assets/images/cases/namecheap/hero-mark.svg" alt="Namecheap mark" loading="eager" />
-      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/namecheap/hero.webp" alt="Namecheap branding — Building a better online world together" loading="eager" fetchpriority="high" />
-      </div>
-      <p class="case-img-caption">Image by Namecheap via namecheap.com</p>
-    </div>
-  </section>
-
-  {/* Summary + decisions, passed in from [slug].astro */}
-  <slot />
-
-  {/* ───────────────────── MY ROLE + KEYWORDS ───────────────────── */}
-  <section class="rwc-role" id="case-role">
-    <div class="rwc-role-left">
-      <div class="eyebrow">My role</div>
-      <p class="case-role">UX Designer</p>
-
-      <p>
-        I led the customer support app design from its start, created a
-        design system to support it, ran research with customer support
-        users, and was responsible for the whole design process, from
-        discovery to delivery.
-      </p>
-
-      <dl class="rwc-aside">
+      <dl class="rwc-aside rwc-facts">
         <div>
-          <dt>My responsibilities</dt>
-          <dd>Lead designer, front-end code reviewer</dd>
+          <dt data-pt={'Função'}>Role</dt>
+          <dd data-pt={'UX Designer'}>UX Designer</dd>
         </div>
         <div>
-          <dt>The team</dt>
-          <dd>Lead designer (myself), 7 engineers, 1 product manager, 1 engineering manager, 8 engineers</dd>
+          <dt data-pt={'Responsabilidades'}>Responsibilities</dt>
+          <dd data-pt={'Lead designer, revisor de código front-end'}>Lead designer, front-end code reviewer</dd>
         </div>
         <div>
-          <dt>Duration</dt>
-          <dd>10 months</dd>
+          <dt data-pt={'Equipa'}>Team</dt>
+          <dd data-pt={'Um product manager, um engineering manager e a equipa de engenharia'}>A product manager, an engineering manager and the engineering team</dd>
+        </div>
+        <div>
+          <dt data-pt={'Duração'}>Duration</dt>
+          <dd data-pt={'10 meses'}>10 months</dd>
         </div>
       </dl>
     </div>
 
-    <aside class="rwc-role-right">
-      <div class="rwc-initiatives-title">Keywords</div>
-      <ul class="rwc-initiatives-list">
-        <li>Customer support engagement</li>
-        <li>Prototyping</li>
-        <li>Motion</li>
-        <li>Field research</li>
-        <li>Multistreaming</li>
-        <li>Built a design system</li>
-        <li>Designed product from its inception</li>
-      </ul>
-    </aside>
+    <div class="rwc-hero-right">
+      <img class="rwc-hero-mark" src="/assets/images/cases/namecheap/hero-mark.svg" alt="Namecheap mark" data-pt-alt="Logótipo da Namecheap" loading="eager" />
+      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/namecheap/hero.webp" alt="Namecheap branding — Building a better online world together" data-pt-alt="Marca da Namecheap — Building a better online world together" loading="eager" fetchpriority="high" />
+      </div>
+      <p class="case-img-caption" data-pt={'Imagem da Namecheap, via namecheap.com'}>Image by Namecheap via namecheap.com</p>
+    </div>
   </section>
 
-  {/* ───────────────────── THE CHALLENGE ───────────────────── */}
+  {/* Summary, passed in from [slug].astro */}
+  <slot />
+
+  <CaseReadBar minutes={4} />
+
+  {/* CONTEXT */}
   <section class="rwc-section" id="case-challenge">
     <div class="rwc-challenge">
       <div class="rwc-challenge-text">
-        <div class="eyebrow">The challenge</div>
-        <h2 class="rwc-h2">Customer support chat application</h2>
-        <p>
-          The challenge was to create an in-house customer support
-          application with multichannel capabilities. Namecheap's customer
-          support teams were using a dated app, and it didn't fit their
-          needs. We started by creating a chat + bot, along with a CS agent
-          application, while learning from in-house customer support agents.
+        <div class="eyebrow" data-pt={'Contexto'}>Context</div>
+        <h2 class="rwc-h2" data-pt={'Cinco chats ao mesmo tempo, em mais de 20 separadores do browser'}>Five chats at once, across 20+ browser tabs</h2>
+        <p data-pt={'As equipas de suporte da Namecheap trabalhavam no Kayako, uma ferramenta datada que não se ajustava à forma como trabalhavam. Os agentes geriam mais de cinco chats ao mesmo tempo, com mais de 20 separadores do browser abertos, cada um com uma ferramenta diferente, e precisavam de muita formação para as aprender todas. Os clientes tinham dificuldade em chegar rapidamente ao chat sem os dados da conta, e poucos deixavam feedback no fim, o que resultava em maus valores de NPS. O pedido era uma app de suporte interna: um chat com um bot para os clientes e uma app para agentes.'}>
+          Namecheap's support teams worked in Kayako, a dated tool that didn't
+          fit how they worked. Agents handled more than five chats at once with
+          20+ browser tabs open, each a different tool, and needed heavy training
+          to learn them all. Customers struggled to reach chat quickly without
+          their account info, and few left feedback at the end, which led to poor
+          NPS scores. The brief was an in-house support app: a chat with a bot
+          for customers, and an agent application.
         </p>
 
-        <p class="rwc-currently-live">
+        <p class="rwc-currently-live" data-pt={'<strong>Atualmente online em:</strong><br/><a href="https://www.namecheap.com/help-center/" target="_blank" rel="noopener noreferrer">Help Center da Namecheap</a><br/><a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">Spaceship</a>'}>
           <strong>Currently live at:</strong><br/>
           <a href="https://www.namecheap.com/help-center/" target="_blank" rel="noopener noreferrer">Namecheap's Help Center</a><br/>
           <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">Spaceship</a>
@@ -99,434 +82,314 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
 
       <div class="rwc-challenge-img">
         <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/chat-widget-feedback.webp" alt="Chat widget with Your Feedback Matters thumbs prompt" loading="lazy" />
+          <img src="/assets/images/cases/namecheap/chat-widget-feedback.webp" alt="Chat widget with Your Feedback Matters thumbs prompt" data-pt-alt="Widget de chat com o pedido de feedback “Your Feedback Matters” e os polegares" loading="lazy" />
         </div>
       </div>
     </div>
   </section>
 
-  {/* ───────────────────── KICKOFF AND RESEARCH ───────────────────── */}
+  {/* DECISION 1 */}
   <section class="rwc-section" id="case-kickoff">
-    <h2 class="rwc-h2">Kickoff and research</h2>
-    <p class="rwc-lead">
-      The project kicked off with a clear vision, communicated to me and
-      the engineering lead by the existing customer support leads. We
-      started by interviewing them to learn as much as we could about
-      their process, so we could design a v1 that met their needs and
-      provided the structure to scale.
-    </p>
-
-    <div class="rwc-columns cols-3">
-      <div class="rwc-column">
-        <div class="case-img-ph is-filled" data-ratio="1-1">
-          <img src="/assets/images/cases/namecheap/shadowing.webp" alt="Shadowing a Namecheap customer support agent at their desk in Ukraine" loading="lazy" />
-        </div>
-        <h3>Shadowing + interviews</h3>
-        <p>
-          Went to Namecheap's Customer Support HQ in Ukraine to meet the
-          agents, supervisors, and managers, and understand how they work
-          daily.
+    <div class="rwc-challenge">
+      <div class="rwc-challenge-text">
+        <div class="eyebrow" data-pt={'Decisão 1'}>Decision 1</div>
+        <h2 class="rwc-h2" data-pt={'Começar pelos agentes'}>Start with the agents</h2>
+        <p data-pt={'Antes de desenhar fosse o que fosse, fui à sede do suporte ao cliente da Namecheap, na Ucrânia, conhecer agentes, supervisores e gestores e ver como trabalham todos os dias. Tudo o que ouvi foi para um experience canvas que serviu de planta do projeto, ao lado de um benchmark de ferramentas concorrentes.'}>
+          Before designing anything, I went to Namecheap's customer support HQ in
+          Ukraine to meet agents, supervisors and managers and see how they work
+          every day. Everything I heard went into an experience canvas that served
+          as the blueprint for the project, next to a benchmark of competing tools.
         </p>
       </div>
-      <div class="rwc-column">
+
+      <div class="rwc-challenge-img">
         <div class="case-img-ph is-filled" data-ratio="1-1">
-          <img src="/assets/images/cases/namecheap/experience-canvas.webp" alt="Experience canvas template — hypothesis, problems, value, users, MVP, success metrics" loading="lazy" />
+          <img src="/assets/images/cases/namecheap/shadowing.webp" alt="Shadowing a Namecheap customer support agent at their desk in Ukraine" data-pt-alt="A acompanhar um agente de suporte da Namecheap na sua secretária, na Ucrânia" loading="lazy" />
         </div>
-        <h3>Built an experience canvas</h3>
-        <p>
-          Used all the input I got from the customer support teams to
-          build an experience canvas, as a blueprint to kickstart the
-          project.
-        </p>
       </div>
-      <div class="rwc-column">
+    </div>
+
+    <CaseDetail label="The canvas and the benchmark" labelPt="O canvas e o benchmark">
+      <div class="case-img-ph-grid cols-2">
         <div class="case-img-ph is-filled" data-ratio="1-1">
-          <img src="/assets/images/cases/namecheap/competitive-benchmark.webp" alt="Competitive support tool — VIP inbox, conversations, and reply panel" loading="lazy" />
+          <img src="/assets/images/cases/namecheap/experience-canvas.webp" alt="Experience canvas template — hypothesis, problems, value, users, MVP, success metrics" data-pt-alt="Modelo de experience canvas — hipótese, problemas, valor, utilizadores, MVP, métricas de sucesso" loading="lazy" />
         </div>
-        <h3>Competitive benchmark</h3>
-        <p>
-          Identified possible product competitors and highlighted what
-          makes each one stand out, gaps, and benefits.
-        </p>
+        <div class="case-img-ph is-filled" data-ratio="1-1">
+          <img src="/assets/images/cases/namecheap/competitive-benchmark.webp" alt="Competitive support tool — VIP inbox, conversations, and reply panel" data-pt-alt="Ferramenta de suporte concorrente — caixa de entrada VIP, conversas e painel de resposta" loading="lazy" />
+        </div>
       </div>
-    </div>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── WHAT WE DISCOVERED ───────────────────── */}
-  <section class="rwc-section" id="case-discovery">
-    <h2 class="rwc-h2">What we discovered</h2>
-
-    <div class="rwc-discovery">
-      <ul class="rwc-bullets">
-        <li>
-          Agents had inefficient shifts, required an extremely high amount
-          of training to learn 20+ different tools, and their current
-          tool, Kayako, wasn't optimized to their exact needs.
-        </li>
-        <li>
-          Support agents had to handle more than 5 chats at once, while
-          they had 20+ browser tabs open — each with a different, specific
-          tool to solve customer problems.
-        </li>
-        <li>
-          Clients reaching out to customer support had difficulty
-          accessing the chat quickly without their account info.
-          Engagement feedback at the end of the chat was low, which led
-          to poor NPS scores.
-        </li>
-      </ul>
-
-      <div class="rwc-goal">
-        <p class="rwc-goal-eyebrow">Our goal was clear:</p>
-        <h3 class="rwc-goal-title">
-          To build an integrated solution for support agents and customers.
-        </h3>
-        <ul class="rwc-bullets">
-          <li>
-            By increasing agent satisfaction and the ease-of-use of the
-            customer support engagement software, when compared to their
-            current toolset.
-          </li>
-          <li>
-            By increasing the positive feedback received overall from
-            clients, and the absolute number of chats receiving feedback,
-            contributing to an increased NPS score.
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  {/* ───────────────────── LOW-FI / HIGH-FI / TESTS ───────────────────── */}
-  <section class="rwc-section" id="case-design-iterations">
-    <h2 class="rwc-h2">Low-fi, High-fi, Unmoderated tests</h2>
-
-    <div class="rwc-sketch-grid">
-      <div class="case-img-ph is-filled" data-ratio="4-3">
-        <img class="rwc-flip-v" src="/assets/images/cases/namecheap/sketch-ui-notes.webp" alt="Sketchbook: UI notes into messages — chat bubble layouts" loading="lazy" />
-      </div>
-      <div class="case-img-ph is-filled rwc-rotated-tile" data-ratio="1-1">
-        <img class="rwc-rotate-90" src="/assets/images/cases/namecheap/sketch-arrangement.webp" alt="Sketchbook: arrangement notes and admin report wireframes" loading="lazy" />
-      </div>
-      <div class="case-img-ph is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/namecheap/sketch-bubble-variants.webp" alt="Sketchbook: chat bubble variants — T, T+A, T+A+Expand" loading="lazy" />
-      </div>
-    </div>
-
-    <div class="rwc-columns cols-2">
-      <p>
-        Working out the arrangement between chat bubbles, and
-        distinguishing received from sent ones, just by using layout. Also
-        considering each message's specific actions.
-      </p>
-      <p>
-        Wireframes to map out the variants of the chat bubble. T - Just
-        text / T+A - Text and attachment / T+A+Expand - All the previous
-        but containing a huge text message (allowing collapse/expand).
-      </p>
-    </div>
-
-    {/* System blueprints / User flows */}
-    <div class="rwc-subsection">
-      <h3 class="rwc-h3">System blueprints / User flows</h3>
-      <p>
-        This system blueprint + flow to tackle alerts on
-        disconnect/auth-error/general errors was a big part of making sure
-        the system provided the right UX at such critical moments.
-      </p>
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/namecheap/system-blueprint.webp" alt="System blueprint and user flow tackling disconnect, auth-error, and general-error alerts" loading="lazy" />
-      </div>
-    </div>
-
-    {/* High-fi prototypes */}
-    <div class="rwc-subsection">
-      <h3 class="rwc-h3">High-fi prototypes</h3>
-      <p>
-        Moved on to high-fidelity and motion design, where we aimed to
-        provide an easy-going appearance to the chat, with a neutral
-        tone-of-voice.
-      </p>
-
-      <div class="rwc-columns cols-3">
-        <div class="rwc-column">
-          <div class="case-img-ph is-filled" data-ratio="3-4">
-            <img src="/assets/images/cases/namecheap/floating-button-states.webp" alt="Floating button — hover, default, agent avatar variants for Storybook Clients and Agents" loading="lazy" />
-          </div>
-          <p class="rwc-caption">
-            Scheme of the floating button states (above), and a complete
-            view of the widget opened with an ongoing conversation.
-          </p>
-        </div>
-        <div class="rwc-column">
-          <div class="rwc-error-stack">
-            <div class="case-img-ph is-filled" data-ratio="1-1">
-              <img src="/assets/images/cases/namecheap/error-503.webp" alt="503 error illustration — ladder, wrench, and pile in a hole" loading="lazy" />
-            </div>
-            <div class="case-img-ph is-filled" data-ratio="1-1">
-              <img src="/assets/images/cases/namecheap/error-404.webp" alt="404 error illustration — ladder and magnifying glass over a hole" loading="lazy" />
-            </div>
-          </div>
-          <p class="rwc-caption">Illustrations for errors.</p>
-        </div>
-        <div class="rwc-column">
-          <div class="case-img-ph is-filled" data-ratio="3-4">
-            <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="High-fidelity chat widget mockup — Jane Doe Available" loading="lazy" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* ───────────────────── CUSTOMER-FACING CHAT ───────────────────── */}
+  {/* DECISION 2 */}
   <section class="rwc-section" id="case-customer-chat">
-    <h2 class="rwc-h2">The customer-facing chat interface.</h2>
+    <div class="eyebrow" data-pt={'Decisão 2'}>Decision 2</div>
+    <h2 class="rwc-h2" data-pt={'Um widget, não uma janela'}>A widget, not a window</h2>
+    <p data-pt={'O Kayako abria uma janela separada do sistema operativo. Nós fizemos do chat um widget flutuante que acompanha o cliente enquanto navega.'}>
+      Kayako opened a separate OS window. We made the chat a floating widget that
+      stays with the customer while they browse.
+    </p>
 
     <div class="rwc-annotated">
-      <ul class="rwc-annotated-list">
-        <li>
-          We opted for a hovering widget that could be there as the user
-          is browsing, unlike Kayako, which used a native OS window
-          separate from the main browser one.
-        </li>
-        <li>We made it themable to any other brand requirements.</li>
-        <li>
-          Avatars only included for agents' messages, as users don't have
-          a profile picture.
-        </li>
-        <li>
-          Floating button included an animated feature to convey the look
-          &amp; feel we wanted.
-        </li>
-      </ul>
-
       <div class="case-img-ph is-filled rwc-annotated-img" data-ratio="3-4">
-        <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="Annotated customer-facing chat widget" loading="lazy" />
+        <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="Annotated customer-facing chat widget" data-pt-alt="Widget de chat para o cliente, anotado" loading="lazy" />
       </div>
 
       <ul class="rwc-annotated-list">
-        <li>
-          Visibility of system status is provided on the header, on both
-          agent status and if errors occur.
-        </li>
-        <li>
-          If colorblind, the user can still scan the message author based
-          on bubble grid alignment.
-        </li>
-        <li>Messages stacked if sent within the same sequence (10 seconds).</li>
-        <li>
-          Main input field will reveal additional controls if focused, or
-          if it contains files ready to be sent (progressive disclosure).
-        </li>
+        <li data-pt={'O cabeçalho mostra o estado do sistema: se há um agente disponível e se há erros.'}>The header shows system status: whether an agent is available, and any errors.</li>
+        <li data-pt={'As mensagens enviadas e recebidas ficam em lados opostos, para que o autor seja claro sem depender da cor.'}>Sent and received messages sit on opposite sides, so the author is clear without relying on colour.</li>
+        <li data-pt={'As mensagens enviadas com menos de 10 segundos de intervalo ficam agrupadas.'}>Messages sent within 10 seconds of each other stack together.</li>
+        <li data-pt={'O campo de texto só mostra controlos extra quando está em foco ou quando há ficheiros prontos a enviar.'}>The input reveals extra controls only when focused or when files are ready to send.</li>
       </ul>
     </div>
+
+    <CaseDetail label="How the design got there" labelPt="Como o design lá chegou">
+      <div class="rwc-sketch-grid">
+        <div class="case-img-ph is-filled" data-ratio="4-3">
+          <img class="rwc-flip-v" src="/assets/images/cases/namecheap/sketch-ui-notes.webp" alt="Sketchbook: UI notes into messages — chat bubble layouts" data-pt-alt="Caderno de esboços: notas de UI para mensagens — layouts de balões de chat" loading="lazy" />
+        </div>
+        <div class="case-img-ph is-filled rwc-rotated-tile" data-ratio="1-1">
+          <img class="rwc-rotate-90" src="/assets/images/cases/namecheap/sketch-arrangement.webp" alt="Sketchbook: arrangement notes and admin report wireframes" data-pt-alt="Caderno de esboços: notas de disposição e wireframes de relatórios de administração" loading="lazy" />
+        </div>
+        <div class="case-img-ph is-filled" data-ratio="4-3">
+          <img src="/assets/images/cases/namecheap/sketch-bubble-variants.webp" alt="Sketchbook: chat bubble variants — T, T+A, T+A+Expand" data-pt-alt="Caderno de esboços: variantes do balão de chat — T, T+A, T+A+Expand" loading="lazy" />
+        </div>
+      </div>
+
+      <div class="rwc-columns cols-2">
+        <p data-pt={'Definir a disposição dos balões de chat e distinguir as mensagens recebidas das enviadas só com o layout. Pensar também nas ações específicas de cada mensagem.'}>
+          Working out the arrangement between chat bubbles, and
+          distinguishing received from sent ones, just by using layout. Also
+          considering each message's specific actions.
+        </p>
+        <p data-pt={'Wireframes para mapear as variantes do balão de chat. T - Só texto / T+A - Texto e anexo / T+A+Expand - Tudo isto, mas com uma mensagem de texto enorme (permitindo recolher/expandir).'}>
+          Wireframes to map out the variants of the chat bubble. T - Just
+          text / T+A - Text and attachment / T+A+Expand - All the previous
+          but containing a huge text message (allowing collapse/expand).
+        </p>
+      </div>
+
+      {/* System blueprints / User flows */}
+      <div class="rwc-subsection">
+        <h3 class="rwc-h3" data-pt={'System blueprints / fluxos de utilizador'}>System blueprints / User flows</h3>
+        <p data-pt={'Este system blueprint + fluxo para tratar alertas de desconexão, erros de autenticação e erros gerais foi uma grande parte de garantir que o sistema dava a UX certa em momentos tão críticos.'}>
+          This system blueprint + flow to tackle alerts on
+          disconnect/auth-error/general errors was a big part of making sure
+          the system provided the right UX at such critical moments.
+        </p>
+        <div class="case-img-ph is-filled is-whole is-whole-capped" data-ratio="16-9">
+          <img src="/assets/images/cases/namecheap/system-blueprint.webp" width="1024" height="1006" alt="System blueprint and user flow tackling disconnect, auth-error, and general-error alerts" data-pt-alt="System blueprint e fluxo de utilizador para alertas de desconexão, erro de autenticação e erros gerais" loading="lazy" />
+        </div>
+      </div>
+
+      {/* High-fi prototypes */}
+      <div class="rwc-subsection">
+        <h3 class="rwc-h3" data-pt={'Protótipos high-fi'}>High-fi prototypes</h3>
+        <p data-pt={'Passámos para a alta fidelidade e para o motion design, onde quisemos dar ao chat um aspeto descontraído, com um tom de voz neutro.'}>
+          Moved on to high-fidelity and motion design, where we aimed to
+          provide an easy-going appearance to the chat, with a neutral
+          tone-of-voice.
+        </p>
+
+        <div class="rwc-columns cols-3 rwc-columns-hifi">
+          <div class="rwc-column">
+            <div class="case-img-ph is-filled" data-ratio="3-4">
+              <img src="/assets/images/cases/namecheap/floating-button-states.webp" alt="Floating button — hover, default, agent avatar variants for Storybook Clients and Agents" data-pt-alt="Botão flutuante — variantes hover, predefinida e com avatar do agente, para o Storybook de Clientes e Agentes" loading="lazy" />
+            </div>
+            <p class="rwc-caption" data-pt={'Esquema dos estados do botão flutuante (em cima) e vista completa do widget aberto, com uma conversa a decorrer.'}>
+              Scheme of the floating button states (above), and a complete
+              view of the widget opened with an ongoing conversation.
+            </p>
+          </div>
+          <div class="rwc-column">
+            <div class="rwc-error-stack">
+              <div class="case-img-ph is-filled" data-ratio="1-1">
+                <img src="/assets/images/cases/namecheap/error-503.webp" alt="503 error illustration — ladder, wrench, and pile in a hole" data-pt-alt="Ilustração do erro 503 — escada, chave inglesa e um monte num buraco" loading="lazy" />
+              </div>
+              <div class="case-img-ph is-filled" data-ratio="1-1">
+                <img src="/assets/images/cases/namecheap/error-404.webp" alt="404 error illustration — ladder and magnifying glass over a hole" data-pt-alt="Ilustração do erro 404 — escada e lupa sobre um buraco" loading="lazy" />
+              </div>
+            </div>
+            <p class="rwc-caption" data-pt={'Ilustrações para os erros.'}>Illustrations for errors.</p>
+          </div>
+          <div class="rwc-column">
+            <div class="case-img-ph is-filled" data-ratio="3-4">
+              <img src="/assets/images/cases/namecheap/chat-widget.webp" alt="High-fidelity chat widget mockup — Jane Doe Available" data-pt-alt="Mockup de alta fidelidade do widget de chat — Jane Doe disponível" loading="lazy" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="rwc-bullets">
+        <li data-pt={'Os avatares aparecem só nas mensagens dos agentes, porque os clientes não têm foto de perfil.'}>Avatars appear only on agents' messages, as customers don't have a profile picture.</li>
+        <li data-pt={'O botão flutuante é animado para transmitir o aspeto e a sensação que queríamos.'}>The floating button is animated to carry the look and feel we wanted.</li>
+      </ul>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── BUILDING A DESIGN SYSTEM ───────────────────── */}
+  {/* DECISION 3 */}
   <section class="rwc-section" id="case-design-system">
-    <h2 class="rwc-h2">Building a design system</h2>
-    <h3 class="rwc-h3">From foundation and principles to styleguide and components.</h3>
-    <p>
-      The chat was intended to be a white-label product, so we considered
-      different themes to kick off its system. We did 2 themes to start
-      with, for namecheap.com and ssls.com.
+    <div class="eyebrow" data-pt={'Decisão 3'}>Decision 3</div>
+    <h2 class="rwc-h2" data-pt={'White-label desde o primeiro dia'}>White-label from day one</h2>
+    <p data-pt={'O chat era para ser um produto white-label, por isso o design system começou com dois temas, para namecheap.com e ssls.com, assentes em tokens de estado e em paletas por marca. Mantive a documentação no Sketch, sincronizada com os repositórios de front-end do Storybook.'}>
+      The chat was meant to be a white-label product, so the design system started
+      with two themes, for namecheap.com and ssls.com, built on status tokens and
+      per-brand palettes. I kept the documentation in Sketch and in sync with the
+      Storybook front-end repositories.
     </p>
 
-    {/* Restructured: button docs (the largest piece of evidence) is
-       a full-width visual; the two palettes sit as equal-weight
-       tiles below, instead of being squashed alongside it. */}
-    <div class="case-img-ph is-filled" data-ratio="16-10">
-      <img src="/assets/images/cases/namecheap/button-docs.webp" alt="Button component documentation — variants, sizes, color classes, states" loading="lazy" />
+    {/* Very tall source (678x1600): show the top at real size, the lightbox has the rest. */}
+    <div class="case-img-ph is-filled" data-ratio="16-10" style="max-width:678px;margin-inline:auto">
+      <img src="/assets/images/cases/namecheap/button-docs.webp" alt="Button component documentation — variants, sizes, color classes, states" data-pt-alt="Documentação do componente botão — variantes, tamanhos, classes de cor, estados" loading="lazy" />
     </div>
 
-    <p class="case-img-caption">
-      Our documentation on Sketch was extensive and kept by myself, and
-      synced with the Storybook front-end repositories.
-    </p>
-
-    <div class="rwc-columns cols-2">
-      <div class="rwc-column">
-        <h3>Status tokens</h3>
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/status-colors.webp" alt="Status colors — Success, Warning, Danger, Info tokens at 10/40/50 stops" loading="lazy" />
+    <CaseDetail label="Tokens, components and accessibility" labelPt="Tokens, componentes e acessibilidade">
+      <div class="rwc-columns cols-2">
+        <div class="rwc-column">
+          <h3 data-pt={'Tokens de estado'}>Status tokens</h3>
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/status-colors.webp" alt="Status colors — Success, Warning, Danger, Info tokens at 10/40/50 stops" data-pt-alt="Cores de estado — tokens Success, Warning, Danger e Info nos níveis 10/40/50" loading="lazy" />
+          </div>
+        </div>
+        <div class="rwc-column">
+          <h3 data-pt={'Paleta por marca'}>Per-brand palette</h3>
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/ssls-colors.webp" alt="SSLs.com primary color palette — sep-ssl tokens" data-pt-alt="Paleta de cores primárias do SSLs.com — tokens sep-ssl" loading="lazy" />
+          </div>
         </div>
       </div>
-      <div class="rwc-column">
-        <h3>Per-brand palette</h3>
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/ssls-colors.webp" alt="SSLs.com primary color palette — sep-ssl tokens" loading="lazy" />
+
+      <div class="rwc-columns cols-2">
+        <div class="rwc-column">
+          <h3 data-pt={'Variantes de componentes'}>Component variants</h3>
+          <p data-pt={'Mapeámos e criámos componentes para alimentar o sistema à medida que as necessidades e funcionalidades do produto evoluíam. (Componente de alerta acima.)'}>
+            We mapped and created components to feed the system as the
+            product needs and features evolved. (Alert component above.)
+          </p>
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/alert-component.webp" alt="Alert component variants — default, danger, warning, success, info" data-pt-alt="Variantes do componente de alerta — default, danger, warning, success, info" loading="lazy" />
+          </div>
+        </div>
+        <div class="rwc-column">
+          <h3 data-pt={'Anatomia dos componentes'}>Component anatomy</h3>
+          <p data-pt={'Cada componente tinha uma descrição da sua anatomia e composição.'}>
+            Each component had a description of its anatomy and composition.
+          </p>
+          <div class="case-img-ph is-filled" data-ratio="3-4">
+            <img src="/assets/images/cases/namecheap/floating-button-anatomy.webp" alt="Floating button anatomy — background, optional badge, content slots" data-pt-alt="Anatomia do botão flutuante — fundo, badge opcional, slots de conteúdo" loading="lazy" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="rwc-columns cols-2">
-      <div class="rwc-column">
-        <h3>Component variants</h3>
-        <p>
-          We mapped and created components to feed the system as the
-          product needs and features evolved. (Alert component above.)
+      <div class="rwc-subsection">
+        <h3 class="rwc-h3" data-pt={'Acessibilidade web'}>Web accessibility</h3>
+        <p data-pt={'Para cumprir as diretrizes WCAG, aplicámos conformidade de contraste (A, AA), detalhes de ordem de foco e estados de foco para navegação por teclado e por voz.'}>
+          To match WCAG guidelines, we applied contrast compliance (A, AA),
+          focus ordering details, and focus states for keyboard and speech
+          navigation.
         </p>
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/alert-component.webp" alt="Alert component variants — default, danger, warning, success, info" loading="lazy" />
+        <div class="case-img-ph is-filled is-whole is-whole-capped" data-ratio="16-9">
+          <img src="/assets/images/cases/namecheap/accessibility.webp" width="1024" height="985" alt="Web accessibility examples — feedback form, focus order, focus outline on keyboard press" data-pt-alt="Exemplos de acessibilidade web — formulário de feedback, ordem de foco, contorno de foco ao usar o teclado" loading="lazy" />
         </div>
       </div>
-      <div class="rwc-column">
-        <h3>Component anatomy</h3>
-        <p>
-          Each component had a description of its anatomy and composition.
-        </p>
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/floating-button-anatomy.webp" alt="Floating button anatomy — background, optional badge, content slots" loading="lazy" />
-        </div>
-      </div>
-    </div>
-
-    <div class="rwc-subsection">
-      <h3 class="rwc-h3">Web accessibility</h3>
-      <p>
-        To match WCAG guidelines, we applied contrast compliance (A, AA),
-        focus ordering details, and focus states for keyboard and speech
-        navigation.
-      </p>
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/namecheap/accessibility.webp" alt="Web accessibility examples — feedback form, focus order, focus outline on keyboard press" loading="lazy" />
-      </div>
-    </div>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
+  {/* RESULT */}
   <section class="rwc-section" id="case-impact">
-    <h2 class="rwc-h2">Outcomes and impact</h2>
+    <div class="eyebrow" data-pt={'Resultado'}>Result</div>
+    <h2 class="rwc-h2" data-pt={'97,4% de feedback positivo, e mais chats'}>97.4% positive feedback, and more chats</h2>
 
     <div class="rwc-stats">
       <div class="rwc-stat">
         <div class="rwc-stat-n">28.9<span class="rwc-stat-unit">%</span></div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Aumento nos chats de atendimento ao cliente no mesmo período. De 15 mil com o Kayako para 21 mil, em 4 meses.'}>
           Increase in customer engagement chats for the same period. From
           15k using Kayako, to 21k, in 4 months.
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">4800<span class="rwc-stat-unit">+</span></div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Chats com feedback — um aumento de mais de 15% face ao mesmo período antes do lançamento.'}>
           Chats received feedback — an increase of over 15% compared to
           the same period before launch.
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">97.4<span class="rwc-stat-unit">%</span></div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Feedback positivo em todos os chats, sobre o novo chat e a nova experiência de suporte.'}>
           Positive feedback to all chats, on the new chat and support
           experience.
         </div>
       </div>
     </div>
 
-    <p>
-      We kept track of metrics such as monthly engagements, monthly
-      feedback rates, and feedback reports.
-    </p>
-
-    {/* Not everything was perfect */}
-    <div class="rwc-subsection">
-      <h3 class="rwc-h3">Not everything was perfect, though.</h3>
-      <div class="rwc-challenge">
-        <div class="rwc-challenge-text">
-          <p>
-            We detected an agent-side platform navigation inefficiency,
-            which we acknowledged after following up with our agents. We
-            adjusted the navigation, tested it, and after 2 weeks we found
-            a solution our agents were happy with.
-          </p>
-          <p>
-            The revamped navigation for the agents' platform achieved a
-            4.6 out of 5 satisfaction rating with the newly proposed
-            navigation, as well as a higher preference compared to the
-            first release, giving us the confidence to move forward with
-            it.
-          </p>
-        </div>
-        <div class="rwc-challenge-img">
-          <div class="case-img-ph is-filled" data-ratio="16-10">
-            <img src="/assets/images/cases/namecheap/preference-survey.webp" alt="Preference survey results between the new and previous navigation" loading="lazy" />
-          </div>
-          <div class="case-img-ph is-filled" data-ratio="16-10">
-            <img src="/assets/images/cases/namecheap/satisfaction-chart.webp" alt="Satisfaction emoji chart — 0%, 0%, 15%, 44%, 41%" loading="lazy" />
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  {/* ───────────────────── CURRENT PRODUCT STATE ───────────────────── */}
-  <section class="rwc-section" id="case-current-state">
-    <h2 class="rwc-h2">Current product state</h2>
-    <p>
-      The Engagement.AI chat is currently available on both
+    <p data-pt={'O chat está online em <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">namecheap.com</a> e <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">spaceship.com</a>, com um tema para cada marca.'}>
+      The chat is live on
       <a href="https://www.namecheap.com" target="_blank" rel="noopener noreferrer">namecheap.com</a>
       and
-      <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">spaceship.com</a>.
-      It's themed according to each of the target brands.
+      <a href="https://www.spaceship.com" target="_blank" rel="noopener noreferrer">spaceship.com</a>,
+      themed for each brand.
     </p>
-
-    <div class="rwc-columns cols-3">
-      <div class="rwc-column">
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/floating-motion.gif" alt="Floating button and chat window motion in the live product" loading="lazy" />
-        </div>
-        <p class="rwc-caption">Floating button and chat window motion.</p>
-      </div>
-      <div class="rwc-column">
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/chat-widget-feedback.webp" alt="Live product — new feedback form" loading="lazy" />
-        </div>
-        <p class="rwc-caption">New feedback form.</p>
-      </div>
-      <div class="rwc-column">
-        <div class="case-img-ph is-filled" data-ratio="3-4">
-          <img src="/assets/images/cases/namecheap/live-chat.gif" alt="Live product — chat widget menu with Namecheap Engagement.AI agent" loading="lazy" />
-        </div>
-        <p class="rwc-caption">Chat widget menu.</p>
-      </div>
-    </div>
-  </section>
-
-  {/* ───────────────────── RETROSPECTIVE ───────────────────── */}
-  <section class="rwc-section" id="case-retrospective">
-    <h2 class="rwc-h2">Retrospective</h2>
 
     <div class="rwc-columns cols-2">
       <div class="rwc-column">
-        <h3>What went well</h3>
-        <p>
-          Great collaboration with the engineering team led to great
-          results and feedback from both users and customer support
-          agents.
-        </p>
-        <p>
-          Front-end and design collaboration effectiveness and efficiency
-          was consistently improved over time. We gradually refined our
-          design QA process.
-        </p>
-        <p>
-          Having refined the process as a team showed its benefits — at
-          the later stages we were an oiled machine in delivering value.
-        </p>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/floating-motion.gif" alt="Floating button and chat window motion in the live product" data-pt-alt="Movimento do botão flutuante e da janela de chat no produto online" loading="lazy" />
+        </div>
+        <p class="rwc-caption" data-pt={'Movimento do botão flutuante e da janela de chat.'}>Floating button and chat window motion.</p>
       </div>
       <div class="rwc-column">
-        <h3>What could've been better</h3>
-        <p>
-          Even though it was an in-house project, reaching users with
-          enough time to do research wasn't always easy.
-        </p>
-        <p>Technical delays held the project back in schedule.</p>
-        <p>
-          It was a great challenge to create such a huge product from
-          scratch — but we managed to plan accordingly and we caught on,
-          especially by having managed to be close to our users early on.
-        </p>
+        <div class="case-img-ph is-filled" data-ratio="3-4">
+          <img src="/assets/images/cases/namecheap/live-chat.gif" alt="Live product — chat widget menu with Namecheap Engagement.AI agent" data-pt-alt="Produto online — menu do widget de chat com o agente Namecheap Engagement.AI" loading="lazy" />
+        </div>
+        <p class="rwc-caption" data-pt={'Menu do widget de chat.'}>Chat widget menu.</p>
       </div>
     </div>
+  </section>
+
+  {/* HINDSIGHT */}
+  <section class="rwc-section" id="case-retrospective">
+    <div class="eyebrow" data-pt={'Em retrospetiva'}>Hindsight</div>
+    <h2 class="rwc-h2" data-pt={'Nem tudo funcionou à primeira'}>Not everything worked first time</h2>
+    <p data-pt={'Depois do lançamento, vimos que a navegação do lado dos agentes era ineficiente, o que confirmámos ao falar com os agentes. Ajustámo-la, testámo-la e, em duas semanas, tínhamos uma versão de que gostaram: 4,6 em 5 de satisfação, e preferida à primeira versão.'}>
+      After launch we found that navigation on the agent side was inefficient,
+      which we confirmed by following up with agents. We adjusted it, tested it,
+      and within two weeks had a version they were happy with: 4.6 out of 5 for
+      satisfaction, and preferred over the first release.
+    </p>
+
+    <div class="case-img-ph-grid cols-2">
+      <div class="case-img-ph is-filled" data-ratio="16-10">
+        <img src="/assets/images/cases/namecheap/preference-survey.webp" alt="Preference survey results between the new and previous navigation" data-pt-alt="Resultados do inquérito de preferência entre a nova navegação e a anterior" loading="lazy" />
+      </div>
+      <div class="case-img-ph is-filled" data-ratio="16-10">
+        <img src="/assets/images/cases/namecheap/satisfaction-chart.webp" alt="Satisfaction emoji chart — 0%, 0%, 15%, 44%, 41%" data-pt-alt="Gráfico de satisfação com emojis — 0%, 0%, 15%, 44%, 41%" loading="lazy" />
+      </div>
+    </div>
+
+    <p data-pt={'Duas coisas atrasaram-nos: nem sempre era fácil chegar aos utilizadores com tempo suficiente para pesquisa, mesmo internamente, e atrasos técnicos puseram o projeto fora do calendário.'}>
+      Two things held us back: it wasn't always easy to reach users with enough
+      time for research, even in-house, and technical delays put the project
+      behind schedule.
+    </p>
+
+    <CaseDetail label="What went well" labelPt="O que correu bem">
+      <p data-pt={'A ótima colaboração com a equipa de engenharia levou a ótimos resultados e a bom feedback, tanto dos utilizadores como dos agentes de suporte.'}>
+        Great collaboration with the engineering team led to great
+        results and feedback from both users and customer support
+        agents.
+      </p>
+      <p data-pt={'A eficácia e a eficiência da colaboração entre front-end e design melhoraram de forma consistente ao longo do tempo. Fomos refinando o processo de QA de design.'}>
+        Front-end and design collaboration effectiveness and efficiency
+        was consistently improved over time. We gradually refined our
+        design QA process.
+      </p>
+      <p data-pt={'Ter refinado o processo em equipa mostrou os seus benefícios. Nas fases finais éramos uma máquina oleada a entregar valor.'}>
+        Having refined the process as a team showed its benefits. At
+        the later stages we were an oiled machine in delivering value.
+      </p>
+    </CaseDetail>
   </section>
 
 </div>
@@ -550,14 +413,6 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
   .rwc-body a { color: var(--text-brand); }
   .rwc-caption { margin-top: var(--dimension-space-8); }
 
-  /* Tinted section wash for the post-launch / impact band. */
-  .rwc-section-tinted {
-    background: color-mix(in srgb, #4ec1e0 12%, var(--surface-default));
-    border-radius: var(--dimension-radius-lg, 12px);
-    padding-left: var(--dimension-space-32);
-    padding-right: var(--dimension-space-32);
-  }
-
   /* Hero right column shrinks to its content — the banner sits at
      its natural size and the Namecheap mark above acts as a small
      fixed badge instead of stretching to the row. */
@@ -580,7 +435,7 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     margin: 0 auto var(--dimension-space-32);
   }
 
-  /* Challenge / 2-col text+image. */
+  /* Context / Decision 1: 2-col text+image. */
   .rwc-challenge {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -591,27 +446,12 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
   .rwc-challenge-img { display: grid; gap: var(--dimension-space-16); align-items: start; }
   .rwc-currently-live { font-size: var(--font-size-sm); margin-top: var(--dimension-space-24); }
 
-  /* Discovery + columns: items align to top so a tall photo doesn't
-     stretch its shorter neighbor; column headings get a slight bump. */
+  /* Columns: items align to top so a tall photo doesn't stretch its
+     shorter neighbor; column headings get a slight bump. */
   .rwc-columns { align-items: start; }
   .rwc-columns h3 {
     margin-top: var(--dimension-space-16) !important;
     font-size: var(--font-size-lg) !important;
-  }
-
-  .rwc-discovery {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--dimension-space-48);
-    margin-top: var(--dimension-space-16);
-  }
-  .rwc-goal-eyebrow { margin-bottom: var(--dimension-space-8) !important; font-size: var(--font-size-sm); }
-  .rwc-goal-title {
-    font-family: var(--font-family-display);
-    font-weight: var(--font-weight-bold);
-    font-size: var(--font-size-lg);
-    color: var(--text-primary);
-    margin-bottom: var(--dimension-space-16);
   }
 
   /* Smaller bullets variant — shrink default font-size + tighter line
@@ -651,12 +491,13 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     height: 100%;
   }
 
+  /* Two columns: chat widget left, one list right, centred against it. */
   .rwc-annotated {
     display: grid;
-    grid-template-columns: 1fr 1.1fr 1fr;
-    gap: var(--dimension-space-32);
+    grid-template-columns: minmax(240px, 340px) 1fr;
+    gap: var(--dimension-space-48);
     margin-top: var(--dimension-space-24);
-    align-items: start;
+    align-items: center;
   }
   .rwc-annotated-list {
     list-style: none;
@@ -671,16 +512,21 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     color: var(--text-secondary);
     line-height: var(--font-line-height-loose);
   }
-  .rwc-annotated-img { max-width: 360px; margin: 0 auto; }
+  .rwc-annotated-img { width: 100%; max-width: 360px; margin: 0; }
+
+  /* High-fi row: two square error illustrations stack in the middle
+     column, so it is narrowed until the stack (2 squares + gap) is as
+     tall as the 3:4 tiles beside it. No tile is cropped differently. */
+  .rwc-columns.rwc-columns-hifi { grid-template-columns: 1fr 0.64fr 1fr; }
 
   /* Stat descriptions read a touch wider than the global default. */
   .rwc-stat-desc { max-width: 30ch; }
 
   @media (max-width: 960px) {
-    .rwc-challenge,
-    .rwc-discovery { grid-template-columns: 1fr; }
+    .rwc-challenge { grid-template-columns: 1fr; }
     .rwc-sketch-grid { grid-template-columns: 1fr; }
     .rwc-annotated { grid-template-columns: 1fr; }
     .rwc-annotated-img { max-width: 100%; }
+    .rwc-columns.rwc-columns-hifi { grid-template-columns: 1fr; }
   }
 </style>

@@ -6,7 +6,6 @@ import UnderstandingWebinarOrganizersBody from '../../components/cases/Understan
 import LeadingDesignSystemBody from '../../components/cases/LeadingDesignSystemBody.astro';
 import DesigningSupportChatBody from '../../components/cases/DesigningSupportChatBody.astro';
 import CaseSummary from '../../components/cases/CaseSummary.astro';
-import CaseDecisions from '../../components/cases/CaseDecisions.astro';
 import XraySwitch from '../../components/XraySwitch.astro';
 
 /* Hidden cases are not built: no page, no sitemap entry (see cases.ts). */
@@ -35,6 +34,25 @@ const customBodySlugs = new Set([
 ]);
 const hasCustomBody = customBodySlugs.has(c.slug);
 
+/* Portuguese labels for the side-TOC, keyed by the English label. */
+const TOC_PT: Record<string, string> = {
+  'Summary': 'Resumo', 'Context': 'Contexto', 'Templates first': 'Primeiro, templates',
+  'One colour': 'Uma cor', 'Settings page': 'Página de definições', 'Result': 'Resultado',
+  'Decisions': 'Decisões', 'My role': 'O meu papel', 'The challenge': 'O desafio',
+  'Deep-dive': 'Análise detalhada', 'Validation': 'Validação', 'Impact': 'Impacto',
+  'Organizing the team': 'Organizar a equipa', 'Weekly practice': 'Prática semanal',
+  'Design': 'Design', 'Kickoff and research': 'Arranque e pesquisa',
+  'What we discovered': 'O que descobrimos', 'Design iterations': 'Iterações de design',
+  'Customer-facing chat': 'Chat para clientes', 'Design system': 'Design system',
+  'Current state': 'Estado atual', 'Retrospective': 'Retrospetiva',
+  'Problem': 'Problema', 'Approach': 'Abordagem', 'Solution': 'Solução',
+  'Outside our users': 'Fora dos nossos utilizadores', 'Concept tests': 'Testes de conceito',
+  'Journey map': 'Mapa de jornada', 'Contribution model': 'Modelo de contribuição',
+  'Visible progress': 'Progresso visível', 'Tokens first': 'Primeiro os tokens',
+  'Agents first': 'Primeiro os agentes', 'Widget, not window': 'Widget, não janela',
+  'White-label': 'White-label', 'Hindsight': 'Em retrospetiva',
+};
+
 /* Side-TOC items.
    - Default cases: fixed journey labels (Context / Problem / Approach /
      Solution / Impact). Section anchors fall through if a case has
@@ -43,55 +61,40 @@ const hasCustomBody = customBodySlugs.has(c.slug);
      anchors defined inside the body component. */
 const tocItems = c.slug === 'redefining-webinar-customization'
   ? [
-      { id: 'case-context',      label: 'Context' },
-      { id: 'case-summary',        label: 'Summary' },
-      { id: 'case-decisions',      label: 'Decisions' },
-      { id: 'case-discovery',    label: 'Discovery' },
-      { id: 'case-problem',      label: 'Problem' },
-      { id: 'case-approach',     label: 'Approach' },
-      { id: 'case-step-1',       label: 'Step 1 · Branding' },
-      { id: 'case-step-2',       label: 'Step 2 · Fields' },
-      { id: 'case-final-result', label: 'Final result' },
-      { id: 'case-impact',       label: 'Impact' },
+      { id: 'case-summary',  label: 'Summary' },
+      { id: 'case-problem',  label: 'Context' },
+      { id: 'case-step-1',   label: 'Templates first' },
+      { id: 'case-palette',  label: 'One colour' },
+      { id: 'case-step-2',   label: 'Settings page' },
+      { id: 'case-impact',   label: 'Result' },
     ]
   : c.slug === 'understanding-webinar-organizers'
   ? [
-      { id: 'case-context',    label: 'Context' },
       { id: 'case-summary',        label: 'Summary' },
-      { id: 'case-decisions',      label: 'Decisions' },
-      { id: 'case-role',       label: 'My role' },
-      { id: 'case-challenge',  label: 'The challenge' },
-      { id: 'case-deep-dive',  label: 'Deep-dive' },
-      { id: 'case-validation', label: 'Validation' },
-      { id: 'case-impact',     label: 'Impact' },
+      { id: 'case-challenge',      label: 'Context' },
+      { id: 'case-recruit',        label: 'Outside our users' },
+      { id: 'case-concept-test',   label: 'Concept tests' },
+      { id: 'case-journey-map',    label: 'Journey map' },
+      { id: 'case-impact',         label: 'Result' },
     ]
   : c.slug === 'leading-and-managing-a-design-system'
   ? [
-      { id: 'case-context',         label: 'Context' },
-      { id: 'case-summary',        label: 'Summary' },
-      { id: 'case-decisions',      label: 'Decisions' },
-      { id: 'case-role',            label: 'My role' },
-      { id: 'case-challenge',       label: 'The challenge' },
-      { id: 'case-organizing',      label: 'Organizing the team' },
-      { id: 'case-weekly-practice', label: 'Weekly practice' },
-      { id: 'case-design',          label: 'Design' },
-      { id: 'case-impact',          label: 'Impact' },
+      { id: 'case-summary',         label: 'Summary' },
+      { id: 'case-challenge',       label: 'Context' },
+      { id: 'case-organizing',      label: 'Contribution model' },
+      { id: 'case-weekly-practice', label: 'Visible progress' },
+      { id: 'case-design',          label: 'Tokens first' },
+      { id: 'case-impact',          label: 'Result' },
     ]
   : c.slug === 'designing-a-support-chat-experience'
   ? [
-      { id: 'case-context',             label: 'Context' },
-      { id: 'case-summary',        label: 'Summary' },
-      { id: 'case-decisions',      label: 'Decisions' },
-      { id: 'case-role',                label: 'My role' },
-      { id: 'case-challenge',           label: 'The challenge' },
-      { id: 'case-kickoff',             label: 'Kickoff and research' },
-      { id: 'case-discovery',           label: 'What we discovered' },
-      { id: 'case-design-iterations',   label: 'Design iterations' },
-      { id: 'case-customer-chat',       label: 'Customer-facing chat' },
-      { id: 'case-design-system',       label: 'Design system' },
-      { id: 'case-impact',              label: 'Impact' },
-      { id: 'case-current-state',       label: 'Current state' },
-      { id: 'case-retrospective',       label: 'Retrospective' },
+      { id: 'case-summary',             label: 'Summary' },
+      { id: 'case-challenge',           label: 'Context' },
+      { id: 'case-kickoff',             label: 'Agents first' },
+      { id: 'case-customer-chat',       label: 'Widget, not window' },
+      { id: 'case-design-system',       label: 'White-label' },
+      { id: 'case-impact',              label: 'Result' },
+      { id: 'case-retrospective',       label: 'Hindsight' },
     ]
   : [
       { id: 'case-context', label: 'Context' },
@@ -105,73 +108,71 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   activePage="cases"
   title={`${c.title} — João Jacinto`}
   description={c.subtitle}
+  titlePt={c.titlePt ? `${c.titlePt} — João Jacinto` : undefined}
+  descriptionPt={c.subtitlePt}
   showCta={true}
 >
 
   <div class="case-wrap" id="case-content">
     <div class="case-toc-rail">
-      <nav class="case-toc" aria-label="Case study sections">
+      <nav class="case-toc" aria-label="Case study sections" data-pt-aria-label="Secções do caso de estudo">
         {tocItems.map(item => (
-          <a href={`#${item.id}`} data-toc-target={item.id} data-umami-event="case-toc" data-umami-event-target={item.id}>{item.label}</a>
+          <a href={`#${item.id}`} data-toc-target={item.id} data-umami-event="case-toc" data-umami-event-target={item.id} data-pt={TOC_PT[item.label]}>{item.label}</a>
         ))}
       </nav>
     </div>
 
     <div class="container">
-      <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
+      <a class="back-link" data-umami-event="case-detail-back" href="/case-studies" data-pt="← Voltar aos casos de estudo">← Back to case studies</a>
 
       {hasCustomBody ? (
         c.slug === 'understanding-webinar-organizers' ? (
           <UnderstandingWebinarOrganizersBody>
             <CaseSummary c={c} />
-            <CaseDecisions c={c} />
           </UnderstandingWebinarOrganizersBody>
         ) : c.slug === 'leading-and-managing-a-design-system' ? (
           <LeadingDesignSystemBody>
             <CaseSummary c={c} />
-            <CaseDecisions c={c} />
           </LeadingDesignSystemBody>
         ) : c.slug === 'designing-a-support-chat-experience' ? (
           <DesigningSupportChatBody>
             <CaseSummary c={c} />
-            <CaseDecisions c={c} />
           </DesigningSupportChatBody>
         ) : (
           <RedefiningWebinarBody>
             <CaseSummary c={c} />
-            <CaseDecisions c={c} />
           </RedefiningWebinarBody>
         )
       ) : (
         <>
           <div class="case-header" id="case-context">
-            <div class="case-cat">{c.cat}</div>
-            <h1 class="case-title">{c.title}</h1>
-            <p class="case-subtitle">{c.subtitle}</p>
+            <div class="case-cat" data-pt={c.catPt}>{c.cat}</div>
+            <h1 class="case-title" data-pt={c.titlePt}>{c.title}</h1>
+            <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
 
             <div class="case-meta-grid">
-              <div><div class="case-meta-label">Company</div><div class="case-meta-val">{c.company}</div></div>
-              <div><div class="case-meta-label">Role</div><div class="case-meta-val">{c.role}</div></div>
-              <div><div class="case-meta-label">Year</div><div class="case-meta-val">{c.year}</div></div>
-              <div><div class="case-meta-label">Duration</div><div class="case-meta-val">{c.duration}</div></div>
+              <div><div class="case-meta-label" data-pt="Empresa">Company</div><div class="case-meta-val">{c.company}</div></div>
+              <div><div class="case-meta-label" data-pt="Função">Role</div><div class="case-meta-val" data-pt={c.rolePt}>{c.role}</div></div>
+              <div><div class="case-meta-label" data-pt="Ano">Year</div><div class="case-meta-val" data-pt={c.yearPt}>{c.year}</div></div>
+              <div><div class="case-meta-label" data-pt="Duração">Duration</div><div class="case-meta-val" data-pt={c.durationPt}>{c.duration}</div></div>
             </div>
 
             <div class="case-keywords">
-              {c.keywords.map(k => <span class="keyword">{k}</span>)}
+              {c.keywords.map((k, ki) => <span class="keyword" data-pt={c.keywordsPt?.[ki]}>{k}</span>)}
             </div>
           </div>
 
           <div class="case-hero-img reveal">
-            <img src={c.img} alt={c.title} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
+            <img src={c.img} alt={c.title} data-pt-alt={c.titlePt} width={c.imgW} height={c.imgH} loading="eager" fetchpriority="high">
           </div>
 
           {c.outcomes.length > 0 && (
             <div class={`outcomes ${outcomesClass} reveal`} id="case-impact">
               {c.outcomes.map(o => (
                 <div class="outcome">
-                  <div class="outcome-num">{o.n}</div>
-                  <div class="outcome-title">{o.title}</div>
-                  <div class="outcome-desc">{o.desc}</div>
+                  <div class="outcome-num" data-pt={o.nPt}>{o.n}</div>
+                  <div class="outcome-title" data-pt={o.titlePt}>{o.title}</div>
+                  <div class="outcome-desc" data-pt={o.descPt}>{o.desc}</div>
                 </div>
               ))}
             </div>
@@ -179,31 +180,31 @@ const tocItems = c.slug === 'redefining-webinar-customization'
 
           {c.achievements.length > 0 && (
             <section class="achievements reveal">
-              <span class="eyebrow">Key outcomes</span>
-              <ul>{c.achievements.map(a => <li>{a}</li>)}</ul>
+              <span class="eyebrow" data-pt="Resultados principais">Key outcomes</span>
+              <ul>{c.achievements.map((a, ai) => <li data-pt={c.achievementsPt?.[ai]}>{a}</li>)}</ul>
             </section>
           )}
 
           <div class="case-sections">
             {c.sections.map((s, sIdx) => (
               <div class="reveal" id={`case-section-${sIdx}`}>
-                <h2>{s.h}</h2>
-                <p>{s.body}</p>
+                <h2 data-pt={s.hPt}>{s.h}</h2>
+                <p data-pt={s.bodyPt}>{s.body}</p>
               </div>
             ))}
           </div>
 
-          {c.quote && <blockquote class="pull-quote reveal">"{c.quote}"</blockquote>}
+          {c.quote && <blockquote class="pull-quote reveal" data-pt={c.quotePt ? `"${c.quotePt}"` : undefined}>"{c.quote}"</blockquote>}
         </>
       )}
 
       <div class="next-case-wrap">
-        <span class="eyebrow">Next case study</span>
+        <span class="eyebrow" data-pt="Próximo caso de estudo">Next case study</span>
         <a class="next-case reveal" href={`/case-studies/${next.slug}`} data-umami-event="next-case" data-umami-event-slug={next.slug}>
-          <img src={next.img} alt={next.title} width={next.imgW} height={next.imgH} loading="lazy">
+          <img src={next.img} alt={next.title} data-pt-alt={next.titlePt} width={next.imgW} height={next.imgH} loading="lazy">
           <div class="next-case-body">
-            <div class="next-case-cat">{next.cat}</div>
-            <div class="next-case-title">{next.title} →</div>
+            <div class="next-case-cat" data-pt={next.catPt}>{next.cat}</div>
+            <div class="next-case-title" data-pt={next.titlePt ? `${next.titlePt} →` : undefined}>{next.title} →</div>
           </div>
         </a>
       </div>
@@ -217,12 +218,16 @@ const tocItems = c.slug === 'redefining-webinar-customization'
   <div id="pw-overlay" style="display:none">
     <div class="case-wrap">
       <div class="container">
-        <a class="back-link" data-umami-event="case-detail-back" href="/case-studies">← Back to case studies</a>
+        <a class="back-link" data-umami-event="case-detail-back" href="/case-studies" data-pt="← Voltar aos casos de estudo">← Back to case studies</a>
 
+        <!-- Split layout: public teaser on the left, key card on the right
+             from the first screen (sticky while the teaser scrolls). -->
+        <div class="case-gate-split">
+        <div class="case-gate-main">
         <header class="case-gate-head">
-          <div class="case-cat">{c.cat}</div>
-          <h1 class="case-title">{c.title}</h1>
-          <p class="case-subtitle">{c.subtitle}</p>
+          <div class="case-cat" data-pt={c.catPt}>{c.cat}</div>
+          <h1 class="case-title" data-pt={c.titlePt}>{c.title}</h1>
+          <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
         </header>
 
         <CaseSummary c={c} anchor={false} xray={false} />
@@ -230,26 +235,34 @@ const tocItems = c.slug === 'redefining-webinar-customization'
         <div class={`outcomes ${outcomesClass} case-gate-outcomes`}>
           {c.outcomes.map(o => (
             <div class="outcome">
-              <div class="outcome-num">{o.n}</div>
-              <div class="outcome-title">{o.title}</div>
-              <div class="outcome-desc">{o.desc}</div>
+              <div class="outcome-num" data-pt={o.nPt}>{o.n}</div>
+              <div class="outcome-title" data-pt={o.titlePt}>{o.title}</div>
+              <div class="outcome-desc" data-pt={o.descPt}>{o.desc}</div>
             </div>
           ))}
         </div>
+        </div>
 
-        <div class="pw-gate reveal visible">
-          <div class="pw-gate-lock">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
+        <aside class="case-gate-aside">
+        <div class="pw-gate" id="pwGate">
+          <div class="pw-gate-top">
+            <div class="pw-gate-lock">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path class="pw-shackle" d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div>
+              <h2 id="pwTitle" data-pt="A história completa é privada">The full story is private</h2>
+              <p data-pt="Decisões, compromissos e ecrãs">Decisions, trade-offs and screens</p>
+            </div>
           </div>
-          <h2>The full story is private</h2>
-          <p>It has the decisions, trade-offs and screens. Enter the password, or ask me for it.</p>
+          <!-- Filled by JS from the article's own section headings. -->
+          <ol class="pw-chapters" id="pwChapters" aria-label="Chapters in the full case study" data-pt-aria-label="Capítulos do caso de estudo completo"></ol>
           <form class="pw-form" id="pwForm">
             <div class="pw-input-wrap">
-              <input type="password" class="pw-input" id="pwInput" placeholder="Password" autocomplete="current-password">
-              <button type="button" class="pw-reveal" id="pwReveal" aria-label="Show password" onclick="togglePwReveal()">
+              <input type="password" class="pw-input" id="pwInput" placeholder="Password" data-pt-placeholder="Palavra-passe" autocomplete="current-password">
+              <button type="button" class="pw-reveal" id="pwReveal" aria-label="Show password" data-pt-aria-label="Mostrar palavra-passe" onclick="togglePwReveal()">
                 <svg class="pw-eye-open" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                 <svg class="pw-eye-shut" viewBox="0 0 24 24" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
               </button>
@@ -257,10 +270,12 @@ const tocItems = c.slug === 'redefining-webinar-customization'
             <p class="pw-error" id="pwError"></p>
             <button type="submit" class="btn btn-accent">
               <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span>
-              <span>Unlock</span>
+              <span data-pt="Desbloquear">Unlock</span>
             </button>
           </form>
-          <button type="button" class="pw-ask" id="pwAsk" data-title={c.title} data-umami-event="case-gate-ask-access" data-umami-event-slug={c.slug}>Ask for access</button>
+          <button type="button" class="pw-ask" id="pwAsk" data-title={c.title} data-title-pt={c.titlePt} data-umami-event="case-gate-ask-access" data-umami-event-slug={c.slug} data-pt="Sem palavra-passe? Pede-me acesso">No password? Ask me for access</button>
+        </div>
+        </aside>
         </div>
       </div>
     </div>
@@ -278,8 +293,59 @@ function isUnlocked() {
 if (!isUnlocked()) {
   document.getElementById('case-content').style.display = 'none';
   document.getElementById('pw-overlay').style.display = '';
-  setTimeout(() => document.getElementById('pwInput')?.focus(), 50);
+  /* Focus only where the key card sits beside the title, and never let
+     the focus scroll the page past the teaser. */
+  if (window.matchMedia('(min-width: 961px)').matches) {
+    setTimeout(() => document.getElementById('pwInput')?.focus({ preventScroll: true }), 50);
+  }
 }
+
+/* Chapter list on the key card: the article's own section headings.
+   Rebuilt on every language switch, so it follows the headings' text. */
+function jjLangNow() { return window.jjLang ? window.jjLang() : 'en'; }
+function buildChapters() {
+  var list = document.getElementById('pwChapters');
+  if (!list) return;
+  list.innerHTML = '';
+  var n = 0;
+  document.querySelectorAll('#case-content .container h2').forEach(function (h) {
+    if (n >= 6 || h.closest('.case-summary, .case-decisions, .next-case-wrap')) return;
+    /* A heading may carry a short data-chapter label for long statements. */
+    var t = ((jjLangNow() === 'pt' && h.getAttribute('data-chapter-pt')) || h.getAttribute('data-chapter') || h.textContent).trim();
+    /* Skip empty headings and sentence-length ones (pull statements). */
+    if (!t || t.length > 60) return;
+    var li = document.createElement('li');
+    li.textContent = t;
+    li.style.setProperty('--i', n);
+    list.appendChild(li);
+    n++;
+  });
+  if (n < 2) list.innerHTML = '';
+}
+buildChapters();
+document.addEventListener('jj:langchange', buildChapters);
+
+/* Gate text the script writes itself (English / Portuguese). */
+var pwErrorShown = false;
+function pwErrorText() {
+  return jjLangNow() === 'pt' ? 'Palavra-passe incorreta — tenta outra vez.' : 'Incorrect password — try again.';
+}
+function revealLabel(showing) {
+  if (jjLangNow() === 'pt') return showing ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe';
+  return showing ? 'Hide password' : 'Show password';
+}
+document.addEventListener('jj:langchange', function () {
+  var error = document.getElementById('pwError');
+  if (error && pwErrorShown) error.textContent = pwErrorText();
+  var title = document.getElementById('pwTitle');
+  var gate = document.getElementById('pwGate');
+  if (title && gate && gate.classList.contains('is-open')) {
+    title.textContent = jjLangNow() === 'pt' ? 'Desbloqueado' : 'Unlocked';
+  }
+  var input = document.getElementById('pwInput');
+  var btn = document.getElementById('pwReveal');
+  if (input && btn) btn.setAttribute('aria-label', revealLabel(input.type === 'text'));
+});
 
 document.getElementById('pwForm')?.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -295,16 +361,25 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
     const content = document.getElementById('case-content');
     /* Reveal the page underneath, then break the gate away over it so
        the content fades up slowly from behind as the lock dissolves. */
-    content.style.display = '';
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      content.style.display = '';
       overlay.style.display = 'none';
     } else {
-      content.classList.add('pw-revealing');
-      overlay.classList.add('pw-breaking');
-      setTimeout(function () { overlay.style.display = 'none'; }, 700);
+      /* A short beat first: the shackle springs open and the chapter
+         rows light up, then the gate breaks away as before. */
+      document.getElementById('pwGate')?.classList.add('is-open');
+      var title = document.getElementById('pwTitle');
+      if (title) title.textContent = jjLangNow() === 'pt' ? 'Desbloqueado' : 'Unlocked';
+      setTimeout(function () {
+        content.style.display = '';
+        content.classList.add('pw-revealing');
+        overlay.classList.add('pw-breaking');
+        setTimeout(function () { overlay.style.display = 'none'; }, 700);
+      }, 650);
     }
   } else {
-    error.textContent = 'Incorrect password — try again.';
+    pwErrorShown = true;
+    error.textContent = pwErrorText();
     input.classList.add('pw-shake');
     input.value = '';
     input.focus();
@@ -313,9 +388,12 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
 });
 
 document.getElementById('pwAsk')?.addEventListener('click', function () {
-  var title = this.getAttribute('data-title') || '';
+  var pt = jjLangNow() === 'pt';
+  var title = (pt && this.getAttribute('data-title-pt')) || this.getAttribute('data-title') || '';
   if (typeof window.jjComposeWith === 'function') {
-    window.jjComposeWith("Hi João, could you send me the password for the case studies? I'd like to read \"" + title + "\".");
+    window.jjComposeWith(pt
+      ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo? Gostava de ler "' + title + '".'
+      : "Hi João, could you send me the password for the case studies? I'd like to read \"" + title + "\".");
   }
 });
 
@@ -327,7 +405,7 @@ function togglePwReveal() {
   input.type = showing ? 'password' : 'text';
   btn.querySelector('.pw-eye-open').style.display = showing ? '' : 'none';
   btn.querySelector('.pw-eye-shut').style.display = showing ? 'none' : '';
-  btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  btn.setAttribute('aria-label', revealLabel(!showing));
   input.focus();
 }
 

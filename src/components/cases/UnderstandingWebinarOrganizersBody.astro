@@ -1,240 +1,192 @@
 ---
 /* Rich body for the "Understanding webinar organizers" case study.
-   The shared [slug].astro template renders this when the slug
-   matches; the default templated layout is bypassed.
+   A 2-minute, decision-led read: context, three decisions, the result.
+   Optional detail sits behind CaseDetail expanders. The shared
+   [slug].astro template renders this when the slug matches and passes
+   the summary through the slot.
    Shared .rwc-* layout/typography lives in global.css; image
    lightbox in CaseBodyLightbox.astro. */
 import CaseBodyLightbox from './CaseBodyLightbox.astro';
+import CaseDetail from './CaseDetail.astro';
+import CaseReadBar from './CaseReadBar.astro';
 ---
 
 <div class="rwc-body">
 
-  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  {/* HERO */}
   <section class="rwc-hero" id="case-context">
     <div class="rwc-hero-left">
-      <div class="case-cat">Case study · On-Air webinars discovery</div>
-      <h1 class="case-title">Understanding webinar organizers</h1>
-      <p class="case-subtitle">
-        As the lead designer for On-Air webinars, I planned, prepared, and
-        co-led a research study aimed at informing the future of our product.
+      <div class="case-cat" data-pt={'Caso de estudo · Descoberta dos webinars On-Air'}>Case study · On-Air webinars discovery</div>
+      <h1 class="case-title" data-pt={'Perceber os organizadores de webinars'}>Understanding webinar organizers</h1>
+      <p class="case-subtitle" data-pt={'O primeiro grande estudo da StreamYard sobre organizadores de webinars: entrevistas com 11 organizadores experientes, testes de conceito e um mapa de jornada que a empresa inteira usou.'}>
+        StreamYard's first major study of webinar organisers: interviews with 11
+        experienced organisers, concept tests, and a journey map the whole company used.
       </p>
-    </div>
-
-    <div class="rwc-hero-right">
-      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/sy-research/hero.webp" alt="StreamYard webinar registration UI — welcome to the webinar" loading="eager" fetchpriority="high" />
-      </div>
-      <p class="case-img-caption">Image by StreamYard via streamyard.com</p>
-    </div>
-  </section>
-
-  {/* Summary + decisions, passed in from [slug].astro */}
-  <slot />
-
-  {/* ───────────────────── MY ROLE + KEY INITIATIVES ───────────────────── */}
-  <section class="rwc-role" id="case-role">
-    <div class="rwc-role-left">
-      <div class="eyebrow">My role</div>
-      <p class="case-role">Staff Product Designer / Research co-lead</p>
-
-      <p>
-        Assisted by our research lead, and some of our team's designers
-        (as notetakers during interviews), we started by setting up a plan
-        for the study and aligning with our team's project manager and
-        engineering manager. Once we agreed on the plan of action, we began
-        the arrangements required to select and recruit participants.
-      </p>
-
-      <dl class="rwc-aside">
+      <dl class="rwc-aside rwc-facts">
         <div>
-          <dt>My responsibilities</dt>
-          <dd>Lead designer, co-researcher</dd>
+          <dt data-pt={'Função'}>Role</dt>
+          <dd data-pt={'Staff Product Designer, co-responsável pela pesquisa'}>Staff Product Designer, research co-lead</dd>
         </div>
         <div>
-          <dt>The team</dt>
-          <dd>1 lead designer (myself), 1 lead researcher</dd>
+          <dt data-pt={'Responsabilidades'}>Responsibilities</dt>
+          <dd data-pt={'Designer principal, co-investigador'}>Lead designer, co-researcher</dd>
         </div>
         <div>
-          <dt>Duration</dt>
-          <dd>3 months</dd>
+          <dt data-pt={'Equipa'}>Team</dt>
+          <dd data-pt={'Eu e um lead researcher, com designers a tomar notas'}>Myself and a lead researcher, with designers as notetakers</dd>
+        </div>
+        <div>
+          <dt data-pt={'Duração'}>Duration</dt>
+          <dd data-pt={'3 meses'}>3 months</dd>
         </div>
       </dl>
     </div>
 
-    <aside class="rwc-role-right">
-      <div class="rwc-initiatives-title">Key initiatives</div>
-      <ul class="rwc-initiatives-list">
-        <li>Defined study goals and scope</li>
-        <li>Screened and recruited participants</li>
-        <li>Interviewed users</li>
-        <li>Tested concept prototypes</li>
-        <li>Processed insights</li>
-        <li>Compiled insights into a Journey map</li>
-        <li>Informed the company and product's roadmap</li>
-      </ul>
-    </aside>
+    <div class="rwc-hero-right">
+      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/sy-research/hero.webp" alt="StreamYard webinar registration UI — welcome to the webinar" data-pt-alt={'UI de registo de webinars do StreamYard — boas-vindas ao webinar'} loading="eager" fetchpriority="high" />
+      </div>
+      <p class="case-img-caption" data-pt={'Imagem do StreamYard, via streamyard.com'}>Image by StreamYard via streamyard.com</p>
+    </div>
   </section>
 
-  {/* ───────────────────── THE CHALLENGE ───────────────────── */}
+  {/* Summary, passed in from [slug].astro */}
+  <slot />
+
+  <CaseReadBar minutes={3} />
+
+  {/* CONTEXT */}
   <section class="rwc-section" id="case-challenge">
     <div class="rwc-challenge">
       <div class="rwc-challenge-text">
-        <div class="eyebrow">The challenge</div>
-        <h2 class="rwc-h2">Inform the future of our product</h2>
-        <p>
-          Roughly 1 year after we launched On-Air webinars, our product
-          roadmap and core priorities were to deliver on the core needs of
-          our users, catch up to our competitors' core benefits, and become a
-          competitive force in the webinar space. But although our product
-          was getting closer to what we had greater confidence on, we lacked
-          a long-term vision on what it should become next, and a
-          complementary way of informing our next priorities.
-        </p>
-        <p>
-          At the time, we were defining our roadmap by scoring initiatives
-          based on insights from sales calls, customer support requests,
-          company townhall asks, and competitive benchmarks.
+        <div class="eyebrow" data-pt={'Contexto'}>Context</div>
+        <h2 class="rwc-h2" data-pt={'O roadmap não tinha uma visão de longo prazo dos organizadores'}>The roadmap had no long-term picture of organisers</h2>
+        <p data-pt={'Um ano depois de lançar os webinars On-Air, definíamos o roadmap pontuando iniciativas a partir de chamadas de vendas, pedidos de suporte, pedidos nos town halls da empresa e benchmarks da concorrência. Isso aproximou-nos das necessidades centrais e dos concorrentes, mas não tínhamos uma visão de longo prazo do que o produto devia vir a ser.'}>
+          A year after launching On-Air webinars, we set the roadmap by scoring
+          initiatives from sales calls, support requests, company town hall asks
+          and competitive benchmarks. That got us closer to the core needs and to
+          our competitors, but we had no long-term view of what the product should
+          become next.
         </p>
       </div>
 
       <div class="rwc-challenge-img">
         <div class="case-img-ph is-filled" data-ratio="4-3">
-          <img src="/assets/images/cases/sy-research/registration.webp" alt="On-Air webinar registration page, April 2024" loading="lazy" />
+          <img src="/assets/images/cases/sy-research/registration.webp" alt="On-Air webinar registration page, April 2024" data-pt-alt={'Página de registo de webinars On-Air, abril de 2024'} loading="lazy" />
         </div>
-        <p class="case-img-caption">On-Air webinar registration page, April 2024.</p>
+        <p class="case-img-caption" data-pt={'Página de registo de webinars On-Air, abril de 2024.'}>On-Air webinar registration page, April 2024.</p>
       </div>
     </div>
   </section>
 
-  {/* ───────────────────── DEEP-DIVE ───────────────────── */}
-  <section class="rwc-section" id="case-deep-dive">
-    <h2 class="rwc-h2">Deep-dive with webinar organizers</h2>
-    <p class="rwc-lead">
-      Our goal was to recruit and interview non-StreamYard users who had
-      significant experience with webinars, to understand their core needs,
-      pain points, and capture their impressions from feature concept
-      prototypes and the existing product experience.
-    </p>
-
-    {/* Screener + Interviews side by side */}
-    <div class="rwc-options">
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-research/screener.webp" alt="User Interviews screener survey v2" loading="lazy" />
-        </div>
-        <h3>Searched for study candidates</h3>
-        <p>
-          Before the study, we decided to target highly experienced webinar
-          organizers, who were paying for a similar product to achieve their
-          goals, and that would potentially be StreamYard users. We did this
-          by setting up a screener survey in the User Interviews platform,
-          from which we found 11 potential fitting participants.
-        </p>
-      </div>
-
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-research/interview.webp" alt="Zoom interview screenshot with participant" loading="lazy" />
-        </div>
-        <h3>Interviews and user-scenarios</h3>
-        <p>
-          We ran a series of interviews with participants ranging from
-          healthcare, education, and corporate-comms industries. After each
-          interview, we allocated 20 minutes for testing a user scenario,
-          which involved presenting stimuli related to a potential new
-          feature, running task scenarios, and gathering feedback.
-        </p>
-      </div>
-    </div>
-
-    {/* From notes to insights */}
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-research/insights-board.webp" alt="Dovetail-tagged interview notes aggregated into insight clusters" loading="lazy" />
-      </div>
-      <h3 class="rwc-h3">From notes to insights</h3>
-      <p>
-        Once all interviews were transcribed using Dovetail, relevant points
-        were labeled accordingly, and notes began to be aggregated into
-        insight areas. Some of the collected insight areas were product fit,
-        engagement needs, post-webinar needs, and competitor impressions.
-      </p>
-    </div>
-
-    {/* From insights into a journey map */}
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-research/journey-map.webp" alt="Webinar organizers' journey map — Plan / Prepare / Run / Debrief / Repurpose and Share" loading="lazy" />
-      </div>
-      <h3 class="rwc-h3">From insights into a journey map of the end-to-end experience</h3>
-      <p>
-        The webinar organisers' insights were then compiled into a journey
-        map, which included 5 key areas that constitute the entire journey,
-        from planning to repurposing and sharing. From here, our goal was to
-        build this knowledge over time with insights collected, have the
-        ability to drill down and understand specific steps of the journey
-        in-depth, while creating specific journey maps per user segment.
-      </p>
-    </div>
-  </section>
-
-  {/* ───────────────────── VALIDATION ───────────────────── */}
-  <section class="rwc-section" id="case-validation">
+  {/* DECISION 1 */}
+  <section class="rwc-section" id="case-recruit">
     <div class="rwc-challenge">
       <div class="rwc-challenge-text">
-        <h2 class="rwc-h2">
-          We validated our assumptions, and informed our future roadmap.
-        </h2>
-        <p>
-          The study's foundational insights and journey map were presented
-          to the entire company, creating a scalable knowledge source and
-          core insights to improve the product further, as well as providing
-          insight into segment-specific needs.
-        </p>
-        <p>
-          Particular insights were used by the growth team to generate
-          hypotheses, and led to new growth tests aimed at improving
-          top-of-funnel growth.
-        </p>
-        <p>
-          User scenarios played a crucial role as they helped us capture
-          highly positive feedback on the concept of the feature. This
-          positive reception gave us the confidence to proceed further
-          with it.
-        </p>
+      <div class="eyebrow" data-pt={'Decisão 1'}>Decision 1</div>
+      <h2 class="rwc-h2" data-pt={'Recrutar fora da nossa base de utilizadores'}>Recruit outside our user base</h2>
+      <p data-pt={'Decidimos entrevistar pessoas que não usavam a StreamYard: organizadores de webinars muito experientes, que pagavam por um produto semelhante e podiam vir a ser nossos utilizadores. Um questionário de seleção no User Interviews encontrou 11 participantes adequados, da saúde, da educação e da comunicação empresarial.'}>
+        We chose to interview people who didn't use StreamYard: highly experienced
+        webinar organisers who were paying for a similar product and could become
+        our users. A screener survey on User Interviews found 11 fitting
+        participants, from healthcare, education and corporate comms.
+      </p>
       </div>
 
       <div class="rwc-challenge-img">
-        <div class="case-img-ph is-filled" data-ratio="4-3">
-          <img src="/assets/images/cases/sy-research/slack-share.webp" alt="Slack post sharing the new webinar organizers' journey map with a Loom video overview" loading="lazy" />
-        </div>
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-research/screener.webp" width="1024" height="522" alt="User Interviews screener survey v2" data-pt-alt={'Questionário de triagem v2 no User Interviews'} loading="lazy" />
+      </div>
       </div>
     </div>
   </section>
 
-  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
+  {/* DECISION 2 */}
+  <section class="rwc-section" id="case-concept-test">
+    <div class="rwc-challenge">
+      <div class="rwc-challenge-text">
+      <div class="eyebrow" data-pt={'Decisão 2'}>Decision 2</div>
+      <h2 class="rwc-h2" data-pt={'Um teste de conceito em cada entrevista'}>A concept test in every interview</h2>
+      <p data-pt={'Depois de cada entrevista, guardávamos 20 minutos para um cenário de utilizador: mostrávamos estímulos de uma possível nova funcionalidade, fazíamos cenários de tarefas e recolhíamos feedback. A reação ao conceito foi muito positiva, o que nos deu confiança para avançar.'}>
+        After each interview we kept 20 minutes for a user scenario: we showed
+        stimuli for a potential new feature, ran task scenarios and gathered
+        feedback. The response to the concept was highly positive, which gave us
+        the confidence to go ahead with it.
+      </p>
+      </div>
+
+      <div class="rwc-challenge-img">
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-research/interview.webp" width="994" height="501" alt="Zoom interview screenshot with participant" data-pt-alt={'Captura de ecrã de uma entrevista no Zoom com um participante'} loading="lazy" />
+      </div>
+      </div>
+    </div>
+  </section>
+
+  {/* DECISION 3 */}
+  <section class="rwc-section" id="case-journey-map">
+    <div class="eyebrow" data-pt={'Decisão 3'}>Decision 3</div>
+    <h2 class="rwc-h2" data-pt={'Um mapa de jornada, não um relatório'}>A journey map, not a report</h2>
+    <p data-pt={'Transcrevemos as entrevistas no Dovetail, etiquetámos os pontos relevantes e agrupámos as notas em áreas de insight, como adequação ao produto, necessidades de envolvimento, necessidades pós-webinar e impressões sobre a concorrência. Daí saiu um mapa de jornada com cinco fases, do planeamento à reutilização e partilha. Foi feito para crescer com a chegada de novos insights, para aprofundar passos individuais e para ser dividido por segmento de utilizadores.'}>
+      We transcribed the interviews in Dovetail, labelled the relevant points and
+      grouped the notes into insight areas such as product fit, engagement needs,
+      post-webinar needs and competitor impressions. Those became a journey map
+      with five stages, from planning to repurposing and sharing. It was built to
+      grow as new insights came in, to drill into single steps, and to split by
+      user segment.
+    </p>
+
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-research/journey-map.webp" width="1522" height="964" alt="Webinar organizers' journey map — Plan / Prepare / Run / Debrief / Repurpose and Share" data-pt-alt={'Journey map dos organizadores de webinars — Planear / Preparar / Realizar / Balanço / Reaproveitar e partilhar'} loading="lazy" />
+    </div>
+
+    <CaseDetail label="From notes to insights" labelPt="Das notas aos insights">
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+        <img src="/assets/images/cases/sy-research/insights-board.webp" width="1408" height="444" alt="Dovetail-tagged interview notes aggregated into insight clusters" data-pt-alt={'Notas de entrevistas etiquetadas no Dovetail, agregadas em clusters de insights'} loading="lazy" />
+      </div>
+    </CaseDetail>
+  </section>
+
+  {/* RESULT */}
   <section class="rwc-section" id="case-impact">
-    <h2 class="rwc-h2">Outcomes and impact</h2>
+    <div class="eyebrow" data-pt={'Resultado'}>Result</div>
+    <h2 class="rwc-h2" data-pt={'A empresa inteira ficou com a mesma visão'}>The whole company got the same picture</h2>
 
     <div class="rwc-stats">
       <div class="rwc-stat">
-        <div class="rwc-stat-n">1<span class="rwc-stat-unit">st</span></div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-n" data-pt={'1<span class="rwc-stat-unit">.ª</span>'}>1<span class="rwc-stat-unit">st</span></div>
+        <div class="rwc-stat-desc" data-pt={'Base de conhecimento de insights de base sobre webinars criada na empresa.'}>
           Knowledgebase of foundational webinar insights created in the
           company.
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">2</div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Pods informados com dados relevantes entre pods (Growth e Library).'}>
           Pods briefed with relevant cross-pod data (Growth and Library).
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">5</div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Insights usados no trabalho de produto em curso.'}>
           Insights used into ongoing product work.
         </div>
+      </div>
+    </div>
+
+    <div class="rwc-challenge">
+      <div class="rwc-challenge-text">
+      <p data-pt={'Apresentámos os insights e o mapa de jornada à empresa inteira. A equipa de Growth usou insights específicos para gerar hipóteses e correr novos testes, a pensar no crescimento do topo do funil.'}>
+        We presented the insights and the journey map to the entire company. The
+        growth team used particular insights to generate hypotheses and run new
+        tests aimed at top-of-funnel growth.
+      </p>
+      </div>
+
+      <div class="rwc-challenge-img">
+      <div class="case-img-ph is-filled is-whole" data-ratio="4-3" style="max-width:571px">
+        <img src="/assets/images/cases/sy-research/slack-share.webp" width="571" height="680" alt="Slack post sharing the new webinar organizers' journey map with a Loom video overview" data-pt-alt={'Publicação no Slack a partilhar o novo journey map dos organizadores de webinars, com um vídeo de apresentação no Loom'} loading="lazy" />
+      </div>
       </div>
     </div>
   </section>
@@ -244,23 +196,15 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
 <CaseBodyLightbox />
 
 <style>
-  /* UWO-specific overrides — shared .rwc-* layout/typography lives
-     in global.css and the lightbox in CaseBodyLightbox.astro. */
-
-  /* Slight tightening of subsection h3 spacing inside this body. */
-  .rwc-subsection h3.rwc-h3 { margin-top: var(--dimension-space-24); }
-
-  /* Challenge / Validation: 2-col text+image. */
+  /* UWO-specific: Context is a 2-col text+image row. Shared .rwc-*
+     layout/typography lives in global.css and the lightbox in
+     CaseBodyLightbox.astro. */
   .rwc-challenge {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
     gap: var(--dimension-space-48);
     align-items: start;
   }
-
-  /* Option-compare tiles get a little more head-room than the
-     global default (h3 starts at 20px, not 0). */
-  .rwc-option h3 { margin-top: var(--dimension-space-20) !important; margin-bottom: var(--dimension-space-12) !important; }
 
   @media (max-width: 960px) {
     .rwc-challenge { grid-template-columns: 1fr; }

@@ -1,384 +1,224 @@
 ---
 /* Rich body for the "Redefining webinar customization" case study.
-   Scaffolds the page structure with image placeholders to be swapped
-   in later. The shared [slug].astro template renders this when the
-   slug matches; the default templated layout is bypassed.
+   A 3-minute, decision-led read: context, three decisions, the result.
+   Optional detail sits behind CaseDetail expanders. The shared
+   [slug].astro template renders this when the slug matches and passes
+   the summary through the slot (no decisions block for this case).
 
    Layout/typography for the .rwc-body family lives in global.css.
-   Only RWB-specific styles (video embed, breakpoint showcase) are
-   kept inline. */
+   Only RWB-specific styles (video embed) are kept inline. */
 import CaseBodyLightbox from './CaseBodyLightbox.astro';
+import CaseDetail from './CaseDetail.astro';
+import CaseReadBar from './CaseReadBar.astro';
 ---
 
 <div class="rwc-body">
 
-  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  {/* HERO */}
   <section class="rwc-hero" id="case-context">
     <div class="rwc-hero-left">
-      <div class="case-cat">Case study · Custom registration fields</div>
-      <h1 class="case-title">Redefining webinar customization</h1>
-      <p class="case-subtitle">
-        As a product designer for StreamYard On-Air webinars, I led the design of
-        webinar customization, enhancing the capabilities and flexibility of the
-        tool for organizers customizing their webinars.
+      <div class="case-cat" data-pt={'Caso de estudo · Campos de registo personalizados'}>Case study · Custom registration fields</div>
+      <h1 class="case-title" data-pt={'Redefinir a personalização de webinars'}>Redefining webinar customization</h1>
+      <p class="case-subtitle" data-pt={'Campos de registo personalizados e branding para os webinars On-Air do StreamYard. Em quatro meses, um em cada três webinars já os usava.'}>
+        Custom registration fields and branding for StreamYard On-Air webinars.
+        Within four months, one in three webinars used them.
       </p>
-    </div>
-
-    <div class="rwc-hero-right">
-      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/sy-webinar/1.webp" alt="A branded StreamYard On-Air webinar registration page and its registration card." loading="eager" fetchpriority="high" />
-      </div>
-    </div>
-  </section>
-
-  {/* Summary + decisions, passed in from [slug].astro */}
-  <slot />
-
-  {/* ───────────────────── MY ROLE + KEY INITIATIVES ───────────────────── */}
-  <section class="rwc-role" id="case-role">
-    <div class="rwc-role-left">
-      <div class="eyebrow">My role</div>
-      <p class="case-role">Senior / Staff Product Designer</p>
-
-      <p>
-        I led the design of the Custom Registration Fields feature, as part of a
-        product trio (engineering lead, product manager, and myself). I was
-        responsible for researching, conceptualizing, ideating, defining, and
-        making sure final designs were delivered according to our specifications.
-      </p>
-      <p>
-        I had weekly syncs with the product trio, as well as with the other
-        designers in the company, to keep every pod aware of the work.
-      </p>
-      <p>
-        In parallel to this role, I was also sporadically contributing to the
-        Integrations and Video Services teams, Accessibility, and leading the
-        StreamYard Design System.
-      </p>
-
-      <dl class="rwc-aside">
+      <dl class="rwc-aside rwc-facts">
         <div>
-          <dt>My responsibilities</dt>
-          <dd>Lead designer, researcher, front-end code reviewer</dd>
+          <dt data-pt={'Função'}>Role</dt>
+          <dd>Senior / Staff Product Designer</dd>
         </div>
         <div>
-          <dt>The team</dt>
-          <dd>Lead designer, product manager, engineering manager, engineers, director of product</dd>
+          <dt data-pt={'Responsabilidades'}>Responsibilities</dt>
+          <dd data-pt={'Designer principal, investigador, revisor de código front-end'}>Lead designer, researcher, front-end code reviewer</dd>
         </div>
         <div>
-          <dt>Duration</dt>
-          <dd>4 months</dd>
+          <dt data-pt={'Equipa'}>Team</dt>
+          <dd data-pt={'Trio de produto com um PM e um responsável de engenharia'}>Product trio with a PM and an engineering lead</dd>
+        </div>
+        <div>
+          <dt data-pt={'Duração'}>Duration</dt>
+          <dd data-pt={'4 meses'}>4 months</dd>
         </div>
       </dl>
     </div>
 
-    <aside class="rwc-role-right">
-      <div class="rwc-initiatives-title">Key initiatives</div>
-      <ul class="rwc-initiatives-list">
-        <li>Competitive benchmarking</li>
-        <li>Discovery</li>
-        <li>Designed product from its inception</li>
-        <li>Led research studies</li>
-        <li>Informed by data and insights</li>
-        <li>Prototyping</li>
-        <li>Design system lead</li>
-      </ul>
-    </aside>
-  </section>
-
-  {/* ───────────────────── DISCOVERY ───────────────────── */}
-  <section class="rwc-section" id="case-discovery">
-    <div class="eyebrow">Discovery</div>
-    <h2 class="rwc-h2">Uncovering the problem</h2>
-    <p class="rwc-lead">
-      We conducted extensive research to develop this feature so that we could
-      surpass user expectations. We did it through several key activities:
-    </p>
-
-    <div class="rwc-columns cols-3">
-      <div>
-        <h3>Insights from research, sales, and support teams</h3>
-        <p>
-          Insights from our customer support, sales teams, and data from weekly
-          customer calls were paramount to inform us about what users were
-          saying and requesting out of the product. These sources provided
-          valuable information on user complaints, suggestions, and usage
-          patterns which were critical in shaping the project direction.
-        </p>
-      </div>
-      <div>
-        <h3>User interviews and concept tests</h3>
-        <p>
-          We conducted user interviews and concept tests with a diverse group of
-          users to understand their overall webinar organizing experience, and
-          to capture their needs, preferences, and pain points with the existing
-          experience.
-        </p>
-      </div>
-      <div>
-        <h3>Tech reviews to assess feasibility</h3>
-        <p>
-          We took early ideation mockups to our engineers to explore how
-          we could technically implement them. This early involvement with
-          engineers was critical to inform what would be feasible during
-          definition.
-        </p>
+    <div class="rwc-hero-right">
+      <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
+        <img src="/assets/images/cases/sy-webinar/1.webp" alt="A branded StreamYard On-Air webinar registration page and its registration card." data-pt-alt={'Uma página de registo de um webinar On-Air do StreamYard, com a marca do cliente, e o respetivo cartão de registo.'} loading="eager" fetchpriority="high" />
       </div>
     </div>
-
-    <div class="case-img-ph-grid cols-2">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-webinar/2a.webp" alt="Discovery synthesis board mapping Productboard insights and the customization options users were asking for." loading="lazy" />
-      </div>
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-webinar/2b.webp" alt="Discovery board framing the custom-registration problem, with competitor research and early ideas." loading="lazy" />
-      </div>
-    </div>
-
   </section>
 
-  {/* ───────────────────── THE PROBLEM ───────────────────── */}
+  {/* Summary, passed in from [slug].astro */}
+  <slot />
+
+  <CaseReadBar minutes={3} />
+
+  {/* CONTEXT */}
   <section class="rwc-section" id="case-problem">
-    <div class="eyebrow">The problem</div>
-    <h2 class="rwc-h2">
-      Hosts lacked customization options to be on-brand, and couldn't collect
-      registrants' data to fit their needs.
-    </h2>
-    <p>
-      Right after we released StreamYard On-Air webinars, which provided
-      barebones customization, our users' requests for extended customization
-      made it a priority for us to work on. Customization was just one of the
-      key areas where we knew we needed to extend On-Air; the others being
-      security, third-party integrations, and engagement.
-    </p>
-    <p>
-      By building custom registration fields and branding for StreamYard On-Air
-      webinars, we addressed two of these user needs. Our registration
-      experience was currently limited to collecting first name, last name, and
-      email — and these 3 fields fell short of providing our users with ways
-      of collecting registrant data. We had a clearly validated need for this
-      functionality from dozens of customer support and sales calls, as well as
-      town hall video comments.
+    <div class="eyebrow" data-pt={'Contexto'}>Context</div>
+    <h2 class="rwc-h2" data-chapter="Context" data-pt={'Os organizadores não conseguiam ter a sua marca na página nem fazer perguntas próprias a quem se registava'} data-pt-data-chapter="Contexto">Hosts couldn't look on-brand or ask registrants their own questions</h2>
+    <p data-pt={'Os webinars On-Air arrancaram com uma personalização mínima e um formulário de registo que pedia nome próprio, apelido e email. Os pedidos de mais opções chegaram através de dezenas de chamadas de suporte e vendas, de chamadas semanais com clientes e de comentários nos town halls. Duas necessidades destacaram-se: os organizadores queriam que a página tivesse a cara da sua marca e queriam fazer as suas próprias perguntas a quem se registava.'}>
+      On-Air webinars launched with bare-bones customization and a registration
+      form that asked for first name, last name and email. Requests for more came
+      in through dozens of support and sales calls, weekly customer calls and town
+      hall comments. Two needs stood out: hosts wanted the page to look like their
+      brand, and they wanted to ask registrants their own questions.
     </p>
 
-    <div class="case-img-ph-grid cols-2">
-      <div class="case-img-ph is-filled" data-ratio="16-10">
-        <img src="/assets/images/cases/sy-webinar/3a.webp" alt="The existing Create-webinar flow, where registration was a single on/off toggle with no field customization." loading="lazy" />
-      </div>
-      <div class="case-img-ph is-filled" data-ratio="16-10">
-        <img src="/assets/images/cases/sy-webinar/3b.webp" alt="Miro synthesis / ideate board" loading="lazy" />
-      </div>
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+      <img src="/assets/images/cases/sy-webinar/3a.webp" width="1600" height="1000" alt="The existing Create-webinar flow, where registration was a single on/off toggle with no field customization." data-pt-alt={'O fluxo existente de criar webinar, em que o registo era um simples botão ligado/desligado, sem personalização de campos.'} loading="lazy" />
     </div>
-    <p class="case-img-caption">On-Air webinars registration page, April 2024.</p>
+    <p class="case-img-caption" data-pt={'Página de registo dos webinars On-Air, abril de 2024.'}>On-Air webinars registration page, April 2024.</p>
+
+    <CaseDetail label="How we researched it" labelPt="Como pesquisámos">
+      <p data-pt={'Três fontes moldaram o trabalho. As chamadas de suporte, vendas e as chamadas semanais com clientes diziam-nos o que os organizadores pediam. As entrevistas e os testes de conceito com um grupo diversificado de organizadores mostraram como organizam um webinar e onde o fluxo existente falhava. Os primeiros mockups foram para os engenheiros antes da definição, para sabermos o que era viável. Também vimos o que a concorrência e ferramentas semelhantes ofereciam e testámos os primeiros protótipos com colegas de vários departamentos.'}>
+        Three inputs shaped the work. Support, sales and weekly customer calls told
+        us what hosts were asking for. Interviews and concept tests with a diverse
+        group of hosts showed how they organise a webinar and where the existing
+        flow hurt. Early mockups went to engineers before definition, so we knew
+        what was feasible. We also looked at what competitors and similar tools
+        offered, and tested early prototypes with employees across departments.
+      </p>
+      <div class="case-img-ph-grid cols-2">
+        <div class="case-img-ph is-filled" data-ratio="16-9">
+          <img src="/assets/images/cases/sy-webinar/2a.webp" alt="Discovery synthesis board mapping Productboard insights and the customization options users were asking for." data-pt-alt={'Quadro de síntese da descoberta, com os insights do Productboard e as opções de personalização que os utilizadores pediam.'} loading="lazy" />
+        </div>
+        <div class="case-img-ph is-filled" data-ratio="16-9">
+          <img src="/assets/images/cases/sy-webinar/2b.webp" alt="Discovery board framing the custom-registration problem, with competitor research and early ideas." data-pt-alt={'Quadro de descoberta a enquadrar o problema do registo personalizado, com pesquisa da concorrência e primeiras ideias.'} loading="lazy" />
+        </div>
+      </div>
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-webinar/3b.webp" width="1440" height="900" alt="Miro synthesis / ideate board" data-pt-alt={'Quadro de síntese / ideação no Miro'} loading="lazy" />
+      </div>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── APPROACH / SOLUTION FRAMEWORK ───────────────────── */}
-  <section class="rwc-section" id="case-approach">
-    <div class="eyebrow">From discovery to solutions</div>
-    <h2 class="rwc-h2">Finding the right solution</h2>
-    <p class="rwc-lead">
-      We brought knowledge gathered from our research and tech reviews to make
-      sure we designed solutions that could be implemented in time.
-    </p>
-
-    <div class="rwc-columns cols-5">
-      <div>
-        <h3>Eclipse</h3>
-        <p>
-          We worked with engineers to figure out the technical feasibility of
-          every option we wanted to explore, considering scope and tradeoffs.
-        </p>
-      </div>
-      <div>
-        <h3>Market research</h3>
-        <p>
-          We did extensive market research to learn what competitors and similar
-          tools were providing, while finding opportunities to differentiate.
-        </p>
-      </div>
-      <div>
-        <h3>Internal testing</h3>
-        <p>
-          We ran internal testing with employees across multiple departments to
-          gather feedback on early prototypes and concepts.
-        </p>
-      </div>
-      <div>
-        <h3>Explore solutions</h3>
-        <p>
-          We explored multiple solutions and ideas, narrowing down to those that
-          best matched user needs and technical feasibility.
-        </p>
-      </div>
-      <div>
-        <h3>Prototype testing</h3>
-        <p>
-          We tested prototypes with users to validate our solutions, iterating
-          quickly based on feedback to ensure we were building the right thing.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  {/* ───────────────────── STEP 1 — WEBINAR BRANDING ───────────────────── */}
+  {/* DECISION 1 */}
   <section class="rwc-section" id="case-step-1">
-    <div class="eyebrow">Step 1 · Webinar branding</div>
-    <h2 class="rwc-h2">
-      Scalability vs. feasibility: WYSIWYG vs. minified previews
-    </h2>
-    <p>
-      Given that customization options for webinars are largely related to look
-      and feel, we explored 2 versions of how to provide that scalable
-      interaction:
+    <div class="eyebrow" data-pt={'Decisão 1'}>Decision 1</div>
+    <h2 class="rwc-h2" data-pt={'Templates antes de um page builder'}>Templates before a page builder</h2>
+    <p data-pt={'Explorámos duas formas de deixar os organizadores personalizar a marca de um webinar. Um editor WYSIWYG completo dava mais controlo, mas implicava construir um website builder: um motor de layouts e uma biblioteca completa de componentes, o que quatro meses não cobriam. Lançámos antes templates com pequenas pré-visualizações em direto. Os organizadores escolhem um template e mudam a cor, o tipo de letra e o logótipo. Não controlam o layout, mas a página fica com a cara deles. Saiu primeiro, para os organizadores terem valor cedo e a engenharia poder começar pelos campos de registo.'}>
+      We explored two ways to let hosts brand a webinar. A full WYSIWYG editor gave
+      the most control, but it meant building a website builder: a layout engine and
+      a full component library, which four months didn't cover. We shipped templates
+      with small live previews instead. Hosts pick a template and change colour, font
+      and logo. They don't control layout, but the page looks like theirs. It went
+      out first, so hosts got value early and engineering could start on registration
+      fields.
     </p>
 
     <div class="rwc-options">
       <div class="rwc-option">
-        <div class="rwc-option-tag">Option 1</div>
-        <h3>Templates with full WYSIWYG</h3>
+        <div class="rwc-option-tag" data-pt={'Opção 1 · Não construída'}>Option 1 · Not built</div>
+        <h3 data-pt={'Templates com WYSIWYG completo'}>Templates with full WYSIWYG</h3>
         <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-webinar/4a.webp" alt="Full WYSIWYG template editor exploration" loading="lazy" />
+          <img src="/assets/images/cases/sy-webinar/4a.webp" alt="Full WYSIWYG template editor exploration" data-pt-alt={'Exploração de um editor de templates WYSIWYG completo'} loading="lazy" />
         </div>
-        <p>
-          We started by trying full WYSIWYG, but this approach required heavy
-          engineering investment that didn't match our timeline. The team would
-          have had to build essentially a website builder, including a layout
-          engine and a full component library.
-        </p>
       </div>
       <div class="rwc-option">
-        <div class="rwc-option-tag">Option 2</div>
-        <h3>Customizable models, outside of the user flow</h3>
+        <div class="rwc-option-tag" data-pt={'Opção 2 · Lançada primeiro'}>Option 2 · Shipped first</div>
+        <h3 data-pt={'Templates personalizáveis, fora do fluxo do utilizador'}>Customizable models, outside of the user flow</h3>
         <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-webinar/4b.webp" alt="Minified preview / template-based customization" loading="lazy" />
-        </div>
-        <p>
-          The second approach used pre-existing templates, customizable in a
-          less granular way. Users could select from a set of templates and
-          tweak basic properties like colors, fonts, and logos. They wouldn't
-          have full layout control, but would still be able to match their
-          brand.
-        </p>
-      </div>
-    </div>
-
-    {/* Color customization rules */}
-    <div class="rwc-subsection">
-      <p>
-        We designed a set of rules to guarantee our form was accessible while
-        providing full color customization for both buttons and backgrounds. As
-        ease-of-use was one of our core principles, we wanted to keep friction
-        low — so we decided that one color choice would automatically generate
-        the entire webinar palette.
-      </p>
-
-      <div class="case-img-ph-grid cols-2">
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-webinar/5a.webp" alt="Color picker / contrast rules UI" loading="lazy" />
-        </div>
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-webinar/5b.webp" alt="Generated color palette example" loading="lazy" />
+          <img src="/assets/images/cases/sy-webinar/4b.webp" alt="Minified preview / template-based customization" data-pt-alt={'Pré-visualização reduzida / personalização baseada em templates'} loading="lazy" />
         </div>
       </div>
-
-      <p>
-        We launched v1 with the minified previews, so that we could get quick
-        time-to-value for our users and free our engineering team to start
-        building custom registration fields faster.
-      </p>
     </div>
   </section>
 
-  {/* ───────────────────── STEP 2 — CUSTOM REGISTRATION FIELDS ───────────────────── */}
+  {/* DECISION 2 */}
+  <section class="rwc-section" id="case-palette">
+    <div class="eyebrow" data-pt={'Decisão 2'}>Decision 2</div>
+    <h2 class="rwc-h2" data-pt={'Uma cor, a paleta toda'}>One colour, the whole palette</h2>
+    <p data-pt={'A facilidade de uso era um princípio central, por isso o organizador escolhe uma cor e nós geramos a paleta completa do webinar a partir dela. Um conjunto de regras mantém botões e fundos acessíveis, seja qual for a escolha.'}>
+      Ease of use was a core principle, so a host picks one colour and we generate the
+      whole webinar palette from it. A set of rules keeps buttons and backgrounds
+      accessible whatever they pick.
+    </p>
+
+    <div class="case-img-ph-grid cols-2">
+      <div class="case-img-ph is-filled" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-webinar/5a.webp" alt="Color picker / contrast rules UI" data-pt-alt={'Seletor de cor / interface das regras de contraste'} loading="lazy" />
+      </div>
+      <div class="case-img-ph is-filled" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-webinar/5b.webp" alt="Generated color palette example" data-pt-alt={'Exemplo de paleta de cores gerada'} loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  {/* DECISION 3 */}
   <section class="rwc-section" id="case-step-2">
-    <div class="eyebrow">Step 2 · Custom registration fields</div>
-    <h2 class="rwc-h2">From a modal to a full page editor</h2>
-
-    <p>
-      As we launched the minified previews, I closely collaborated with our
-      data analyst and PM to track quant data through Looker, Mixpanel, and
-      FullStory sessions. We saw significant usage of webinar branding
-      capabilities (78%) within the first 3 weeks, which gave us confidence to
-      move toward custom registration fields. Our research led us to agree on
-      5 fields to be part of v1: phone number, country, custom text field,
-      custom checkbox, and custom single-select.
+    <div class="eyebrow" data-pt={'Decisão 3'}>Decision 3</div>
+    <h2 class="rwc-h2" data-pt={'De um modal a uma página de definições'}>From a modal to a settings page</h2>
+    <p data-pt={'O branding teve 78% de utilização nas primeiras três semanas. Isso deu-nos confiança para construir os campos de registo e deu-me argumentos para propor algo maior do que um modal: uma página de definições por webinar, organizada em subpáginas, com espaço para o que vinha a seguir no roadmap. A pesquisa fechou a v1 em cinco campos: número de telefone, país, texto livre, caixa de seleção e escolha única. O nome e o email ficam fixos no topo porque a segurança do webinar depende deles. Os organizadores editam com a vista do convidado ao lado, para verem o que os registados vão ver.'}>
+      Branding saw 78% usage in its first three weeks. That gave us the confidence to
+      build registration fields, and gave me the case to pitch something bigger than a
+      modal: a settings page for each webinar, organised in subpages, with room for what
+      was next on the roadmap. Research settled v1 on five fields: phone number, country,
+      custom text, checkbox and single-select. Name and email stay fixed on top because
+      webinar security depends on them. Hosts edit with the guest view beside them, so they
+      see what registrants will see.
     </p>
 
-    <h3 class="rwc-h3">
-      I reinforced the need for a new single-page UX to house all webinar
-      settings.
-    </h3>
-
-    <div class="case-img-ph is-filled" data-ratio="16-9">
-      <img src="/assets/images/cases/sy-webinar/variants.webp" alt="Template variants exploration — WYSIWYG direction" loading="lazy" />
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-webinar/5c.webp" width="1805" height="1167" alt="New On-Air settings page: branding navigation" data-pt-alt={'Nova página de definições On-Air: navegação do branding'} loading="lazy" />
+    </div>
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-webinar/6a.webp" width="1600" height="662" alt="Registration fields editor (host) + guest preview" data-pt-alt={'Editor de campos de registo (organizador) + pré-visualização do convidado'} loading="lazy" />
     </div>
 
-    <p>
-      WYSIWYG was the way to go. As we got clarity on our mid- to long-term
-      roadmap core initiatives, I pitched the templating concept again to our
-      trio and product director, anticipating the need for a more scalable
-      information architecture and navigation. A new On-Air settings page
-      would house the settings specific to each webinar, organized by
-      subpages. It would fit the existing customize-model options, while
-      providing a scalable platform for upcoming functionality.
-    </p>
+    <CaseDetail label="More on the settings page" labelPt="Mais sobre a página de definições">
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+        <img src="/assets/images/cases/sy-webinar/variants.webp" width="1600" height="768" alt="Template variants exploration — WYSIWYG direction" data-pt-alt={'Exploração de variantes de templates — direção WYSIWYG'} loading="lazy" />
+      </div>
+      <p data-pt={'A página de registo é modular. Adapta-se à existência de descrição, logótipo, miniatura ou vários campos. Os campos personalizados também aceitam links colados.'}>
+        The registration page is modular. It adapts to whether there is a description, a
+        logo, a thumbnail or several fields. Custom fields also accept pasted links.
+      </p>
+      <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+        <img src="/assets/images/cases/sy-webinar/7b.webp" width="1440" height="900" alt="Smallest form factor registration view" data-pt-alt={'Vista de registo no menor formato de ecrã'} loading="lazy" />
+      </div>
+    </CaseDetail>
+  </section>
 
-    <div class="case-img-ph is-filled" data-ratio="16-9">
-      <img src="/assets/images/cases/sy-webinar/5c.webp" alt="New On-Air settings page: branding navigation" loading="lazy" />
-    </div>
+  {/* RESULT */}
+  <section class="rwc-section" id="case-impact">
+    <div class="eyebrow" data-pt={'Resultado'}>Result</div>
+    <h2 class="rwc-h2" data-pt={'Um em cada três webinars usou-o em quatro meses'}>One in three webinars used it within four months</h2>
 
-    <p>
-      As we tested and approved internally, we designed custom registration
-      fields into their own page.
-    </p>
-    <ul class="rwc-bullets">
-      <li>
-        Technically, email, first name, and last name were core to the
-        webinar's security, so those 3 fields weren't editable and always
-        appeared on top.
-      </li>
-      <li>Custom fields supported pasting links.</li>
-    </ul>
-
-    <div class="case-img-ph is-filled" data-ratio="16-9">
-      <img src="/assets/images/cases/sy-webinar/6a.webp" alt="Registration fields editor (host) + guest preview" loading="lazy" />
-    </div>
-
-    <p>
-      We designed the page to be a modular, multi-page registration system that
-      could adapt based on whether there was a description, logo, thumbnail, or
-      multiple fields.
-    </p>
-
-    {/* Responsive breakpoints showcase */}
-    <div class="rwc-breakpoints">
-      <div class="rwc-breakpoint">
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-webinar/7b.webp" alt="Smallest form factor registration view" loading="lazy" />
+    <div class="rwc-stats">
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">32.9<span class="rwc-stat-unit">%</span></div>
+        <div class="rwc-stat-desc" data-pt={'Dos webinars criados usaram esta funcionalidade, 4 meses após o lançamento.'}>
+          Of all webinars used this functionality, 4 months after release.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">6000<span class="rwc-stat-unit">+</span></div>
+        <div class="rwc-stat-desc" data-pt={'Campos de registo personalizados criados, 4 meses após o lançamento.'}>
+          Custom registration fields created, 4 months after release.
+        </div>
+      </div>
+      <div class="rwc-stat">
+        <div class="rwc-stat-n">3<span class="rwc-stat-unit">×</span></div>
+        <div class="rwc-stat-desc" data-pt={'Aumento de webinars semanais criados desde o lançamento.'}>
+          Increase in weekly webinars created since release.
         </div>
       </div>
     </div>
 
-    <p>
-      Whichever way users were used to organizing their webinars, we wanted to
-      make it the most painless experience possible. By providing both a host
-      and a guest view, we made sure the experience was straightforward for
-      both ends.
+    <p data-pt={'Os webinars semanais passaram de cerca de 200 para cerca de 600 nos meses a seguir ao lançamento. A percentagem de registados que apareceu para ver subiu de cerca de 10% para cerca de 15% no mesmo período.'}>
+      Weekly webinars went from about 200 to about 600 in the months after release. The
+      share of registrants who showed up to watch rose from about 10% to about 15% over
+      the same period.
     </p>
-  </section>
 
-  {/* ───────────────────── FINAL RESULT ───────────────────── */}
-  <section class="rwc-section" id="case-final-result">
-    <div class="eyebrow">Final result</div>
-    <h2 class="rwc-h2">The shipped experience</h2>
-    <div class="case-img-ph is-filled" data-ratio="16-9">
-      <img src="/assets/images/cases/sy-webinar/7c.webp" alt="Final shipped UI showing host and guest views side by side" loading="lazy" />
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-webinar/7c.webp" width="1600" height="939" alt="Final shipped UI showing host and guest views side by side" data-pt-alt={'UI final lançada, com as vistas do organizador e do convidado lado a lado'} loading="lazy" />
     </div>
-  </section>
 
-  {/* ───────────────────── VIDEO PRESENTATION ───────────────────── */}
-  <section class="rwc-section" id="case-video">
-    <h2 class="rwc-h2">Video presentation</h2>
+    <h3 class="rwc-h3" data-pt={'Apresentação em vídeo'}>Video presentation</h3>
     <div class="rwc-video-embed">
       <iframe
         src="https://www.youtube-nocookie.com/embed/La_vJZgFhnY"
@@ -389,71 +229,26 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
         allowfullscreen
       ></iframe>
     </div>
-  </section>
 
-  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
-  <section class="rwc-section" id="case-impact">
-    <h2 class="rwc-h2">Outcomes and impact</h2>
-
-    <div class="rwc-stats">
-      <div class="rwc-stat">
-        <div class="rwc-stat-n">32.9<span class="rwc-stat-unit">%</span></div>
-        <div class="rwc-stat-desc">
-          Of all webinars used this functionality, 4 months after release.
+    <CaseDetail label="The dashboards" labelPt="Os dashboards">
+      <div class="case-img-ph-grid cols-2">
+        <div class="case-img-ph is-filled" data-ratio="16-10">
+          <img src="/assets/images/cases/sy-webinar/8a.webp" alt="Field usage dashboard (Looker)" data-pt-alt={'Dashboard de utilização dos campos (Looker)'} loading="lazy" />
+        </div>
+        <div class="case-img-ph is-filled" data-ratio="16-10">
+          <img src="/assets/images/cases/sy-webinar/8b.webp" alt="Registrations / viewers trend chart" data-pt-alt={'Gráfico de tendência de registos / espectadores'} loading="lazy" />
         </div>
       </div>
-      <div class="rwc-stat">
-        <div class="rwc-stat-n">6000<span class="rwc-stat-unit">+</span></div>
-        <div class="rwc-stat-desc">
-          Custom registration fields created, 4 months after release.
-        </div>
-      </div>
-      <div class="rwc-stat">
-        <div class="rwc-stat-n">3<span class="rwc-stat-unit">×</span></div>
-        <div class="rwc-stat-desc">
-          Increase in weekly webinars created since release.
-        </div>
-      </div>
-    </div>
-
-    <p>
-      Custom registration fields was a success for On-Air webinars, bringing
-      new organizers into StreamYard by allowing them to customize their
-      webinar registration, being delivered on time, and enhancing the
-      flexibility and appeal of StreamYard On-Air webinars. In less than 4
-      months since launch, users have created over 6,000 custom registration
-      fields for their webinars — demonstrating the feature's utility and
-      data-retrieval capabilities for organizers. Since we released this
-      functionality, we saw a significant 3× increase of weekly webinars
-      created over the following months, from ~200 per week to ~600 per week
-      (today). The percentage of registrants that became viewers also gradually
-      increased from ~10% to ~15% over time.
-    </p>
-
-    <div class="case-img-ph-grid cols-2">
-      <div class="case-img-ph is-filled" data-ratio="16-10">
-        <img src="/assets/images/cases/sy-webinar/8a.webp" alt="Field usage dashboard (Looker)" loading="lazy" />
-      </div>
-      <div class="case-img-ph is-filled" data-ratio="16-10">
-        <img src="/assets/images/cases/sy-webinar/8b.webp" alt="Registrations / viewers trend chart" loading="lazy" />
-      </div>
-    </div>
+    </CaseDetail>
   </section>
 
 </div>
 
 <CaseBodyLightbox />
-<style>
-  /* RWB-specific overrides — shared .rwc-* layout/typography lives
-     in global.css and the lightbox in CaseBodyLightbox.astro. */
 
-  /* ===== Video placeholder + responsive YouTube embed =====
-     16:9 frame that scales to any width. The iframe absolutely fills
-     the wrapper so we don't depend on intrinsic iframe sizing. */
-  .rwc-video-ph {
-    min-height: 360px;
-    background: linear-gradient(135deg, rgba(120, 80, 200, 0.08), rgba(80, 50, 160, 0.04));
-  }
+<style>
+  /* RWB-specific: responsive YouTube embed. Shared .rwc-* layout lives in
+     global.css and the lightbox in CaseBodyLightbox.astro. */
   .rwc-video-embed {
     position: relative;
     width: 100%;
@@ -469,32 +264,5 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
     width: 100%;
     height: 100%;
     border: 0;
-  }
-
-  /* Breakpoint showcase — tagged frames stacked vertically. */
-  .rwc-breakpoints {
-    margin: var(--dimension-space-32) 0;
-    display: grid;
-    gap: var(--dimension-space-20);
-  }
-  .rwc-breakpoint-tag {
-    font-family: var(--font-family-mono, monospace);
-    font-size: var(--font-size-xs);
-    color: var(--text-tertiary);
-    text-transform: uppercase;
-    letter-spacing: var(--font-letter-spacing-wider);
-    margin-bottom: var(--dimension-space-8);
-  }
-
-  /* RWB tightens the responsive ramp for cols-3/cols-5: 2 cols at
-     960px, single col only at 560px. Overrides global.css's single
-     960px breakpoint. */
-  @media (max-width: 960px) {
-    .rwc-columns.cols-3,
-    .rwc-columns.cols-5 { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 560px) {
-    .rwc-columns.cols-3,
-    .rwc-columns.cols-5 { grid-template-columns: 1fr; }
   }
 </style>

@@ -1,0 +1,37 @@
+---
+/* Reading bar for case-study bodies: the read time plus a "Show all detail"
+   button that opens or closes every CaseDetail expander on the page. Styles
+   live in global.css (.case-readbar). */
+interface Props { minutes: number; }
+const { minutes } = Astro.props;
+---
+<div class="case-readbar">
+  <span class="case-readbar-time" data-pt={`${minutes} min de leitura`}>{minutes} min read</span>
+  <button type="button" class="case-readbar-btn" id="caseDetailAll" aria-pressed="false" data-umami-event="case-detail-expand-all">Show all detail</button>
+</div>
+
+<script is:inline>
+  /* "Show all detail": open or close every expander on the page. */
+  (function () {
+    var btn = document.getElementById('caseDetailAll');
+    if (!btn || btn.getAttribute('data-bound') === '1') return;
+    btn.setAttribute('data-bound', '1');
+    var TXT = {
+      en: { show: 'Show all detail', hide: 'Hide all detail' },
+      pt: { show: 'Mostrar todo o detalhe', hide: 'Esconder todo o detalhe' }
+    };
+    function lang() { return (window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'pt' : 'en'; }
+    function label() {
+      var open = btn.getAttribute('aria-pressed') === 'true';
+      btn.textContent = TXT[lang()][open ? 'hide' : 'show'];
+    }
+    btn.addEventListener('click', function () {
+      var open = btn.getAttribute('aria-pressed') !== 'true';
+      document.querySelectorAll('.rwc-body details.case-detail').forEach(function (d) { d.open = open; });
+      btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+      label();
+    });
+    document.addEventListener('jj:langchange', label);
+    if (lang() === 'pt') label();
+  })();
+</script>

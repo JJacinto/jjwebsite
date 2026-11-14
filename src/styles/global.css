@@ -411,6 +411,35 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .li-badge svg { width: 18px; height: 18px; fill: currentColor; }
 
+/* EN/PT language switch — a two-segment pill beside Start project.
+   Same 44px height and 4px inset as the pill nav; the lit segment is
+   the language in use (aria-pressed, set by the script in Base.astro). */
+.lang-switch {
+  display: inline-flex; align-items: stretch; flex-shrink: 0;
+  min-height: var(--target-min);
+  padding: var(--dimension-space-4);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+.lang-switch button {
+  min-width: 40px;
+  padding: 0 var(--dimension-space-12);
+  border: none; border-radius: var(--radius-pill);
+  background: transparent;
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  color: var(--text-secondary); cursor: pointer; user-select: none;
+  transition: color var(--motion-duration-short) var(--motion-easing-standard), background var(--motion-duration-short) var(--motion-easing-standard);
+}
+.lang-switch button:hover { color: var(--text-primary); }
+.lang-switch button[aria-pressed="true"] {
+  background: var(--text-primary);
+  /* Page colour, so the label always contrasts with the lit segment
+     (--text-inverse stays light in dark mode). */
+  color: var(--background-page);
+}
+/* In the mobile menu it sits centred above the Start project button. */
+.mobile-menu-secondary .lang-switch { align-self: center; margin-bottom: var(--dimension-space-8); }
+
 .btn.nav-cta {
   padding: var(--dimension-space-8) var(--dimension-space-16); font-size: var(--font-size-sm); border-width: 2px;
   min-width: 0;
@@ -4134,6 +4163,57 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .pw-ask:hover { text-decoration-thickness: 2px; }
 .pw-ask:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; border-radius: var(--dimension-radius-sm); }
 
+/* Locked page, split layout: the public teaser on the left and the key
+   card on the right from the first screen, sticky while the teaser
+   scrolls. Below 960px the card drops under the teaser. */
+.case-gate-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); gap: var(--dimension-space-64); align-items: start; }
+.case-gate-main { min-width: 0; }
+.case-gate-split .case-gate-head { min-height: 0; margin-bottom: 0; display: block; }
+.case-gate-main .case-summary-list { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
+.case-gate-main .outcomes { padding: var(--dimension-space-28); gap: var(--dimension-space-20); }
+.case-gate-aside { position: sticky; top: 104px; }
+#pw-overlay .case-gate-aside .pw-gate {
+  max-width: none; margin: 0; text-align: left;
+  padding: var(--dimension-space-32);
+  animation: pw-card-in 650ms var(--motion-easing-emphasized) 0.15s both;
+}
+@keyframes pw-card-in { from { opacity: 0; transform: translateY(24px); } }
+.pw-gate-top { display: flex; align-items: center; gap: var(--dimension-space-16); margin-bottom: var(--dimension-space-20); }
+.pw-gate-top h2 { margin: 0 0 2px; }
+.pw-gate-top p { margin: 0; font-size: var(--font-size-sm); color: var(--text-secondary); }
+.case-gate-aside .pw-gate-lock { width: 48px; height: 48px; margin: 0; flex: none; perspective: none; }
+.case-gate-aside .pw-gate-lock svg { animation: none; overflow: visible; }
+.pw-shackle { transform-origin: 17px 11px; transition: transform 550ms var(--motion-easing-spring); }
+.pw-gate.is-open .pw-shackle { transform: translateY(-2px) rotate(28deg); }
+.pw-chapters { list-style: none; margin: 0 0 var(--dimension-space-20); padding: 0; counter-reset: pwch; border-top: var(--dimension-border-width-1) solid var(--border-strong); }
+.pw-chapters:empty { display: none; }
+.pw-chapters li {
+  counter-increment: pwch;
+  display: flex; align-items: baseline; gap: var(--dimension-space-12);
+  padding: var(--dimension-space-10) var(--dimension-space-4);
+  border-bottom: var(--dimension-border-width-1) solid var(--border-strong);
+  font-family: var(--font-family-body); font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  transition: color 300ms var(--motion-easing-standard);
+}
+.pw-chapters li::before { content: counter(pwch, decimal-leading-zero); flex: none; font-size: var(--font-size-xs); font-variant-numeric: tabular-nums; color: var(--text-tertiary); }
+.pw-chapters li::after {
+  content: '→'; margin-left: auto; flex: none; color: var(--text-brand);
+  opacity: 0; transform: translateX(-8px);
+  transition: opacity 300ms, transform 400ms var(--motion-easing-emphasized);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+.pw-gate.is-open .pw-chapters li { color: var(--text-primary); }
+.pw-gate.is-open .pw-chapters li::after { opacity: 1; transform: none; }
+@media (max-width: 960px) {
+  .case-gate-split { grid-template-columns: 1fr; gap: var(--dimension-space-48); }
+  .case-gate-aside { position: static; width: 100%; max-width: 480px; margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #pw-overlay .case-gate-aside .pw-gate { animation: none; }
+  .pw-shackle, .pw-chapters li, .pw-chapters li::after { transition: none; }
+}
+
 @media (max-width: 768px) {
   .case-summary-list { grid-template-columns: 1fr; }
   .case-summary-card { padding: var(--dimension-space-24); }
@@ -4302,6 +4382,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .pill-nav { display: none; }
   .nav-toggle { display: inline-flex; }
   .nav-right .nav-cta { display: none; }
+  /* The language switch moves into the mobile menu too. */
+  .nav-right .lang-switch { display: none; }
   /* Move the theme toggle into the mobile menu (.mobile-menu has its
      own #mobileThemeToggle button) so the header collapses to just
      logo + hamburger and the toggle isn't sitting awkwardly next to
@@ -4389,6 +4471,36 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   transition: transform 0.5s var(--motion-easing-emphasized);
 }
 .case-img-ph.is-filled:hover img { transform: scale(1.08); }
+/* is-whole — standalone, full-width image tiles. The tile takes the
+   image's own aspect ratio and shows all of it (no cover crop). Pair
+   with real width/height attributes on the <img> to avoid layout shift,
+   and an inline max-width on the tile when the file is narrower than
+   900px so it is never upscaled. Grid tiles keep the cropping above. */
+.case-img-ph.is-whole {
+  aspect-ratio: auto;
+  min-height: 0;
+  height: auto;
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
+}
+.case-img-ph.is-whole img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+/* is-whole-capped — very tall images stop at 640px and sit centred in
+   a tile that hugs them, instead of being cropped. */
+.case-img-ph.is-whole.is-whole-capped {
+  width: fit-content;
+  max-width: 100%;
+}
+.case-img-ph.is-whole.is-whole-capped img {
+  width: auto;
+  max-width: 100%;
+  max-height: 640px;
+  margin-inline: auto;
+}
 .case-img-ph-label {
   display: inline-block;
   max-width: 36ch;
@@ -4659,6 +4771,101 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .rwc-options { grid-template-columns: 1fr; }
   .rwc-stats { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
   .case-img-ph-grid.cols-2 { grid-template-columns: 1fr; }
+}
+
+/* hero facts row (RWB): Role / Responsibilities / Team / Duration */
+.rwc-aside.rwc-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--dimension-space-16) var(--dimension-space-32);
+  margin-top: var(--dimension-space-32);
+}
+.rwc-aside.rwc-facts > div { flex: 1 1 140px; min-width: 0; }
+.rwc-aside.rwc-facts dd { font-size: var(--font-size-sm); line-height: var(--font-line-height-snug, 1.4); }
+@media (max-width: 560px) {
+  .rwc-aside.rwc-facts { flex-direction: column; flex-wrap: nowrap; }
+  .rwc-aside.rwc-facts > div { flex: 0 0 auto; }
+}
+
+/* reading bar: read time + expand-all toggle */
+.case-readbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--dimension-space-16);
+  padding: var(--dimension-space-12) 0;
+  margin-bottom: var(--dimension-space-16);
+}
+.case-readbar-time {
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: var(--font-letter-spacing-wider);
+}
+.case-readbar-btn {
+  min-height: 44px;
+  padding: 0 var(--dimension-space-16);
+  background: transparent;
+  border: var(--dimension-border-width-1) solid var(--border-subtle);
+  border-radius: var(--dimension-radius-full);
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--motion-duration-short) ease, border-color var(--motion-duration-short) ease;
+}
+.case-readbar-btn:hover { color: var(--text-primary); border-color: var(--text-tertiary); }
+.case-readbar-btn[aria-pressed="true"] { color: var(--text-primary); }
+.case-readbar-btn:focus-visible {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: var(--dimension-space-2);
+}
+
+/* optional-detail expander (CaseDetail.astro) */
+.case-detail { margin-top: var(--dimension-space-24); }
+.case-detail-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--dimension-space-8);
+  min-height: 44px;
+  padding: 0 var(--dimension-space-4);
+  list-style: none;
+  cursor: pointer;
+  font-family: var(--font-family-body);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  border-radius: var(--dimension-radius-sm);
+  transition: color var(--motion-duration-short) ease;
+  user-select: none;
+}
+.case-detail-summary::-webkit-details-marker { display: none; }
+.case-detail-summary::marker { content: ''; }
+.case-detail-summary:hover { color: var(--text-primary); }
+.case-detail-summary:focus-visible {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: var(--dimension-space-2);
+}
+.case-detail-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: var(--text-brand);
+  transition: transform var(--motion-duration-short) ease;
+}
+.case-detail-icon svg { width: 100%; height: 100%; }
+.case-detail[open] > .case-detail-summary .case-detail-icon { transform: rotate(45deg); }
+.case-detail-body {
+  padding-top: var(--dimension-space-16);
+  padding-left: var(--dimension-space-16);
+  border-left: var(--dimension-border-width-1) solid var(--border-subtle);
+  margin-top: var(--dimension-space-4);
+}
+.case-detail-body > .case-img-ph,
+.case-detail-body > .case-img-ph-grid { margin-bottom: var(--dimension-space-16); }
+@media (prefers-reduced-motion: reduce) {
+  .case-detail-icon,
+  .case-detail-summary,
+  .case-readbar-btn { transition: none; }
 }
 
 /* ============================================================
@@ -5104,3 +5311,13 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .about-story, .work-head, .rwc-hero, .case-gate-head { min-height: 0; }
   .hero { padding-top: var(--dimension-space-96); }
 }
+
+/* ============================================================
+   Portuguese versions of labels generated in CSS (EN/PT switch
+   sets <html lang="pt-PT">; see the language script in Base.astro)
+   ============================================================ */
+:lang(pt) .j-cnt::after { content: "passos " counter(n); }
+:lang(pt) .j-go::after { content: "Entrar em direto"; }
+:lang(pt) .j-pct::after { content: "a imprimir " counter(n) "%"; }
+:lang(pt) .wall .vc:after { content: "variantes ×" counter(n); }
+:lang(pt) .wall .hc:after { content: "passos " counter(n); }

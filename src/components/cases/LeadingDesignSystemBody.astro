@@ -1,316 +1,202 @@
 ---
 /* Rich body for the "Leading and managing a design system" case
-   study. The shared [slug].astro template renders this when the
-   slug matches; the default templated layout is bypassed.
+   study. A 2-minute, decision-led read: context, three decisions, the
+   result. Optional detail sits behind CaseDetail expanders. The shared
+   [slug].astro template renders this when the slug matches and passes
+   the summary through the slot.
    Shared .rwc-* layout/typography lives in global.css; image
    lightbox in CaseBodyLightbox.astro. */
 import CaseBodyLightbox from './CaseBodyLightbox.astro';
+import CaseDetail from './CaseDetail.astro';
+import CaseReadBar from './CaseReadBar.astro';
 ---
 
 <div class="rwc-body">
 
-  {/* ───────────────────── HERO / CONTEXT ───────────────────── */}
+  {/* HERO */}
   <section class="rwc-hero" id="case-context">
     <div class="rwc-hero-left">
-      <div class="case-cat">Case study · StreamYard Design System</div>
-      <h1 class="case-title">Leading and managing a design system</h1>
-      <p class="case-subtitle">
-        Implemented and led a cross-functional design system team across 6
-        teams for enhanced product quality, accessibility, and efficiency.
+      <div class="case-cat" data-pt={'Caso de estudo · Design system da StreamYard'}>Case study · StreamYard Design System</div>
+      <h1 class="case-title" data-pt={'Liderar e gerir um design system'}>Leading and managing a design system</h1>
+      <p class="case-subtitle" data-pt={'Liderar um design system em seis equipas de produto da StreamYard para voltar a alinhar o Figma e o código, até a venda da empresa parar o projeto.'}>
+        Leading a design system across six StreamYard product teams to bring
+        Figma and code back in line, until the company's sale halted the project.
       </p>
+      <dl class="rwc-aside rwc-facts">
+        <div>
+          <dt data-pt={'Função'}>Role</dt>
+          <dd data-pt={'Lead designer e gestor do design system'}>Lead designer and design system manager</dd>
+        </div>
+        <div>
+          <dt data-pt={'Responsabilidades'}>Responsibilities</dt>
+          <dd data-pt={'Gestor do design system, co-gestor de projeto, revisor de código front-end'}>Design system manager, co-project manager, front-end code reviewer</dd>
+        </div>
+        <div>
+          <dt data-pt={'Equipa'}>Team</dt>
+          <dd data-pt={'2 design leads, 6 designers, 7 engenheiros de 6 equipas de produto, 1 engineering manager'}>2 design leads, 6 designers, 7 engineers from 6 product teams, 1 engineering manager</dd>
+        </div>
+        <div>
+          <dt data-pt={'Duração'}>Duration</dt>
+          <dd data-pt={'10 meses'}>10 months</dd>
+        </div>
+      </dl>
     </div>
 
     <div class="rwc-hero-right">
       <div class="case-img-ph rwc-hero-img is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/sy-ds/hero.webp" alt="StreamYard design system planning overview" loading="eager" fetchpriority="high" />
+        <img src="/assets/images/cases/sy-ds/hero.webp" alt="StreamYard design system planning overview" data-pt-alt="Visão geral do planeamento do design system da StreamYard" loading="eager" fetchpriority="high" />
       </div>
     </div>
   </section>
 
-  {/* Summary + decisions, passed in from [slug].astro */}
+  {/* Summary, passed in from [slug].astro */}
   <slot />
 
-  {/* ───────────────────── MY ROLE ───────────────────── */}
-  <section class="rwc-role" id="case-role">
-    <div class="rwc-role-left">
-      <div class="eyebrow">My role</div>
-      <p class="case-role">Lead designer and design system manager</p>
+  <CaseReadBar minutes={3} />
 
-      <p>
-        The design system project was driven by a design-focused strategy,
-        led by myself and another designer. We managed the project,
-        coordinating with engineers, project managers, and documenting
-        components thoroughly. Collaboration and reviews ensured high
-        standards and alignment with project goals, showcasing the impact
-        of strategic design leadership. We created foundational design
-        elements and tokens for consistency and a single source of truth
-        across design and engineering.
-      </p>
-
-      <dl class="rwc-aside">
-        <div>
-          <dt>My responsibilities</dt>
-          <dd>Lead designer, Design system manager, Co-project manager, Front-end code reviewer</dd>
-        </div>
-        <div>
-          <dt>The team</dt>
-          <dd>2 design leads, 6 designers, 7 engineers (from 6 separate product teams), 1 engineering manager</dd>
-        </div>
-        <div>
-          <dt>Duration</dt>
-          <dd>10 months</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
-
-  {/* ───────────────────── THE CHALLENGE ───────────────────── */}
+  {/* CONTEXT */}
   <section class="rwc-section" id="case-challenge">
-    <div class="eyebrow">The challenge</div>
-    <h2 class="rwc-h2">
-      Design deliverables and code built were different. In some cases,
-      there were 5+ variations of a single component.
-    </h2>
-
-    <p>
-      The design team at StreamYard encountered significant hurdles that
-      prompted the development of a shared design system. A notable
-      disparity between designs and their corresponding code resulted in
-      inconsistencies that impacted the final product's cohesion and
-      quality. All designers frequently found themselves redoing components
-      due to discrepancies in dimensions, spacing, and other crucial
-      elements. Similarly, developers often had to reconstruct or adjust
-      existing components, adding to their workload and impeding efficiency.
+    <div class="eyebrow" data-pt={'Contexto'}>Context</div>
+    <h2 class="rwc-h2" data-pt={'Os designs e o código tinham-se afastado'}>Designs and code had drifted apart</h2>
+    <p data-pt={'Os designs e o código construído a partir deles não coincidiam. Alguns componentes existiam em cinco ou mais versões, os designers refaziam componentes porque as dimensões e os espaçamentos estavam errados, e os engenheiros reconstruíam ou ajustavam o que já existia. Uma auditoria à utilização dos componentes mostrou a dimensão do problema. O produto já era grande e estava online, não havia nada montado no Figma, e a equipa de design estava no limite da capacidade, sem orçamento para crescer.'}>
+      Designs and the code built from them didn't match. Some components existed
+      in five or more variations, designers kept redoing components because
+      dimensions and spacing were off, and engineers kept rebuilding or adjusting
+      what already existed. An audit of component usage showed the scale of the
+      problem. The product was already large and live, there was nothing set up
+      in Figma, and the design team was at full capacity with no budget to grow.
     </p>
-
-    <p>
-      Complicating matters was the product's extensive scale, which was
-      already firmly established and operational in the market when the
-      need for a formal design approach arose. This meant there was no
-      existing infrastructure in Figma, forcing the team to construct
-      everything from scratch. Furthermore, the design team operated at
-      full capacity, with limited resources and no budget for expansion,
-      posing challenges in resource allocation for this extensive endeavor.
-    </p>
-
-    <p>
-      The adoption of a design system was viewed as a strategic maneuver to
-      tackle these issues. By centralizing design components and
-      establishing a singular point of truth through the design system, the
-      team aimed to eradicate disparities and streamline both the design
-      and development processes. Despite requiring a coordinated effort to
-      do this, the objective was to build the system efficiently and
-      strategically, ensuring it could address the challenges of aligning
-      design with code, minimizing repetitive tasks, and bolstering overall
-      product coherence without requiring team expansion. This wasn't
-      merely a quick fix but a long-term investment in enhancing the
-      quality and scalability of StreamYard's product design.
-    </p>
-
-    <div class="rwc-columns cols-2">
-      <div>
-        <h3>Engineers and designers were unhappy with the disparity between the design files and our Storybook library. It led us to severe inefficiency.</h3>
-      </div>
-      <div>
-        <h3>By auditing component usage we identified the scale of the problem.</h3>
-      </div>
-    </div>
   </section>
 
-  {/* ───────────────────── ORGANIZING THE TEAM ───────────────────── */}
+  {/* DECISION 1 */}
   <section class="rwc-section" id="case-organizing">
-    <div class="eyebrow">Organizing the team</div>
-    <h2 class="rwc-h2">
-      We started by setting goals and our contribution model
-    </h2>
-
-    <p>
-      To guarantee all team members had clarity on what to do, when, and
-      why, we started by drafting OKRs for both design contributors and
-      design system engineers. Design contributor goals were aimed at
-      completing documentation for component proposals and building
-      toolkits to increase design efficiency while ensuring great quality,
-      whereas design system engineer goals targeted component merges and
-      adoption over time in our codebases. We organized our process by
-      setting up a contribution model detailing the required checkpoints
-      each step of the way, starting from the ideation phase all the way
-      to the adoption phase.
+    <div class="eyebrow" data-pt={'Decisão 1'}>Decision 1</div>
+    <h2 class="rwc-h2" data-pt={'Um modelo de contribuição, não uma equipa central'}>A contribution model, not a central team</h2>
+    <p data-pt={'Sem orçamento para uma equipa dedicada, o sistema tinha de ser construído por designers e engenheiros de seis equipas de produto. Orientei uma série de workshops para acordar um modelo de contribuição: os pontos de controlo por que passa um componente, da ideia à adoção. Passou a fazer parte da documentação de cada componente, para que cada designer visse em que ponto estava a sua proposta.'}>
+      With no budget for a dedicated team, the system had to be built by designers
+      and engineers from six product teams. I led a series of workshops to agree
+      on a contribution model: the checkpoints a component goes through, from idea
+      to adoption. It became part of every component's documentation, so each
+      designer could see where their proposal stood.
     </p>
 
-    <div class="rwc-options">
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="4-3">
-          <img src="/assets/images/cases/sy-ds/team-goals.webp" alt="Team Goals (Q1) in Notion — Build lovable products objective and key results" loading="lazy" />
-        </div>
-        <p class="rwc-caption">
-          "Build lovable products" objective and key results, with 2 key
-          results. Tracked weekly.
-        </p>
-      </div>
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="16-10">
-          <img src="/assets/images/cases/sy-ds/contribution-model.webp" alt="v2 - Contribution model flow diagram from Figma" loading="lazy" />
-        </div>
-        <p class="rwc-caption">
-          Led a series of workshops aimed at agreeing on a contribution
-          model for the design system, which became an integral part of
-          each component's documentation.
-        </p>
-      </div>
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-10">
+      <img src="/assets/images/cases/sy-ds/contribution-model.webp" width="1024" height="527" alt="v2 - Contribution model flow diagram from Figma" data-pt-alt="v2 - Diagrama de fluxo do modelo de contribuição, no Figma" loading="lazy" />
     </div>
 
-    <p>
-      The design system project was driven by a design-focused strategy,
-      highlighting design's central role in shaping project outcomes and
-      product improvements. As design leads, we created core design
-      elements and tokens for consistency across design and development.
-      Using Figma and atomic design principles, we ensured components were
-      adaptable and reusable. Acting as project managers, we collaborated
-      closely with engineers, documenting components thoroughly for
-      a clean handover. Continuous teamwork and reviews maintained high
-      standards, showcasing the power of design leadership in tech
-      development.
+    <div class="case-img-ph is-filled is-whole is-whole-capped" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-ds/component-checklist.webp" width="1600" height="1238" alt="Figma Buttons component page with contribution-model checklist embedded in documentation" data-pt-alt="Página do componente Buttons no Figma, com a checklist do modelo de contribuição integrada na documentação" loading="lazy" />
+    </div>
+    <p class="case-img-caption" data-pt={'O nosso modelo de contribuição passou a ser uma parte central da documentação dos componentes, em que cada designer tinha pontos de controlo para as suas propostas de componentes e de diretrizes.'}>
+      Our contribution model then became a core part of our component
+      documentation, where each designer had checkpoints for their
+      component and guideline proposals.
     </p>
-
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-ds/component-checklist.webp" alt="Figma Buttons component page with contribution-model checklist embedded in documentation" loading="lazy" />
-      </div>
-      <p class="case-img-caption">
-        Our contribution model then became a core part of our component
-        documentation, where each designer had checkpoints for their
-        component and guideline proposals.
-      </p>
-    </div>
   </section>
 
-  {/* ───────────────────── ESTABLISHING WEEKLY PRACTICE ───────────────────── */}
+  {/* DECISION 2 */}
   <section class="rwc-section" id="case-weekly-practice">
-    <h2 class="rwc-h2">Establishing a weekly practice</h2>
-
-    <p>
-      As co-design lead and project manager at StreamYard, I orchestrated
-      collaboration across 6 teams, guiding the project alongside another
-      design lead. We coordinated design and engineering efforts,
-      establishing foundational tokens and applying atomic design
-      principles to create detailed components and guidelines. Our
-      engineering team then transformed these into reusable React
-      components, benefiting all of StreamYard's development and design
-      teams.
+    <div class="eyebrow" data-pt={'Decisão 2'}>Decision 2</div>
+    <h2 class="rwc-h2" data-pt={'Progresso que todos viam'}>Progress everyone could see</h2>
+    <p data-pt={'Escrevemos OKRs para os dois ofícios. Os objetivos dos designers eram propostas de componentes e toolkits documentados; os dos engenheiros eram merges de componentes e a adoção nos codebases. Organizei uma sync semanal do design system para os acompanhar, e a adoção era seguida ao lado do trabalho de design e de engenharia, para o progresso se manter visível nos dois lados.'}>
+      We wrote OKRs for both crafts. Designers' goals were documented component
+      proposals and toolkits; engineers' goals were component merges and adoption
+      in the codebases. I hosted a weekly design system sync to track them, and
+      adoption was tracked next to design and engineering work so progress stayed
+      visible across both.
     </p>
 
-    <p>
-      To keep all team members focused on our goal, I hosted a weekly
-      design system sync to track progress week-in, week-out. Facilitating
-      regular meetings among design and engineering leads ensured clear
-      communication and alignment, preempting issues and maintaining
-      momentum.
-    </p>
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-ds/progress-board.webp" width="1024" height="652" alt="SY Design System Jira board — components in To Do, In Progress, Ready to Publish, Published, and In Adoption columns" data-pt-alt="Quadro do Jira do design system da SY — componentes nas colunas To Do, In Progress, Ready to Publish, Published e In Adoption" loading="lazy" />
+    </div>
 
-    <p>
-      My role was crucial in ensuring the design system met technical and
-      aesthetic standards, enhancing workflow and product consistency.
-    </p>
-
-    <div class="rwc-options">
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="4-3">
-          <img src="/assets/images/cases/sy-ds/cycle.webp" alt="Four-step design system cycle: Define experience specs, Build and adopt, Adopt and promote, Communicate and evolve" loading="lazy" />
+    <CaseDetail label="The goals and the weekly rhythm" labelPt="Os objetivos e o ritmo semanal">
+      <div class="lds-trio">
+        <div class="rwc-option">
+          <div class="case-img-ph is-filled" data-ratio="4-3">
+            <img src="/assets/images/cases/sy-ds/team-goals.webp" alt="Team Goals (Q1) in Notion — Build lovable products objective and key results" data-pt-alt="Objetivos da equipa (Q1) no Notion — objetivo “Build lovable products” e resultados-chave" loading="lazy" />
+          </div>
+          <p class="rwc-caption" data-pt={'O objetivo “Build lovable products” e os resultados-chave, com 2 resultados-chave. Acompanhado semanalmente.'}>
+            "Build lovable products" objective and key results, with 2 key
+            results. Tracked weekly.
+          </p>
+        </div>
+        <div class="rwc-option">
+          <div class="case-img-ph is-filled" data-ratio="4-3">
+            <img src="/assets/images/cases/sy-ds/cycle.webp" alt="Four-step design system cycle: Define experience specs, Build and adopt, Adopt and promote, Communicate and evolve" data-pt-alt="Ciclo do design system em quatro passos: definir as especificações da experiência, construir e adotar, adotar e promover, comunicar e evoluir" loading="lazy" />
+          </div>
+        </div>
+        <div class="rwc-option">
+          <div class="case-img-ph is-filled" data-ratio="4-3">
+            <img src="/assets/images/cases/sy-ds/slack-sync.webp" alt="DS Leads sync — Slack notes and takeaways from a weekly meeting" data-pt-alt="Sync dos DS Leads — notas e conclusões, no Slack, de uma reunião semanal" loading="lazy" />
+          </div>
         </div>
       </div>
-      <div class="rwc-option">
-        <div class="case-img-ph is-filled" data-ratio="4-3">
-          <img src="/assets/images/cases/sy-ds/slack-sync.webp" alt="DS Leads sync — Slack notes and takeaways from a weekly meeting" loading="lazy" />
-        </div>
-      </div>
-    </div>
-
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-ds/progress-board.webp" alt="SY Design System Jira board — components in To Do, In Progress, Ready to Publish, Published, and In Adoption columns" loading="lazy" />
-      </div>
-      <p class="case-img-caption">
-        Each week, we looked back at how we were doing to achieve our
-        goals. Component adoption was tracked alongside design and
-        engineering work, so progress stayed visible across both crafts.
-      </p>
-    </div>
-
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="16-9">
-        <img src="/assets/images/cases/sy-ds/quarter-status.webp" alt="This quarter status — 8 components to finalize design, 3 to adopt, plus building and adoption lists" loading="lazy" />
-      </div>
-      <p class="case-img-caption">
-        A quarter-at-a-glance view kept leadership and contributors aligned
-        on what was finishing, what was building, and what was ready to
-        adopt.
-      </p>
-    </div>
+          <div class="case-img-ph is-filled is-whole is-whole-capped" data-ratio="16-9">
+            <img src="/assets/images/cases/sy-ds/quarter-status.webp" width="1024" height="814" alt="This quarter status — 8 components to finalize design, 3 to adopt, plus building and adoption lists" data-pt-alt="Estado deste trimestre — 8 componentes para finalizar o design, 3 para adotar, mais as listas de construção e de adoção" loading="lazy" />
+          </div>
+          <p class="rwc-caption" data-pt={'Uma vista do trimestre num relance mantinha a liderança e os contribuidores alinhados sobre o que estava a ser finalizado, o que estava em construção e o que estava pronto a adotar.'}>
+            A quarter-at-a-glance view kept leadership and contributors aligned
+            on what was finishing, what was building, and what was ready to
+            adopt.
+          </p>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── DESIGN ───────────────────── */}
+  {/* DECISION 3 */}
   <section class="rwc-section" id="case-design">
-    <h2 class="rwc-h2">Design</h2>
-
-    <p>
-      Components were specified with the full surface area engineers needed
-      to implement them: every type, variant, size, state, icon
-      configuration, spacing token, and usage guideline. Each spec was
-      paired with a contribution checklist so component handover stayed
-      consistent across designers.
+    <div class="eyebrow" data-pt={'Decisão 3'}>Decision 3</div>
+    <h2 class="rwc-h2" data-pt={'Primeiro os tokens'}>Tokens first</h2>
+    <p data-pt={'Começámos pelos tokens de base e depois especificámos cada componente com tudo o que os engenheiros precisavam: cada tipo, variante, tamanho, estado, configuração de ícones, token de espaçamento e orientação de uso. Os tokens e as variáveis com âmbito definido permitiram mudar o tema inteiro entre claro e escuro com uma só definição.'}>
+      We started with foundational tokens, then specified each component with
+      everything engineers needed: every type, variant, size, state, icon
+      configuration, spacing token and usage guideline. Tokens and scoped
+      variables meant the whole theme could switch between light and dark with
+      one setting.
     </p>
 
-    <div class="case-img-ph is-filled" data-ratio="16-9">
-      <img src="/assets/images/cases/sy-ds/button-spec.webp" alt="Button component specification — spacing rules and usage guidance, light and dark variants side-by-side" loading="lazy" />
+    <div class="case-img-ph is-filled is-whole" data-ratio="16-9">
+      <img src="/assets/images/cases/sy-ds/button-spec.webp" width="1024" height="640" alt="Button component specification — spacing rules and usage guidance, light and dark variants side-by-side" data-pt-alt="Especificação do componente botão — regras de espaçamento e orientações de uso, variantes clara e escura lado a lado" loading="lazy" />
     </div>
 
-    <p class="case-img-caption">
-      The tokens and scoped variables allowed the entire theme to be
-      swappable between light and dark modes with a simple setting change.
-    </p>
-
-    <div class="rwc-subsection">
-      <div class="case-img-ph is-filled" data-ratio="4-3">
-        <img src="/assets/images/cases/sy-ds/color-tokens.webp" alt="Color token table in Figma — neutral, primary, status with mapped light and dark values" loading="lazy" />
+    <CaseDetail label="The colour tokens" labelPt="Os tokens de cor">
+      <div class="case-img-ph is-filled is-whole is-whole-capped" data-ratio="4-3" style="max-width:700px">
+        <img src="/assets/images/cases/sy-ds/color-tokens.webp" width="700" height="1024" alt="Color token table in Figma — neutral, primary, status with mapped light and dark values" data-pt-alt="Tabela de tokens de cor no Figma — neutral, primary e status, com os valores mapeados para claro e escuro" loading="lazy" />
       </div>
-    </div>
+    </CaseDetail>
   </section>
 
-  {/* ───────────────────── OUTCOMES & IMPACT ───────────────────── */}
+  {/* RESULT */}
   <section class="rwc-section" id="case-impact">
-    <h2 class="rwc-h2">Outcomes and impact</h2>
+    <div class="eyebrow" data-pt={'Resultado'}>Result</div>
+    <h2 class="rwc-h2" data-pt={'Seis equipas num só roadmap, até a venda o parar'}>Six teams on one roadmap, until the sale stopped it</h2>
 
     <div class="rwc-stats">
       <div class="rwc-stat">
         <div class="rwc-stat-n">6</div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Equipas de produto unidas numa única equipa e num único roadmap de design system.'}>
           Product teams united into a single DS team and roadmap.
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">15<span class="rwc-stat-unit">+</span></div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Componentes desenhados e documentados.'}>
           Components designed and documented.
         </div>
       </div>
       <div class="rwc-stat">
         <div class="rwc-stat-n">3</div>
-        <div class="rwc-stat-desc">
+        <div class="rwc-stat-desc" data-pt={'Melhorias centrais no produto: WCAG AA*, modo escuro (a caminho), sincronização design-código*. <em>* parcial.</em>'}>
           Core product improvements: WCAG AA*, Dark mode (upcoming),
           Design-to-code sync*. <em>* partial.</em>
         </div>
       </div>
     </div>
 
-    <p>
-      Despite the premature halt of the StreamYard design system project
-      due to our parent company's sale, its initial progress significantly
-      improved product consistency, aesthetics, and usability. Even
-      incomplete, it streamlined workflows for both design and front-end
-      development, reducing redundancy and effort. Despite constraints,
-      our small team achieved remarkable progress in a short time,
-      demonstrating dedication and skill. The partial rollout lays a
-      foundation for future potential under new ownership.
+    <p data-pt={'O projeto parou cedo, quando a empresa-mãe foi vendida. Nessa altura, a implementação parcial já tinha reduzido o trabalho repetido de designers e engenheiros de front-end e tornado o produto mais consistente.'}>
+      The project stopped early when our parent company was sold. By then the
+      partial rollout had already cut repeated work for designers and front-end
+      engineers and made the product more consistent.
     </p>
   </section>
 
@@ -322,12 +208,23 @@ import CaseBodyLightbox from './CaseBodyLightbox.astro';
   /* LDS-specific overrides — shared .rwc-* layout/typography lives
      in global.css and the lightbox in CaseBodyLightbox.astro. */
 
-  /* Role section is single-column (no key-initiatives sidebar). */
-  .rwc-role { grid-template-columns: none; }
-  .rwc-aside { max-width: 720px; }
-
   /* Stats descriptions use a slightly wider measure here than the
      default 28ch. */
   .rwc-stat-desc { max-width: 32ch; }
   .rwc-stat-desc em { font-style: italic; opacity: 0.75; }
+
+  /* Goals / cycle / weekly sync: one row of three equal tiles. */
+  .lds-trio {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--dimension-space-20);
+    align-items: start;
+    margin-top: var(--dimension-space-24);
+    margin-bottom: var(--dimension-space-24);
+  }
+  .lds-trio .rwc-option .case-img-ph { margin-bottom: var(--dimension-space-8); }
+
+  @media (max-width: 960px) {
+    .lds-trio { grid-template-columns: minmax(0, 1fr); }
+  }
 </style>

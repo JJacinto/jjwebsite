@@ -1,0 +1,29 @@
+---
+/* Optional-detail expander for case-study bodies. Native <details>, so it
+   works without JS. Styles live in global.css (.case-detail). */
+interface Props { label: string; labelPt?: string; }
+const { label, labelPt } = Astro.props;
+---
+<details class="case-detail">
+  <summary class="case-detail-summary" data-umami-event="case-detail-open" data-umami-event-label={label}>
+    <span class="case-detail-icon" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v10M3 8h10" />
+      </svg>
+    </span>
+    <span class="case-detail-label" data-pt={labelPt}>{label}</span>
+  </summary>
+  <div class="case-detail-body">
+    <slot />
+  </div>
+</details>
+
+<script is:inline>
+  /* Open every expander before printing so nothing is hidden on paper. */
+  if (!window.__caseDetailPrint) {
+    window.__caseDetailPrint = true;
+    window.addEventListener('beforeprint', function () {
+      document.querySelectorAll('details.case-detail').forEach(function (d) { d.open = true; });
+    });
+  }
+</script>
