@@ -4844,33 +4844,43 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 
 /* optional-detail expander (CaseDetail.astro) */
 .case-detail { margin-top: var(--dimension-space-24); }
+/* A full-width bordered row so it reads as a control, not a footnote. */
 .case-detail-summary {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--dimension-space-8);
-  min-height: 44px;
-  padding: 0 var(--dimension-space-4);
+  gap: var(--dimension-space-12);
+  min-height: 52px;
+  padding: var(--dimension-space-8) var(--dimension-space-16);
   list-style: none;
   cursor: pointer;
   font-family: var(--font-family-body);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  border-radius: var(--dimension-radius-sm);
-  transition: color var(--motion-duration-short) ease;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+  background: var(--surface-raised);
+  border: var(--dimension-border-width-1) solid var(--border-default);
+  border-radius: var(--dimension-radius-md);
+  transition: border-color var(--motion-duration-short) ease, background-color var(--motion-duration-short) ease;
   user-select: none;
 }
 .case-detail-summary::-webkit-details-marker { display: none; }
 .case-detail-summary::marker { content: ''; }
-.case-detail-summary:hover { color: var(--text-primary); }
+.case-detail-summary:hover { border-color: var(--text-brand); }
 .case-detail-summary:focus-visible {
   outline: var(--dimension-border-width-2) solid var(--border-focus);
   outline-offset: var(--dimension-space-2);
 }
 .case-detail-icon {
   display: inline-flex;
-  width: 16px;
-  height: 16px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 5px;
   color: var(--text-brand);
+  border: var(--dimension-border-width-1) solid currentColor;
+  border-radius: var(--dimension-radius-full);
   transition: transform var(--motion-duration-short) ease;
 }
 .case-detail-icon svg { width: 100%; height: 100%; }
