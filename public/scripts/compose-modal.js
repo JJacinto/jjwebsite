@@ -2,9 +2,11 @@
 (function () {
   /* Internal indexes stay stable (0 chat, 1 project, 2 book-call, 3 hiring)
      so openComposeModal(0|1|2) callers and analytics keep their meaning.
-     INTENT_ORDER is the visual order: hiring first. */
+     INTENT_ORDER is the visual order: hiring first. Book a call (2) is
+     no longer offered as a tab \u2014 the cal.eu link covers it \u2014 so it is
+     left out of the order and openModal(2) falls back to chat. */
   var INTENT_LABELS = { 0: "Just saying hi", 1: "I have a project", 2: "Book a call", 3: "I\u2019m hiring" };
-  var INTENT_ORDER  = [3, 0, 1, 2];
+  var INTENT_ORDER  = [3, 0, 1];
   var INTENT_NAMES  = ['chat', 'project', 'book-call', 'hiring'];
   var mounted   = false;
   var intentIdx = 0;
@@ -661,6 +663,7 @@
     void bd.offsetWidth;
     bd.classList.add('is-open');
     document.body.style.overflow = 'hidden';
+    if (typeof targetIdx === 'number' && INTENT_ORDER.indexOf(targetIdx) === -1) targetIdx = 0;
     if (typeof targetIdx === 'number' && selectIntent) selectIntent(targetIdx);
     var checked = bd.querySelector('.intent-btn[aria-checked="true"]');
     if (checked) checked.focus();
