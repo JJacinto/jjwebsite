@@ -2916,6 +2916,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   }
   .p-grid, .board-grid { grid-template-columns: minmax(0, 1fr); }
   .b-photos, .b-music, .b-into, .b-desk { grid-column: span 1; }
+  .d4-wrap { gap: var(--dimension-space-8); padding: 0 var(--dimension-space-8); }
+  .d4-panel { width: 140px; }
   .polaroids {
     display: flex;
     gap: var(--dimension-space-12);
