@@ -22,19 +22,20 @@ const photos = [
 ];
 
 /* How I work. `body` and `tools` are the stack before LLMs; `now` and
-   `plus` are what the same step looks like today. The section's switch
-   flips between the two. */
+   `plus` are what the same step looks like today (the same three
+   chips on every card). The section's switch flips between the two. */
+const plus = ['MCPs', 'Skills', 'Plugins'];
 const loop = [
-  { n: '01', name: 'Talk', namePt: 'Conversa', bodyPt: 'Começo pela conversa, não pelo Figma. Os piores erros que vi começaram num ecrã em branco.', nowPt: 'Continua a ser uma conversa. A thread no Slack passa a ser o brief.', body: "I start in conversation, not in Figma. The worst mistakes I've seen began on a blank canvas.", tools: ['FigJam', 'Dovetail', 'Maze'], drop: ['FigJam', 'Dovetail', 'Maze'],
-    now: 'Still a conversation. The Slack thread becomes the brief.', plus: 'Slack' },
+  { n: '01', name: 'Talk', namePt: 'Conversa', bodyPt: 'Começo pela conversa, não pelo Figma. Os piores erros que vi começaram num ecrã em branco.', nowPt: 'Continua a ser uma conversa. A thread no Slack passa a ser o brief.', body: "I start in conversation, not in Figma. The worst mistakes I've seen began on a blank canvas.", tools: ['Slack', 'FigJam', 'Dovetail', 'Maze'], drop: ['FigJam', 'Dovetail', 'Maze'],
+    now: 'Still a conversation. The Slack thread becomes the brief.' },
   { n: '02', name: 'Map', namePt: 'Mapear', bodyPt: 'Primeiro o sistema, depois os ecrãs: como as coisas se relacionam, que regras dependem de quais.', nowPt: 'O mesmo raciocínio. Os MCPs ligam as ferramentas, e o mapa vem do sistema real.', body: 'System first, screens second: how things relate, which rules depend on which.', tools: ['FigJam', 'Notion'], drop: ['FigJam'],
-    now: 'Same thinking. MCPs link the tools, so the map comes from the real system.', plus: 'MCPs' },
+    now: 'Same thinking. MCPs link the tools, so the map comes from the real system.' },
   { n: '03', name: 'Cut', namePt: 'Cortar', bodyPt: 'Depois corto o que ninguém daria por falta. A complexidade que tem de ficar, torno-a visível.', nowPt: 'Cortar continua a ser comigo. As skills verificam cada passagem com as mesmas regras.', body: 'Then I cut whatever nobody would miss. The complexity that has to stay, I make visible.', tools: ['Figma', 'Jitter', 'Retune.dev'], drop: ['Figma', 'Jitter'],
-    now: 'The cutting is still mine. Skills check every pass against the same rules.', plus: 'Skills' },
+    now: 'The cutting is still mine. Skills check every pass against the same rules.' },
   { n: '04', name: 'Ship', namePt: 'Lançar', bodyPt: 'O Figma é o contrato. Se o developer abre o ficheiro e nada o surpreende, fiz o meu trabalho.', nowPt: 'O Figma continua a ser o contrato. Os plugins e o Claude Code tratam do handoff repetível. Eu revejo.', body: "Figma is the contract. If the dev opens the file and nothing surprises them, I've done my job.", tools: ['Figma', 'Linear', 'Loom', 'Slack'], drop: ['Figma', 'Loom'],
-    now: 'Figma is still the contract. Plugins and Claude Code handle the repeat work of handoff. I review it.', plus: 'Plugins' },
+    now: 'Figma is still the contract. Plugins and Claude Code handle the repeat work of handoff. I review it.' },
   { n: '05', name: 'Measure', namePt: 'Medir', bodyPt: 'Lançar não é acabar. É aqui que vejo se tinha razão. Quase nunca por inteiro. Isto é o ciclo.', nowPt: 'As automações trazem-me os números todas as semanas. Vejo mais cedo onde errei. Isto é o ciclo.', body: "Shipped isn't done. This is where I find out if I was right. Rarely entirely. That's the loop.", tools: ['Fullstory', 'Mixpanel', 'Looker'], drop: ['Fullstory'],
-    now: "Automations bring me the numbers every week, so I see where I was wrong sooner. That's the loop.", plus: 'Automations', plusPt: 'Automações' },
+    now: "Automations bring me the numbers every week, so I see where I was wrong sooner. That's the loop." },
 ];
 ---
 <Base
@@ -158,7 +159,7 @@ const loop = [
                 </div>
                 <ul class="loop-tools">
                   {s.tools.map((t) => <li class={s.drop?.includes(t) ? 'loop-drop' : undefined} data-when={s.drop?.includes(t) ? 'before' : undefined}>{t}</li>)}
-                  <li class="loop-plus" data-when="now" data-pt={s.plusPt}>{s.plus}</li>
+                  {plus.map((p) => <li class="loop-plus" data-when="now">{p}</li>)}
                 </ul>
                 <span class="loop-feed" aria-hidden="true"></span>
               </li>
