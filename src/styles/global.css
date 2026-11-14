@@ -1081,8 +1081,18 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 /* Featured manager quote on the left across both rows; the two
    peer quotes stack on the right. Cards are flex columns so the
    footer sits on the bottom edge whatever the quote length. */
-.testimonials-masonry { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--dimension-space-20); }
+/* Five cards: the featured one plus two columns of two. The grid breaks
+   out of the container to near full viewport width (capped), the same way
+   the brands marquee runs wider than the text column. */
+.testimonials-masonry {
+  display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: var(--dimension-space-20);
+  margin-inline: calc(50% - min(50vw - var(--dimension-space-24), 760px));
+}
 .testimonial-card--featured { grid-row: span 2; }
+@media (max-width: 1180px) {
+  .testimonials-masonry { grid-template-columns: 1fr 1fr; margin-inline: 0; }
+  .testimonial-card--featured { grid-column: 1 / -1; grid-row: auto; }
+}
 .testimonial-card {
   display: flex; flex-direction: column;
   background: var(--surface-default); border-radius: var(--radius-card-lg);
@@ -1124,6 +1134,8 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .testimonials-masonry .testimonial-card:nth-child(2) .testimonial-stroke-light { animation-delay: -7s; }
 .testimonials-masonry .testimonial-card:nth-child(3) .testimonial-stroke-light { animation-delay: -14s; }
+.testimonials-masonry .testimonial-card:nth-child(4) .testimonial-stroke-light { animation-delay: -4s; }
+.testimonials-masonry .testimonial-card:nth-child(5) .testimonial-stroke-light { animation-delay: -11s; }
 @keyframes testimonial-stroke-refract {
   0%   { background-position: -100% -60%, 200%  200%; }
   100% { background-position:  200%  200%, -100% -60%; }
@@ -1146,6 +1158,32 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   border-radius: var(--dimension-radius-lg);
 }
 .testimonial-card:hover::before { opacity: 1; }
+/* Face texture — the person's photo printed into the card surface as a
+   fine halftone, only in the right-hand part of the card. The dot grid
+   is intersected with a soft radial fade so the face dissolves into the
+   card with no edge. It fades out on hover so the brand wash and the
+   quote take over. Right corners match the inner border curve. */
+.testimonial-face {
+  position: absolute; top: 0; right: 0; bottom: 0; width: 42%;
+  z-index: 0; pointer-events: none;
+  border-radius: 0 var(--dimension-radius-lg) var(--dimension-radius-lg) 0;
+  background-image: var(--face);
+  background-size: cover; background-position: 50% 25%; background-repeat: no-repeat;
+  filter: grayscale(1) contrast(1.4) brightness(1.1);
+  opacity: 0.24;
+  -webkit-mask-image:
+    radial-gradient(circle, #000 1.1px, transparent 1.6px),
+    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
+  -webkit-mask-size: 5px 5px, 100% 100%;
+  -webkit-mask-composite: source-in;
+          mask-image:
+    radial-gradient(circle, #000 1.1px, transparent 1.6px),
+    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
+          mask-size: 5px 5px, 100% 100%;
+          mask-composite: intersect;
+  transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
+}
+.testimonial-card:hover .testimonial-face { opacity: 0; }
 .testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
 .testimonial-avatar {
   width: 50px; height: 50px; border-radius: 50%; flex-shrink: 0;
@@ -1230,6 +1268,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .testimonial-logo--talkdesk { --logo: url("/assets/logos/talkdesk-mark.svg"); width: 14px; }
 .testimonial-logo--streamyard { --logo: url("/assets/logos/streamyard-mark.svg"); }
+.testimonial-logo--beubi { --logo: url("/assets/logos/beubi.avif"); width: 32px; }
 .testimonial-card:hover .testimonial-logo { background: var(--text-primary); }
 .testimonial-source { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); white-space: nowrap; transition: color var(--motion-duration-standard) var(--motion-easing-standard); }
 .testimonial-card:hover .testimonial-source { color: var(--text-brand); }
