@@ -2,7 +2,6 @@
 import Base from '../layouts/Base.astro';
 import XraySwitch from '../components/XraySwitch.astro';
 import WorkWall from '../components/home/WorkWall.astro';
-import LlmSlider from '../components/home/LlmSlider.astro';
 ---
 <Base
   activePage="home"
@@ -26,25 +25,22 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <!-- HERO -->
   <section class="hero" data-hero-intro>
     <!-- Decide the intro mode before first paint. Full intro once per
-         session, a short word-rise on later visits, nothing at all for
-         reduced motion. Without JS the hero is simply visible. -->
+         session, the short version (from beat 9) on later visits, nothing
+         at all for reduced motion. cut-pending hides the intro parts until
+         hero-cut.js draws its first frame. Without JS the hero is simply
+         visible. -->
     <script is:inline>
-    (function(){try{var d=document.documentElement;if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add(sessionStorage.getItem('jj-intro')?'intro-short':'intro-run');}catch(e){}})();
+    (function(){try{var d=document.documentElement;if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add(sessionStorage.getItem('jj-intro')?'intro-short':'intro-run','cut-pending');}catch(e){}})();
     </script>
-    <!-- Particle overlay — the drifting dot field that greets visitors
-         on work / about / case pages, also present on the home hero.
-         The compose-modal init picks this up via the .hero-particles
-         class; the particle canvas stays transparent so the CSS wash
-         gradient behind it shows through. -->
-    <div class="hero-particles" aria-hidden="true">
-      <canvas class="cta-footer-bg"></canvas>
-    </div>
+    <!-- Intro stage, drawn by /scripts/hero-cut.js. Fixed and full-viewport
+         while it plays; the same canvas draws the X-ray cut lines. -->
+    <canvas data-cut-canvas aria-hidden="true" data-words="EVERY|PART|EARNS ITS PLACE." data-pt-data-words="CADA|PARTE|MERECE O LUGAR." data-layers="surface|states|rules|data" data-pt-data-layers="superfície|estados|regras|dados" data-label="PARTS" data-pt-data-label="PARTES"></canvas>
     <div class="container hero-inner" data-xray>
       <aside class="xray-note" data-xray-note data-pt="Um título, uma promessa. A linha por baixo traz a prova, por isso o título pode ficar curto.">One headline, one promise. The line under it carries the proof, so the headline can stay short.</aside>
-      <h1 class="hero-greeting" data-pt="Olá, sou o João. Um product designer que constrói.">Hey, I'm João. A product designer who builds.</h1>
-      <p class="hero-role"><span class="hero-line">I design the parts users don't see.</span></p>
-      <p class="hero-sub" data-pt="Para que as que veem pareçam inevitáveis. Dez anos em fintech, vídeo e ferramentas de suporte, e construo o que desenho.">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
-      <div class="hero-ctas">
+      <h1 class="hero-greeting" data-cut-rise data-pt="Olá, sou o João. Um product designer que constrói.">Hey, I'm João. A product designer who builds.</h1>
+      <p class="hero-role" data-cut-line><span class="hero-line" data-pt="Desenho as partes que os utilizadores não veem.">I design the parts users don't see.</span></p>
+      <p class="hero-sub" data-cut-rise data-pt="Para que as que veem pareçam inevitáveis. Dez anos em fintech, vídeo e ferramentas de suporte, e construo o que desenho.">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
+      <div class="hero-ctas" data-cut-rise>
         <button class="btn btn-accent" type="button" data-umami-event="hero-hire" onclick="openComposeModal(3)">
           <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
           <span data-pt="A contratar? Vamos falar">Hiring? Let's talk</span>
@@ -54,32 +50,14 @@ import LlmSlider from '../components/home/LlmSlider.astro';
           <span data-pt="Ver o trabalho">See the work</span>
         </a>
       </div>
-      <div class="hero-xray">
+      <div class="hero-xray" data-cut-rise>
         <XraySwitch wrap=".home-wrap" />
         <span class="hero-xray-hint" data-pt="ou prime <kbd>X</kbd>">or press <kbd>X</kbd></span>
-      </div>
-
-      <!-- Intro stage: the logo draws itself, flies to the nav, then the
-           keywords play in the headline's place. Decorative only; the
-           real copy above is what stays on screen. Keywords live in
-           data-keywords so they can be edited without touching the JS. -->
-      <div class="hero-stage" aria-hidden="true" data-keywords="Product designer|Who builds|Ten years in" data-pt-data-keywords="Product designer|Que constrói|Dez anos em">
-        <svg class="hero-logo" viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
-          <g transform="matrix(1.20499,0,0,1.20469,-1150.09,-2581.94)">
-            <mask id="jjIntroM1"><path class="hero-logo-draw" pathLength="1" d="M1108,2767C1092,2820 1090,2900 1157,2924C1215,2940 1262,2900 1297,2791L1433,2268C1490,2285 1560,2290 1621,2256"/></mask>
-            <path mask="url(#jjIntroM1)" d="M1468.5,2314.5C1439.63,2429.03 1365.6,2721.15 1340.63,2804.28C1299.23,2942.15 1221.67,2989.38 1144.62,2967.52C1076.63,2948.24 1029.01,2878.62 1064.42,2754.18C1071.3,2730.03 1096.48,2716.01 1120.62,2722.89C1144.76,2729.76 1158.78,2754.94 1151.9,2779.09C1143.99,2806.88 1141.6,2830.08 1144.94,2848.7C1147.87,2865.03 1156.11,2876.22 1169.43,2880C1186.93,2884.96 1201.96,2876.29 1215.43,2859.34C1230.49,2840.4 1243.01,2813.11 1253.52,2778.11C1284.56,2674.74 1391.99,2245.82 1391.99,2245.82C1395.13,2233.26 1403.23,2223.24 1413.67,2217.31C1427.34,2208.36 1445.39,2207.09 1460.66,2215.55C1460.66,2215.55 1529.91,2253.82 1599.98,2215.75C1622.04,2203.77 1649.67,2211.95 1661.65,2234.02C1673.62,2256.08 1665.44,2283.72 1643.39,2295.7C1577.48,2331.5 1512.03,2325.74 1468.5,2314.5Z"/>
-            <mask id="jjIntroM2"><path class="hero-logo-draw" pathLength="1" d="M1574,2452L1483,2791C1465,2850 1445,2895 1425,2910C1410,2922 1398,2927 1385,2925"/></mask>
-            <path mask="url(#jjIntroM2)" d="M1392.08,2879.85C1399.28,2869.7 1423.21,2833.42 1439.82,2778.11C1483.13,2633.9 1530.2,2440.99 1530.2,2440.99C1536.15,2416.6 1560.78,2401.63 1585.17,2407.59C1609.55,2413.54 1624.51,2438.17 1618.56,2462.56C1618.56,2462.56 1570.83,2658.11 1526.93,2804.28C1504.59,2878.69 1480.11,2921.48 1456.11,2945.35C1406.45,2994.74 1361.63,2963.16 1361.63,2963.16C1340.57,2949.52 1334.54,2921.33 1348.18,2900.26C1357.98,2885.11 1375.3,2877.73 1392.08,2879.85Z"/>
-          </g>
-          <g transform="matrix(1.20499,0,0,1.20469,-1229.74,-2381.85)">
-            <mask id="jjIntroM3"><path class="hero-logo-draw" pathLength="1" d="M1707,2653L1678,2761"/></mask>
-            <path mask="url(#jjIntroM3)" d="M1722.17,2773.11C1715.66,2797.35 1690.7,2811.76 1666.46,2805.26C1642.22,2798.75 1627.82,2773.79 1634.32,2749.54L1663.35,2641.27C1669.85,2617.02 1694.81,2602.61 1719.05,2609.12C1743.3,2615.62 1757.7,2640.58 1751.2,2664.83L1722.17,2773.11Z"/>
-          </g>
-        </svg>
-        <div class="hero-keyword"><span></span></div>
+        <button class="hero-replay" type="button" data-cut-replay data-pt="Rever intro">Replay intro</button>
       </div>
     </div>
   </section>
+  <script src="/scripts/hero-cut.js" defer></script>
 
   <!-- WORK WALL -->
   <section class="home-work" id="work">
@@ -125,34 +103,26 @@ import LlmSlider from '../components/home/LlmSlider.astro';
       </div>
       <ol class="how-steps">
         <li class="how-step reveal reveal-d1">
-          <span class="how-n">01</span>
+          <div class="how-top"><span class="how-n">01</span><span class="how-maps" data-pt="Conversa · Mapear">Talk · Map</span></div>
           <h3 data-pt="Encontrar o problema real">Find the real problem</h3>
           <p data-pt="Na StreamYard, o roadmap vinha de chamadas de vendas e tickets de suporte. Por isso entrevistei organizadores que pagavam por ferramentas concorrentes.">At StreamYard the roadmap came from sales calls and support tickets. So I interviewed organisers who paid for competing tools.</p>
         </li>
         <li class="how-step reveal reveal-d2">
-          <span class="how-n">02</span>
+          <div class="how-top"><span class="how-n">02</span><span class="how-maps" data-pt="Cortar">Cut</span></div>
           <h3 data-pt="Cortar o que não merece o lugar">Cut what doesn't earn its place</h3>
           <p data-pt="Dispensei o page builder. Lançámos antes templates em que uma só cor define a paleta inteira.">I skipped the page builder. Templates where one colour makes the whole palette shipped instead.</p>
           <span class="how-chip" data-pt="Anchorage · <b>40 → 1</b> passo">Anchorage · <b>40 → 1</b> step</span>
         </li>
         <li class="how-step reveal reveal-d3">
-          <span class="how-n">03</span>
+          <div class="how-top"><span class="how-n">03</span><span class="how-maps" data-pt="Lançar · Medir">Ship · Measure</span></div>
           <h3 data-pt="Construir, em código quando ajuda">Build it, in code when it helps</h3>
           <p data-pt="Na StreamYard especifiquei tokens e 15+ componentes para que design e código partilhassem uma só fonte. Este site também é feito à mão.">At StreamYard I specified tokens and 15+ components so design and code could share one source. This site is hand-built too.</p>
         </li>
       </ol>
-    </div>
-  </section>
-
-  <!-- THEN AND NOW -->
-  <section class="home-then">
-    <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note data-pt="Uma ideia, duas formas de trabalhar. Arrastar o cursor e a imagem explica-se sozinha.">One idea, two ways of working. Drag it and the picture explains itself.</aside>
-      <div class="home-head" data-xray-gap="48">
-        <p class="eyebrow home-eyebrow reveal" data-pt="Antes e agora">Then and now</p>
-        <h2 class="home-h2 reveal reveal-d1" data-pt="O mesmo plano, outra fábrica.">Same plan, a different factory.</h2>
-      </div>
-      <LlmSlider />
+      <p class="how-more reveal reveal-d3">
+        <span data-pt="Os mesmos passos antes e depois dos LLMs. Só mudaram as ferramentas.">Same steps before and after LLMs. Only the tools changed.</span>
+        <a href="/about#loop" data-umami-event="home-how-to-loop" data-pt="Ver a stack →">See the stack →</a>
+      </p>
     </div>
   </section>
 
@@ -160,9 +130,9 @@ import LlmSlider from '../components/home/LlmSlider.astro';
   <section class="testimonials">
     <div class="container home-block" data-xray>
       <aside class="xray-note" data-xray-note data-pt="Só pessoas com quem trabalhei diretamente. Cada uma diz como trabalhámos em conjunto.">Only people I worked with directly. Each one says how we worked together.</aside>
-      <p class="eyebrow reveal" data-pt="O que dizem as pessoas com quem trabalhei">What people I've worked with say</p>
+      <p class="eyebrow reveal" data-pt="Chefias e colegas sobre como trabalho">Managers and teammates on how I work</p>
       <div class="testimonials-masonry">
-        <a class="testimonial-card reveal reveal-d1" data-umami-event="testimonial" data-umami-event-author="daniel-cardoso" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
+        <a class="testimonial-card testimonial-card--featured reveal reveal-d1" data-umami-event="testimonial" data-umami-event-author="daniel-cardoso" href="https://www.linkedin.com/in/joaofranciscojacinto/details/recommendations/" target="_blank" rel="noopener noreferrer">
           <span class="testimonial-stroke-light" aria-hidden="true"></span>
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="/assets/images/Daniel.avif" alt="Daniel Cardoso" width="512" height="512" loading="lazy"></div>
@@ -171,11 +141,15 @@ import LlmSlider from '../components/home/LlmSlider.astro';
               <div class="testimonial-role" data-pt="Diretor de Design para IA na Talkdesk">Director of Design for AI at Talkdesk</div>
             </div>
           </div>
-          <p class="testimonial-quote" data-pt="Tive o privilégio de trabalhar com o João como Senior Product Designer num produto de IA, e fiquei sempre impressionado com a sua experiência e competências. O João tem uma combinação única de proficiência técnica, conhecimento de design e competências de UX excecionais, o que faz dele uma mais-valia para qualquer equipa.">I had the privilege of working with João as a Senior Product Designer on an AI product, and I was continually impressed by his expertise and skills. João possesses a unique combination of technical proficiency, design expertise, and exceptional UX competencies, making him a valuable asset to any team.</p>
-          <p class="testimonial-relation" data-pt="O Daniel foi o meu manager na Talkdesk">Daniel was my manager at Talkdesk</p>
+          <p class="testimonial-quote" data-pt="Tive o privilégio de trabalhar com o João como Senior Product Designer num produto de IA… O João tem <strong>uma combinação única de proficiência técnica, conhecimento de design e competências de UX excecionais</strong>, o que faz dele uma mais-valia para qualquer equipa.">I had the privilege of working with João as a Senior Product Designer on an AI product… João possesses <strong>a unique combination of technical proficiency, design expertise, and exceptional UX competencies</strong>, making him a valuable asset to any team.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--talkdesk" role="img" aria-label="Talkdesk"></span>
+            <p class="testimonial-relation" data-pt="O Daniel foi o meu manager na Talkdesk">Daniel was my manager at Talkdesk</p>
+            <span class="testimonial-source" data-pt="Ler no LinkedIn ↗">Read on LinkedIn ↗</span>
+          </div>
         </a>
 
-        <a class="testimonial-card reveal reveal-d2" data-umami-event="testimonial" data-umami-event-author="will-brett-atkin" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
+        <a class="testimonial-card reveal reveal-d2" data-umami-event="testimonial" data-umami-event-author="will-brett-atkin" href="https://www.linkedin.com/in/joaofranciscojacinto/details/recommendations/" target="_blank" rel="noopener noreferrer">
           <span class="testimonial-stroke-light" aria-hidden="true"></span>
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="/assets/images/Will.avif" alt="Will Brett-Atkin" width="91" height="105" loading="lazy"></div>
@@ -184,11 +158,15 @@ import LlmSlider from '../components/home/LlmSlider.astro';
               <div class="testimonial-role">Staff Product Designer</div>
             </div>
           </div>
-          <p class="testimonial-quote" data-pt="O João tem um talento raro para gerir, em simultâneo e com eficiência, vários projetos de grande prioridade e grande impacto. A capacidade de equilibrar tudo e de se destacar em ambientes tão exigentes é prova da sua experiência e dedicação.">João possesses a rare talent for efficiently managing multiple high-priority, high-impact projects simultaneously. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
-          <p class="testimonial-relation" data-pt="O Will foi meu colega na StreamYard">Will was my coworker at StreamYard</p>
+          <p class="testimonial-quote" data-pt="O João tem um talento raro para <strong>gerir, em simultâneo e com eficiência, vários projetos de grande prioridade e grande impacto</strong>. A capacidade de equilibrar tudo e de se destacar em ambientes tão exigentes é prova da sua experiência e dedicação.">João possesses a rare talent for <strong>efficiently managing multiple high-priority, high-impact projects simultaneously</strong>. His ability to balance and excel in such demanding environments is a testament to his expertise and dedication.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--streamyard" role="img" aria-label="StreamYard"></span>
+            <p class="testimonial-relation" data-pt="O Will foi meu colega na StreamYard">Will was my coworker at StreamYard</p>
+            <span class="testimonial-source" data-pt="Ler no LinkedIn ↗">Read on LinkedIn ↗</span>
+          </div>
         </a>
 
-        <a class="testimonial-card reveal reveal-d3" data-umami-event="testimonial" data-umami-event-author="xavier-gallego" href="https://linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer">
+        <a class="testimonial-card reveal reveal-d3" data-umami-event="testimonial" data-umami-event-author="xavier-gallego" href="https://www.linkedin.com/in/joaofranciscojacinto/details/recommendations/" target="_blank" rel="noopener noreferrer">
           <span class="testimonial-stroke-light" aria-hidden="true"></span>
           <div class="testimonial-header">
             <div class="testimonial-avatar"><img src="/assets/images/Xavier.avif" alt="Xavier Gallego" width="91" height="105" loading="lazy"></div>
@@ -197,8 +175,12 @@ import LlmSlider from '../components/home/LlmSlider.astro';
               <div class="testimonial-role" data-pt="Engenheiro sénior na Synthesia">Sr. Engineer at Synthesia</div>
             </div>
           </div>
-          <p class="testimonial-quote" data-pt="A dedicação do João em manter padrões de design elevados e em promover a colaboração na nossa equipa é de primeira. A sua abertura ao feedback ajuda a criar um ambiente que melhora muito o nosso fluxo de trabalho e as nossas entregas.">João's dedication to maintain high design standards and foster collaboration within our team is top notch. His openness to feedback helps create an environment that greatly enhances our workflow and deliverables.</p>
-          <p class="testimonial-relation" data-pt="O Xavier foi meu colega na StreamYard">Xavier was my coworker at StreamYard</p>
+          <p class="testimonial-quote" data-pt="A dedicação do João em manter padrões de design elevados e em promover a colaboração na nossa equipa é de primeira. <strong>A sua abertura ao feedback</strong> ajuda a criar um ambiente que melhora muito o nosso fluxo de trabalho e as nossas entregas.">João's dedication to maintain high design standards and foster collaboration within our team is top notch. <strong>His openness to feedback</strong> helps create an environment that greatly enhances our workflow and deliverables.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--streamyard" role="img" aria-label="StreamYard"></span>
+            <p class="testimonial-relation" data-pt="O Xavier foi meu colega na StreamYard">Xavier was my coworker at StreamYard</p>
+            <span class="testimonial-source" data-pt="Ler no LinkedIn ↗">Read on LinkedIn ↗</span>
+          </div>
         </a>
       </div>
     </div>
@@ -210,143 +192,20 @@ import LlmSlider from '../components/home/LlmSlider.astro';
 </Base>
 
 <script is:inline>
-/* Hero intro. Full run: logo draws, flies to the nav, three keywords
-   play, then the headline rises word by word and stays still. Short
-   run (later visits in the same session): the word rise only. Any
-   click, key, scroll or touch skips straight to the final state. */
+/* Hero intro glue. The intro itself is /scripts/hero-cut.js (loaded above,
+   deferred). Here: remember the full run for this session, and tell the
+   script when X-ray turns on or off. X-ray is the .xray class on .home-wrap,
+   toggled by the switch or the X key, so one observer covers both. */
 (function() {
-  const root = document.documentElement;
-  const hero = document.querySelector('[data-hero-intro]');
-  if (!hero) return;
-  const full = root.classList.contains('intro-run');
-  const short = root.classList.contains('intro-short');
-  if (!full && !short) return;
-
-  const role = hero.querySelector('.hero-role');
-  const line = hero.querySelector('.hero-line');
-  const stage = hero.querySelector('.hero-stage');
-  const logo = stage.querySelector('.hero-logo');
-  const kw = stage.querySelector('.hero-keyword span');
-  const navLogo = document.querySelector('.nav .logo-mark');
-  const css = getComputedStyle(root);
-  const ease = (name, fallback) => (css.getPropertyValue(name) || '').trim() || fallback;
-  const EMPH = ease('--motion-easing-emphasized', 'cubic-bezier(0.22,1,0.36,1)');
-  const STD  = ease('--motion-easing-standard', 'cubic-bezier(0.4,0,0.2,1)');
-  const EXIT = ease('--motion-easing-exit', 'cubic-bezier(0.4,0,1,1)');
-
-  /* Split the headline into words so they can rise one after another.
-     Spaces stay as text nodes, so it still reads as one sentence. */
-  const words = line.textContent.trim().split(/\s+/);
-  line.textContent = '';
-  words.forEach((w, i) => {
-    const s = document.createElement('span');
-    s.className = 'hw';
-    s.style.setProperty('--i', i);
-    s.textContent = w;
-    line.appendChild(s);
-    if (i < words.length - 1) line.appendChild(document.createTextNode(' '));
-  });
-  role.classList.add('is-split');
-
-  let done = false;
-  const timers = [];
-  const wait = (ms) => new Promise((resolve) => {
-    timers.push({ id: setTimeout(resolve, ms), resolve });
-  });
-  const skipEvents = ['pointerdown', 'keydown', 'wheel', 'touchstart'];
-
-  function finish() {
-    if (done) return;
-    done = true;
-    timers.forEach((t) => { clearTimeout(t.id); t.resolve(); });
-    skipEvents.forEach((e) => window.removeEventListener(e, finish));
+  document.addEventListener('jj:cutdone', function() {
     try { sessionStorage.setItem('jj-intro', '1'); } catch (_) {}
-    stage.style.display = 'none';
-    root.classList.remove('intro-run', 'intro-short', 'intro-logo-landed');
-    root.classList.add('intro-done');
-    void role.offsetWidth; /* commit the hidden word state before the rise */
-    role.classList.add('is-in');
-  }
-  skipEvents.forEach((e) => window.addEventListener(e, finish, { passive: true }));
-
-  async function play() {
-    /* 1. The logo draws itself: long stroke, short stroke, then the dot. */
-    const strokes = stage.querySelectorAll('.hero-logo-draw');
-    const timing = [[0, 520], [380, 360], [720, 160]];
-    strokes.forEach((p, i) => {
-      p.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }],
-        { delay: timing[i][0], duration: timing[i][1], easing: STD, fill: 'both' });
-    });
-    await wait(1000);
-    if (done) return;
-
-    /* 2. It flies to its place in the nav and becomes the real logo. */
-    if (navLogo) {
-      const from = logo.getBoundingClientRect();
-      const to = navLogo.getBoundingClientRect();
-      const fly = logo.animate(
-        [{ transform: 'none' },
-         { transform: 'translate(' + (to.left - from.left) + 'px,' + (to.top - from.top) + 'px) scale(' + (to.width / from.width) + ')' }],
-        { duration: 600, easing: EMPH, fill: 'forwards' });
-      fly.finished.then(() => {
-        if (done) return;
-        root.classList.add('intro-logo-landed');
-        logo.style.visibility = 'hidden';
-      }).catch(() => {});
-    }
-    await wait(380); /* let the logo clear the spot the keywords use */
-
-    /* 3. Keywords, one at a time, long enough to read. */
-    const list = (stage.dataset.keywords || '').split('|').filter(Boolean);
-    for (const word of list) {
-      if (done) return;
-      kw.textContent = word;
-      const dot = document.createElement('i');
-      dot.textContent = '.';
-      kw.appendChild(dot);
-      kw.animate([{ transform: 'translateY(105%)' }, { transform: 'none' }],
-        { duration: 350, easing: EMPH, fill: 'both' });
-      await wait(640);
-      if (done) return;
-      kw.animate([{ transform: 'none' }, { transform: 'translateY(-105%)' }],
-        { duration: 180, easing: EXIT, fill: 'both' });
-      await wait(170);
-    }
-
-    /* 4. The headline rises and stays. */
-    finish();
-  }
-
-  if (full) play(); else requestAnimationFrame(finish);
-})();
-
-/* Hero headline: the intro script above splits it into word spans, so the
-   Portuguese is handled here rather than with data-pt. Rebuilds the same
-   word spans (or plain text when the intro never split it). */
-(function() {
-  const line = document.querySelector('.hero-line');
-  if (!line) return;
-  const TEXT = { en: line.textContent.trim(), pt: 'Desenho as partes que os utilizadores não veem.' };
-  const lang = () => (window.jjLang ? window.jjLang() : 'en');
-  const set = () => {
-    const t = TEXT[lang() === 'pt' ? 'pt' : 'en'];
-    if (line.querySelector('.hw')) {
-      const words = t.split(/\s+/);
-      line.textContent = '';
-      words.forEach((w, i) => {
-        const s = document.createElement('span');
-        s.className = 'hw';
-        s.style.setProperty('--i', i);
-        s.textContent = w;
-        line.appendChild(s);
-        if (i < words.length - 1) line.appendChild(document.createTextNode(' '));
-      });
-    } else {
-      line.textContent = t;
-    }
-  };
-  if (lang() === 'pt') set();
-  document.addEventListener('jj:langchange', set);
+  });
+  const wrap = document.querySelector('.home-wrap');
+  if (!wrap) return;
+  const send = () => { if (window.HeroCut) window.HeroCut.xray(wrap.classList.contains('xray')); };
+  new MutationObserver(send).observe(wrap, { attributes: true, attributeFilter: ['class'] });
+  /* Deferred scripts have run by DOMContentLoaded; catch X-ray already on. */
+  document.addEventListener('DOMContentLoaded', () => { if (wrap.classList.contains('xray')) send(); });
 })();
 
 (function() {

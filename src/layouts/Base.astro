@@ -130,7 +130,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
 
 <a href="#main-content" class="skip-link" data-umami-event="skip-link" data-pt="Saltar para o conteúdo">Skip to content</a>
 
-<nav class:list={['nav', { 'nav-dark': navDark }]} id="nav">
+<nav class:list={['nav', { 'nav-dark': navDark }]} id="nav" {...(activePage === 'home' ? { 'data-cut-nav': '' } : {})}>
   <div class="container">
     <a href="/" class="logo-outer" aria-label="Home" data-pt-aria-label="Início">
       <span class="logo-bg"></span>

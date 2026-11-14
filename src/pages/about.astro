@@ -126,7 +126,7 @@ const loop = [
       <!-- The markup rests on "now", so no-JS and reduced-motion visitors
            get today's stack. With JS it opens on "before" and flips to
            "now" once the cards are in view; the switch flips it back. -->
-      <section class="about-section loop" data-loop data-mode="now" data-live data-xray data-xray-gap="128" aria-labelledby="loop-title">
+      <section id="loop" class="about-section loop" data-loop data-mode="now" data-live data-xray data-xray-gap="128" aria-labelledby="loop-title">
         <aside class="xray-note" data-xray-note data-pt="Os mesmos cinco passos dos dois lados do interruptor. Só mudam as ferramentas e o que corre por baixo delas.">Same five steps on both sides of the switch. Only the tools change, and what runs underneath them.</aside>
 
         <div class="about-head">
@@ -248,21 +248,15 @@ const loop = [
           <article class="p-card reveal reveal-d2" tabindex="0">
             <div class="p-demo" aria-hidden="true">
               <span class="tap-hint"></span>
-              <div class="d4-wrap">
-                <div class="d4-panel">
-                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Frame 412</span><span class="d4-new">Card / Header</span></span></div>
-                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Group 87 copy</span><span class="d4-new">Card / Actions</span></span></div>
-                  <div class="d4-row"><span class="d4-ico"></span><span class="d4-names"><span class="d4-old">Rectangle 3</span><span class="d4-new">Card / Surface</span></span></div>
-                </div>
-                <div class="d5-doc">
-                  <i class="d5-h"></i>
-                  <p class="d5-line"><span data-pt="Porquê: um passo, menos erros.">Why: one step, fewer mistakes.</span><span class="d5-caret"></span></p>
-                  <span class="d5-bubble" data-pt="Contestar ↗">Push back ↗</span>
-                </div>
+              <div class="d4-thread">
+                <div class="d4-msg d4-msg--me"><p><b data-pt="Seg">Mon</b> <span data-pt="Rascunho no ar, ainda tosco.">Rough draft's up, on purpose.</span></p></div>
+                <div class="d4-msg d4-msg--me d4-msg--later"><p><b data-pt="Ter">Tue</b> <span data-pt="Sem o passo 3. Porquê: menos erros.">Cut step 3. Why: fewer errors.</span></p></div>
+                <div class="d4-msg d4-msg--them d4-msg--later"><p data-pt="E os admins?">What about admins?</p></div>
+                <span class="d4-typing"><i></i><i></i><i></i></span>
               </div>
             </div>
             <h3 class="p-title" data-pt="Não deixar surpresas.">Leave no surprises.</h3>
-            <p class="p-body" data-pt="Dou nome às camadas, escrevo a decisão e o porquê. Quem abrir o ficheiro a seguir, developer ou designer, consegue segui-lo e contestá-lo.">Name the layers, write down the decision and why. Whoever opens the file next, dev or designer, can follow it, and push back.</p>
+            <p class="p-body" data-pt="O trabalho anda mais depressa, por isso falo cedo e muitas vezes: o rascunho, a decisão, o porquê. Ninguém descobre só na revisão, e contestar ainda sai barato.">Work moves faster now, so I share early and often: the rough draft, the decision, the why. Nobody finds out at the review, and pushing back is still cheap.</p>
           </article>
         </div>
       </section>

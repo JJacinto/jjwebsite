@@ -721,10 +721,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .hero .hero-inner {
   width: 100%;
-  /* Sit above .hero-particles (z 1) so the headline and CTAs read
-     crisply over the drifting dot field. */
+  /* No z-index on purpose: a stacking context here would trap the
+     [data-cut-line] / [data-cut-rise] children below the intro canvas
+     (see "Hero intro: the cut"). */
   position: relative;
-  z-index: var(--z-elevated);
   /* Column flow with a small consistent gap on top of each child's
      own margin-bottom rhythm — gives the greeting / role / CTAs a
      touch of breathing room without overriding the existing per-
@@ -733,42 +733,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   flex-direction: column;
   gap: var(--dimension-space-8);
 }
-/* Particle overlay — rendered by the same compose-modal init (queried
-   by the .hero-particles class), with bgImage skipped so the particle
-   canvas stays transparent. Clipped by .hero { overflow: hidden } so
-   it never bleeds into the brands strip below.
-   - The CSS background is a lighter --surface-default wash at the top
-     fading out lower down, giving the hero the same "lifted" feel
-     visitors see on about / work above the fold.
-   - The mask keeps the particle field fully visible well past the CTA
-     buttons (to ~70%), then fades it out gently by the bottom of the
-     hero — so plenty of the field shows below the buttons. */
-.hero-particles {
-  position: absolute; inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    var(--surface-default) 0%,
-    transparent 65%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    var(--component-marquee-fade-edge) 0%,
-    var(--component-marquee-fade-edge) 70%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    var(--component-marquee-fade-edge) 0%,
-    var(--component-marquee-fade-edge) 70%,
-    transparent 100%
-  );
-}
-.hero-particles canvas {
-  width: 100%; height: 100%;
-  display: block;
-}
+
 .hero-marquee {
   position: absolute; top: 50%; left: 0; right: 0;
   transform: translateY(-60%);
@@ -782,7 +747,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
      purple, dark mode). 5.5% gives a barely-there wash in both. */
   color: color-mix(in srgb, var(--text-brand) 5.5%, transparent);
 }
-.hero-inner { position: relative; z-index: var(--z-elevated); }
+.hero-inner { position: relative; }
 .hero-greeting {
   font-family: var(--font-family-body);
   font-weight: var(--font-weight-medium);
@@ -812,102 +777,60 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .hero-line { display: block; }
 
-/* ---- Hero intro -------------------------------------------------
-   html.intro-run   first visit this session: logo draw → keywords → headline
-   html.intro-short later visits: headline word rise only
-   html.intro-done  final, still state
-   The classes are set by an inline script in the hero, so without JS
-   (or with reduced motion) none of this applies and the hero is just
-   visible. The failsafe animation shows the content anyway if the
-   intro script never runs. */
+/* ---- Hero intro: the cut ------------------------------------------
+   public/scripts/hero-cut.js draws the whole piece from time (canvas plus
+   inline styles on [data-cut-line], [data-cut-rise], [data-cut-nav]).
+   html.cut-pending  set in <head> of the hero until the first frame
+   html.cut-playing  while the canvas covers the viewport
+   Neither class is set under reduced motion: the hero is simply static.
+   The failsafe animation shows everything anyway if the script never
+   runs. */
 @keyframes hero-intro-failsafe { to { opacity: 1; transform: none; } }
 
-.intro-run .hero-greeting,
-.intro-run .hero-ctas {
-  opacity: 0;
-  transform: translateY(var(--dimension-space-12));
-  animation: hero-intro-failsafe 0s 7s forwards;
-}
-.intro-run .hero-role,
-.intro-short .hero-role {
-  opacity: 0;
-  animation: hero-intro-failsafe 0s 7s forwards;
-}
-.intro-run:not(.intro-logo-landed) .nav .logo-mark {
-  opacity: 0;
-  animation: hero-intro-failsafe 0s 7s forwards;
-}
-.intro-done .hero-greeting,
-.intro-done .hero-ctas {
-  transition:
-    opacity var(--motion-duration-reveal) var(--motion-easing-emphasized),
-    transform var(--motion-duration-reveal) var(--motion-easing-emphasized);
-}
-.intro-done .hero-ctas { transition-delay: var(--motion-duration-expressive); }
-
-/* Headline words: hidden once split, then rise in order. */
-.hero-role.is-split .hw {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(0.5em);
-}
-.hero-role.is-split.is-in .hw {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity var(--motion-duration-reveal) var(--motion-easing-emphasized),
-    transform var(--motion-duration-reveal) var(--motion-easing-emphasized);
-  transition-delay: calc(var(--i) * 30ms);
-}
-
-/* The stage sits where the headline will land. */
-.hero-stage {
+/* Stacking: the canvas lives in #main-content's stacking context (above all
+   page content, below the fixed nav at z 100). The hero text sits one step
+   above it, which only works because .hero-inner has no z-index. */
+[data-cut-canvas] {
+  --cut-ink: var(--background-page);
+  --cut-cream: var(--color-neutral-30);
+  --cut-indigo: var(--color-primary-50);
+  --cut-line: var(--color-primary-40);
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   display: none;
-  position: absolute;
-  top: 0;
-  left: var(--spacing-container-pad);
-  right: var(--spacing-container-pad);
   pointer-events: none;
+  z-index: 50;
 }
-.intro-run .hero-stage { display: block; }
-.hero-logo {
-  position: absolute;
-  top: 0; left: 0;
-  width: clamp(96px, 16vw, 190px);
-  height: auto;
-  aspect-ratio: 1;
-  fill: var(--text-primary);
-  transform-origin: 0 0;
-  will-change: transform;
+[data-cut-line], [data-cut-rise] { position: relative; z-index: 51; }
+.cut-pending [data-cut-line],
+.cut-pending [data-cut-rise] {
+  opacity: 0;
+  animation: hero-intro-failsafe 0s 6s forwards;
 }
-.hero-logo-draw {
-  fill: none;
-  stroke: #fff;
-  stroke-width: 130;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
+.cut-pending [data-cut-nav] {
+  transform: translateY(-100%);
+  animation: hero-intro-failsafe 0s 6s forwards;
 }
-.hero-keyword {
-  overflow: hidden;
-  font-family: var(--font-family-display);
-  font-weight: var(--font-weight-black);
-  font-size: clamp(2.5rem, 8.5vw, 6.5rem);
-  line-height: 1.05;
-  letter-spacing: var(--font-letter-spacing-tighter);
-  color: var(--text-primary);
-  /* Room for descenders inside the clipping box. */
-  padding-bottom: 0.12em;
+/* Words stay still: the headline is revealed by the script's clip-path wipe. */
+.hero-line { display: block; }
+
+.hero-replay {
+  margin-top: var(--dimension-space-12);
+  padding: 0;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 3px;
+  transition: color var(--motion-duration-standard) var(--motion-easing-standard), text-decoration-color var(--motion-duration-standard) var(--motion-easing-standard);
 }
-.hero-keyword span {
-  display: block;
-  transform: translateY(105%);
-}
-.hero-keyword i {
-  font-style: normal;
-  color: var(--fill-brand-default);
-}
+.hero-replay:hover { color: var(--text-secondary); text-decoration-color: currentColor; }
+.hero-replay:focus-visible { outline: 2px solid var(--text-brand); outline-offset: 3px; border-radius: var(--dimension-radius-xs); }
+@media (prefers-reduced-motion: reduce) { .hero-replay { display: none; } }
+
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
   height: clamp(200px, 26vw, 268px);
@@ -1155,10 +1078,15 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   .testimonials::before { animation: none; }
 }
 .testimonials .eyebrow { text-align: center; display: block; margin-bottom: var(--dimension-space-40); }
-.testimonials-masonry { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dimension-space-20); }
+/* Featured manager quote on the left across both rows; the two
+   peer quotes stack on the right. Cards are flex columns so the
+   footer sits on the bottom edge whatever the quote length. */
+.testimonials-masonry { display: grid; grid-template-columns: 1.3fr 1fr; gap: var(--dimension-space-20); }
+.testimonial-card--featured { grid-row: span 2; }
 .testimonial-card {
+  display: flex; flex-direction: column;
   background: var(--surface-default); border-radius: var(--radius-card-lg);
-  border: 6px solid var(--border-subtle); padding: var(--dimension-space-24); margin-bottom: var(--dimension-space-20);
+  border: 6px solid var(--border-subtle); padding: var(--dimension-space-24); margin-bottom: 0;
   box-shadow: var(--shadow-sm); will-change: transform;
   position: relative;
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
@@ -1280,10 +1208,31 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .sc-on .sc-c1 { transform: translateY(-100%); }
 .sc-on .sc-c2 { transform: translateY(0); }
 .testimonial-quote { position: relative; z-index: var(--z-elevated); font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-loose); margin-bottom: var(--dimension-space-10); }
+.testimonial-quote strong { color: var(--text-primary); font-weight: var(--font-weight-medium); }
+.testimonial-card--featured .testimonial-quote { font-family: var(--font-family-display); font-size: var(--font-size-2xl); line-height: var(--font-line-height-normal); letter-spacing: var(--font-letter-spacing-snug); margin-top: var(--dimension-space-12); }
+.testimonial-card--featured .testimonial-avatar { width: 64px; height: 64px; }
+.testimonial-footer {
+  position: relative; z-index: var(--z-elevated);
+  margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; gap: var(--dimension-space-12);
+  padding-top: var(--dimension-space-10); border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+}
 .testimonial-relation {
   font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary);
-  line-height: var(--font-line-height-normal); margin: 0; padding-top: var(--dimension-space-10); border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+  line-height: var(--font-line-height-normal); margin: 0 auto 0 0;
 }
+/* Company mark where we worked together. Masked so it takes the
+   text colour (one tone, no badge), and lights up with the card. */
+.testimonial-logo {
+  flex-shrink: 0; align-self: center; width: 18px; height: 18px; margin-right: calc(var(--dimension-space-8) - var(--dimension-space-12));
+  background: var(--text-tertiary);
+  -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat;
+  transition: background-color var(--motion-duration-standard) var(--motion-easing-standard);
+}
+.testimonial-logo--talkdesk { --logo: url("/assets/logos/talkdesk-mark.svg"); width: 14px; }
+.testimonial-logo--streamyard { --logo: url("/assets/logos/streamyard-mark.svg"); }
+.testimonial-card:hover .testimonial-logo { background: var(--text-primary); }
+.testimonial-source { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); white-space: nowrap; transition: color var(--motion-duration-standard) var(--motion-easing-standard); }
+.testimonial-card:hover .testimonial-source { color: var(--text-brand); }
 /* Group hover: hovered card scales up, siblings dim and desaturate */
 .testimonial-card {
   transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
@@ -2328,72 +2277,66 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
 .p-card:is(:hover, :focus-within) .d3-dot--them { right: calc(50% - 22px); }
 .p-card:is(:hover, :focus-within) .d3-line { opacity: 0; }
 
-/* 4. Leave no surprises: the layers get real names, then the
-   decision note asks for pushback. */
-.d4-wrap { display: flex; align-items: center; gap: var(--dimension-space-12); padding: 0 var(--dimension-space-12); }
-.d4-panel {
-  flex: none;
-  width: 158px;
-  padding: var(--dimension-space-4) 0;
-  border-radius: var(--dimension-radius-sm);
-  background: var(--surface-raised);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
+/* 4. Leave no surprises: a short thread. At rest, one early update and
+   someone typing; on hover the next update lands and the reply pushes
+   back while it's still cheap. */
+.d4-thread {
+  display: flex; flex-direction: column;
+  width: min(248px, calc(100% - 2 * var(--dimension-space-16)));
 }
-.d4-row { display: flex; align-items: center; gap: var(--dimension-space-8); padding: var(--dimension-space-4) var(--dimension-space-10); }
-.d4-ico { flex: none; width: 8px; height: 8px; border-radius: 2px; border: 1px solid var(--text-tertiary); }
-.d4-names {
-  position: relative; display: block; flex: 1;
-  height: 1.3em;
-  font-family: var(--font-family-mono);
-  font-size: 0.7rem;
-  line-height: 1.3;
-}
-.d4-old, .d4-new { position: absolute; left: 0; top: 0; white-space: nowrap; transition: opacity 240ms var(--motion-easing-standard); }
-.d4-old { color: var(--text-secondary); }
-.d4-new { color: var(--text-primary); opacity: 0; }
-.d4-row:nth-child(2) :is(.d4-old, .d4-new) { transition-delay: 80ms; }
-.d4-row:nth-child(3) :is(.d4-old, .d4-new) { transition-delay: 160ms; }
-.p-card:is(:hover, :focus-within) .d4-old { opacity: 0; }
-.p-card:is(:hover, :focus-within) .d4-new { opacity: 1; }
-
-.d5-doc {
-  position: relative;
+.d4-msg {
   display: grid;
-  gap: var(--dimension-space-8);
-  flex: 0 1 150px;
-  min-width: 0;
-  padding: var(--dimension-space-10) var(--dimension-space-12);
-  border-radius: var(--dimension-radius-sm);
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 320ms var(--motion-easing-standard);
+}
+.d4-msg > p {
+  min-height: 0; overflow: hidden;
+  justify-self: start;
+  max-width: 100%;
+  margin: 0 0 var(--dimension-space-4);
+  padding: var(--dimension-space-4) var(--dimension-space-10);
+  border-radius: 10px 10px 10px 2px;
   background: var(--surface-raised);
   border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
-}
-.d5-h { display: block; width: 40%; height: 8px; border-radius: 4px; background: color-mix(in srgb, var(--text-primary) 35%, transparent); }
-.d5-line { font-size: var(--font-size-xs); line-height: var(--font-line-height-normal); color: var(--text-primary); }
-.d5-caret {
-  display: inline-block;
-  width: 1px; height: 1em;
-  margin-left: 2px;
-  vertical-align: text-bottom;
-  background: var(--text-brand);
-  animation: about-blink 1s steps(1) infinite;
-}
-@keyframes about-blink { 50% { opacity: 0; } }
-.d5-bubble {
-  position: absolute;
-  right: -6px; bottom: -14px;
-  padding: var(--dimension-space-4) var(--dimension-space-10);
-  border-radius: 10px 10px 2px 10px;
-  background: var(--fill-brand-default);
-  color: var(--text-on-brand);
+  color: var(--text-primary);
   font-size: var(--font-size-xs);
   line-height: var(--font-line-height-normal);
   white-space: nowrap;
-  opacity: 0;
-  transform: scale(0.5);
-  transform-origin: bottom right;
-  transition: opacity 200ms var(--motion-easing-standard), transform 450ms var(--motion-easing-spring);
+  transition: opacity 240ms var(--motion-easing-standard), transform 420ms var(--motion-easing-spring);
 }
-.p-card:is(:hover, :focus-within) .d5-bubble { opacity: 1; transform: scale(1); transition-delay: 450ms; }
+.d4-msg > p b { font-weight: 400; color: var(--text-tertiary); margin-right: 2px; }
+.d4-msg--them > p {
+  justify-self: end;
+  border-radius: 10px 10px 2px 10px;
+  border-color: transparent;
+  background: var(--fill-brand-default);
+  color: var(--text-on-brand);
+  transform-origin: bottom right;
+}
+.d4-msg--later { grid-template-rows: 0fr; }
+.d4-msg--later > p { opacity: 0; transform: translateY(6px) scale(0.92); border-width: 0; padding-block: 0; margin: 0; }
+.p-card:is(:hover, :focus-within) .d4-msg--later { grid-template-rows: 1fr; }
+.p-card:is(:hover, :focus-within) .d4-msg--later > p {
+  opacity: 1; transform: none; border-width: 1px;
+  padding-block: var(--dimension-space-4);
+  margin-bottom: var(--dimension-space-4);
+}
+.p-card:is(:hover, :focus-within) .d4-msg--them { transition-delay: 380ms; }
+.p-card:is(:hover, :focus-within) .d4-msg--them > p { transition-delay: 380ms; }
+
+.d4-typing {
+  justify-self: end; align-self: flex-end;
+  display: inline-flex; gap: 3px;
+  padding: 7px var(--dimension-space-10);
+  border-radius: 10px 10px 2px 10px;
+  background: color-mix(in srgb, var(--text-brand) 18%, transparent);
+  transition: opacity 160ms var(--motion-easing-standard);
+}
+.d4-typing i { width: 4px; height: 4px; border-radius: 50%; background: var(--text-brand); animation: d4-dot 1.2s ease-in-out infinite; }
+.d4-typing i:nth-child(2) { animation-delay: 150ms; }
+.d4-typing i:nth-child(3) { animation-delay: 300ms; }
+@keyframes d4-dot { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+.p-card:is(:hover, :focus-within) .d4-typing { opacity: 0; position: absolute; transition-delay: 0ms; }
 
 /* ---- Journey ------------------------------------------------------- */
 /* One list, two tracks. Career: solid rail, filled dots. Education:
@@ -2916,8 +2859,6 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   }
   .p-grid, .board-grid { grid-template-columns: minmax(0, 1fr); }
   .b-photos, .b-music, .b-into, .b-desk { grid-column: span 1; }
-  .d4-wrap { gap: var(--dimension-space-8); padding: 0 var(--dimension-space-8); }
-  .d4-panel { width: 140px; }
   .polaroids {
     display: flex;
     gap: var(--dimension-space-12);
@@ -2959,7 +2900,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .journey-list > li::after { clip-path: none; transition: none; }
   .j-scene, .js .journey-item:not(.visible) .j-scene { transform: none; transition: none; }
   .j-scene .tl, .j-banner, .j-badge i, .j-typing i { animation: none; }
-  .journey-chapter--career + .journey-item::before, .pulse-dot, .b-projects li.is-live::before, .theme-spark, .d5-caret { animation: none; }
+  .journey-chapter--career + .journey-item::before, .pulse-dot, .b-projects li.is-live::before, .theme-spark, .d4-typing i { animation: none; }
   .theme-spark { opacity: 0.8; }
   .eq span { animation: none; }
 
@@ -2969,9 +2910,10 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .d3-dot--me { left: calc(50% - 22px); transition: none; }
   .d3-dot--them { right: calc(50% - 22px); transition: none; }
   .d3-line { opacity: 0; transition: none; }
-  .d4-old { opacity: 0; transition: none; }
-  .d4-new { opacity: 1; transition: none; }
-  .d5-bubble { opacity: 1; transform: none; transition: none; }
+  .d4-msg, .d4-msg > p { transition: none; }
+  .d4-msg--later { grid-template-rows: 1fr; }
+  .d4-msg--later > p { opacity: 1; transform: none; border-width: 1px; padding-block: var(--dimension-space-4); margin-bottom: var(--dimension-space-4); }
+  .d4-typing { display: none; }
   .tap-hint { display: none; } /* end state is always shown */
 
   .polaroid {
@@ -4427,6 +4369,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .mobile-menu-btn { justify-content: center; }
   .stats-grid { grid-template-columns: 1fr; gap: var(--dimension-space-32); }
   .testimonials-masonry { grid-template-columns: 1fr; }
+  .testimonial-card--featured { grid-row: auto; }
+  .testimonial-card--featured .testimonial-quote { font-size: var(--font-size-lg); }
   .may-like-grid, .cases-grid, .cases-grid-row-2 { grid-template-columns: 1fr; }
   .journey-row { grid-template-columns: 1fr; gap: var(--dimension-space-8); }
   .influences-right { grid-template-columns: 1fr; }
@@ -4956,7 +4900,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
 }
-.hero-xray:has([data-xray-switch][hidden]) .hero-xray-hint { display: none; }
+.hero-xray:has([data-xray-switch][hidden]) .hero-xray-hint,
+.hero-xray:has([data-xray-switch][hidden]) .hero-replay { display: none; }
 .hero-xray-hint kbd {
   font: inherit;
   padding: 1px var(--dimension-space-6);
@@ -4964,24 +4909,10 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   border-radius: var(--dimension-radius-xs);
   color: var(--text-secondary);
 }
-/* The sub line and the switch arrive after the headline has risen. */
-.intro-run .hero-sub, .intro-short .hero-sub, .intro-run .hero-xray {
-  opacity: 0;
-  transform: translateY(var(--dimension-space-12));
-  animation: hero-intro-failsafe 0s 7s forwards;
-}
-.intro-done .hero-sub, .intro-done .hero-xray {
-  transition:
-    opacity var(--motion-duration-reveal) var(--motion-easing-emphasized),
-    transform var(--motion-duration-reveal) var(--motion-easing-emphasized);
-}
-.intro-done .hero-sub { transition-delay: var(--motion-duration-expressive); }
-.intro-done .hero-xray { transition-delay: calc(var(--motion-duration-expressive) + 120ms); }
 
 /* ---- Section heads --------------------------------------------- */
 .home-work { padding: clamp(var(--dimension-space-64), 8vw, var(--dimension-space-96)) 0 clamp(var(--dimension-space-80), 10vw, 120px); }
 .home-how { padding: clamp(var(--dimension-space-80), 10vw, 120px) 0; }
-.home-then { padding: 0 0 clamp(var(--dimension-space-80), 10vw, 120px); }
 .home-head { position: relative; margin-bottom: var(--dimension-space-48); }
 .home-eyebrow { display: block; color: var(--text-brand); margin-bottom: var(--dimension-space-16); }
 .home-h2 { font-size: var(--font-size-3xl); max-width: 32ch; text-wrap: balance; }
@@ -5060,13 +4991,13 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .wall { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .wall .tile--lead { grid-column: span 3; }
   .wall .tile--lead:first-child { grid-column: span 6; }
-  .wall .tile--more { grid-column: span 2; }
-  .wall .tile--more:nth-last-child(-n+2) { grid-column: span 3; }
+  .wall .tile--more { grid-column: span 3; }
 }
+/* 12 columns: three lead tiles (4 each) on top, four smaller tiles (3 each) below, both rows full width. */
 @media (min-width: 1080px) {
-  .wall { grid-template-columns: repeat(15, minmax(0, 1fr)); }
-  .wall .tile--lead, .wall .tile--lead:first-child { grid-column: span 5; }
-  .wall .tile--more, .wall .tile--more:nth-last-child(-n+2) { grid-column: span 3; }
+  .wall { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .wall .tile--lead, .wall .tile--lead:first-child { grid-column: span 4; }
+  .wall .tile--more { grid-column: span 3; }
 }
 
 .wall .tile {
@@ -5325,6 +5256,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   box-shadow: var(--shadow-sm);
 }
 .how-n { font-family: var(--font-family-mono); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); letter-spacing: 0.08em; color: var(--text-brand); }
+.how-top { display: flex; align-items: baseline; justify-content: space-between; gap: var(--dimension-space-12); }
+.how-maps { font-family: var(--font-family-mono); font-size: var(--font-size-xs); letter-spacing: 0.04em; color: var(--text-secondary); }
 .how-step h3 { font-size: var(--font-size-2xl); }
 .how-step p { margin: 0; }
 .how-chip {
@@ -5337,11 +5270,18 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .how-chip b { font-weight: var(--font-weight-medium); color: var(--text-brand); }
 .xray .how-step { border-style: dashed; border-color: color-mix(in srgb, var(--text-brand) 50%, transparent); }
 @media (max-width: 900px) { .how-steps { grid-template-columns: 1fr; } }
+.how-more {
+  margin: var(--dimension-space-32) 0 0;
+  display: flex; flex-wrap: wrap; gap: var(--dimension-space-8) var(--dimension-space-16); align-items: baseline;
+  color: var(--text-secondary);
+}
+.how-more a { color: var(--text-brand); font-weight: var(--font-weight-medium); text-decoration: none; }
+.how-more a:hover { text-decoration: underline; text-underline-offset: 3px; }
+#loop { scroll-margin-top: 96px; }
 
 @media (prefers-reduced-motion: reduce) {
   .wall *, .wall *::before, .wall *::after { animation: none !important; }
   .wall .tile, .wall .ov, .wall-sw::after { transition: none; }
-  .intro-run .hero-sub, .intro-short .hero-sub, .intro-run .hero-xray { opacity: 1; transform: none; animation: none; }
 }
 
 /* ---- Centred heroes -----------------------------------------------
