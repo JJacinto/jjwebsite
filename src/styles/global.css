@@ -5123,14 +5123,15 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   overflow: hidden;
   transition: opacity 0.32s var(--motion-easing-emphasized), transform 0.4s var(--motion-easing-emphasized), border-color 0.3s, box-shadow 0.3s;
 }
-/* Filtered out: the tile keeps its place as a faint ghost, content hidden, animations stopped. */
-.wall .tile > * { transition: opacity 0.32s var(--motion-easing-emphasized), visibility 0.32s; }
-.wall .tile.ghost, .xray .wall .tile.ghost {
-  background: var(--w-wash); border-color: transparent; border-style: solid; box-shadow: none;
-  pointer-events: none; cursor: default;
-}
-.wall .tile.ghost > * { opacity: 0 !important; visibility: hidden !important; }
-.wall .tile.ghost::after { opacity: 0; }
+/* Filtered out: the tile leaves the wall (the script sets [hidden]).
+   The view transition below animates the change. */
+.wall .tile[hidden] { display: none; }
+.wall .tile { view-transition-class: wall-tile; }
+::view-transition-group(*.wall-tile) { animation-duration: 0.42s; animation-timing-function: var(--motion-easing-emphasized); }
+::view-transition-old(*.wall-tile):only-child { animation: wall-tile-out 0.22s var(--motion-easing-standard) both; }
+::view-transition-new(*.wall-tile):only-child { animation: wall-tile-in 0.36s var(--motion-easing-emphasized) 0.12s both; }
+@keyframes wall-tile-out { to { opacity: 0; transform: scale(0.94); } }
+@keyframes wall-tile-in { from { opacity: 0; transform: scale(0.94); } }
 .wall .tile:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
 .wall .media {
   position: relative;
@@ -5347,8 +5348,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .wall .tile--more:not(:hover, :focus-within, .open) *::after { animation: none; }
 .wall .tile--more .tl { animation-delay: -5.85s; }
 .wall.is-paused *, .wall.is-paused *::before, .wall.is-paused *::after,
-.wall .tile.off *, .wall .tile.off *::before, .wall .tile.off *::after,
-.wall .tile.ghost *, .wall .tile.ghost *::before, .wall .tile.ghost *::after { animation-play-state: paused !important; }
+.wall .tile.off *, .wall .tile.off *::before, .wall .tile.off *::after { animation-play-state: paused !important; }
 
 /* ---- How I work ------------------------------------------------- */
 .how-steps {

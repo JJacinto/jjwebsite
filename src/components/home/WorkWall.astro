@@ -233,18 +233,27 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
     setPaused(matchMedia('(prefers-reduced-motion: reduce)').matches);
     pause?.addEventListener('click', () => setPaused(!wall.classList.contains('is-paused')));
 
-    /* Filters */
-    chips.forEach((c) => c.addEventListener('click', () => {
-      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
-      const f = c.dataset.f;
+    /* Filters: tiles that don't match leave the wall; the rest close up.
+       A view transition animates it (leavers shrink out, stayers glide to
+       their new spot, newcomers grow in). Without support, or with reduced
+       motion, it just switches. */
+    tiles.forEach((t, i) => { t.style.viewTransitionName = `wall-tile-${i}`; });
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    const applyFilter = (f: string | undefined) => {
       tiles.forEach((t) => {
         const show = f === 'all' || t.dataset.cat === f;
-        /* Filtered-out tiles stay as ghosts so the wall keeps its shape. */
-        t.classList.toggle('ghost', !show);
+        t.hidden = !show;
         t.classList.remove('open');
-        if (show) { t.removeAttribute('aria-hidden'); t.tabIndex = 0; }
-        else { t.setAttribute('aria-hidden', 'true'); t.tabIndex = -1; }
       });
+    };
+    chips.forEach((c) => c.addEventListener('click', () => {
+      if (c.getAttribute('aria-pressed') === 'true') return;
+      chips.forEach((x) => x.setAttribute('aria-pressed', String(x === c)));
+      const f = c.dataset.f;
+      const doc = document as Document & { startViewTransition?: (cb: () => void) => unknown };
+      if (doc.startViewTransition && !reduce.matches) {
+        doc.startViewTransition(() => applyFilter(f));
+      } else applyFilter(f);
     }));
 
     /* Tap to reveal on touch; links inside still navigate. */
