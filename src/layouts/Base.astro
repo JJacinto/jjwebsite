@@ -98,29 +98,128 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- Theme bootstrap — runs before paint to prevent FOUC. Theme is
-     locked to dark while the user-facing toggle is commented out
-     (see .nav-right + .mobile-menu-secondary). Re-enable the
-     toggle and the localStorage opt-out (kept below, commented)
-     to restore user choice. -->
+<!-- Settings bootstrap — runs before paint so nothing flashes.
+     The visitor's choices come from the settings menu in the nav and
+     are saved in localStorage:
+       lang      "pt" | "en"                  (default: en)
+       theme     "light" | "dark" | "system"  (default: dark)
+       contrast  "high" | "normal"            (unset: follow the system)
+       motion    "reduce" | "full"            (unset: follow the system)
+       textsize  "115" | "130"                (default: 100)
+     What they turn into on <html>:
+       lang="pt-PT"            Portuguese copy (see the language script below)
+       data-theme="dark"       dark theme; no attribute means light
+       data-contrast="high"    high-contrast colours (global.css)
+       data-motion="reduce"    low motion: no animations, no custom cursor or
+                               card tilt; CSS and the canvas scripts read this
+       data-text-size="115"    larger text (or "130"); scales the root font size
+     Other scripts can use window.jjPrefs (get / set / effective) and
+     listen on document for "jj:motionchange" (detail.reduce),
+     "jj:themechange" (detail.theme) and "jj:contrastchange"
+     (detail.contrast). -->
 <script is:inline>
-  /* Language bootstrap: English unless the visitor picked Portuguese
-     with the EN/PT switch (saved in localStorage as "lang"). Runs
-     before paint so the right switch segment is lit from the start. */
-  try {
-    if (localStorage.getItem('lang') === 'pt') document.documentElement.lang = 'pt-PT';
-  } catch (_) {}
-  document.documentElement.setAttribute('data-theme', 'dark');
-  /*
-  (function () {
+(function () {
+  var root = document.documentElement;
+  var VALUES = {
+    theme: ['light', 'dark', 'system'],
+    contrast: ['high', 'normal', 'system'],
+    motion: ['reduce', 'full', 'system'],
+    textsize: ['100', '115', '130']
+  };
+  var DEFAULTS = { theme: 'dark', contrast: 'system', motion: 'system', textsize: '100' };
+
+  function read(key) {
     try {
-      var stored = localStorage.getItem('theme');
-      if (stored !== 'light') document.documentElement.setAttribute('data-theme', 'dark');
-    } catch (_) {
-      document.documentElement.setAttribute('data-theme', 'dark');
+      var v = localStorage.getItem(key);
+      return VALUES[key].indexOf(v) > -1 ? v : DEFAULTS[key];
+    } catch (_) { return DEFAULTS[key]; }
+  }
+  function media(query) {
+    try { return window.matchMedia(query); } catch (_) { return { matches: false }; }
+  }
+  var sysDark = media('(prefers-color-scheme: dark)');
+  var sysContrast = media('(prefers-contrast: more)');
+  var sysMotion = media('(prefers-reduced-motion: reduce)');
+
+  var pref = { theme: read('theme'), contrast: read('contrast'), motion: read('motion'), textsize: read('textsize') };
+
+  function effective() {
+    return {
+      theme: pref.theme === 'system' ? (sysDark.matches ? 'dark' : 'light') : pref.theme,
+      contrast: pref.contrast === 'system' ? (sysContrast.matches ? 'high' : 'normal') : pref.contrast,
+      motion: pref.motion === 'system' ? (sysMotion.matches ? 'reduce' : 'full') : pref.motion,
+      textsize: pref.textsize
+    };
+  }
+
+  function setAttr(name, on, value) {
+    if (on) root.setAttribute(name, value); else root.removeAttribute(name);
+  }
+
+  var shown = null;      /* what is on <html> right now */
+  var fadeTimer = 0;
+  function apply() {
+    var next = effective();
+    var first = !shown;
+    var prev = shown || {};
+    var coloursChanged = next.theme !== prev.theme || next.contrast !== prev.contrast;
+
+    /* Cross-fade colours on a change the visitor made (never on load,
+       never with animations off). See html.theme-transitioning in global.css. */
+    if (!first && coloursChanged && next.motion !== 'reduce') {
+      root.classList.add('theme-transitioning');
+      clearTimeout(fadeTimer);
+      fadeTimer = setTimeout(function () { root.classList.remove('theme-transitioning'); }, 500);
     }
-  })();
-  */
+
+    setAttr('data-motion', next.motion === 'reduce', 'reduce');
+    setAttr('data-theme', next.theme === 'dark', 'dark');
+    setAttr('data-contrast', next.contrast === 'high', 'high');
+    setAttr('data-text-size', next.textsize !== '100', next.textsize);
+    shown = next;
+    if (first) return;
+
+    function tell(name, detail) {
+      document.dispatchEvent(new CustomEvent(name, { detail: detail }));
+    }
+    if (next.motion !== prev.motion) tell('jj:motionchange', { reduce: next.motion === 'reduce' });
+    if (next.theme !== prev.theme) tell('jj:themechange', { theme: next.theme });
+    if (next.contrast !== prev.contrast) tell('jj:contrastchange', { contrast: next.contrast });
+    if (next.textsize !== prev.textsize) {
+      /* Everything changed size: let scripts that measure re-measure. */
+      window.dispatchEvent(new Event('resize'));
+    }
+  }
+
+  try {
+    if (localStorage.getItem('lang') === 'pt') root.lang = 'pt-PT';
+  } catch (_) {}
+  apply();
+
+  /* Follow the system while a setting is on "system". */
+  [sysDark, sysContrast, sysMotion].forEach(function (m) {
+    if (m.addEventListener) m.addEventListener('change', apply);
+    else if (m.addListener) m.addListener(apply);
+  });
+
+  window.jjPrefs = {
+    /* The visitor's choice: may be "system". */
+    get: function (key) { return pref[key]; },
+    /* What is applied right now: never "system". */
+    effective: effective,
+    set: function (key, value) {
+      if (!VALUES[key] || VALUES[key].indexOf(value) < 0) return;
+      pref[key] = value;
+      try {
+        /* "Follow the system" is stored as nothing at all, except for the
+           theme, whose default is dark rather than the system's. */
+        if (value === 'system' && key !== 'theme') localStorage.removeItem(key);
+        else localStorage.setItem(key, value);
+      } catch (_) {}
+      apply();
+    }
+  };
+})();
 </script>
 
 {umamiOn && (
@@ -147,20 +246,72 @@ const umamiOn  = !!(umamiSrc && umamiId);
     </div>
 
     <div class="nav-right">
-      {/* Theme toggle — temporarily disabled. The button is kept
-          commented out so it can be re-enabled by uncommenting
-          this block (the click handler in nav.js still looks for
-          #themeToggle and short-circuits when it isn't there). */}
-      {/*
-      <button class="btn btn-ghost theme-toggle" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
-        <span class="btn-icon"><svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg><svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-      </button>
-      */}
-      {/* EN/PT switch. English by default; the choice is saved and
-          applied on every page (see the language script below). */}
-      <div class="lang-switch" role="group" aria-label="Language" data-pt-aria-label="Idioma">
-        <button type="button" data-lang-set="en" lang="en" aria-pressed="true" aria-label="English" data-umami-event="lang-en">EN</button>
-        <button type="button" data-lang-set="pt" lang="pt-PT" aria-pressed="false" aria-label="Português" data-umami-event="lang-pt">PT</button>
+      {/* Settings menu: language, theme, high contrast, animations.
+          One button at every width (it stays in the bar on phones,
+          beside the menu button). The button shows the language in use
+          so visitors looking for EN/PT still find it. Choices are saved
+          and applied before paint by the settings script in <head>;
+          the menu itself is wired in nav.js. */}
+      <div class="settings" id="settings">
+        <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings: language, theme and accessibility" data-pt-aria-label="Definições: idioma, tema e acessibilidade" data-umami-event="settings-open">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 8h9M19 8h1M4 16h1M11 16h9"/><circle cx="16" cy="8" r="2.5"/><circle cx="8" cy="16" r="2.5"/></svg>
+          <span class="settings-btn-lang" aria-hidden="true" data-pt="PT">EN</span>
+        </button>
+        <div class="settings-panel" id="settingsPanel" role="dialog" aria-labelledby="settingsTitle" hidden>
+          <div class="settings-head">
+            <p class="settings-title" id="settingsTitle" data-pt="Definições">Settings</p>
+            <button class="settings-close" id="settingsClose" type="button" aria-label="Close settings" data-pt-aria-label="Fechar definições">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+
+          <fieldset class="settings-group">
+            <legend data-pt="Idioma">Language</legend>
+            <div class="settings-seg">
+              <label><input type="radio" name="jj-lang" value="en"><span lang="en">English</span></label>
+              <label><input type="radio" name="jj-lang" value="pt"><span lang="pt-PT">Português</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="settings-group">
+            <legend data-pt="Tema">Theme</legend>
+            <div class="settings-seg">
+              <label><input type="radio" name="jj-theme" value="light"><span data-pt="Claro">Light</span></label>
+              <label><input type="radio" name="jj-theme" value="dark"><span data-pt="Escuro">Dark</span></label>
+              <label><input type="radio" name="jj-theme" value="system"><span data-pt="Sistema">System</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="settings-group">
+            <legend data-pt="Tamanho do texto">Text size</legend>
+            <div class="settings-seg">
+              <label><input type="radio" name="jj-textsize" value="100"><span data-pt="Normal">Default</span></label>
+              <label><input type="radio" name="jj-textsize" value="115"><span>115%</span></label>
+              <label><input type="radio" name="jj-textsize" value="130"><span>130%</span></label>
+            </div>
+          </fieldset>
+
+          {/* Two choices. With nothing chosen the site follows the
+              system: Default for most people, Low if their device asks
+              for reduced motion. Low also drops the custom cursor and
+              the card tilt. */}
+          <fieldset class="settings-group">
+            <legend data-pt="Movimento">Motion</legend>
+            <div class="settings-seg">
+              <label><input type="radio" name="jj-motion" value="full"><span data-pt="Normal">Default</span></label>
+              <label><input type="radio" name="jj-motion" value="reduce"><span data-pt="Reduzido">Low</span></label>
+            </div>
+          </fieldset>
+
+          <label class="settings-switch">
+            <span class="settings-switch-text">
+              <span class="settings-switch-name" data-pt="Alto contraste">High contrast</span>
+              <span class="settings-switch-hint" data-pt="Texto mais forte e contornos mais nítidos.">Stronger text and clearer outlines.</span>
+            </span>
+            <input type="checkbox" role="switch" id="settingsContrast">
+            <span class="settings-switch-track" aria-hidden="true"></span>
+          </label>
+        </div>
       </div>
       <button class="btn btn-ghost nav-cta" type="button" data-umami-event="nav-cta-start-project" onclick="openComposeModal(1)">
         <span class="btn-icon"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12v9H2z"/><path d="M2 4l6 5 6-5"/></svg></span>
@@ -179,20 +330,8 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <a href="/case-studies" data-page="cases" class:list={[{ active: activePage === 'cases' }]} onclick="toggleMobile()" data-pt="Trabalho">Work</a>
   <a href="/contact" data-page="contact" class:list={[{ active: activePage === 'contact' }]} onclick="toggleMobile()" data-pt="Contacto">Contact</a>
   <div class="mobile-menu-secondary">
-    {/* Mobile theme toggle — temporarily disabled. Uncomment to
-        restore. The handler in nav.js short-circuits when
-        #mobileThemeToggle isn't in the DOM. */}
-    {/*
-    <button class="mobile-menu-btn" type="button" id="mobileThemeToggle" aria-label="Toggle dark mode">
-      <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-      <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <span class="mobile-theme-label">Switch theme</span>
-    </button>
-    */}
-    <div class="lang-switch" role="group" aria-label="Language" data-pt-aria-label="Idioma">
-      <button type="button" data-lang-set="en" lang="en" aria-pressed="true" aria-label="English" data-umami-event="lang-en">EN</button>
-      <button type="button" data-lang-set="pt" lang="pt-PT" aria-pressed="false" aria-label="Português" data-umami-event="lang-pt">PT</button>
-    </div>
+    {/* Language and theme live in the settings menu, which stays in
+        the bar above this menu on phones. */}
     <button class="mobile-menu-btn mobile-menu-btn--primary" type="button" data-umami-event="mobile-menu-start-project" onclick="toggleMobile(); openComposeModal(1);">
       <span data-pt="Iniciar projeto">Start project</span>
     </button>
@@ -289,6 +428,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
    (replaces that attribute, e.g. data-pt-aria-label). Anything without
    one stays in English. The choice is saved in localStorage ("lang") and
    read again in <head> on every page. This runs before the deferred
+   The visitor picks the language in the settings menu in the nav.
    scripts, so nav.js measures the nav with the final labels.
    Other scripts can read window.jjLang() ("en" or "pt"), listen for
    "jj:langchange" on document, and call window.jjLangRefresh(el) for
@@ -341,9 +481,6 @@ const umamiOn  = !!(umamiSrc && umamiId);
       var v = pt ? a[3] : a[2];
       if (v === null) a[0].removeAttribute(a[1]); else a[0].setAttribute(a[1], v);
     });
-    document.querySelectorAll('[data-lang-set]').forEach(function (b) {
-      b.setAttribute('aria-pressed', String(b.getAttribute('data-lang-set') === lang));
-    });
   }
 
   window.jjLang = current;
@@ -363,11 +500,8 @@ const umamiOn  = !!(umamiSrc && umamiId);
     document.dispatchEvent(new CustomEvent('jj:langchange', { detail: { lang: lang } }));
   };
 
-  document.querySelectorAll('[data-lang-set]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      document.querySelectorAll('.lang-switch').forEach(function (s) { s.classList.add('is-animated'); });
-      window.jjSetLang(b.getAttribute('data-lang-set')); });
-  });
+  /* The language is picked in the settings menu (nav.js), which calls
+     window.jjSetLang. */
 
   if (current() === 'pt') apply('pt');
 })();
