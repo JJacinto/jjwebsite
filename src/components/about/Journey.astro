@@ -13,6 +13,9 @@ type Step = {
   id: 'anchorage' | 'streamyard' | 'talkdesk' | 'namecheap' | 'beubi' | 'aveiro' | 'ubi' | 'self';
   years: string; yearsPt?: string; name: string; namePt?: string; href?: string; role: string; rolePt?: string; line: string; linePt?: string; win?: Win;
   caseSlug?: string;
+  /* Courses, certificates and self-taught tools picked up during this job.
+     Shown as one "Picked up here" line; omit or leave empty to hide it. */
+  learned?: { text: string; textPt?: string }[];
 };
 
 /* Only cases that are built (not hidden) get a link. */
@@ -30,14 +33,16 @@ const career: Step[] = [
   { id: 'streamyard', years: '2022–2024', name: 'StreamYard', href: 'https://streamyard.com',
     role: 'Senior → Staff Product Designer', line: 'Live streaming. Webinars UX, research ops and the design system.', linePt: 'Live streaming. UX de webinars, research ops e o design system.',
     win: { from: 1, to: 3, suffix: '×', text: '3×', label: 'weekly webinar volume after shipping customisation', labelPt: 'volume semanal de webinars depois de lançarmos a personalização' },
-    caseSlug: 'redefining-webinar-customization' },
+    caseSlug: 'redefining-webinar-customization',
+    learned: [{ text: 'Product Discovery course, Panash (2023)', textPt: 'Curso de Product Discovery, Panash (2023)' }] },
   { id: 'talkdesk', years: '2021–2022', name: 'Talkdesk', href: 'https://www.talkdesk.com',
     role: 'Senior Product Designer', line: 'AI for customer support, before LLMs. I redesigned the labelling tool CX teams used to train conversational AI.',
     linePt: 'IA para suporte ao cliente, antes dos LLMs. Redesenhei a ferramenta de etiquetagem que as equipas de CX usavam para treinar IA conversacional.' },
   { id: 'namecheap', years: '2017–2021', name: 'Namecheap', href: 'https://www.namecheap.com',
     role: 'Product Designer', line: 'Domains and hosting. Internal support tools, iterated daily with 200+ agents.', linePt: 'Domínios e alojamento. Ferramentas internas de suporte, iteradas todos os dias com mais de 200 agentes.',
     win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch', labelPt: 'de feedback positivo quatro meses depois do lançamento do novo chat e suporte' },
-    caseSlug: 'designing-a-support-chat-experience' },
+    caseSlug: 'designing-a-support-chat-experience',
+    learned: [{ text: 'Interaction Design Foundation membership (2021)', textPt: 'Membro da Interaction Design Foundation (2021)' }] },
   { id: 'beubi', years: '2015–2017', name: 'Be.Ubi', href: 'https://github.com/beubi',
     role: 'UX/UI Designer', line: '3D printing software and a land registry system for a Portuguese municipality. I rebuilt the printing software after embedding with the team and interviewing clients.',
     linePt: 'Software de impressão 3D e um sistema de registo predial para um município português. Reconstruí o software de impressão depois de me integrar na equipa e de entrevistar clientes.' },
@@ -64,7 +69,7 @@ const phases = ['discover', 'define', 'develop', 'deliver'];
 const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
 ---
 <ol class="journey-list">
-  {[{ key: 'career', title: 'Career', titlePt: 'Carreira', span: '2015–now', spanPt: '2015–agora', steps: career }, { key: 'edu', title: 'Education', titlePt: 'Formação', span: '2000–2015', spanPt: undefined, steps: education }].map((track) => (
+  {[{ key: 'career', title: 'Career', titlePt: 'Carreira', span: '2015–now', spanPt: '2015–agora', steps: career }, { key: 'edu', title: 'Where it started', titlePt: 'Onde tudo começou', span: '2000–2015', spanPt: undefined, steps: education }].map((track) => (
     <>
       <li class={`journey-chapter journey-chapter--${track.key} reveal`}>
         <h3 data-pt={track.titlePt}>{track.title}</h3>
@@ -83,6 +88,14 @@ const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
               <p class="journey-win">
                 <b>{s.win.pre}<span data-count data-from={s.win.from} data-to={s.win.to} data-decimals={s.win.decimals} data-suffix={s.win.suffix} data-duration="1100">{s.win.text}</span></b>
                 <span data-pt={s.win.labelPt}>{s.win.label}</span>
+              </p>
+            )}
+            {s.learned && s.learned.length > 0 && (
+              <p class="journey-learned">
+                <span class="journey-learned-k" data-pt="Aprendi aqui">Picked up here</span>
+                <span class="journey-learned-v">
+                  {s.learned.map((l, i) => <>{i > 0 && <span class="journey-learned-sep" aria-hidden="true"> · </span>}<span data-pt={l.textPt}>{l.text}</span></>)}
+                </span>
               </p>
             )}
           </div>

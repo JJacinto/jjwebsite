@@ -2534,6 +2534,32 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   color: var(--text-primary);
 }
 
+/* Learning picked up on the job: a hollow diamond (the "Where it started"
+   marker) says it continues that track. */
+.journey-learned {
+  display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--dimension-space-10); row-gap: var(--dimension-space-4);
+  margin-top: var(--dimension-space-16);
+  font-size: var(--font-size-sm);
+  line-height: var(--font-line-height-normal);
+  color: var(--text-secondary);
+}
+.journey-learned-k {
+  display: inline-flex; align-items: center; gap: var(--dimension-space-8);
+  flex: none;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+.journey-learned-k::before {
+  content: '';
+  width: 7px; height: 7px;
+  transform: rotate(45deg);
+  border: 1.5px solid var(--j-rail);
+}
+.journey-learned-sep { color: var(--text-tertiary, var(--text-secondary)); }
+
 /* Scene tile: same frame as the home Work wall tiles. */
 .j-scene {
   margin: 0;
