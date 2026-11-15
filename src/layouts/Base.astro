@@ -348,11 +348,16 @@ const umamiOn  = !!(umamiSrc && umamiId);
 </main>
 
 {(showCta || showFooter) && (
-  <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]}>
+  <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]} data-space-root>
     {/* Canvas in both modes — solo wraps (contact + error pages) get the
-        same FBM-dithered gradient + particle treatment as the regular
-        cta-footer-wrap, so the page→footer transition looks organic. */}
+        same FBM-dithered gradient treatment as the regular cta-footer-wrap,
+        so the page→footer transition looks organic. The old canvas now only
+        paints that gradient (compose-modal.js skips its particles when a
+        data-hero-space canvas is inside); the particles are the field from
+        /scripts/hero-space.js. The PARTS read-out is skipped on the thin
+        solo strip. */}
     <canvas class="cta-footer-bg" aria-hidden="true"></canvas>
+    <canvas class="hero-space" data-hero-space data-space-auto data-space-counter={showCta ? '' : undefined} data-label="PARTS" data-pt-data-label="PARTES" aria-hidden="true"></canvas>
     {showCta && (
       <section class="global-cta-section">
         <div class="container">
@@ -423,12 +428,12 @@ const umamiOn  = !!(umamiSrc && umamiId);
 
 <script is:inline>
 /* Language switch (EN/PT).
+   The visitor picks the language in the settings menu in the nav.
    Copy is English in the markup. An element opts in to Portuguese with
    data-pt="…" (replaces its inner HTML) or data-pt-<attribute>="…"
    (replaces that attribute, e.g. data-pt-aria-label). Anything without
    one stays in English. The choice is saved in localStorage ("lang") and
    read again in <head> on every page. This runs before the deferred
-   The visitor picks the language in the settings menu in the nav.
    scripts, so nav.js measures the nav with the final labels.
    Other scripts can read window.jjLang() ("en" or "pt"), listen for
    "jj:langchange" on document, and call window.jjLangRefresh(el) for
@@ -510,6 +515,9 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <script is:inline src={versioned('/scripts/nav.js')} defer></script>
 <script is:inline src={versioned('/scripts/text-hover.js')} defer></script>
 <script is:inline src={versioned('/scripts/compose-modal.js')} defer></script>
+{/* The field in the bottom contact areas. The home page loads it itself,
+    next to the hero scripts, so the intro finds HeroSpace in order. */}
+{!isHome && (showCta || showFooter) && <script is:inline src={versioned('/scripts/hero-space.js')} defer></script>}
 
 <script>
   /* Retune visual-editing overlay — dev only. The branch is dead-code

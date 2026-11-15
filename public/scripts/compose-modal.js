@@ -1414,6 +1414,9 @@
     }
 
     var IR = 130;
+    /* When the wrap holds a hero-space field canvas, that script draws the
+       particles and this canvas only paints the gradient: one paint, no loop. */
+    var fieldOwned = !!wrap.querySelector('canvas[data-hero-space]');
     function frame() {
       raf = 0;
       var w = canvas.offsetWidth, h = canvas.offsetHeight;
@@ -1424,6 +1427,7 @@
       } else {
         ctx.clearRect(0, 0, w, h);
       }
+      if (fieldOwned) return;
 
       var spd = mouseInside ? Math.min(Math.sqrt(velX * velX + velY * velY), 30) : 0;
 

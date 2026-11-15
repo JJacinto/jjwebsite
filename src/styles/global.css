@@ -843,6 +843,76 @@ html[data-motion="reduce"] {
 .hero-replay:focus-visible { outline: 2px solid var(--text-brand); outline-offset: 3px; border-radius: var(--dimension-radius-xs); }
 html[data-motion="reduce"] { .hero-replay { display: none; } }
 
+/* Hero portrait in dots (/scripts/hero-face.js). The box has a fixed size so
+   nothing shifts when the dots load. The canvas is larger than the box so
+   dots can drift and scatter past its edge. Same z-index as the hero copy and
+   earlier in the DOM, so the copy paints above it where they meet. */
+.hero-face {
+  --face-dot: var(--text-primary);
+  --face-shadow: var(--color-neutral-100);
+  --face-mid: var(--color-primary-50);
+  --face-light: var(--color-neutral-30);
+  position: relative;
+  z-index: 51;
+  flex: none;
+  align-self: flex-start;
+  height: clamp(190px, 34svh, 320px);
+  aspect-ratio: 4 / 5;
+  margin: 0 0 var(--dimension-space-16) -4%;
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-face canvas {
+  position: absolute;
+  /* 40% of the box's width on every side (BLEED in hero-face.js). */
+  left: -40%;
+  top: -32%;
+  width: 180%;
+  height: 164%;
+  pointer-events: none;
+  opacity: 0;
+}
+.hero-face.is-live canvas { opacity: 1; }
+/* Beside the copy only when the one-line headline leaves room for it. */
+@media (min-width: 1280px) {
+  .hero-face {
+    position: absolute;
+    /* Out past the container, as far as the viewport allows. */
+    right: calc(-1 * min(9%, (100vw - 100%) / 2 - 12px));
+    top: 50%;
+    height: min(80svh, 740px, 46vw);
+    margin: 0;
+    transform: translateY(-50%);
+  }
+  /* With the portrait beside it the headline sets in two lines, which leaves
+     the portrait room to be large. */
+  .hero .hero-role { max-width: 560px; }
+}
+
+/* Particle field behind the whole hero (/scripts/hero-space.js). Positioned
+   and first in the hero, so the copy and the portrait paint above it. */
+.hero-space {
+  --space-dot: var(--text-primary);
+  --space-accent: var(--text-brand);
+  --space-ink: var(--background-page);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.hero-space.is-live { opacity: 1; }
+/* The same field in the closing call-to-action areas. The wrap is positioned
+   and clips overflow; this canvas is placed after .cta-footer-bg (which still
+   paints the gradient) so it sits above it and below the content. --space-ink
+   is the colour the field sits on, so planets and holes read as cut-outs. */
+.cta-footer-wrap .hero-space { --space-ink: var(--background-section-muted); z-index: 0; }
+.contact .hero-space { --space-ink: var(--background-page); }
+
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
   height: clamp(200px, 26vw, 268px);
