@@ -10,7 +10,7 @@
      11    the camera dives into the top layer; a dot matrix fills the screen (cream)
      12    a ripple crosses the matrix and lifts it into a sphere (indigo)
      13    the sphere flattens into one bar where the headline sits (dark)
-     14    the bar wipes aside: it is the headline
+     14    the bar wipes aside: it is the headline; its points fly off and form the portrait
 
    Markup contract (all inside or near section.hero):
      canvas[data-cut-canvas]   the stage
@@ -408,6 +408,8 @@
       var edge = lerp(g.x1, g.x2, p);
       c.fillStyle = col.cream; c.fillRect(edge, g.y1, g.x2 - edge, g.y2 - g.y1);
       if (p > 0 && p < 1) { c.fillStyle = col.line; c.fillRect(edge - 2, g.y1, 4, g.y2 - g.y1); }
+      // The bar's points leave it and settle as the portrait (see hero-face.js).
+      if (window.HeroFace) window.HeroFace.intro(c, t, g, WIPE);
     }
     drawHud(c, t);
     drawChip(c, t);
@@ -529,6 +531,8 @@
     canvas.style.display = 'none';
     root.classList.remove('cut-playing', 'cut-pending');
     if (xrayOn) xray(true);
+    if (window.HeroFace) window.HeroFace.live(was);
+    if (window.HeroSpace) window.HeroSpace.live();
     if (was) { document.dispatchEvent(new CustomEvent('jj:cutdone')); report(); }
   }
   function play(from) {
@@ -536,6 +540,8 @@
     if (window.scrollY > 40) { finish(); return; }
     playing = true;
     stale = true;
+    if (window.HeroFace) window.HeroFace.hide();
+    if (window.HeroSpace) window.HeroSpace.hide();
     root.classList.add('cut-playing');
     canvas.style.display = 'block';
     var start = from || 0, t0 = 0, T = duration(), last = 0, slow = 0;

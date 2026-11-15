@@ -107,48 +107,118 @@ ready.then(() => {
 });
 window.addEventListener('resize', movePillIndicator);
 
-/* Theme toggle — light ↔ dark. Dark is the site default; clicking the
-   toggle stores the user's choice in localStorage so the anti-FOUC
-   bootstrap on the next page load applies it before paint. System
-   prefers-color-scheme is intentionally not followed. */
+/* Settings menu — language, theme, text size, motion, high contrast.
+   The choices themselves are stored and applied by the settings script
+   in <head> (window.jjPrefs) and the language script (window.jjSetLang),
+   both in Base.astro. This block only runs the menu: open and close,
+   keep keyboard focus inside while it is open, and keep the controls
+   showing what is in use. */
 (function () {
-  const root = document.documentElement;
-  /* Reduced-motion users skip the cross-fade — they get an instant
-     swap, which is the existing pre-animation behavior. */
-  const allowAnim = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function flip(source) {
-    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-    /* Drop the transient class onto <html> *before* mutating
-       data-theme so the CSS rule it activates is already in effect
-       when the custom properties cascade. The matching rule in
-       global.css applies a 0.5s transition to color / background-
-       color / border-color / fill / stroke / box-shadow on every
-       element for the duration; the class is removed at 500ms so
-       it doesn't burden subsequent hover interactions. */
-    if (allowAnim) root.classList.add('theme-transitioning');
-    if (next === 'dark') root.setAttribute('data-theme', 'dark');
-    else root.removeAttribute('data-theme');
-    try { localStorage.setItem('theme', next); } catch (_) {}
-    if (allowAnim) {
-      setTimeout(() => root.classList.remove('theme-transitioning'), 500);
-    }
-    /* Override the data-umami-event auto-fire with a richer call that
-       carries the resulting theme as a property — gives the dashboard
-       a "switched-to-dark vs switched-to-light" breakdown, plus a
-       source dimension so we can see desktop nav vs mobile menu use. */
+  const wrap  = document.getElementById('settings');
+  const btn   = document.getElementById('settingsBtn');
+  const panel = document.getElementById('settingsPanel');
+  const prefs = window.jjPrefs;
+  if (!wrap || !btn || !panel || !prefs) return;
+  const contrast = document.getElementById('settingsContrast');
+
+  function check(name, value) {
+    const input = panel.querySelector('input[name="' + name + '"][value="' + value + '"]');
+    if (input) input.checked = true;
+  }
+  /* Make the controls show the current choices. */
+  function sync() {
+    check('jj-lang', window.jjLang ? window.jjLang() : 'en');
+    check('jj-theme', prefs.get('theme'));
+    check('jj-textsize', prefs.get('textsize'));
+    /* Motion shows what is in use: Default, or Low (chosen here or asked
+       for by the system). */
+    check('jj-motion', prefs.effective().motion);
+    contrast.checked = prefs.effective().contrast === 'high';
+  }
+  sync();
+
+  function track(setting, value) {
     if (window.umami && typeof window.umami.track === 'function') {
-      window.umami.track('theme-toggle', { theme: next, source: source });
+      window.umami.track('settings-change', { setting: setting, value: value });
     }
   }
-  const navBtn = document.getElementById('themeToggle');
-  if (navBtn) navBtn.addEventListener('click', () => flip('nav'));
-  const mobileBtn = document.getElementById('mobileThemeToggle');
-  if (mobileBtn) mobileBtn.addEventListener('click', () => {
-    flip('mobile-menu');
-    /* Drop focus so the button doesn't keep its :focus ring after tap
-       — touch users were reading the persistent focus state as "this
-       button stays selected". */
-    mobileBtn.blur();
+
+  panel.addEventListener('change', function (e) {
+    const el = e.target;
+    if (el === contrast) {
+      prefs.set('contrast', el.checked ? 'high' : 'normal');
+      track('contrast', el.checked ? 'high' : 'normal');
+    } else if (el.name === 'jj-lang') {
+      if (window.jjSetLang) window.jjSetLang(el.value);
+      track('lang', el.value);
+    } else if (el.name === 'jj-theme') {
+      prefs.set('theme', el.value);
+      track('theme', el.value);
+    } else if (el.name === 'jj-textsize') {
+      prefs.set('textsize', el.value);
+      track('textsize', el.value);
+    } else if (el.name === 'jj-motion') {
+      /* Picking what the system already asks for clears the saved choice,
+         so the site keeps following the system afterwards. */
+      const systemLow = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const same = (el.value === 'reduce') === systemLow;
+      prefs.set('motion', same ? 'system' : el.value);
+      track('motion', el.value);
+    }
+  });
+  /* The system can flip contrast or motion while the menu is open. */
+  document.addEventListener('jj:contrastchange', sync);
+  document.addEventListener('jj:motionchange', sync);
+
+  /* What Tab can land on: buttons, the switch, and one radio per group
+     (the chosen one), which is how radio groups take focus. */
+  function stops() {
+    return Array.prototype.filter.call(panel.querySelectorAll('button, input'), function (el) {
+      return el.type !== 'radio' || el.checked;
+    });
+  }
+
+  function isOpen() { return !panel.hidden; }
+  function open() {
+    if (isOpen()) return;
+    sync();
+    panel.hidden = false;
+    btn.setAttribute('aria-expanded', 'true');
+    wrap.classList.add('is-open');
+    const first = panel.querySelector('input:checked') || stops()[0];
+    if (first) first.focus();
+  }
+  function close(returnFocus) {
+    if (!isOpen()) return;
+    panel.hidden = true;
+    btn.setAttribute('aria-expanded', 'false');
+    wrap.classList.remove('is-open');
+    if (returnFocus) btn.focus();
+  }
+
+  btn.addEventListener('click', function () { if (isOpen()) close(true); else open(); });
+  document.getElementById('settingsClose').addEventListener('click', function () { close(true); });
+
+  document.addEventListener('keydown', function (e) {
+    if (!isOpen()) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      close(true);
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const list = stops();
+    const first = list[0];
+    const last = list[list.length - 1];
+    const at = document.activeElement;
+    if (!panel.contains(at)) { e.preventDefault(); first.focus(); }
+    else if (e.shiftKey && at === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && at === last) { e.preventDefault(); first.focus(); }
+  });
+
+  /* A click or tap anywhere else closes it. */
+  document.addEventListener('pointerdown', function (e) {
+    if (isOpen() && !wrap.contains(e.target)) close(false);
   });
 })();
 
@@ -201,7 +271,14 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     el.classList.remove('tilt-active');
   };
 
+  /* Low motion (settings menu or system) turns the tilt off. */
+  const lowMotion = function () { return document.documentElement.getAttribute('data-motion') === 'reduce'; };
+
   document.addEventListener('mousemove', function(e) {
+    if (lowMotion()) {
+      if (tiltCard) { clearTilt(tiltCard); tiltCard = null; }
+      return;
+    }
     const card = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost), .j-scene.has-case, .next-case, .case-img-ph.is-filled, .hero-photo, .btn, .logo-outer, .about-cta-avatar-stack');
     if (tiltCard && tiltCard !== card) {
       clearTilt(tiltCard);
@@ -254,6 +331,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     }
   }
   document.addEventListener('pointerdown', function (e) {
+    if (lowMotion() || !e.target.closest) return;
     var t = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost), .j-scene.has-case, .next-case, .case-img-ph.is-filled, .btn, .logo-outer, .about-cta-avatar-stack');
     if (!t) return;
     pressedBtn = t;
@@ -328,6 +406,12 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   const ballLabel = ball.querySelector('.cursor-ball-label');
   let activeCard = null;
   document.addEventListener('mousemove', function(e) {
+    /* Low motion: no custom cursor (global.css hides the ball and gives
+       the cards their normal pointer back). */
+    if (document.documentElement.getAttribute('data-motion') === 'reduce') {
+      if (activeCard) { activeCard = null; ball.classList.remove('is-active'); }
+      return;
+    }
     ball.style.left = e.clientX + 'px';
     ball.style.top  = e.clientY + 'px';
     const card = e.target.closest('.case-card, .testimonial-card[href], .wall .tile:not(.ghost):has(.rd), .j-scene.has-case, .next-case, .case-img-ph.is-filled');

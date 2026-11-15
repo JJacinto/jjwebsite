@@ -35,9 +35,16 @@ import WorkWall from '../components/home/WorkWall.astro';
     </script>
     <!-- Intro stage, drawn by /scripts/hero-cut.js. Fixed and full-viewport
          while it plays; the same canvas draws the X-ray cut lines. -->
+    <!-- Particle field behind the whole hero, with the comet and planet
+         gestures. Drawn by /scripts/hero-space.js. -->
+    <canvas class="hero-space" data-hero-space data-space-counter data-space-face data-label="PARTS" data-pt-data-label="PARTES" aria-hidden="true"></canvas>
     <canvas data-cut-canvas aria-hidden="true" data-words="EVERY|PART|EARNS ITS PLACE." data-pt-data-words="CADA|PARTE|MERECE O LUGAR." data-layers="surface|states|rules|data" data-pt-data-layers="superfície|estados|regras|dados" data-label="PARTS" data-pt-data-label="PARTES"></canvas>
     <div class="container hero-inner" data-xray>
       <aside class="xray-note" data-xray-note data-pt="Um título, uma promessa. A linha por baixo traz a prova, por isso o título pode ficar curto.">One headline, one promise. The line under it carries the proof, so the headline can stay short.</aside>
+      <!-- Portrait made of dots, drawn by /scripts/hero-face.js. First in the
+           DOM so it sits above the copy on small screens; pinned to the right
+           on wide ones. Sized in CSS so the headline never moves when it loads. -->
+      <div class="hero-face" data-hero-face data-photo="/assets/images/hero-face.webp" data-dots="/assets/hero-face-{theme}.json" role="img" aria-label="Portrait of João, drawn in dots" data-pt-aria-label="Retrato do João, desenhado em pontos"><canvas></canvas></div>
       <h1 class="hero-greeting" data-cut-rise data-pt="Olá, sou o João. Um product designer que constrói.">Hey, I'm João. A product designer who builds.</h1>
       <p class="hero-role" data-cut-line><span class="hero-line" data-pt="Desenho as partes que os utilizadores não veem.">I design the parts users don't see.</span></p>
       <p class="hero-sub" data-cut-rise data-pt="Para que as que veem pareçam inevitáveis. Dez anos em fintech, vídeo e ferramentas de suporte, e construo o que desenho.">So the parts they do see feel inevitable. Ten years across fintech, video and support tools, and I build what I design.</p>
@@ -58,6 +65,8 @@ import WorkWall from '../components/home/WorkWall.astro';
       </div>
     </div>
   </section>
+  <script is:inline src={versioned('/scripts/hero-face.js')} defer></script>
+  <script is:inline src={versioned('/scripts/hero-space.js')} defer></script>
   <script is:inline src={versioned('/scripts/hero-cut.js')} defer></script>
 
   <!-- WORK WALL -->

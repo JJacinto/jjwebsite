@@ -72,17 +72,29 @@ button { font-family: inherit; background: none; border: none; cursor: pointer; 
 }
 .skip-link:focus { transform: translateY(0); }
 
-/* Honour user motion preferences globally — kills all transitions
-   and animations for users who request reduced motion. Per-component
-   overrides below have always-on behaviour preserved (e.g. compose
-   modal fade-in, which is essential UI feedback). */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* Honour motion preferences globally — kills all transitions and
+   animations when animations are off. Per-component overrides below
+   have always-on behaviour preserved (e.g. compose modal fade-in,
+   which is essential UI feedback).
+
+   Every reduced-motion rule in this file keys off the attribute
+   html[data-motion="reduce"], not the media query. The settings script
+   in <head> (Base.astro) sets the attribute before paint when the
+   visitor turned animations off in the settings menu, or when their
+   system asks for reduced motion and they haven't chosen otherwise.
+   Write new rules as  html[data-motion="reduce"] { .thing { … } }
+   (and html:not([data-motion="reduce"]) for motion-only rules), so
+   the menu can turn animations both off and back on. */
+/* This one is written flat (no nesting) so it also works in browsers
+   from before CSS nesting (2023). */
+html[data-motion="reduce"],
+html[data-motion="reduce"] *,
+html[data-motion="reduce"] *::before,
+html[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }
 
 /* ──────────────────────────────────────────────────────────────────
@@ -159,7 +171,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   100% { transform: translateX(-50%); }
 }
 
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .reveal { transition: none; opacity: 1; transform: none; }
   .marquee-track { animation: none !important; }
   .compose-backdrop, .compose-modal { transition: none; animation: none; }
@@ -451,7 +463,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .lang-switch.is-animated::before {
   transition: transform 420ms cubic-bezier(0.34, 1.36, 0.64, 1);
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .lang-switch.is-animated::before { transition: none; }
   .lang-switch button { transition: none; }
   .lang-switch button:active { transform: none; }
@@ -829,7 +841,77 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 }
 .hero-replay:hover { color: var(--text-secondary); text-decoration-color: currentColor; }
 .hero-replay:focus-visible { outline: 2px solid var(--text-brand); outline-offset: 3px; border-radius: var(--dimension-radius-xs); }
-@media (prefers-reduced-motion: reduce) { .hero-replay { display: none; } }
+html[data-motion="reduce"] { .hero-replay { display: none; } }
+
+/* Hero portrait in dots (/scripts/hero-face.js). The box has a fixed size so
+   nothing shifts when the dots load. The canvas is larger than the box so
+   dots can drift and scatter past its edge. Same z-index as the hero copy and
+   earlier in the DOM, so the copy paints above it where they meet. */
+.hero-face {
+  --face-dot: var(--text-primary);
+  --face-shadow: var(--color-neutral-100);
+  --face-mid: var(--color-primary-50);
+  --face-light: var(--color-neutral-30);
+  position: relative;
+  z-index: 51;
+  flex: none;
+  align-self: flex-start;
+  height: clamp(190px, 34svh, 320px);
+  aspect-ratio: 4 / 5;
+  margin: 0 0 var(--dimension-space-16) -4%;
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero-face canvas {
+  position: absolute;
+  /* 40% of the box's width on every side (BLEED in hero-face.js). */
+  left: -40%;
+  top: -32%;
+  width: 180%;
+  height: 164%;
+  pointer-events: none;
+  opacity: 0;
+}
+.hero-face.is-live canvas { opacity: 1; }
+/* Beside the copy only when the one-line headline leaves room for it. */
+@media (min-width: 1280px) {
+  .hero-face {
+    position: absolute;
+    /* Out past the container, as far as the viewport allows. */
+    right: calc(-1 * min(9%, (100vw - 100%) / 2 - 12px));
+    top: 50%;
+    height: min(80svh, 740px, 46vw);
+    margin: 0;
+    transform: translateY(-50%);
+  }
+  /* With the portrait beside it the headline sets in two lines, which leaves
+     the portrait room to be large. */
+  .hero .hero-role { max-width: 560px; }
+}
+
+/* Particle field behind the whole hero (/scripts/hero-space.js). Positioned
+   and first in the hero, so the copy and the portrait paint above it. */
+.hero-space {
+  --space-dot: var(--text-primary);
+  --space-accent: var(--text-brand);
+  --space-ink: var(--background-page);
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+.hero-space.is-live { opacity: 1; }
+/* The same field in the closing call-to-action areas. The wrap is positioned
+   and clips overflow; this canvas is placed after .cta-footer-bg (which still
+   paints the gradient) so it sits above it and below the content. --space-ink
+   is the colour the field sits on, so planets and holes read as cut-outs. */
+.cta-footer-wrap .hero-space { --space-ink: var(--background-section-muted); z-index: 0; }
+.contact .hero-space { --space-ink: var(--background-page); }
 
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
@@ -957,7 +1039,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   animation: line-refract-b-flash 41s cubic-bezier(0.6, 0, 0.4, 1) infinite;
   animation-delay: -19s;
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .brands::before, .brands::after { animation: none; }
 }
 .brands-label { text-align: center; margin-bottom: var(--dimension-space-36); }
@@ -1007,7 +1089,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   content: url("/assets/logos/streamyard-white.png");
 }
 
-@media (prefers-reduced-motion: reduce) { .brands-track { animation: none; } }
+html[data-motion="reduce"] { .brands-track { animation: none; } }
 .brands-tooltip {
   position: fixed; z-index: var(--z-toast); pointer-events: none;
   padding: var(--dimension-space-6) var(--dimension-space-12); border-radius: var(--dimension-radius-sm);
@@ -1074,7 +1156,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   animation: line-refract-a-flash 27s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
   animation-delay: -13s;
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .testimonials::before { animation: none; }
 }
 .testimonials .eyebrow { text-align: center; display: block; margin-bottom: var(--dimension-space-40); }
@@ -1219,7 +1301,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   0%   { background-position: -100% -60%, 200%  200%; }
   100% { background-position:  200%  200%, -100% -60%; }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .testimonial-stroke-light { animation: none; }
 }
 /* Brand-tint wash on hover — same recipe .case-card uses. The fade-in
@@ -1556,7 +1638,7 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
   .work-next { flex-direction: column; align-items: flex-start; }
   .work-next-stat { align-items: flex-start; text-align: left; }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .work-card-media img { transition: none; }
   .work-card:hover .work-card-media img { transform: none; }
   .work-grid:has(.case-card:hover) .case-card:hover { scale: 1; }
@@ -2233,7 +2315,7 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
    (.is-live comes from the page's data-live hook). One cycle is one
    trip round the loop: the comet crosses the five cards left to right,
    each card lights for its fifth, and the rail carries it back. */
-@media (prefers-reduced-motion: no-preference) {
+html:not([data-motion="reduce"]) {
   .loop.is-live[data-mode="now"] .loop-line::after { animation: loop-comet var(--loop-cycle) linear infinite; }
   .loop.is-live[data-mode="now"] .loop-bus::before { animation: loop-return var(--loop-cycle) linear infinite; }
   .loop.is-live[data-mode="now"] .loop-card { animation: loop-pass var(--loop-cycle) linear infinite; }
@@ -3058,7 +3140,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 }
 .chip-panel[hidden] { display: none; }
 @keyframes chip-pop-in { from { opacity: 0; translate: 0 -4px; } }
-@media (prefers-reduced-motion: reduce) { .chip-panel { animation: none; } }
+html[data-motion="reduce"] { .chip-panel { animation: none; } }
 
 /* ---- Breakpoints --------------------------------------------------- */
 @media (max-width: 1023px) {
@@ -3133,7 +3215,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 }
 
 /* ---- Reduced motion: end states, no motion ------------------------- */
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .xray-grid, [data-xray], .xray-note, .xray-track, .xray-knob, .xray-switch--float { transition: none; }
   .loop-line, .loop-card + .loop-card::before { transition: none; }
   .loop [data-when], .loop-seg-thumb, .loop-feed, .loop-line::after, .loop-bus::before { transition: none; }
@@ -3167,8 +3249,8 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   }
   .book, .chips li { transition: none; }
 }
-@media (prefers-reduced-motion: reduce) and (max-width: 640px) {
-  .polaroid { transform: rotate(var(--rot)); }
+@media (max-width: 640px) {
+  html[data-motion="reduce"] .polaroid { transform: rotate(var(--rot)); }
 }
 
 /* Full-width dark "outro" wrap: a single canvas paints the organic
@@ -3352,7 +3434,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   17%  { opacity: 0; transform: rotateY(90deg) translateZ(-40px); }
   100% { opacity: 0; transform: rotateY(90deg) translateZ(-40px); }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   /* Static fallback — show only the original headshot, no cycling,
      no hover flip. */
   .about-cta-avatar-stack:hover .about-cta-avatar-frame { animation: none; }
@@ -3447,7 +3529,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   transform: translateY(-50%) translateX(0);
 }
 
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .about-cta-avatar-progress,
   .about-cta-avatar-tooltip { transition: none; }
   .about-cta-avatar-stack.is-frozen .about-cta-avatar-progress circle { animation: none; }
@@ -3582,7 +3664,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   color: var(--text-secondary); margin: var(--dimension-space-24) 0 var(--dimension-space-8);
 }
 .contact-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--text-tertiary); transition: background 0.4s; }
-@media (prefers-reduced-motion: no-preference) {
+html:not([data-motion="reduce"]) {
   .contact-status-dot.state-available, .contact-status-dot.state-offhours, .contact-status-dot.state-sleeping { animation: dot-breathe 2.4s ease-in-out infinite; }
 }
 .contact-hint {
@@ -4152,7 +4234,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 }
 .case-toc a.is-active::before { opacity: 1; }
 
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .case-toc, .case-toc a, .case-toc a::before { transition: none; }
 }
 @media (max-width: 1024px) { /* matches --bp-xl */
@@ -4236,7 +4318,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   from { transform: rotateY(0deg); }
   to   { transform: rotateY(360deg); }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .pw-gate-lock svg { animation: none; }
 }
 /* Unlock — the gate pins itself over the page and breaks away (scales
@@ -4427,7 +4509,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .case-gate-split { grid-template-columns: 1fr; gap: var(--dimension-space-48); }
   .case-gate-aside { position: static; width: 100%; max-width: 480px; margin: 0 auto; }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   #pw-overlay .case-gate-aside .pw-gate { animation: none; }
   .pw-shackle, .pw-chapters li, .pw-chapters li::after { transition: none; }
 }
@@ -4437,7 +4519,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   .case-summary-card { padding: var(--dimension-space-24); }
   .case-decisions-list { grid-template-columns: 1fr; }
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .case-summary-row { transition: none; }
 }
 
@@ -4486,7 +4568,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   animation: line-refract-b 41s cubic-bezier(0.6, 0, 0.4, 1) infinite;
   animation-delay: -19s;
 }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .footer::before, .footer::after { animation: none; }
 }
 .footer .container {
@@ -5092,7 +5174,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 }
 .case-detail-body > .case-img-ph,
 .case-detail-body > .case-img-ph-grid { margin-bottom: var(--dimension-space-16); }
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .case-detail-icon,
   .case-detail-summary,
   .case-readbar-btn { transition: none; }
@@ -5524,7 +5606,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .how-more a:hover { text-decoration: underline; text-underline-offset: 3px; }
 #loop { scroll-margin-top: 96px; }
 
-@media (prefers-reduced-motion: reduce) {
+html[data-motion="reduce"] {
   .wall *, .wall *::before, .wall *::after { animation: none !important; }
   .wall .tile, .wall .ov, .wall-sw::after { transition: none; }
 }
@@ -5565,3 +5647,344 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 :lang(pt) .j-pct::after { content: "a imprimir " counter(n) "%"; }
 :lang(pt) .wall .vc:after { content: "variantes ×" counter(n); }
 :lang(pt) .wall .hc:after { content: "passos " counter(n); }
+
+/* ============================================================
+   SETTINGS MENU (nav)
+   One button in the nav opens a small panel: language, theme,
+   animations, high contrast. Markup in Base.astro, behaviour in
+   nav.js, choices applied before paint by the script in <head>.
+   ============================================================ */
+.settings {
+  position: relative; flex-shrink: 0;
+  /* Panel colours in one place, so the dark nav on case pages and
+     high contrast can swap them without touching the controls. */
+  --sp-bg: var(--surface-default);
+  --sp-line: var(--border-strong);
+}
+/* Case pages force a dark nav in both themes; the panel follows it. */
+.nav.nav-dark .settings {
+  --sp-bg: var(--color-neutral-90);
+  --sp-line: rgba(240, 237, 232, 0.16);
+}
+.settings-btn {
+  display: inline-flex; align-items: center; gap: var(--dimension-space-6);
+  min-height: var(--target-min);
+  padding: 0 var(--dimension-space-12);
+  border-radius: var(--radius-pill);
+  border: var(--dimension-border-width-2) solid transparent;
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  color: var(--text-secondary); cursor: pointer; user-select: none;
+  transition:
+    color var(--motion-duration-short) var(--motion-easing-standard),
+    background var(--motion-duration-short) var(--motion-easing-standard);
+}
+.settings-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+.settings-btn:hover,
+.settings.is-open .settings-btn {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
+}
+
+.settings-panel {
+  position: absolute; top: calc(100% + var(--dimension-space-12)); right: 0;
+  z-index: var(--z-elevated);
+  /* rem, so the panel grows with the text-size setting. */
+  width: min(20rem, calc(100vw - var(--dimension-space-48)));
+  max-height: calc(100vh - 96px); overflow-y: auto;
+  display: flex; flex-direction: column; gap: var(--dimension-space-16);
+  padding: var(--dimension-space-16);
+  border-radius: var(--radius-card);
+  border: var(--dimension-border-width-1) solid var(--sp-line);
+  background: var(--sp-bg);
+  box-shadow: var(--shadow-xl), 0 24px 48px -24px rgba(0, 0, 0, 0.5);
+  color: var(--text-primary);
+  font-family: var(--font-family-body);
+  text-align: left;
+  animation: settings-in var(--motion-duration-short) var(--motion-easing-emphasized);
+}
+.settings-panel[hidden] { display: none; }
+@keyframes settings-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.settings-head { display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-12); }
+.settings-title {
+  font-family: var(--font-family-display); font-weight: var(--font-weight-black);
+  font-size: var(--font-size-lg); line-height: var(--font-line-height-tight);
+  letter-spacing: var(--font-letter-spacing-snug);
+  color: var(--text-primary);
+}
+.settings-close {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: var(--target-min); height: var(--target-min);
+  /* Pull the 44px target into the panel's corner padding. */
+  margin: calc(-1 * var(--dimension-space-10)) calc(-1 * var(--dimension-space-10)) calc(-1 * var(--dimension-space-10)) 0;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+  transition: color var(--motion-duration-short), background var(--motion-duration-short);
+}
+.settings-close svg { width: 18px; height: 18px; }
+.settings-close:hover { color: var(--text-primary); background: color-mix(in srgb, var(--text-primary) 10%, transparent); }
+
+.settings-group { border: 0; padding: 0; margin: 0; min-width: 0; }
+.settings-group legend {
+  padding: 0; margin-bottom: var(--dimension-space-6);
+  font-size: var(--font-size-sm); line-height: var(--font-line-height-tight);
+  color: var(--text-secondary);
+}
+/* A row of choices: real radio buttons, drawn as one segmented pill.
+   The chosen one is filled with the text colour, so it stands out by
+   more than a tint. */
+.settings-seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: var(--dimension-space-2);
+  padding: var(--dimension-space-4);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+}
+.settings-seg label { position: relative; display: block; cursor: pointer; }
+.settings-seg input,
+.settings-switch input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; opacity: 0; cursor: pointer;
+}
+/* The tap area covers the pill's 4px inset too: 44px tall. */
+.settings-seg input { top: calc(-1 * var(--dimension-space-4)); height: calc(100% + 2 * var(--dimension-space-4)); }
+.settings-seg span {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 36px; padding: 0 var(--dimension-space-8);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  line-height: var(--font-line-height-tight); white-space: nowrap;
+  color: var(--text-secondary);
+  transition: color var(--motion-duration-short), background var(--motion-duration-short);
+}
+.settings-seg label:hover span { color: var(--text-primary); }
+.settings-seg input:checked + span { background: var(--text-primary); color: var(--sp-bg); }
+.settings-seg input:focus-visible + span,
+.settings-switch input:focus-visible ~ .settings-switch-track {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: var(--dimension-space-2);
+}
+
+/* On/off row: label and hint on the left, switch on the right. */
+.settings-switch {
+  position: relative;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-16);
+  min-height: var(--target-min);
+  padding-top: var(--dimension-space-12);
+  border-top: var(--dimension-border-width-1) solid var(--border-subtle);
+  cursor: pointer;
+}
+.settings-switch-text { display: flex; flex-direction: column; gap: var(--dimension-space-2); }
+.settings-switch-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-medium); line-height: var(--font-line-height-tight); color: var(--text-primary); }
+.settings-switch-hint { font-size: var(--font-size-xs); line-height: var(--font-line-height-snug); color: var(--text-secondary); }
+.settings-switch-track {
+  position: relative; flex-shrink: 0;
+  width: 46px; height: 28px;
+  border-radius: var(--radius-pill);
+  border: var(--dimension-border-width-2) solid var(--text-secondary);
+  transition: background var(--motion-duration-short), border-color var(--motion-duration-short);
+}
+.settings-switch-track::after {
+  content: ''; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--text-secondary);
+  transition: transform var(--motion-duration-short) var(--motion-easing-emphasized), background var(--motion-duration-short);
+}
+.settings-switch input:checked ~ .settings-switch-track { background: var(--text-primary); border-color: var(--text-primary); }
+.settings-switch input:checked ~ .settings-switch-track::after { transform: translateX(18px); background: var(--sp-bg); }
+
+@media (max-width: 680px) {
+  /* On phones the button sits beside the menu button; line the panel
+     up with the right edge of the bar instead of the button. */
+  .settings-panel { right: calc(-1 * (var(--target-min) + var(--dimension-space-8))); }
+}
+
+/* ============================================================
+   LIGHT THEME — footer
+   The footer used to sit on an always-dark band and kept two
+   white-on-dark colours after it became theme-aware: the status line
+   ("Available…") and the top hairline were invisible on a light page.
+   Dark theme is untouched.
+   ============================================================ */
+html:not([data-theme="dark"]) { --component-footer-status-color: var(--text-tertiary); }
+html:not([data-theme="dark"]) .footer { border-top-color: var(--border-subtle); }
+
+/* ============================================================
+   TEXT SIZE and LOW MOTION extras (settings menu)
+   ============================================================ */
+/* Text size: sizes across the site are in rem, so scaling the root
+   scales the text. Set before paint by the script in <head>. */
+html[data-text-size="115"] { font-size: 115%; }
+html[data-text-size="130"] { font-size: 130%; }
+
+/* Low motion also drops the custom cursor and the card tilt (the tilt
+   itself is switched off in nav.js). Cards get a normal pointer back. */
+html[data-motion="reduce"] #cursor-ball { display: none !important; }
+html[data-motion="reduce"] :is(
+  .case-card, .testimonial-card, .next-case, .case-img-ph.is-filled,
+  .j-scene.has-case, .j-scene.has-case .j-case,
+  .wall .tile:not(.ghost):has(.rd), .wall .tile:not(.ghost):has(.rd) .rd,
+  .tilt-active
+):hover { cursor: pointer; }
+
+/* ============================================================
+   HIGH CONTRAST
+   html[data-contrast="high"] is set before paint by the settings
+   script in <head> (Base.astro) when the visitor turns it on in the
+   settings menu, or when their system asks for more contrast and
+   they haven't chosen otherwise.
+
+   It works by re-pointing the semantic colour tokens: pure page
+   backgrounds, text that is never muted, borders you can see, and a
+   brand colour dark enough for white text. Text and controls reach
+   at least 7:1 (WCAG AAA) on every surface. These live here rather
+   than in tokens.css because that file is generated from tokens.json.
+   ============================================================ */
+/* Light */
+html[data-contrast="high"] {
+  --background-page: var(--color-neutral-0);
+  --background-section-default: var(--color-neutral-0);
+  --background-section-muted: var(--color-neutral-20);
+  --background-section-inverse: #000;
+  --background-footer: #000;
+
+  --surface-default: var(--color-neutral-0);
+  --surface-raised: var(--color-neutral-0);
+  --surface-sunken: var(--color-neutral-20);
+  --surface-overlay: #000;
+
+  --fill-brand-default: var(--color-primary-80);
+  --fill-brand-hover: var(--color-primary-70);
+  --fill-brand-active: var(--color-primary-90);
+  --fill-brand-subtle: var(--color-primary-10);
+  --fill-brand-muted: rgba(37, 40, 122, 0.14);
+  --fill-neutral-inverse: #000;
+
+  --text-primary: #000;
+  --text-secondary: var(--color-neutral-100);
+  --text-tertiary: var(--color-neutral-90);
+  --text-disabled: var(--color-neutral-80);
+  --text-brand: var(--color-primary-80);
+  --text-on-brand: var(--color-neutral-0);
+  --text-inverse: var(--color-neutral-0);
+  --text-inverse-muted: var(--color-neutral-30);
+
+  --border-subtle: var(--color-neutral-80);
+  --border-default: var(--color-neutral-100);
+  --border-strong: #000;
+  --border-focus: var(--color-primary-70);
+  --border-inverse: var(--color-neutral-30);
+
+  --icon-primary: #000;
+  --icon-secondary: var(--color-neutral-100);
+  --icon-tertiary: var(--color-neutral-90);
+  --icon-brand: var(--color-primary-80);
+  --icon-on-brand: var(--color-neutral-0);
+
+  --component-nav-scrolled-hairline: var(--border-subtle);
+  --component-footer-text-default: var(--text-secondary);
+  --component-footer-text-muted: var(--text-secondary);
+  --component-footer-status-color: var(--text-secondary);
+  --component-form-input-bg-light: var(--color-neutral-0);
+  --component-form-input-bg-light-focus: var(--color-neutral-0);
+}
+/* Dark — the page, and any card that pins itself to the dark theme. */
+html[data-contrast="high"][data-theme="dark"],
+html[data-contrast="high"] [data-theme="dark"] {
+  --background-page: #000;
+  --background-section-default: #000;
+  --background-section-muted: var(--color-neutral-100);
+  --background-section-inverse: var(--color-neutral-100);
+  --background-footer: var(--color-neutral-100);
+
+  --surface-default: var(--color-neutral-100);
+  --surface-raised: var(--color-neutral-90);
+  --surface-sunken: #000;
+  --surface-overlay: var(--color-neutral-90);
+
+  /* White text sits on the brand fill all over the site, so the fill
+     stays dark and gets a visible outline (see .btn-accent below). */
+  --fill-brand-default: var(--color-primary-70);
+  --fill-brand-hover: var(--color-primary-60);
+  --fill-brand-active: var(--color-primary-80);
+  --fill-brand-subtle: var(--color-primary-90);
+  --fill-brand-muted: rgba(212, 208, 255, 0.2);
+  --fill-neutral-inverse: var(--color-neutral-0);
+
+  --text-primary: var(--color-neutral-0);
+  --text-secondary: var(--color-neutral-30);
+  --text-tertiary: var(--color-neutral-40);
+  --text-disabled: var(--color-neutral-60);
+  --text-brand: var(--color-primary-20);
+  --text-on-brand: var(--color-neutral-0);
+
+  --border-subtle: var(--color-neutral-60);
+  --border-default: var(--color-neutral-30);
+  --border-strong: var(--color-neutral-0);
+  --border-focus: var(--color-primary-20);
+
+  --icon-primary: var(--color-neutral-0);
+  --icon-secondary: var(--color-neutral-30);
+  --icon-tertiary: var(--color-neutral-40);
+  --icon-brand: var(--color-primary-20);
+  --icon-on-brand: var(--color-neutral-0);
+
+  --component-form-input-bg-dark: #000;
+  --component-form-input-bg-dark-focus: #000;
+}
+/* Surfaces that are dark in both themes (see "Always-dark surface
+   scoping" near the top of this file). */
+html[data-contrast="high"] .compose-modal,
+html[data-contrast="high"] .nav.nav-dark {
+  --text-primary: var(--color-neutral-0);
+  --text-secondary: var(--color-neutral-30);
+  --text-tertiary: var(--color-neutral-40);
+  --text-brand: var(--color-primary-20);
+  --border-subtle: var(--color-neutral-60);
+  --border-default: var(--color-neutral-30);
+  --border-strong: var(--color-neutral-0);
+  --border-focus: var(--color-primary-20);
+  --icon-primary: var(--color-neutral-0);
+  --icon-secondary: var(--color-neutral-30);
+  --icon-brand: var(--color-primary-20);
+  --fill-brand-muted: rgba(212, 208, 255, 0.2);
+}
+
+/* Things the tokens can't reach. */
+html[data-contrast="high"] {
+  /* A heavier focus ring. */
+  :where(a, button, input, textarea, select, [role="button"], [tabindex]):focus-visible {
+    outline-width: 3px;
+    outline-offset: 3px;
+  }
+  /* Links inside running text are underlined, not only coloured. */
+  main p a:not(.btn) { text-decoration: underline; text-underline-offset: 0.15em; }
+
+  /* Nav: a solid bar with an outline once scrolled; the current page
+     is ringed instead of tinted. */
+  .nav.scrolled .container,
+  .nav.nav-dark.scrolled .container {
+    background: var(--background-page);
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border-color: var(--text-primary);
+  }
+  .nav.nav-dark.scrolled .container { background: #000; }
+  .nav.nav-dark .pill-nav a,
+  .nav.nav-dark .pill-nav a:hover:not(.active) { color: var(--text-primary); }
+  .pill-indicator { background: transparent; box-shadow: inset 0 0 0 2px var(--text-primary); }
+  .mobile-menu { background: var(--background-page); }
+
+  /* Buttons and controls get a full-strength outline. */
+  .btn-accent, .btn-accent:hover { border-color: var(--text-primary); box-shadow: none; }
+  .btn-ghost:hover { border-color: var(--text-primary); }
+  .settings-btn { border-color: var(--text-primary); background: var(--background-page); color: var(--text-primary); }
+  .nav.nav-dark .settings-btn { background: #000; }
+  .settings { --sp-line: var(--text-primary); }
+  .nav.nav-dark .settings { --sp-bg: #000; }
+  .settings-panel { border-width: var(--dimension-border-width-2); }
+  .settings-seg { background: transparent; box-shadow: inset 0 0 0 1px var(--text-primary); }
+}
