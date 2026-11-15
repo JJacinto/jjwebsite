@@ -128,10 +128,14 @@ import WorkWall from '../components/home/WorkWall.astro';
   </section>
 
   <!-- TESTIMONIALS -->
-  <section class="testimonials">
+  <section class="testimonials" data-testimonials>
+    <!-- Delight layer: the Antennae Galaxies as a particle canvas, drawn by
+         the second script below. Fades in when the section is reached.
+         Decorative only. -->
+    <div class="testimonials-glow" aria-hidden="true"><canvas class="testimonials-galaxy"></canvas></div>
     <div class="container home-block" data-xray>
-      <aside class="xray-note" data-xray-note data-pt="Só pessoas com quem trabalhei diretamente. Cada uma diz como trabalhámos em conjunto.">Only people I worked with directly. Each one says how we worked together.</aside>
-      <p class="eyebrow reveal" data-pt="Chefias e colegas sobre como trabalho">Managers and teammates on how I work</p>
+      <aside class="xray-note" data-xray-note data-pt="Só pessoas com quem trabalhei diretamente. Cada uma diz como trabalhámos em conjunto. O fundo são as Galáxias das Antenas, NGC 4038 e NGC 4039, a cerca de 60 milhões de anos-luz, na constelação do Corvo. Duas galáxias espirais presas numa colisão, com as estrelas e o gás a fundirem-se. Uma vénia a como uma boa equipa nos puxa para a frente.">Only people I worked with directly. Each one says how we worked together. The background is the Antennae Galaxies, NGC 4038 and NGC 4039, about 60 million light-years away in Corvus. Two spiral galaxies locked in a collision, their stars and gas merging. A nod to how a good crew pulls you along.</aside>
+      <p class="eyebrow reveal" data-pt="Palavras simpáticas das minhas equipas">Kind words from my crews</p>
       <div class="testimonials-masonry">
         <a class="testimonial-card testimonial-card--featured reveal reveal-d1" data-umami-event="testimonial" data-umami-event-author="daniel-cardoso" href="https://www.linkedin.com/in/joaofranciscojacinto/details/recommendations/" target="_blank" rel="noopener noreferrer">
           <span class="testimonial-stroke-light" aria-hidden="true"></span>
@@ -221,6 +225,98 @@ import WorkWall from '../components/home/WorkWall.astro';
             <span class="testimonial-source" data-pt="Ler no LinkedIn ↗">Read on LinkedIn ↗</span>
           </div>
         </a>
+
+        <!-- Anchorage kudos, cut from internal Lattice posts. No public
+             link, so these are articles, not links. -->
+        <article class="testimonial-card testimonial-card--featured testimonial-card--featured-end reveal reveal-d1">
+          <span class="testimonial-stroke-light" aria-hidden="true"></span>
+          <span class="testimonial-face" aria-hidden="true" style="--face: url(/assets/images/Carlos.avif)"></span>
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="/assets/images/Carlos.avif" alt="Carlos Santos" width="100" height="100" loading="lazy"></div>
+            <div>
+              <div class="testimonial-name">Carlos Santos</div>
+              <div class="testimonial-role" data-pt="Engenheiro sénior na Anchorage Digital">Senior Engineer at Anchorage Digital</div>
+            </div>
+          </div>
+          <p class="testimonial-quote" data-pt="Posso dizer, sem dúvida, que o Jacinto é um dos product designers mais brilhantes com quem já trabalhei. <strong>O foco e a capacidade de organização dele ajudaram a dar forma a um projeto enorme como o Shared Policies</strong>, e teve um papel decisivo na forma como a equipa de desenvolvimento o abordou.">I can definitely say, without a doubt, that Jacinto is one of the most brilliant product designers I have worked with. <strong>His focus and organizational skills helped shape a huge project like Shared Policies</strong>, and he played a major role in how the development team approached it.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--anchorage" role="img" aria-label="Anchorage Digital"></span>
+            <p class="testimonial-relation" data-pt="O Carlos trabalhou comigo na Anchorage">Carlos worked with me at Anchorage</p>
+            <span class="testimonial-source" data-pt="Kudos no Lattice">Kudos on Lattice</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card reveal reveal-d2">
+          <span class="testimonial-stroke-light" aria-hidden="true"></span>
+          <span class="testimonial-face" aria-hidden="true" style="--face: url(/assets/images/Eunice.avif)"></span>
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="/assets/images/Eunice.avif" alt="Eunice Costa" width="100" height="100" loading="lazy"></div>
+            <div>
+              <div class="testimonial-name">Eunice Costa</div>
+              <div class="testimonial-role" data-pt="Lead Designer na Primetag">Lead Designer at Primetag</div>
+            </div>
+          </div>
+          <p class="testimonial-quote" data-pt="Um dos melhores designers com quem já trabalhei. <strong>Pensa de forma super organizada e traz sempre uma opinião bem fundamentada para a mesa.</strong> Obrigada, sou melhor designer por tua causa.">One of the best designers I've ever worked with. <strong>Super organized thinker, always has a well argued opinion to bring to the table.</strong> Thank you, I'm a better designer because of you.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--anchorage" role="img" aria-label="Anchorage Digital"></span>
+            <p class="testimonial-relation" data-pt="A Eunice foi minha colega na Anchorage">Eunice was my teammate at Anchorage</p>
+            <span class="testimonial-source" data-pt="Kudos no Lattice">Kudos on Lattice</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card reveal reveal-d3">
+          <span class="testimonial-stroke-light" aria-hidden="true"></span>
+          <span class="testimonial-face" aria-hidden="true" style="--face: url(/assets/images/TiagoAlmeida.avif)"></span>
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="/assets/images/TiagoAlmeida.avif" alt="Tiago Almeida" width="100" height="100" loading="lazy"></div>
+            <div>
+              <div class="testimonial-name">Tiago Almeida</div>
+              <div class="testimonial-role" data-pt="Engineering Manager na Anchorage Digital">Engineering Manager at Anchorage Digital</div>
+            </div>
+          </div>
+          <p class="testimonial-quote" data-pt="O Jacinto abraçou a comunicação assíncrona como mais ninguém. Faz os melhores vídeos a dar contexto, mas também documenta tudo. <strong>É um mestre a organizar informação para que toda a equipa esteja alinhada.</strong>">Jacinto embraced async communication like no one else. He does the best videos giving context, but he also documents everything. <strong>Jacinto is a master organising information so everyone on the team is aligned.</strong></p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--anchorage" role="img" aria-label="Anchorage Digital"></span>
+            <p class="testimonial-relation" data-pt="O Tiago foi meu colega na Anchorage">Tiago was my teammate at Anchorage</p>
+            <span class="testimonial-source" data-pt="Kudos no Lattice">Kudos on Lattice</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card reveal reveal-d2">
+          <span class="testimonial-stroke-light" aria-hidden="true"></span>
+          <span class="testimonial-face" aria-hidden="true" style="--face: url(/assets/images/Shannon.avif)"></span>
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="/assets/images/Shannon.avif" alt="Shannon Harrington" width="100" height="100" loading="lazy"></div>
+            <div>
+              <div class="testimonial-name">Shannon Harrington</div>
+              <div class="testimonial-role" data-pt="Customer Experience na Anchorage Digital">Customer Experience at Anchorage Digital</div>
+            </div>
+          </div>
+          <p class="testimonial-quote" data-pt="O Anil e o João foram uma ajuda preciosa para a equipa de CX durante a migração de clientes novos e existentes para as shared policies. <strong>Estiveram em várias sessões com clientes para os guiar pela migração em tempo real.</strong>">Anil and João have been invaluable resources for the CX team during the migration of new and existing clients to shared policies. <strong>They joined multiple client sessions to guide them through the migration process in real time.</strong></p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--anchorage" role="img" aria-label="Anchorage Digital"></span>
+            <p class="testimonial-relation" data-pt="A Shannon trabalhou comigo na Anchorage">Shannon worked with me at Anchorage</p>
+            <span class="testimonial-source" data-pt="Kudos no Lattice">Kudos on Lattice</span>
+          </div>
+        </article>
+
+        <article class="testimonial-card reveal reveal-d3">
+          <span class="testimonial-stroke-light" aria-hidden="true"></span>
+          <span class="testimonial-face" aria-hidden="true" style="--face: url(/assets/images/Margarida.avif)"></span>
+          <div class="testimonial-header">
+            <div class="testimonial-avatar"><img src="/assets/images/Margarida.avif" alt="Margarida Trigo" width="100" height="100" loading="lazy"></div>
+            <div>
+              <div class="testimonial-name">Margarida Trigo</div>
+              <div class="testimonial-role" data-pt="Product Manager na Anchorage Digital">Product Manager at Anchorage Digital</div>
+            </div>
+          </div>
+          <p class="testimonial-quote" data-pt="Mudaste por completo a forma como o Product Design funciona dentro da equipa de Core Experience. <strong>A tua proatividade e a capacidade de gerir o trabalho com autonomia</strong>, sobretudo com tanta mudança de contexto, têm sido impressionantes.">You've been a game-changer for how PD operates within the Core Experience team. <strong>Your proactiveness and ability to manage your workload autonomously</strong>, especially with all the context-switching involved, have been truly impressive.</p>
+          <div class="testimonial-footer">
+            <span class="testimonial-logo testimonial-logo--anchorage" role="img" aria-label="Anchorage Digital"></span>
+            <p class="testimonial-relation" data-pt="A Margarida trabalhou comigo na Anchorage">Margarida worked with me at Anchorage</p>
+            <span class="testimonial-source" data-pt="Kudos no Lattice">Kudos on Lattice</span>
+          </div>
+        </article>
       </div>
     </div>
   </section>
@@ -229,6 +325,271 @@ import WorkWall from '../components/home/WorkWall.astro';
   </div>
 
 </Base>
+
+<script is:inline>
+/* Testimonials glow follows the scroll. --glow-in rises as the section
+   comes up the screen and falls as it leaves (both ends eased, no hard
+   switch); --glow-shift moves the glow slower than the page (parallax).
+   .is-lit runs the drift and sparks only while it is visible. */
+(function() {
+  var el = document.querySelector('[data-testimonials]');
+  if (!el) return;
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ticking = false;
+  function smooth(t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); }
+  function update() {
+    ticking = false;
+    var r = el.getBoundingClientRect(), vh = window.innerHeight || 1;
+    var p = (vh - r.top) / (vh + r.height);           /* 0 entering, 1 gone */
+    var glow = smooth(Math.min(p, 1 - p) * 3.5);       /* ramps over ~30% each end */
+    el.style.setProperty('--glow-in', glow.toFixed(3));
+    el.style.setProperty('--glow-shift', still ? '0' : ((0.5 - p) * 220).toFixed(1));
+    el.classList.toggle('is-lit', glow > 0.02);
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  /* Hover reaction: hearts and emoji float up from the card. */
+  if (!still) {
+    var last = new WeakMap();
+    el.querySelectorAll('.testimonial-card').forEach(function(card) {
+      card.addEventListener('pointerenter', function(e) {
+        if (e.pointerType === 'touch') return;
+        var now = Date.now();
+        if (now - (last.get(card) || 0) < 900) return;
+        last.set(card, now);
+        card.classList.add('is-reacting');
+        setTimeout(function() { card.classList.remove('is-reacting'); }, 2100);
+        /* 3-4 reactions, a mix of hearts and emoji, blooming out from
+           just above both top corners (split at random, one side gets more). */
+        var host = card.parentElement.parentElement; /* section container */
+        var cr = card.getBoundingClientRect(), hr = host.getBoundingClientRect();
+        var ox = cr.left - hr.left, oy = cr.top - hr.top, w = cr.width, h = cr.height;
+        var picks = ['heart', 'heart', '💪', '🔥', '🙏', '🙌', '👏'];
+        var n = 3 + Math.round(Math.random());
+        var nr = Math.random() < 0.5 ? Math.ceil(n / 2) : Math.floor(n / 2), nl = n - nr;
+        for (var i = 0; i < n; i++) {
+          var pick = picks[Math.floor(Math.random() * picks.length)];
+          /* Corner bloom: start a little above the top edge, about 26px in
+             from each side, so the hovered card (scaled and tilted) never
+             covers them. The right corner fans from straight up to up-right,
+             the left is its mirror, with a little jitter. */
+          var left = i >= nr, k = left ? i - nr : i, m = left ? nl : nr;
+          var base = -100 + (k + 0.5) * (85 / m) + (Math.random() - 0.5) * 14;
+          var ang = (left ? -180 - base : base) * Math.PI / 180;
+          var dist = 72 + Math.random() * 34;
+          var x = left ? 26 : w - 26, y = -6 - Math.random() * 4, dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist;
+          var s = document.createElement('span');
+          s.className = 'testimonial-heart' + (pick === 'heart' ? '' : ' testimonial-heart--emoji');
+          if (pick !== 'heart') s.textContent = pick;
+          s.setAttribute('aria-hidden', 'true');
+          var size = pick === 'heart' ? 12 + Math.random() * 8 : 18 + Math.random() * 8;
+          s.style.cssText = '--hl:' + (ox + x).toFixed(0) + 'px;--ht:' + (oy + y).toFixed(0) + 'px;--hs:' + size.toFixed(0) + 'px;--hd:' + (i * 0.12 + Math.random() * 0.1).toFixed(2) + 's;--hdx:' + dx.toFixed(0) + 'px;--hdy:' + dy.toFixed(0) + 'px;--hr:' + (Math.random() * 24 - 12).toFixed(0) + 'deg';
+          s.addEventListener('animationend', function() { this.remove(); });
+          host.appendChild(s);
+        }
+      });
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  update();
+})();
+</script>
+<script is:inline>
+/* Testimonials background: the Antennae Galaxies (NGC 4038 and NGC 4039),
+   two spirals mid-collision, drawn as particles on one canvas. Same dot
+   language as the hero intro and the face halftone: small solid round dots
+   in the brand indigo, colours read from CSS custom properties, canvas
+   capped at 2x with a pixel budget. Two dense cores trail spiral arms and
+   lean toward each other with a rose glow where they meet; two sparse tails
+   stream away, one up and left, one down and right. Opacity (--glow-in) and
+   parallax (--glow-shift) stay on the canvas in CSS. It only animates while
+   the section is lit and the tab is visible, and draws one still frame with
+   reduced motion. */
+(function() {
+  var sec = document.querySelector('[data-testimonials]');
+  var cv = sec && sec.querySelector('.testimonials-galaxy');
+  var ctx = cv && cv.getContext('2d');
+  if (!ctx) return;
+  var still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var TAU = Math.PI * 2, PAD = 120, PIXELS = 7e6, STILL_T = 26;
+  var W = 0, H = 0, K = 1, col = null, raf = 0, running = false, last = 0, clock = STILL_T;
+
+  function rng(a) { return function() { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  var rand = rng(4038);
+  function gauss() { return (rand() + rand() + rand() + rand() - 2) * 0.87; }
+  function clamp(x, a, b) { return x < a ? a : x > b ? b : x; }
+  function smooth(a, b, x) { var t = clamp((x - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+
+  /* Particles live in unit space, so a resize never rebuilds them. */
+  var disks = [[], []], tails = [[], []], stars = [], i, g, p, r, u;
+  for (g = 0; g < 2; g++) {
+    for (i = 0; i < 820; i++) {
+      u = rand();
+      if (u < 0.62) {          /* spiral arms, two per galaxy */
+        r = Math.pow(rand(), 0.8);
+        p = { r: r, a: (i & 1 ? Math.PI : 0) + 4.2 * r + gauss() * (0.16 + 0.4 * r) };
+      } else {                 /* bulge and halo */
+        r = Math.pow(rand(), 1.9);
+        p = { r: r, a: rand() * TAU };
+      }
+      p.z = 0.5 + rand() * 0.55 + (1 - r) * 0.5;       /* dot radius, px */
+      p.l = 0.3 + 0.7 * rand();                         /* brightness */
+      p.f = rand() * TAU;
+      disks[g].push(p);
+    }
+    for (i = 0; i < 780; i++) {
+      tails[g].push({ s: rand(), o: gauss(), z: 0.45 + rand() * 0.6, l: 0.3 + 0.7 * rand(), f: rand() * TAU });
+    }
+  }
+  for (i = 0; i < 150; i++) stars.push({ x: rand(), y: rand(), z: 0.4 + rand() * 0.6, l: 0.25 + 0.75 * rand(), f: rand() * TAU });
+
+  /* Colours come from CSS custom properties on the canvas, so both themes
+     and any later token change are picked up by readColors(). */
+  function hex(v, fb) {
+    var m = /^#([0-9a-f]{6})$/i.exec((v || '').trim()) || /^#([0-9a-f]{6})$/i.exec(fb);
+    var n = parseInt(m[1], 16);
+    return [n >> 16 & 255, n >> 8 & 255, n & 255];
+  }
+  function readColors() {
+    var cs = getComputedStyle(cv);
+    function v(n, fb) { return hex(cs.getPropertyValue(n), fb); }
+    var a = v('--gal-a', '#8080f0'), b = v('--gal-b', '#b6b0f8'), w = v('--gal-warm', '#f08cb0'), s = v('--gal-star', '#b6b0f8');
+    function mix(c, d, t) { return 'rgb(' + Math.round(c[0] + (d[0] - c[0]) * t) + ',' + Math.round(c[1] + (d[1] - c[1]) * t) + ',' + Math.round(c[2] + (d[2] - c[2]) * t) + ')'; }
+    function ramp(c) { var o = []; for (var k = 0; k <= 6; k++) o.push(mix(c, w, k / 6)); return o; }
+    col = {
+      ramp: [ramp(a), ramp(b)], star: mix(s, s, 0), rgb: [a, b, w],
+      blend: cs.getPropertyValue('--gal-blend').trim() || 'source-over',
+      glow: parseFloat(cs.getPropertyValue('--gal-glow')) || 0.16
+    };
+  }
+  function rgba(c, al) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + al + ')'; }
+
+  function size() {
+    var host = cv.parentNode, w = host.clientWidth, h = host.clientHeight + PAD * 2;
+    if (!w || !h) return false;
+    K = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXELS / (w * h)));
+    W = w; H = h;
+    cv.width = Math.round(W * K); cv.height = Math.round(H * K);
+    return true;
+  }
+
+  function bez(a, b, c, d, s) { var m = 1 - s; return m * m * m * a + 3 * m * m * s * b + 3 * m * s * s * c + s * s * s * d; }
+  function dbez(a, b, c, d, s) { var m = 1 - s; return 3 * m * m * (b - a) + 6 * m * s * (c - b) + 3 * s * s * (d - c); }
+
+  function draw(t) {
+    if (!col) readColors();
+    ctx.setTransform(K, 0, 0, K, 0, 0);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, W, H);
+
+    /* Stage: the cores sit in the extra room above the heading. */
+    var padTop = parseFloat(getComputedStyle(sec).paddingTop) || 240;
+    var R = clamp(W * 0.16, 60, 230);
+    var cx = W * 0.5, cy = PAD + padTop * 0.78;
+    var ph = 0.42 + 0.14 * Math.sin(t * 0.045);              /* gentle rock, keeps the pair together */
+    var sep = R * (1.7 + 0.08 * Math.sin(t * 0.06));
+    var dx = Math.cos(ph) * sep / 2, dy = Math.sin(ph) * sep / 2;
+    var C = [{ x: cx - dx, y: cy - dy }, { x: cx + dx, y: cy + dy }];
+    var tilt = [-0.55, 0.5], flat = [0.5, 0.62], spin = [0.05, 0.044];
+    var mx = cx, my = cy;
+
+    /* Background stars. */
+    ctx.fillStyle = col.star;
+    for (i = 0; i < stars.length; i++) {
+      var st = stars[i];
+      ctx.globalAlpha = 0.16 + 0.4 * st.l * (0.65 + 0.35 * Math.sin(t * 0.25 + st.f));
+      ctx.beginPath(); ctx.arc(st.x * W, st.y * H, st.z * 1.05, 0, TAU); ctx.fill();
+    }
+
+    ctx.globalCompositeOperation = col.blend;
+    /* Glow: rose where the cores meet, a faint wash over each core. */
+    function wash(x, y, rad, c, al) {
+      var gr = ctx.createRadialGradient(x, y, 0, x, y, rad);
+      gr.addColorStop(0, rgba(c, al)); gr.addColorStop(1, rgba(c, 0));
+      ctx.globalAlpha = 1; ctx.fillStyle = gr; ctx.fillRect(x - rad, y - rad, rad * 2, rad * 2);
+    }
+    wash(C[0].x, C[0].y, R * 1.3, col.rgb[0], col.glow * 0.5);
+    wash(C[1].x, C[1].y, R * 1.3, col.rgb[1], col.glow * 0.5);
+    wash(mx, my, R * 1.25, col.rgb[2], col.glow * 0.9);
+
+    /* Tidal tails: cubic curves leaving the cores. Particles stream slowly
+       along them and fade in and out at the ends, so nothing pops. */
+    var pts = [
+      [C[0].x, C[0].y, C[0].x - W * 0.2, C[0].y - R * 1.9, W * 0.04, cy - R * 1.7, W * 0.025, cy + H * 0.2],
+      [C[1].x, C[1].y, C[1].x + W * 0.24, C[1].y + R * 1.3, W * 0.98, cy + R * 2.8, W * 0.93, cy + H * 0.5]
+    ];
+    var drift = (t * 0.0035) % 1, lastStyle = '', k, arr;
+    for (k = 0; k < 2; k++) {
+      var q = pts[k];
+      arr = tails[k];
+      for (i = 0; i < arr.length; i++) {
+        p = arr[i];
+        var s = (p.s + drift * (k ? 1 : 0.85)) % 1;
+        var fade = smooth(0, 0.07, s) * Math.pow(1 - s, 0.9);
+        if (fade < 0.02) continue;
+        var x = bez(q[0], q[2], q[4], q[6], s), y = bez(q[1], q[3], q[5], q[7], s);
+        var tx = dbez(q[0], q[2], q[4], q[6], s), ty = dbez(q[1], q[3], q[5], q[7], s), tl = Math.hypot(tx, ty) || 1;
+        var wd = R * (0.1 + 0.55 * Math.pow(s, 0.8)) * p.o + Math.sin(t * 0.2 + p.f) * 1.2;
+        x += -ty / tl * wd; y += tx / tl * wd;
+        var near = Math.exp(-Math.pow(Math.hypot(x - mx, y - my) / (R * 0.9), 2));
+        var style = col.ramp[k][Math.round(near * 6)];
+        if (style !== lastStyle) { ctx.fillStyle = style; lastStyle = style; }
+        ctx.globalAlpha = Math.min(1, 0.72 * p.l * fade + 0.06);
+        ctx.beginPath(); ctx.arc(x, y, p.z * (0.7 + 0.5 * (1 - s)), 0, TAU); ctx.fill();
+      }
+    }
+
+    /* Spiral cores: the pattern turns rigidly, outer stars lean toward the
+       other core (the tidal pull). */
+    for (g = 0; g < 2; g++) {
+      var me = C[g], other = C[1 - g], ox = other.x - me.x, oy = other.y - me.y, ol = Math.hypot(ox, oy) || 1;
+      var ct = Math.cos(tilt[g]), sn = Math.sin(tilt[g]);
+      arr = disks[g];
+      ox /= ol; oy /= ol;
+      for (i = 0; i < arr.length; i++) {
+        p = arr[i];
+        var ang = p.a + spin[g] * t * (1 + 0.3 * (1 - p.r));
+        var rad = p.r * R * 1.2;
+        var lx = Math.cos(ang) * rad, ly = Math.sin(ang) * rad * flat[g];
+        var px = me.x + lx * ct - ly * sn + ox * p.r * p.r * R * 0.5 + Math.sin(t * 0.3 + p.f) * 0.7;
+        var py = me.y + lx * sn + ly * ct + oy * p.r * p.r * R * 0.5 + Math.cos(t * 0.27 + p.f) * 0.7;
+        var nr = Math.exp(-Math.pow(Math.hypot(px - mx, py - my) / (R * 0.8), 2));
+        var st2 = col.ramp[g][Math.round(nr * 6)];
+        if (st2 !== lastStyle) { ctx.fillStyle = st2; lastStyle = st2; }
+        ctx.globalAlpha = Math.min(1, p.l * (0.28 + 0.72 * (1 - p.r * 0.75)) + nr * 0.25);
+        ctx.beginPath(); ctx.arc(px, py, p.z, 0, TAU); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* Loop: roughly 30 fps is plenty for something this slow. Time only
+     advances while drawing, so pausing and resuming never jumps. */
+  function frame(now) {
+    raf = 0;
+    if (!running) return;
+    if (now - last >= 33) { clock += Math.min(now - last, 100) / 1000; last = now; draw(clock); }
+    raf = requestAnimationFrame(frame);
+  }
+  function sync() {
+    var on = !still && sec.classList.contains('is-lit') && !document.hidden;
+    if (on && !running) { running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+    else if (!on && running) { running = false; if (raf) cancelAnimationFrame(raf); raf = 0; }
+  }
+
+  if (size()) { readColors(); draw(clock); }
+  if (window.ResizeObserver) new ResizeObserver(function() { if (size()) { col = null; draw(clock); } }).observe(cv.parentNode);
+  window.addEventListener('resize', function() { if (size()) draw(clock); });
+  /* Theme switch: re-read the colours and repaint (the loop repaints itself). */
+  new MutationObserver(function() { col = null; if (!W) size(); if (!running) draw(clock); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  if (!still) {
+    new MutationObserver(sync).observe(sec, { attributes: true, attributeFilter: ['class'] });
+    document.addEventListener('visibilitychange', sync);
+    sync();
+  }
+})();
+</script>
 
 <script is:inline>
 /* Hero intro glue. The intro itself is /scripts/hero-cut.js (loaded above,

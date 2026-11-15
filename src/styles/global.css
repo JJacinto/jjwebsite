@@ -1078,6 +1078,76 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   .testimonials::before { animation: none; }
 }
 .testimonials .eyebrow { text-align: center; display: block; margin-bottom: var(--dimension-space-40); }
+/* Delight layer. The Antennae Galaxies (NGC 4038 and NGC 4039, two spirals
+   mid-collision) drawn as particles on a canvas behind the cards; the
+   script is in index.astro. It follows your scroll: a small script sets
+   --glow-in (0 to 1, how far into the section you are, easing in and out
+   at both ends) and --glow-shift (a parallax offset in px). The layer is
+   masked so it melts into the page at the top and bottom instead of
+   stopping at a hard line. The extra top padding is the stage for the two
+   cores, above the heading; the tails sweep down the side margins. Content
+   sits above. */
+.testimonials { padding-top: clamp(220px, 22vw, 300px); }
+.testimonials > .container { position: relative; z-index: 1; }
+.testimonials-glow {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 min(22%, 140px), #000 calc(100% - min(22%, 140px)), transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 min(22%, 140px), #000 calc(100% - min(22%, 140px)), transparent 100%);
+}
+/* Galaxy colours, read by the script: two cool cores and a warm rose where
+   they meet. Dark mode lifts them and lets overlapping dots add up. */
+.testimonials-galaxy {
+  --gal-a: var(--color-primary-60);
+  --gal-b: var(--color-primary-50);
+  --gal-warm: #d9668f;
+  --gal-star: var(--color-primary-50);
+  --gal-blend: source-over;
+  --gal-glow: 0.14;
+  position: absolute; left: 0; top: -120px; width: 100%; height: calc(100% + 240px);
+  opacity: var(--glow-in, 0);
+  transform: translate3d(0, calc(var(--glow-shift, 0) * 1px), 0);
+  will-change: opacity, transform;
+}
+[data-theme="dark"] .testimonials-galaxy {
+  --gal-a: var(--color-primary-40);
+  --gal-b: var(--color-primary-30);
+  --gal-warm: #f08cb0;
+  --gal-star: var(--color-primary-30);
+  --gal-blend: lighter;
+  --gal-glow: 0.2;
+}
+/* Hover reaction: hovering a card sends hearts and emoji out from behind
+   its edges, like reactions on a post. Spawned by a script in index.astro
+   into the section container and removed when their animation ends.
+   Layering: the hovered card (z 2) sits over its reactions (z 1), which
+   sit over the other cards, so they bloom from behind it into view. */
+.testimonials-masonry .testimonial-card:hover,
+.testimonials-masonry .testimonial-card.is-reacting { z-index: 2; }
+.testimonial-heart {
+  position: absolute; z-index: 1; pointer-events: none;
+  left: var(--hl, 50%); top: var(--ht, 50%); margin: calc(var(--hs, 14px) / -2) 0 0 calc(var(--hs, 14px) / -2);
+  width: var(--hs, 14px); aspect-ratio: 24 / 22;
+  background: linear-gradient(160deg, var(--color-primary-40), var(--spark-warm, #f08cb0));
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M12 21.6 10.3 20C4.2 14.5 0 10.8 0 6.3 0 2.7 2.8 0 6.4 0c2 0 4 .9 5.6 2.4C13.6.9 15.6 0 17.6 0 21.2 0 24 2.7 24 6.3c0 4.5-4.2 8.2-10.3 13.7z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 22'%3E%3Cpath d='M12 21.6 10.3 20C4.2 14.5 0 10.8 0 6.3 0 2.7 2.8 0 6.4 0c2 0 4 .9 5.6 2.4C13.6.9 15.6 0 17.6 0 21.2 0 24 2.7 24 6.3c0 4.5-4.2 8.2-10.3 13.7z'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter: drop-shadow(0 0 6px rgba(240,140,176,0.55));
+  animation: testimonial-heart-up 1.6s cubic-bezier(0.22, 1, 0.36, 1) var(--hd, 0s) both;
+}
+/* Emoji variant: same rise, the glyph instead of the masked heart. */
+.testimonial-heart--emoji {
+  width: auto; aspect-ratio: auto; background: none;
+  -webkit-mask: none; mask: none;
+  font-size: var(--hs, 18px); line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+}
+.testimonial-card { --spark-warm: #d9668f; }
+[data-theme="dark"] .testimonial-card { --spark-warm: #f08cb0; }
+@keyframes testimonial-heart-up {
+  0%   { transform: translate(0, 0) scale(0.4) rotate(0deg); opacity: 0; }
+  25%  { transform: translate(calc(var(--hdx, 0px) * 0.45), calc(var(--hdy, -40px) * 0.45)) scale(1.05) rotate(calc(var(--hr, 6deg) * 0.5)); opacity: 1; }
+  100% { transform: translate(var(--hdx, 0px), var(--hdy, -40px)) scale(0.85) rotate(var(--hr, 6deg)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .testimonial-heart { display: none; } }
 /* Featured manager quote on the left across both rows; the two
    peer quotes stack on the right. Cards are flex columns so the
    footer sits on the bottom edge whatever the quote length. */
@@ -1089,6 +1159,10 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
   margin-inline: calc(50% - min(50vw - var(--dimension-space-24), 760px));
 }
 .testimonial-card--featured { grid-row: span 2; }
+/* Second block (Anchorage): the featured quote sits on the right and the
+   four peer quotes fill the two columns beside it. */
+.testimonials-masonry { grid-auto-flow: dense; }
+.testimonial-card--featured-end { grid-column: 3; }
 @media (max-width: 1180px) {
   .testimonials-masonry { grid-template-columns: 1fr 1fr; margin-inline: 0; }
   .testimonial-card--featured { grid-column: 1 / -1; grid-row: auto; }
@@ -1136,6 +1210,11 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .testimonials-masonry .testimonial-card:nth-child(3) .testimonial-stroke-light { animation-delay: -14s; }
 .testimonials-masonry .testimonial-card:nth-child(4) .testimonial-stroke-light { animation-delay: -4s; }
 .testimonials-masonry .testimonial-card:nth-child(5) .testimonial-stroke-light { animation-delay: -11s; }
+.testimonials-masonry .testimonial-card:nth-child(6) .testimonial-stroke-light { animation-delay: -18s; }
+.testimonials-masonry .testimonial-card:nth-child(7) .testimonial-stroke-light { animation-delay: -2s; }
+.testimonials-masonry .testimonial-card:nth-child(8) .testimonial-stroke-light { animation-delay: -9s; }
+.testimonials-masonry .testimonial-card:nth-child(9) .testimonial-stroke-light { animation-delay: -16s; }
+.testimonials-masonry .testimonial-card:nth-child(10) .testimonial-stroke-light { animation-delay: -5s; }
 @keyframes testimonial-stroke-refract {
   0%   { background-position: -100% -60%, 200%  200%; }
   100% { background-position:  200%  200%, -100% -60%; }
@@ -1269,6 +1348,7 @@ p { font-family: var(--font-family-body); font-size: var(--font-size-base); colo
 .testimonial-logo--talkdesk { --logo: url("/assets/logos/talkdesk-mark.svg"); width: 14px; }
 .testimonial-logo--streamyard { --logo: url("/assets/logos/streamyard-mark.svg"); }
 .testimonial-logo--beubi { --logo: url("/assets/logos/beubi.avif"); width: 32px; }
+.testimonial-logo--anchorage { --logo: url("/assets/logos/anchorage-mark.svg"); width: 20px; }
 .testimonial-card:hover .testimonial-logo { background: var(--text-primary); }
 .testimonial-source { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); white-space: nowrap; transition: color var(--motion-duration-standard) var(--motion-easing-standard); }
 .testimonial-card:hover .testimonial-source { color: var(--text-brand); }
@@ -1590,6 +1670,37 @@ body:has(.work-wrap) .global-cta-section { padding-top: clamp(var(--dimension-sp
   transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
 }
 .is-playing .about-story-note { opacity: 0; }
+
+/* Anchorage 2026 Impact Award, under the story note */
+.about-award {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--dimension-space-12);
+  margin: var(--dimension-space-20) 0;
+  padding: var(--dimension-space-12) var(--dimension-space-16);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-card-lg, 12px);
+  background: var(--surface-default);
+  max-width: 44ch;
+  transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
+}
+.is-playing .about-award { opacity: 0; }
+.about-award-medal { flex: none; width: 28px; height: 34px; }
+.about-award-ribbon { fill: var(--text-tertiary); }
+.about-award-disc { fill: var(--text-brand); }
+.about-award-ring { fill: none; stroke: var(--text-on-brand); stroke-opacity: 0.45; stroke-width: 1; }
+.about-award-star { fill: var(--text-on-brand); }
+.about-award figcaption { display: grid; gap: var(--dimension-space-4, 4px); }
+.about-award-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.about-award-text {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  text-wrap: pretty;
+}
 @media (max-width: 768px) {
   .about-story {
     grid-template-columns: 1fr;
