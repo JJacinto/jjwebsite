@@ -1,5 +1,6 @@
 ﻿---
 import '../styles/global.css';
+import { versioned } from '../lib/script-url';
 
 interface Props {
   title?: string;
@@ -372,9 +373,9 @@ const umamiOn  = !!(umamiSrc && umamiId);
 })();
 </script>
 
-<script src="/scripts/nav.js" defer></script>
-<script src="/scripts/text-hover.js" defer></script>
-<script src="/scripts/compose-modal.js" defer></script>
+<script is:inline src={versioned('/scripts/nav.js')} defer></script>
+<script is:inline src={versioned('/scripts/text-hover.js')} defer></script>
+<script is:inline src={versioned('/scripts/compose-modal.js')} defer></script>
 
 <script>
   /* Retune visual-editing overlay — dev only. The branch is dead-code

@@ -730,15 +730,20 @@
     var now      = new Date();
     var lisbonStr = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: 'numeric', hour12: false });
     var hour     = parseInt(lisbonStr, 10);
+    /* Working hours: weekdays 09:00-18:00 Lisbon time. Weekends are off. */
+    var wday     = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', weekday: 'short' });
+    var weekend  = wday === 'Sat' || wday === 'Sun';
     var timeStr  = now.toLocaleString('en-US', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hour12: false });
     var dot      = document.getElementById('footer-status-dot');
     var label    = document.getElementById('footer-status-label');
     if (!dot || !label) return;
     var color, text, icon, state;
-    if (hour >= 9 && hour < 20) {
-      color = '#22c55e'; text = T('Available · Working hours', 'Dispon\u00edvel · Hor\u00e1rio de trabalho'); icon = ''; state = 'available';
-    } else if (hour >= 1 && hour < 9) {
+    if (hour >= 1 && hour < 9) {
       color = '#4b5563'; text = T('Sleeping', 'A dormir');   icon = BOLT; state = 'sleeping';
+    } else if (weekend) {
+      color = '#f59e0b'; text = T('Weekend · Not available', 'Fim de semana · Indisponível'); icon = ''; state = 'offhours';
+    } else if (hour >= 9 && hour < 18) {
+      color = '#22c55e'; text = T('Available · Working hours', 'Dispon\u00edvel · Hor\u00e1rio de trabalho'); icon = ''; state = 'available';
     } else {
       color = '#f59e0b'; text = T('Outside working hours', 'Fora do hor\u00e1rio de trabalho'); icon = ''; state = 'offhours';
     }

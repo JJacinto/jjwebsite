@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import { versioned } from '../lib/script-url';
 import XraySwitch from '../components/XraySwitch.astro';
 import WorkWall from '../components/home/WorkWall.astro';
 ---
@@ -57,7 +58,7 @@ import WorkWall from '../components/home/WorkWall.astro';
       </div>
     </div>
   </section>
-  <script src="/scripts/hero-cut.js" defer></script>
+  <script is:inline src={versioned('/scripts/hero-cut.js')} defer></script>
 
   <!-- WORK WALL -->
   <section class="home-work" id="work">
