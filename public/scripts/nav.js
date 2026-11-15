@@ -330,7 +330,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   document.addEventListener('mousemove', function(e) {
     ball.style.left = e.clientX + 'px';
     ball.style.top  = e.clientY + 'px';
-    const card = e.target.closest('.case-card, .testimonial-card, .wall .tile:not(.ghost):has(.rd), .j-scene.has-case, .next-case, .case-img-ph.is-filled');
+    const card = e.target.closest('.case-card, .testimonial-card[href], .wall .tile:not(.ghost):has(.rd), .j-scene.has-case, .next-case, .case-img-ph.is-filled');
     if (card !== activeCard) {
       activeCard = card;
       if (card) {
