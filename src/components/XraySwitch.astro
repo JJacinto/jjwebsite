@@ -8,16 +8,27 @@
 interface Props {
   wrap: string;
   float?: boolean;
+  /* With float: shown all the time, for pages with no inline switch.
+     Base.astro renders one on every page; a page with its own switch wins. */
+  always?: boolean;
+  /* Renders as a ghost button ("Turn on X-ray" / "Turn off X-ray") instead
+     of a track and knob. Still a role="switch", synced like the others. */
+  button?: boolean;
   label?: string;
   labelPt?: string;
 }
 const DEFAULT_LABEL = "Show the parts you don't see";
-const { wrap, float = false, label = DEFAULT_LABEL, labelPt } = Astro.props;
+const { wrap, float = false, always = false, button = false, label = DEFAULT_LABEL, labelPt } = Astro.props;
 /* Portuguese: the default label has one built in; a custom label needs labelPt. */
 const ptLabel = labelPt ?? (label === DEFAULT_LABEL ? 'Mostrar as partes que não se veem' : undefined);
 ---
-{float ? (
-  <button type="button" role="switch" aria-checked="false" aria-label={label} data-pt-aria-label={ptLabel} class="xray-switch xray-switch--float" data-xray-switch data-xray-wrap={wrap} hidden>
+{button ? (
+  <button type="button" role="switch" aria-checked="false" aria-label="X-ray" data-pt-aria-label="Raio-X" class="btn btn-ghost xray-btn" data-xray-switch data-xray-wrap={wrap} data-umami-event="xray-button" data-sc-each hidden>
+    <span class="xray-btn-off" data-pt="Ligar o Raio-X">Turn on X-ray</span>
+    <span class="xray-btn-on" data-pt="Desligar o Raio-X">Turn off X-ray</span>
+  </button>
+) : float ? (
+  <button type="button" role="switch" aria-checked="false" aria-label={label} data-pt-aria-label={ptLabel} class:list={['xray-switch', 'xray-switch--float', { 'xray-switch--always': always }]} data-xray-switch data-xray-global={always ? '' : undefined} data-xray-wrap={wrap} hidden>
     <span class="xray-track" aria-hidden="true"><span class="xray-knob"></span></span>
     <span class="xray-label" aria-hidden="true" data-pt="Raio-X">X-ray</span>
   </button>
@@ -31,7 +42,12 @@ const ptLabel = labelPt ?? (label === DEFAULT_LABEL ? 'Mostrar as partes que nã
 <script>
   /* Hero/inline switch + floating copy, kept in sync. The `x` key toggles
      the first wrapper on the page. */
-  const switches = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-xray-switch]'));
+  let switches = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-xray-switch]'));
+  /* The site-wide switch steps aside when the page has its own. */
+  if (switches.some((s) => !s.hasAttribute('data-xray-global'))) {
+    switches.filter((s) => s.hasAttribute('data-xray-global')).forEach((s) => s.remove());
+    switches = switches.filter((s) => !s.hasAttribute('data-xray-global'));
+  }
   const wrapOf = (s: HTMLElement) => document.querySelector<HTMLElement>(s.dataset.xrayWrap || '');
   const wraps = Array.from(new Set(switches.map(wrapOf).filter((w): w is HTMLElement => !!w)));
 
@@ -41,8 +57,23 @@ const ptLabel = labelPt ?? (label === DEFAULT_LABEL ? 'Mostrar as partes que nã
       if (!isNaN(mb)) el.setAttribute('data-xray-gap', String(Math.round(mb)));
     });
   }
+  /* The grid lives on <body>, so it covers the shared footer too, which
+     sits outside the page wrapper. The footer CTA takes the same .xray. */
+  const grids = Array.from(document.querySelectorAll<HTMLElement>('.xray-grid'));
+  grids.forEach((g, i) => { if (i === 0) document.body.appendChild(g); else g.remove(); });
+  if (!grids.length && switches.length) {
+    const g = document.createElement('div');
+    g.className = 'xray-grid';
+    g.setAttribute('aria-hidden', 'true');
+    g.innerHTML = '<div class="xray-grid-inner">' + '<span></span>'.repeat(12) + '</div>';
+    document.body.appendChild(g);
+  }
+  const footer = document.querySelector<HTMLElement>('.cta-footer-wrap');
+
   function setXray(wrap: HTMLElement, on: boolean) {
     wrap.classList.toggle('xray', on);
+    document.documentElement.classList.toggle('xray-on', on);
+    if (footer) { footer.classList.toggle('xray', on); if (on) labelGaps(footer); }
     switches.forEach((s) => { if (wrapOf(s) === wrap) s.setAttribute('aria-checked', String(on)); });
     if (on) labelGaps(wrap);
   }

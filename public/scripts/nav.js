@@ -156,10 +156,27 @@ window.addEventListener('resize', movePillIndicator);
     });
   }
 
-  function isOpen() { return !panel.hidden; }
+  /* Closing plays an exit animation first (.is-closing in global.css);
+     the panel counts as closed from the moment it starts. */
+  let closing = false;
+  let closeTimer = 0;
+  function finishClose() {
+    clearTimeout(closeTimer);
+    if (!closing) return;
+    closing = false;
+    panel.classList.remove('is-closing');
+    panel.hidden = true;
+  }
+  panel.addEventListener('animationend', function (e) {
+    if (e.target === panel && closing) finishClose();
+  });
+
+  function isOpen() { return !panel.hidden && !closing; }
   function open() {
     if (isOpen()) return;
     sync();
+    closing = false;
+    panel.classList.remove('is-closing');
     panel.hidden = false;
     btn.setAttribute('aria-expanded', 'true');
     wrap.classList.add('is-open');
@@ -168,7 +185,11 @@ window.addEventListener('resize', movePillIndicator);
   }
   function close(returnFocus) {
     if (!isOpen()) return;
-    panel.hidden = true;
+    closing = true;
+    panel.classList.add('is-closing');
+    /* Fallback in case animationend never fires (e.g. animations off). */
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(finishClose, 400);
     btn.setAttribute('aria-expanded', 'false');
     wrap.classList.remove('is-open');
     if (returnFocus) btn.focus();

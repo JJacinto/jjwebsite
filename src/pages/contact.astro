@@ -18,7 +18,7 @@ import { versioned } from '../lib/script-url';
 
   <section class="contact contact--with-footer cta-footer-wrap" id="contact-section" data-space-root>
     <canvas class="cta-footer-bg" id="contact-canvas" aria-hidden="true"></canvas>
-    <canvas class="hero-space" data-hero-space data-space-auto aria-hidden="true"></canvas>
+    <canvas class="hero-space" data-hero-space data-space-no-orbit data-space-auto data-space-rally data-rally-label="RALLY" data-pt-data-rally-label="TROCAS" data-best-label="BEST" data-pt-data-best-label="MELHOR" data-rally-hint="MOVE TO RETURN" data-pt-data-rally-hint="MOVE O RATO PARA DEVOLVER" aria-hidden="true"></canvas>
     <canvas class="contact-binary" aria-hidden="true"></canvas>
     <div class="contact-inner reveal">
       <h1 data-pt="Vamos falar sobre<br>o que andas a construir.">Let's talk about<br>what you're building.</h1>
@@ -45,14 +45,16 @@ import { versioned } from '../lib/script-url';
       </div>
 
       <div class="contact-row">
-        <span class="contact-row-email">contact@joaojacinto.com</span>
-        <button class="btn btn-ghost contact-card-btn" data-umami-event="contact-email-copy" onclick="copyEmail(this)" aria-label="Copy email address" data-pt-aria-label="Copiar endereço de email">
-          <span class="btn-icon">
-            <svg class="copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <svg class="copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
-          </span>
-          <span id="emailHint" data-pt="Copiar">Copy</span>
-        </button>
+        <span class="contact-copy">
+          <button class="btn btn-ghost contact-card-btn contact-copy-btn" data-umami-event="contact-email-copy" onclick="copyEmail(this)" aria-label="Copy email contact@joaojacinto.com to clipboard" data-pt-aria-label="Copiar o email contact@joaojacinto.com para a área de transferência">
+            <span class="btn-icon">
+              <svg class="copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <svg class="copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+            </span>
+            <span>contact@joaojacinto.com</span>
+          </button>
+          <span class="contact-copy-tip" id="emailCopied" role="status"></span>
+        </span>
         <span class="contact-row-sep" aria-hidden="true"></span>
         <a class="btn btn-ghost contact-card-btn contact-card-btn--icon" data-umami-event="contact-social-linkedin" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
@@ -73,24 +75,17 @@ import { versioned } from '../lib/script-url';
 <script is:inline>
 function copyEmail(el) {
   navigator.clipboard?.writeText('contact@joaojacinto.com').then(() => {
-    const hint = document.getElementById('emailHint');
-    if (!hint) return;
-    /* Save innerHTML so the per-char .sc-wrap structure survives the
-       swap. textContent would collapse it into doubled characters
-       (CCooppyy) because of the c1/c2 layered spans. */
-    const original = hint.innerHTML;
-    hint.textContent = (window.jjLang && window.jjLang() === 'pt') ? 'Copiado!' : 'Copied!';
-    /* Swap the copy SVG out for a checkmark for the same 2s window
-       — the icon transition reinforces the success state alongside
-       the label change. */
-    const def = el.querySelector('.copy-icon-default');
-    const ok  = el.querySelector('.copy-icon-success');
-    if (def) def.style.display = 'none';
-    if (ok)  ok.style.display  = '';
-    setTimeout(() => {
-      hint.innerHTML = original;
-      if (def) def.style.display = '';
-      if (ok)  ok.style.display  = 'none';
+    /* The label stays the address; the copy icon turns into a check and
+       a small tooltip rises above the button for 2s (.is-copied). The
+       tooltip is a status region, so screen readers hear it too. */
+    const tip = document.getElementById('emailCopied');
+    const pt = window.jjLang && window.jjLang() === 'pt';
+    if (tip) tip.textContent = pt ? 'Copiado para a área de transferência' : 'Copied to clipboard';
+    el.classList.add('is-copied');
+    clearTimeout(el._copyTimer);
+    el._copyTimer = setTimeout(() => {
+      el.classList.remove('is-copied');
+      if (tip) setTimeout(() => { if (!el.classList.contains('is-copied')) tip.textContent = ''; }, 300);
     }, 2000);
   });
 }

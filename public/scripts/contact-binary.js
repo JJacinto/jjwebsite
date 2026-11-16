@@ -2,6 +2,9 @@
    button; the visitor's star eases toward their pointer. The closer the two
    are, the faster João's star orbits, the clearer the dashed line between
    them and the more particles stream from the visitor's star to João's.
+   When any button in the section is hovered (or keyboard-focused), both stars
+   move to that button and orbit it together on opposite sides, just outside
+   its edge, so neither ends up behind it.
    When a message is actually sent (compose-modal.js fires "jj:message-sent")
    the two spiral in around the button while ripples quicken, then one flash.
    A small read-out under the field shows the separation.
@@ -30,6 +33,14 @@
   if (!section || !cv || !cta || !cv.getContext) return;
   var ctx = cv.getContext('2d');
   if (!ctx) return;
+  /* The two stars go on a second canvas above the content, so a star passing
+     a button is drawn in front of it, never hidden behind it. The line, the
+     stream and the ripples stay on the canvas under the content. */
+  var cvTop = document.createElement('canvas');
+  cvTop.className = 'contact-binary contact-binary--top';
+  cvTop.setAttribute('aria-hidden', 'true');
+  cv.parentNode.insertBefore(cvTop, cv.nextSibling);
+  var ctxBase = ctx, ctxTop = cvTop.getContext('2d') || ctx;
 
   var TAU = Math.PI * 2;
   var MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
@@ -55,6 +66,9 @@
   var pendingSend = false, calmTimer = 0, calmSent = false;
   var mode = 'sep', dist = 0, inspiral = 0;       /* what the read-out says */
   var shownText = '';
+  var BTN_SEL = 'a.btn, button.btn, .btn';
+  var hoverBtn = null, focusBtn = null, hk = 0;   /* the hovered button, and how far the pair has moved to it */
+  var orb = { x: 0, y: 0, rx: 0, ry: 0, init: false };   /* the orbit, eased between buttons */
 
   /* ---------- helpers ---------- */
   function clamp(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
@@ -121,7 +135,7 @@
     var k = Math.min(window.devicePixelRatio || 1, 2);
     if (r.width === W && r.height === H && k === K) return true;
     W = r.width; H = r.height; K = k;
-    cv.width = Math.round(W * K); cv.height = Math.round(H * K);
+    cv.width = cvTop.width = Math.round(W * K); cv.height = cvTop.height = Math.round(H * K);
     return true;
   }
 
@@ -133,14 +147,25 @@
     last = now;
     if (!t0) t0 = now;
     var t = calm ? 99 : (now - t0) / 1000;
+    ctxTop.setTransform(K, 0, 0, K, 0, 0);
+    ctxTop.clearRect(0, 0, W, H);
     ctx.setTransform(K, 0, 0, K, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.globalAlpha = 1;
 
     var sr = cv.getBoundingClientRect(), br = cta.getBoundingClientRect();
     var c = { x: br.left - sr.left + br.width / 2, y: br.top - sr.top + br.height / 2 };
-    var orx = br.width / 2 + 26, ory = br.height / 2 + 20;
-    function jp() { return { x: c.x + orx * Math.cos(theta), y: c.y + ory * Math.sin(theta) }; }
+    /* the orbit: round the hovered button, else round "Get in touch" */
+    var ob = (!send && !calm && (hoverBtn || focusBtn)) || null;
+    var obr = ob ? ob.getBoundingClientRect() : br;
+    var otx = obr.left - sr.left + obr.width / 2, oty = obr.top - sr.top + obr.height / 2;
+    var otrx = obr.width / 2 + 24, otry = obr.height / 2 + 20;
+    var oe = orb.init && !calm ? Math.min(1, dt * 6) : 1;
+    orb.x += (otx - orb.x) * oe; orb.y += (oty - orb.y) * oe;
+    orb.rx += (otrx - orb.rx) * oe; orb.ry += (otry - orb.ry) * oe; orb.init = true;
+    hk += ((ob ? 1 : 0) - hk) * (calm ? 1 : Math.min(1, dt * 5));
+    var hke = ease(hk);
+    function jp(a) { a = a === undefined ? theta : a; return { x: orb.x + orb.rx * Math.cos(a), y: orb.y + orb.ry * Math.sin(a) }; }
 
     /* where the visitor's body wants to be */
     var tx, ty;
@@ -184,10 +209,12 @@
         if (st > T_IN + T_HOLD) { send = null; born = now; mode = 'sep'; }
       }
     } else {
-      if (!calm) theta += (0.55 + 3.6 * SPEED * p * p) * dt;
+      if (!calm) theta += ((0.45 + 1.2 * SPEED * p * p) * (1 - hke) + 0.8 * hke) * dt;
       J = jp();
-      var wob = 4 + 10 * p;
-      Y = { x: v.x - wob * Math.cos(theta), y: v.y - wob * Math.sin(theta) };
+      var wob = (3 + 5 * p) * (1 - hke);
+      var Yo = jp(theta + Math.PI);                 /* the visitor's place on the orbit, opposite João */
+      var Yf = { x: v.x - wob * Math.cos(theta), y: v.y - wob * Math.sin(theta) };
+      Y = { x: Yf.x + (Yo.x - Yf.x) * hke, y: Yf.y + (Yo.y - Yf.y) * hke };
       if (!calmSent) mode = 'sep';
       dist = d;
     }
@@ -207,13 +234,13 @@
     /* the line between the two, and the stream across it */
     if (Y) {
       var intro = ease((t - 1.2) / 0.5) * (1 - ease((t - 2.8) / 0.9)) * 0.3;
-      var la = Math.min(1, Math.max(intro, 0.16 + 0.3 * p) * LINE) * Math.min(aJ, aY);
+      var la = Math.min(1, Math.max(intro, 0.14 + 0.22 * p) * LINE) * Math.min(aJ, aY) * (1 - hke);
       ctx.globalAlpha = la; ctx.strokeStyle = 'rgb(' + col.dot + ')'; ctx.lineWidth = 1; ctx.setLineDash([2, 6]);
       ctx.beginPath(); ctx.moveTo(Y.x, Y.y); ctx.lineTo(J.x, J.y); ctx.stroke(); ctx.setLineDash([]);
       ctx.globalAlpha = 1;
 
-      if (!calm && !send && t > 2) {
-        spawnAcc += p * p * 46 * STREAM * dt;
+      if (!calm && !send && t > 2 && hk < 0.3) {
+        spawnAcc += p * p * 14 * STREAM * dt;
         if (spawnAcc > 40) spawnAcc = 40;
         while (spawnAcc > 1 && stream.length < 400) { spawnAcc -= 1; stream.push({ u: 0, dur: 0.8 + Math.random() * 0.7, k: 0.5 + Math.random() }); }
       }
@@ -223,14 +250,16 @@
         if (pt.u >= 1) { stream.splice(n, 1); continue; }
         var cx = mx - sy * 0.3 * pt.k, cy = my + sx * 0.3 * pt.k, uu = pt.u, iu = 1 - uu;
         var px = iu * iu * Y.x + 2 * iu * uu * cx + uu * uu * J.x, py = iu * iu * Y.y + 2 * iu * uu * cy + uu * uu * J.y;
-        dot(px, py, 1.1, Math.sin(Math.PI * uu) * 0.9, uu < 0.55 ? col.dot : col.accent);
+        dot(px, py, 1, Math.sin(Math.PI * uu) * 0.6 * (1 - hke), uu < 0.55 ? col.dot : col.accent);
       }
     } else { stream.length = 0; }
 
     if (flash > 0) glow(c.x, c.y, 120 + 260 * (1 - flash), Math.min(1, 0.75 * flash * FLASH), col.accent);
     var you = isPt() ? 'tu' : 'you';
+    ctx = ctxTop;
     body(J.x, J.y, (merged ? 6.5 : 4.5) * SIZE, aJ, col.accent, merged ? '' : 'João');
     if (Y) body(Y.x, Y.y, 3.6 * SIZE, aY, col.dot, send ? '' : you);
+    ctx = ctxBase;
 
     ctx.globalAlpha = 1;
     if (!still) wake();
@@ -277,7 +306,27 @@
   function track(e) { ptr.cx = e.clientX; ptr.cy = e.clientY; ptr.on = true; }
   section.addEventListener('pointermove', track, { passive: true });
   section.addEventListener('pointerdown', track, { passive: true });
-  section.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') ptr.on = false; }, { passive: true });
+  section.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse') ptr.on = false; hoverBtn = null; }, { passive: true });
+
+  /* The hovered or keyboard-focused button: the pair orbits it together. */
+  function btnOf(t) {
+    var b = t && t.closest ? t.closest(BTN_SEL) : null;
+    return b && section.contains(b) && !b.disabled && !b.closest('footer') ? b : null;
+  }
+  section.addEventListener('pointerover', function (e) {
+    if (e.pointerType === 'touch') return;
+    var b = btnOf(e.target); if (b) { hoverBtn = b; wake(); }
+  });
+  section.addEventListener('pointerout', function (e) {
+    var b = btnOf(e.target);
+    if (b && b === hoverBtn && !(e.relatedTarget && b.contains(e.relatedTarget))) hoverBtn = null;
+  });
+  section.addEventListener('focusin', function (e) {
+    var b = btnOf(e.target), fv = true;
+    try { fv = b && b.matches(':focus-visible'); } catch (x) {}
+    if (b && fv) { focusBtn = b; wake(); }
+  });
+  section.addEventListener('focusout', function (e) { if (focusBtn && focusBtn.contains(e.target)) focusBtn = null; });
 
   if (window.ResizeObserver) new ResizeObserver(function () { drawStill(); wake(); }).observe(cv);
   else window.addEventListener('resize', function () { drawStill(); wake(); });

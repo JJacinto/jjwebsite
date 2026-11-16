@@ -15,10 +15,10 @@ const bars = Array.from({ length: 24 }, (_, i) => {
 
 const photos = [
   { src: '/assets/images/photo-astronaut.webp', cap: 'Trained for zero gravity. Employed for zero margin.', capPt: 'Treinado para gravidade zero. Contratado para margem zero.', k: -2, rot: -6 },
-  { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', capPt: 'A praticar baixinho. Os vizinhos discordam.', k: -1, rot: 3 },
+  { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', capPt: 'Intenção de smash. Resultado: lob.', k: -1, rot: 3 },
   { src: '/assets/images/photo-tickets.webp', cap: 'Itinerary: aspirational. Carry-on: overpacked.', capPt: 'Itinerário: ambicioso. Bagagem de mão: a rebentar pelas costuras.', k: 0, rot: -2 },
   { src: '/assets/images/photo-vr.webp', cap: '911 in VR. EV in the garage. Identity crisis.', capPt: 'Um 911 em VR. Um elétrico na garagem. Crise de identidade.', k: 1, rot: 5 },
-  { src: '/assets/images/photo-padel.webp', cap: 'Smash intent. Lob outcome.', capPt: 'Intenção de smash. Resultado: lob.', k: 2, rot: -4 },
+  { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', capPt: 'A praticar baixinho. Os vizinhos discordam.', k: 2, rot: 4 },
 ];
 
 /* How I work. `body` and `tools` are the stack before LLMs; `now` and
@@ -318,6 +318,52 @@ const loop = [
           </div>
 
           <div class="b-card b-music reveal reveal-d1" data-live>
+            <button class="b-play" type="button" aria-pressed="false" aria-label="Play Boreal Haze" data-pt-aria-label="Ouvir Boreal Haze" data-play data-video="QoDfqEXccf0" data-start="162">
+              <svg class="b-play-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z" fill="currentColor"/></svg>
+              <svg class="b-play-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+            </button>
+            <div class="b-play-host" aria-hidden="true"><div data-play-host></div></div>
+            <script is:inline>
+              (() => {
+                const btn = document.querySelector('[data-play]');
+                if (!btn) return;
+                const card = btn.closest('.b-music');
+                let player = null, pending = false;
+                const set = (on) => { btn.setAttribute('aria-pressed', String(on)); card.classList.toggle('is-playing', on); };
+                const build = () => {
+                  player = new YT.Player(card.querySelector('[data-play-host]'), {
+                    host: 'https://www.youtube-nocookie.com',
+                    width: 1, height: 1,
+                    videoId: btn.dataset.video,
+                    playerVars: { start: +btn.dataset.start, autoplay: 1, controls: 0, playsinline: 1, rel: 0 },
+                    events: {
+                      onReady: (e) => e.target.playVideo(),
+                      onStateChange: (e) => set(e.data === YT.PlayerState.PLAYING || e.data === YT.PlayerState.BUFFERING),
+                    },
+                  });
+                };
+                btn.addEventListener('click', () => {
+                  if (player && player.getPlayerState) {
+                    const s = player.getPlayerState();
+                    if (s === YT.PlayerState.PLAYING || s === YT.PlayerState.BUFFERING) { player.pauseVideo(); set(false); }
+                    else {
+                      if (s === YT.PlayerState.ENDED) player.seekTo(+btn.dataset.start, true);
+                      player.playVideo(); set(true);
+                    }
+                    return;
+                  }
+                  if (pending) return;
+                  pending = true; set(true);
+                  if (window.YT && window.YT.Player) return build();
+                  const prev = window.onYouTubeIframeAPIReady;
+                  window.onYouTubeIframeAPIReady = () => { prev && prev(); build(); };
+                  const s = document.createElement('script');
+                  s.src = 'https://www.youtube.com/iframe_api';
+                  s.onerror = () => { pending = false; set(false); };
+                  document.head.appendChild(s);
+                });
+              })();
+            </script>
             <span class="eyebrow b-label" data-pt="A produzir com amigos">Producing with friends</span>
             <a class="b-title" data-umami-event="about-music" href="https://music.youtube.com/watch?v=80hpbDstlhc&list=OLAK5uy_mex7K9FoXhQBxg8yKviL81Avmz9Xfh4WI" target="_blank" rel="noopener noreferrer">Boreal Haze</a>
             <div class="eq" aria-hidden="true">
@@ -888,6 +934,40 @@ const loop = [
         }
       });
     };
+    /* Hold each card at the taller of its two sides, so the flip only
+       reshuffles the chips and never resizes the cards. Measured in one
+       synchronous pass (no paint in between), again on resize, on a
+       language switch and once the fonts settle. */
+    const cards = Array.from(loopEl.querySelectorAll('.loop-card'));
+    const lockHeights = () => {
+      const mode = loopEl.dataset.mode;
+      loopEl.classList.add('is-measuring');
+      cards.forEach((c) => { c.style.minHeight = ''; });
+      const tall = cards.map(() => 0);
+      ['before', 'now'].forEach((m) => {
+        loopEl.dataset.mode = m;
+        cards.forEach((c, i) => { tall[i] = Math.max(tall[i], c.offsetHeight); });
+      });
+      loopEl.dataset.mode = mode;
+      cards.forEach((c, i) => { c.style.minHeight = `${tall[i]}px`; });
+      void loopEl.offsetHeight;
+      loopEl.classList.remove('is-measuring');
+    };
+    lockHeights();
+    let lockT;
+    const relock = () => { clearTimeout(lockT); lockT = setTimeout(lockHeights, 120); };
+    let lastW = loopEl.clientWidth;
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(() => {
+        if (loopEl.clientWidth === lastW) return;
+        lastW = loopEl.clientWidth;
+        relock();
+      }).observe(loopEl);
+    } else {
+      window.addEventListener('resize', relock);
+    }
+    document.addEventListener('jj:langchange', relock);
+    if (document.fonts) document.fonts.ready.then(lockHeights);
     btns.forEach((b) => b.addEventListener('click', () => { touched = true; setMode(b.dataset.loopMode); }));
     const first = loopEl.querySelector('.loop-card');
     if (!reduce && first && 'IntersectionObserver' in window) {
