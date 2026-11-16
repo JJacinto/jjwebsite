@@ -912,23 +912,6 @@ html[data-motion="reduce"] { .hero-replay { display: none; } }
    is the colour the field sits on, so planets and holes read as cut-outs. */
 .cta-footer-wrap .hero-space { --space-ink: var(--background-section-muted); z-index: 0; }
 .contact .hero-space { --space-ink: var(--background-page); }
-/* Feather the field where its section meets the next one, so the stars
-   thin out instead of stopping on a hard horizontal line. The hero fades
-   at its bottom; the closing call-to-action bands fade in at their top;
-   the contact and error pages (which start at the top of the page) fade
-   out at the bottom into the footer. */
-.hero > .hero-space {
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 360px)), transparent 100%);
-          mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 360px)), transparent 100%);
-}
-.cta-footer-wrap .hero-space {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-fade, 360px), #000 100%);
-          mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-fade, 360px), #000 100%);
-}
-.contact .hero-space {
-  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 240px)), transparent 100%);
-          mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 240px)), transparent 100%);
-}
 
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
@@ -1623,7 +1606,6 @@ html[data-motion="reduce"] {
 }
 .about-story-stage.is-paper { cursor: pointer; }
 .about-story-stage svg { display: block; width: 100%; height: 100%; }
-  vector-effect: non-scaling-stroke;   /* it scales down from the orbit's size */
 .st-tangle {
   fill: none; stroke: currentColor; stroke-width: 2.5;
   stroke-linecap: round; stroke-linejoin: round;
@@ -1641,6 +1623,7 @@ html[data-motion="reduce"] {
 }
 .st-pill {
   fill: var(--fill-brand-default); stroke: transparent; stroke-width: 2;
+  vector-effect: non-scaling-stroke;   /* it scales down from the orbit's size */
   transform-box: fill-box; transform-origin: center;
 }
 .is-paper .st-pill { fill: transparent; stroke: currentColor; }
