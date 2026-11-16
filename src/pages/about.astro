@@ -420,7 +420,7 @@ const loop = [
 </Base>
 
 <script is:inline>
-/* About story. Loose particles gather into a tangle (the problem), the
+/* About story. A comet draws a glowing tangle (the problem), the
    tangle collapses into pieces, the pieces get mapped, four are cut,
    the three left merge into one ball, and the ball becomes the knob of
    a single switch. Flipping it turns the paper sketch into the finished, dark
@@ -464,48 +464,61 @@ const loop = [
   const a = (el, frames, opts) => el.animate(frames, Object.assign({ fill: 'forwards', easing: EMPH }, opts));
   const set = (el, props) => el.animate([props, props], { duration: 1, fill: 'forwards' });
 
-  /* Dust: the particles of steps 1 and 2, on a canvas over the SVG and in
-     its coordinates. start() spirals them in from around the stage onto
-     the tangle's path, where they keep shuffling; split() pulls each one
-     into its nearest piece; stop() clears the canvas. */
+  /* Dust: steps 1 and 2, on a canvas over the SVG and in its coordinates.
+     start() sends a comet along the tangle's path; it leaves a glowing
+     line behind it and sheds sparks that hang around the line. split()
+     breaks the line into its sparks and pulls each one into its nearest
+     piece; stop() clears the canvas. The tangle is drawn GROW times the
+     size of the SVG path, so it spills past the stage. */
   const dust = (function () {
     const cv = $('.st-dust'), ctx = cv && cv.getContext && cv.getContext('2d');
     if (!ctx || !tangle.getTotalLength) return { start() {}, split() {}, stop() {} };
-    const PAD = 0.35, N = 520, LUT = 480;
+    const PAD = 0.35, N = 420, LUT = 520, GROW = 1.5;
+    const FLY_IN = 0.25, TRACE = 1.55, FLY_OUT = 0.3;   /* seconds */
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
     const len = tangle.getTotalLength(), lut = [];
-    for (let i = 0; i <= LUT; i++) { const p = tangle.getPointAtLength(len * i / LUT); lut.push(p.x, p.y); }
+    for (let i = 0; i <= LUT; i++) {
+      const p = tangle.getPointAtLength(len * i / LUT);
+      lut.push(C[0] + (p.x - 242) * GROW, C[1] + 2 + (p.y - 186) * GROW);
+    }
     const at = (u) => {
-      u = Math.max(0, Math.min(1, u)) * LUT;
+      u = clamp01(u) * LUT;
       const i = Math.min(LUT - 1, u | 0), f = u - i;
       return [lut[i * 2] + (lut[i * 2 + 2] - lut[i * 2]) * f, lut[i * 2 + 1] + (lut[i * 2 + 3] - lut[i * 2 + 1]) * f];
     };
+    /* Unit tangents at both ends, for the comet's way in and out. */
+    const unit = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1; return [dx / d, dy / d]; };
+    const P0 = at(0), P1 = at(1), T0 = unit(P0, at(0.01)), T1 = unit(at(0.99), P1);
+
     const P = [];
     for (let i = 0; i < N; i++) {
       const u = (i + Math.random()) / N, home = at(u);
-      const ang = Math.random() * Math.PI * 2, rad = 230 + Math.random() * 170;
+      const ang = Math.random() * Math.PI * 2, far = 2 + 34 * Math.pow(Math.random(), 3);
       let k = 0, best = Infinity;
       nodes.forEach((n, j) => {
         const d = (n.s[0] - home[0]) * (n.s[0] - home[0]) + (n.s[1] - home[1]) * (n.s[1] - home[1]);
         if (d < best) { best = d; k = j; }
       });
       P.push({
-        u, k,
-        jx: (Math.random() - 0.5) * 3.5, jy: (Math.random() - 0.5) * 3.5,
-        sx: C[0] + Math.cos(ang) * rad, sy: C[1] + Math.sin(ang) * rad * 0.75,
-        delay: Math.random() * 0.5, dur: 0.75 + Math.random() * 0.45,
-        swirl: (0.6 + Math.random() * 0.9) * (Math.random() < 0.5 ? -1 : 1),
+        u, k, born: -1,
+        dx: Math.cos(ang) * far, dy: Math.sin(ang) * far,
         ph: Math.random() * Math.PI * 2, sp: 0.8 + Math.random() * 1.6,
-        r: 0.9 + Math.random() * 1.1, a: 0.5 + Math.random() * 0.5,
-        accent: Math.random() < 0.1, d2: Math.random() * 0.22,
+        r: 0.9 + Math.random() * 1.3, a: 0.55 + Math.random() * 0.45,
+        accent: Math.random() < 0.3, d2: Math.random() * 0.22,
       });
     }
-    let raf = 0, t0 = 0, splitAt = 0, w = 0, h = 0, k = 0, ink = '', brand = '';
+    let raf = 0, t0 = 0, splitAt = 0, w = 0, h = 0, k = 0, ink = '', brand = '', brand0 = '';
     function size() {
       const cw = stage.clientWidth, ch = stage.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
       if (cw === w && ch === h && dpr === k) return;
       w = cw; h = ch; k = dpr;
       cv.width = Math.round(w * (1 + PAD * 2) * k);
       cv.height = Math.round(h * (1 + PAD * 2) * k);
+    }
+    function trace(from, to) {
+      const a = Math.max(0, Math.round(from * LUT)), b = Math.min(LUT, Math.round(to * LUT));
+      ctx.beginPath(); ctx.moveTo(lut[a * 2], lut[a * 2 + 1]);
+      for (let j = a + 1; j <= b; j++) ctx.lineTo(lut[j * 2], lut[j * 2 + 1]);
     }
     function frame(now) {
       raf = 0;
@@ -515,38 +528,74 @@ const loop = [
       ctx.clearRect(0, 0, cv.width, cv.height);
       if (ts > 0.9) return;
       ctx.setTransform(k * sc, 0, 0, k * sc, w * PAD * k, h * PAD * k);
-      /* A faint thread under the dots once they have gathered, so the
-         mess reads as one knotted line. It goes as the dots leave. */
-      const thread = Math.max(0, Math.min(1, (t - 0.7) / 0.7)) * (ts < 0 ? 1 : Math.max(0, 1 - ts / 0.3));
-      if (thread > 0) {
-        ctx.globalAlpha = 0.28 * thread;
-        ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
-        ctx.beginPath(); ctx.moveTo(lut[0], lut[1]);
-        for (let j = 2; j < lut.length; j += 2) ctx.lineTo(lut[j], lut[j + 1]);
-        ctx.stroke();
+      ctx.lineJoin = ctx.lineCap = 'round';
+
+      /* How far along the path the comet is: steady, eased a little at both ends. */
+      const lin = clamp01((t - FLY_IN) / TRACE);
+      const head = 0.6 * lin + 0.4 * lin * lin * (3 - 2 * lin);
+      const line = ts < 0 ? 1 : Math.max(0, 1 - ts / 0.35);   /* the line goes as the sparks leave */
+
+      /* The glowing line: two soft accent strokes, then a bright core. */
+      if (head > 0 && line > 0) {
+        trace(0, head);
+        ctx.strokeStyle = brand;
+        ctx.globalAlpha = 0.1 * line; ctx.lineWidth = 16; ctx.stroke();
+        ctx.globalAlpha = 0.24 * line; ctx.lineWidth = 7; ctx.stroke();
+        ctx.shadowColor = brand; ctx.shadowBlur = 14 * k;
+        ctx.strokeStyle = ink;
+        ctx.globalAlpha = line * (0.9 + 0.1 * Math.sin(t * 3.2)); ctx.lineWidth = 2.6; ctx.stroke();
+        ctx.shadowBlur = 0;
+        /* Hotter just behind the comet. */
+        if (lin < 1) { trace(head - 0.07, head); ctx.globalAlpha = 0.9; ctx.lineWidth = 4.4; ctx.stroke(); }
       }
+
+      /* Sparks: born as the comet passes, thrown off the line, then they hover. */
       for (let i = 0; i < N; i++) {
         const p = P[i];
-        let g = Math.max(0, Math.min(1, (t - p.delay) / p.dur));
-        if (g <= 0) continue;
-        g = 1 - Math.pow(1 - g, 3);
-        const home = at(p.u + 0.012 * Math.sin(t * p.sp + p.ph));
-        const hx = home[0] + p.jx, hy = home[1] + p.jy;
-        /* Spiral in: the offset from home shrinks while it turns. */
-        const rot = (1 - g) * p.swirl, c = Math.cos(rot), s = Math.sin(rot);
-        const ox = (p.sx - hx) * (1 - g), oy = (p.sy - hy) * (1 - g);
-        let x = hx + ox * c - oy * s, y = hy + ox * s + oy * c;
-        let alpha = p.a * Math.min(1, g * 3), r = p.r;
+        if (p.born < 0) { if (head < p.u || lin <= 0) continue; p.born = t; }
+        const age = t - p.born, out = 1 - Math.exp(-4 * age);
+        const home = at(p.u + 0.008 * Math.sin(t * p.sp + p.ph));
+        let x = home[0] + p.dx * out, y = home[1] + p.dy * out;
+        let alpha = p.a * (0.3 + 0.7 * Math.exp(-1.4 * age)), r = p.r * (1 + 0.8 * Math.exp(-5 * age));
         if (ts >= 0) {
-          let q = Math.max(0, Math.min(1, (ts - p.d2) / 0.45));
+          let q = clamp01((ts - p.d2) / 0.45);
           q = q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
           const n = nodes[p.k].s;
           x += (n[0] - x) * q; y += (n[1] - y) * q;
-          alpha *= 1 - q * q * q; r *= 1 - 0.4 * q;
+          alpha = (alpha + (p.a - alpha) * Math.min(1, ts / 0.15)) * (1 - q * q * q);
+          r *= 1 - 0.4 * q;
         }
         ctx.globalAlpha = alpha;
         ctx.fillStyle = p.accent ? brand : ink;
         ctx.beginPath(); ctx.arc(x, y, r / Math.max(sc, 0.6), 0, Math.PI * 2); ctx.fill();
+      }
+
+      /* The comet: flies in along the first tangent, runs the path, flies out. */
+      if (ts < 0) {
+        let pos = null, dir = T0, seen = 1, tail = 0;
+        if (t < FLY_IN) {
+          const q = t / FLY_IN;
+          pos = [P0[0] - T0[0] * 150 * (1 - q), P0[1] - T0[1] * 150 * (1 - q)]; seen = q; tail = 70;
+        } else if (lin < 1) {
+          pos = at(head);
+        } else {
+          const q = (t - FLY_IN - TRACE) / FLY_OUT;
+          if (q < 1) { pos = [P1[0] + T1[0] * 170 * q, P1[1] + T1[1] * 170 * q]; dir = T1; seen = 1 - q; tail = 70 * (1 - q); }
+        }
+        if (pos) {
+          if (tail) {
+            const g = ctx.createLinearGradient(pos[0], pos[1], pos[0] - dir[0] * tail, pos[1] - dir[1] * tail);
+            g.addColorStop(0, ink); g.addColorStop(0.4, brand); g.addColorStop(1, brand0);
+            ctx.globalAlpha = seen; ctx.strokeStyle = g; ctx.lineWidth = 3.4;
+            ctx.beginPath(); ctx.moveTo(pos[0], pos[1]); ctx.lineTo(pos[0] - dir[0] * tail, pos[1] - dir[1] * tail); ctx.stroke();
+          }
+          const glow = ctx.createRadialGradient(pos[0], pos[1], 0, pos[0], pos[1], 42);
+          glow.addColorStop(0, brand); glow.addColorStop(1, brand0);
+          ctx.globalAlpha = 0.7 * seen; ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(pos[0], pos[1], 42, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = seen; ctx.fillStyle = ink;
+          ctx.beginPath(); ctx.arc(pos[0], pos[1], 5, 0, Math.PI * 2); ctx.fill();
+        }
       }
       ctx.globalAlpha = 1;
       raf = requestAnimationFrame(frame);
@@ -561,6 +610,9 @@ const loop = [
         stop();
         ink = getComputedStyle(stage).color;
         brand = getComputedStyle(cv).color;
+        /* The accent at zero alpha, for gradients that fade to nothing. */
+        brand0 = /^rgb\(/.test(brand) ? brand.replace('rgb(', 'rgba(').replace(')', ', 0)') : 'rgba(128,128,240,0)';
+        P.forEach((p) => { p.born = -1; });
         t0 = performance.now(); splitAt = 0;
         raf = requestAnimationFrame(frame);
       },
@@ -618,10 +670,10 @@ const loop = [
     nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(n.s, 0) }));
     stage.classList.remove('is-pending');
 
-    /* 1. Take the tangle as it is: particles gather into the mess. */
+    /* 1. Take the tangle as it is: a comet draws the mess as a glowing line. */
     step(0);
     dust.start();
-    await wait(1900); if (!live()) return;
+    await wait(2500); if (!live()) return;
 
     /* 2. Pull it apart into pieces: the mess collapses into the nodes,
        each one growing where its particles land. */
