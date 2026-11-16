@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import { versioned } from '../lib/script-url';
 import Footer from '../components/Footer.astro';
+import XraySwitch from '../components/XraySwitch.astro';
 
 interface Props {
   title?: string;
@@ -229,7 +230,35 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <div class="container">
     <a href="/" class="logo-outer" aria-label="Home" data-pt-aria-label="Início">
       <span class="logo-bg"></span>
-      <img class="logo-mark" src="/assets/jj-logo.svg" alt="" aria-hidden="true">
+      {/* Inline copy of /assets/jj-logo.svg so the hover light pass can
+          run along the strokes. .logo-pass paths are stroke centrelines,
+          clipped to the mark by the mask. */}
+      <svg class="logo-mark" viewBox="0 0 1080 1080" aria-hidden="true" focusable="false">
+        <defs>
+          <g id="jjLogoShape">
+            <g transform="matrix(1.20499,0,0,1.20469,-1150.09,-2581.94)">
+              <path d="M1468.5,2314.5C1439.63,2429.03 1365.6,2721.15 1340.63,2804.28C1299.23,2942.15 1221.67,2989.38 1144.62,2967.52C1076.63,2948.24 1029.01,2878.62 1064.42,2754.18C1071.3,2730.03 1096.48,2716.01 1120.62,2722.89C1144.76,2729.76 1158.78,2754.94 1151.9,2779.09C1143.99,2806.88 1141.6,2830.08 1144.94,2848.7C1147.87,2865.03 1156.11,2876.22 1169.43,2880C1186.93,2884.96 1201.96,2876.29 1215.43,2859.34C1230.49,2840.4 1243.01,2813.11 1253.52,2778.11C1284.56,2674.74 1391.99,2245.82 1391.99,2245.82C1395.13,2233.26 1403.23,2223.24 1413.67,2217.31C1427.34,2208.36 1445.39,2207.09 1460.66,2215.55C1460.66,2215.55 1529.91,2253.82 1599.98,2215.75C1622.04,2203.77 1649.67,2211.95 1661.65,2234.02C1673.62,2256.08 1665.44,2283.72 1643.39,2295.7C1577.48,2331.5 1512.03,2325.74 1468.5,2314.5Z"/>
+              <path d="M1392.08,2879.85C1399.28,2869.7 1423.21,2833.42 1439.82,2778.11C1483.13,2633.9 1530.2,2440.99 1530.2,2440.99C1536.15,2416.6 1560.78,2401.63 1585.17,2407.59C1609.55,2413.54 1624.51,2438.17 1618.56,2462.56C1618.56,2462.56 1570.83,2658.11 1526.93,2804.28C1504.59,2878.69 1480.11,2921.48 1456.11,2945.35C1406.45,2994.74 1361.63,2963.16 1361.63,2963.16C1340.57,2949.52 1334.54,2921.33 1348.18,2900.26C1357.98,2885.11 1375.3,2877.73 1392.08,2879.85Z"/>
+            </g>
+            <g transform="matrix(1.20499,0,0,1.20469,-1229.74,-2381.85)">
+              <path d="M1722.17,2773.11C1715.66,2797.35 1690.7,2811.76 1666.46,2805.26C1642.22,2798.75 1627.82,2773.79 1634.32,2749.54L1663.35,2641.27C1669.85,2617.02 1694.81,2602.61 1719.05,2609.12C1743.3,2615.62 1757.7,2640.58 1751.2,2664.83L1722.17,2773.11Z"/>
+            </g>
+          </g>
+          <mask id="jjLogoMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1080" height="1080">
+            <use href="#jjLogoShape" fill="#fff"/>
+          </mask>
+        </defs>
+        <use href="#jjLogoShape" fill="currentColor"/>
+        <g mask="url(#jjLogoMask)">
+          <g transform="matrix(1.20499,0,0,1.20469,-1150.09,-2581.94)">
+            <path class="logo-pass logo-pass-1" pathLength="1" d="M1120,2715C1075,2850 1100,2912 1157,2924C1215,2938 1267,2895 1297,2791C1330,2680 1437,2256 1437,2256C1480,2285 1560,2305 1665,2232"/>
+            <path class="logo-pass logo-pass-2" pathLength="1" d="M1587,2400C1574,2452 1527,2645 1483,2791C1455,2885 1420,2925 1335,2925"/>
+          </g>
+          <g transform="matrix(1.20499,0,0,1.20469,-1229.74,-2381.85)">
+            <path class="logo-pass logo-pass-3" pathLength="1" d="M1721,2600L1664,2814"/>
+          </g>
+        </g>
+      </svg>
     </a>
 
     <div class="pill-nav" id="pillNav">
@@ -312,7 +341,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
           its own particles when a data-hero-space canvas is beside it);
           the second is the home hero's field, without the portrait. */}
       <canvas class="cta-footer-bg"></canvas>
-      <canvas class="hero-space" data-hero-space data-space-auto></canvas>
+      <canvas class="hero-space" data-hero-space data-space-auto data-space-rally data-hole-a="let go now for a quiet game of zero-gravity pong" data-pt-data-hole-a="larga agora para um pingue-pongue em gravidade zero" data-hole-b="keep holding and I can't promise anything" data-pt-data-hole-b="continua a carregar e não prometo nada" data-hole-c="too late. let go and it's war" data-pt-data-hole-c="tarde demais. larga e é guerra" data-swarm-label="SCORE" data-pt-data-swarm-label="PONTOS" data-swarm-hint="MOVE AND CLICK TO SHOOT" data-pt-data-swarm-hint="MOVE O RATO E CLICA PARA DISPARAR" data-rally-label="RALLY" data-pt-data-rally-label="TROCAS" data-best-label="BEST" data-pt-data-best-label="MELHOR" data-rally-hint="MOVE TO RETURN" data-pt-data-rally-hint="MOVE O RATO PARA DEVOLVER"></canvas>
     </div>
   )}
   <slot />
@@ -325,14 +354,14 @@ const umamiOn  = !!(umamiSrc && umamiId);
         so the page→footer transition looks organic. The old canvas now only
         paints that gradient (compose-modal.js skips its particles when a
         data-hero-space canvas is inside); the particles are the field from
-        /scripts/hero-space.js. The PARTS read-out is skipped on the thin
-        solo strip. */}
+        /scripts/hero-space.js. */}
     <canvas class="cta-footer-bg" aria-hidden="true"></canvas>
-    <canvas class="hero-space" data-hero-space data-space-auto data-space-counter={showCta ? '' : undefined} data-label="PARTS" data-pt-data-label="PARTES" aria-hidden="true"></canvas>
+    <canvas class="hero-space" data-hero-space data-space-auto data-space-rally data-hole-a="let go now for a quiet game of zero-gravity pong" data-pt-data-hole-a="larga agora para um pingue-pongue em gravidade zero" data-hole-b="keep holding and I can't promise anything" data-pt-data-hole-b="continua a carregar e não prometo nada" data-hole-c="too late. let go and it's war" data-pt-data-hole-c="tarde demais. larga e é guerra" data-swarm-label="SCORE" data-pt-data-swarm-label="PONTOS" data-swarm-hint="MOVE AND CLICK TO SHOOT" data-pt-data-swarm-hint="MOVE O RATO E CLICA PARA DISPARAR" data-rally-label="RALLY" data-pt-data-rally-label="TROCAS" data-best-label="BEST" data-pt-data-best-label="MELHOR" data-rally-hint="MOVE TO RETURN" data-pt-data-rally-hint="MOVE O RATO PARA DEVOLVER" aria-hidden="true"></canvas>
     {showCta && (
       <section class="global-cta-section">
         <div class="container">
-          <div class="about-cta reveal">
+          <div class="about-cta reveal" data-xray>
+            <aside class="xray-note" data-xray-note data-pt="Uma pergunta, duas respostas: escreve-me ou marca uma chamada. Mais nada compete pelo clique.">One ask, two answers: write to me or book a call. Nothing else competes for the click.</aside>
             <div class="about-cta-avatar-stack" aria-hidden="true">
               {/* Six-frame roulette, hover-triggered. Each <img> is
                   absolutely positioned over the others; the original
@@ -363,7 +392,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
                   fades it in. */}
               <span class="about-cta-avatar-tooltip"></span>
             </div>
-            <h2 data-pt="Vamos construir algo.">Let's build something.</h2>
+            <h2 data-pt="Tens algo que precisa de estrutura?">Need something held together?</h2>
             <p data-pt="Gosto de trabalho de produto, design systems e projetos 0→1, onde a estrutura conta tanto como a superfície.">Drawn to product work, design systems, and 0→1 projects where the structure matters as much as the surface.</p>
             <div class="about-cta-btns">
               <button class="btn btn-accent" data-umami-event="cta-get-in-touch" onclick="openComposeModal()">
@@ -382,6 +411,9 @@ const umamiOn  = !!(umamiSrc && umamiId);
     {showFooter && <Footer />}
   </div>
 )}
+
+{/* Site-wide X-ray switch. Home and About bring their own, and this one removes itself there. */}
+<XraySwitch float always wrap="#main-content" />
 
 <div id="compose-root"></div>
 
@@ -475,6 +507,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
 
 <script is:inline src={versioned('/scripts/nav.js')} defer></script>
 <script is:inline src={versioned('/scripts/text-hover.js')} defer></script>
+<script is:inline src={versioned('/scripts/card-light.js')} defer></script>
 <script is:inline src={versioned('/scripts/compose-modal.js')} defer></script>
 {/* The field at the top of the page and in the bottom contact areas. The
     home page loads it itself, next to the hero scripts, so the intro finds

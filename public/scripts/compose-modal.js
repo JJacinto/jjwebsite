@@ -106,7 +106,7 @@
           '<span class="form-slider-val" id="proj-timeline-val">Flexible (3–6 mo)</span>' +
         '</div>' +
         '<input class="form-slider" type="range" id="proj-timeline" min="1" max="4" value="2" step="1" aria-labelledby="proj-timeline-label" aria-valuetext="Flexible (3–6 mo)">' +
-        '<div class="form-slider-ticks"><span data-pt="A explorar">Exploring</span><span data-pt="Flex\u00edvel (3–6 meses)">Flexible (3–6 mo)</span><span data-pt="Em breve (1–3 meses)">Soon (1–3 mo)</span><span>ASAP</span></div>' +
+        '<div class="form-slider-ticks" aria-hidden="true"><span data-pt="A explorar">Exploring</span><span>ASAP</span></div>' +
       '</div>' +
       '<div class="compose-field">' +
         '<label class="eyebrow" for="proj-context" data-pt="Fala-me do projeto">Tell me about the project</label>' +
@@ -257,6 +257,9 @@
     /* Pulse-ring diameter per step — grows with urgency, biggest at
        "ASAP". Drives the thumb's --slider-pulse-spread in global.css. */
     var pulseSpread = ['10px', '14px', '17px', '21px'];
+    /* Pulse ring + value colour follow the position: calm violet at
+       "Exploring" (step 1) shifting to warm red at "ASAP" (step 4). */
+    var pulseColor = ['#8080f0', '#9e80c3', '#bb8097', '#d9806a'];
     if (!slider || !val) return;
     var sync = function () {
       var v   = +slider.value;
@@ -269,6 +272,8 @@
       slider.style.setProperty('--slider-frac', String((v - min) / (max - min)));
       slider.style.setProperty('--slider-pulse-dur', pulseDur[v - 1] || '1.7s');
       slider.style.setProperty('--slider-pulse-spread', pulseSpread[v - 1] || '14px');
+      slider.style.setProperty('--slider-pulse-color', pulseColor[v - 1] || '#8080f0');
+      val.style.color = pulseColor[v - 1] || '';
       var labels = L() === 'pt' ? labelsPT : labelsEN;
       var label = labels[v - 1] || labels[0];
       val.textContent = label;
@@ -297,15 +302,99 @@
     langHooks.push(update);
   };
 
-  var showFields = function (idx) {
-    var chatEl = document.getElementById('compose-fields-chat');
-    var projEl = document.getElementById('compose-fields-project');
-    var bookEl = document.getElementById('compose-fields-book');
-    var hireEl = document.getElementById('compose-fields-hiring');
-    if (hireEl) hireEl.style.display = (idx === 3) ? '' : 'none';
-    if (chatEl) chatEl.style.display = (idx === 0) ? '' : 'none';
-    if (projEl) projEl.style.display = (idx === 1) ? '' : 'none';
-    if (bookEl) bookEl.style.display = (idx === 2) ? '' : 'none';
+  /* Segmented toggles: a sliding thumb sits behind the selected option.
+     Options differ in width and count, so the thumb is measured here.
+     Hidden groups measure 0, so layoutSegs() re-runs when fields show,
+     on open, on resize and on language change. */
+  var segGroups = [];
+  var segSelected = function (g) {
+    return g.querySelector('.intent-btn[aria-checked="true"], .form-radio input:checked');
+  };
+  var positionSeg = function (g, instant) {
+    var thumb = g.querySelector('.seg-thumb');
+    var sel = segSelected(g);
+    if (!thumb) return;
+    var opt = sel && (sel.classList.contains('intent-btn') ? sel : sel.parentNode);
+    if (!opt || !g.offsetWidth) { thumb.classList.add('is-empty'); return; }
+    if (instant) thumb.classList.add('is-instant');
+    thumb.classList.remove('is-empty');
+    thumb.style.width = opt.offsetWidth + 'px';
+    thumb.style.transform = 'translateX(' + (opt.offsetLeft - 3) + 'px)';
+    if (instant) { void thumb.offsetWidth; thumb.classList.remove('is-instant'); }
+  };
+  var layoutSegs = function (instant) {
+    segGroups.forEach(function (g) { positionSeg(g, instant); });
+  };
+  var bindSegs = function (root) {
+    Array.prototype.forEach.call(root.querySelectorAll('.intent-toggle, .form-radio-group'), function (g) {
+      var t = document.createElement('span');
+      t.className = 'seg-thumb is-empty';
+      t.setAttribute('aria-hidden', 'true');
+      g.insertBefore(t, g.firstChild);
+      segGroups.push(g);
+      g.addEventListener('change', function () { positionSeg(g, false); });
+    });
+    window.addEventListener('resize', function () { layoutSegs(true); });
+    langHooks.push(function () { layoutSegs(true); });
+  };
+
+  var FIELD_IDS = { 0: 'compose-fields-chat', 1: 'compose-fields-project', 2: 'compose-fields-book', 3: 'compose-fields-hiring' };
+  var applyFields = function (idx) {
+    Object.keys(FIELD_IDS).forEach(function (k) {
+      var el = document.getElementById(FIELD_IDS[k]);
+      if (el) el.style.display = (+k === idx) ? '' : 'none';
+    });
+    /* Snap only the groups inside the fields that just appeared; the
+       intent toggle is positioned (animated) by selectIntent. */
+    segGroups.forEach(function (g) {
+      if (!g.classList.contains('intent-toggle')) positionSeg(g, true);
+    });
+  };
+  var reduceMotion = function () {
+    return document.documentElement.getAttribute('data-motion') === 'reduce' ||
+      (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  };
+  /* Switching intent: the old fields slide out the way the toggle moved
+     away from them, the modal eases to its new height, and the new
+     fields slide in from the side the toggle moved towards. A token
+     drops stale steps when the user switches again mid-animation. */
+  var fieldsToken = 0;
+  var fieldsAnims = [];
+  var showFields = function (idx, prevIdx) {
+    var token = ++fieldsToken;
+    fieldsAnims.forEach(function (a) { try { a.cancel(); } catch (_) {} });
+    fieldsAnims = [];
+    var prevEl = document.getElementById(FIELD_IDS[prevIdx]);
+    var nextEl = document.getElementById(FIELD_IDS[idx]);
+    var modal = document.getElementById('compose-modal');
+    if (prevIdx === undefined || prevIdx === idx || !prevEl || !nextEl || !modal ||
+        !prevEl.animate || reduceMotion() || prevEl.style.display === 'none') {
+      applyFields(idx);
+      return;
+    }
+    var dir = INTENT_ORDER.indexOf(idx) > INTENT_ORDER.indexOf(prevIdx) ? 1 : -1;
+    var h0 = modal.offsetHeight;
+    var out = prevEl.animate([
+      { opacity: 1, transform: 'translateX(0)' },
+      { opacity: 0, transform: 'translateX(' + (-dir * 16) + 'px)' }
+    ], { duration: 140, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' });
+    fieldsAnims.push(out);
+    /* A timer, not onfinish: paused animations (background tabs) must
+       never leave the old fields stuck on screen. */
+    setTimeout(function () {
+      if (token !== fieldsToken) return;
+      out.cancel();
+      applyFields(idx);
+      var h1 = modal.offsetHeight;
+      if (h1 !== h0) {
+        fieldsAnims.push(modal.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }],
+          { duration: 300, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }));
+      }
+      fieldsAnims.push(nextEl.animate([
+        { opacity: 0, transform: 'translateX(' + (dir * 24) + 'px)' },
+        { opacity: 1, transform: 'translateX(0)' }
+      ], { duration: 320, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', delay: 40, fill: 'backwards' }));
+    }, 140);
   };
 
   var collectSharedFields = function () {
@@ -373,6 +462,66 @@
     };
   };
 
+  /* Moon-phase disc whose lit side follows the hour of day (same drawing
+     as the contact page). Used for the header horizon and the sent state. */
+  var planet = function (pc, h, lit) {
+    if (!pc || !pc.getContext) return;
+    var f = (1 + Math.cos(2 * Math.PI * (h - 12) / 24)) / 2;
+    var c = pc.getContext('2d'), S = pc.width, r = S / 2 - 4;
+    c.clearRect(0, 0, S, S); c.save(); c.translate(S / 2, S / 2);
+    c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.clip();
+    c.fillStyle = lit; c.beginPath(); c.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, h >= 12); c.fill();
+    if (f <= 0.5) c.globalCompositeOperation = 'destination-out';
+    c.beginPath(); c.ellipse(0, 0, Math.abs(1 - 2 * f) * r, r, 0, 0, 6.2832); c.fill();
+    c.globalCompositeOperation = 'destination-over';
+    c.globalAlpha = 0.2; c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.fill();
+    c.restore();
+    c.globalAlpha = 0.6; c.beginPath(); c.arc(S / 2, S / 2, r, 0, 6.2832); c.strokeStyle = lit; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1;
+  };
+  var pad2 = function (n) { return ('0' + n).slice(-2); };
+  var lisbonFmt = null;
+  var getTimes = function () {
+    var now = new Date();
+    var you = { h: now.getHours(), m: now.getMinutes() };
+    var av = { h: you.h, m: you.m };
+    try {
+      if (!lisbonFmt) lisbonFmt = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Lisbon', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+      lisbonFmt.formatToParts(now).forEach(function (x) {
+        if (x.type === 'hour') av.h = parseInt(x.value, 10) % 24;
+        if (x.type === 'minute') av.m = parseInt(x.value, 10);
+      });
+    } catch (_) {}
+    you.s = pad2(you.h) + ':' + pad2(you.m); av.s = pad2(av.h) + ':' + pad2(av.m);
+    you.dec = you.h + you.m / 60; av.dec = av.h + av.m / 60;
+    return { you: you, av: av };
+  };
+  var litColors = function (el) {
+    var inv = el && getComputedStyle(el).getPropertyValue('--text-inverse').trim();
+    /* Hex fallbacks if the token is missing or not a colour the canvas
+       can parse. */
+    return { you: inv || '#f0ede8', av: '#9c9cf5' };
+  };
+  var clockTimer = null;
+  var updateBodies = function () {
+    var modal = document.getElementById('compose-modal');
+    if (!modal) return;
+    var t = getTimes();
+    var col = litColors(modal);
+    var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
+    set('compose-time-av', t.av.s);
+    planet(document.getElementById('compose-planet-av'), t.av.dec, col.av);
+    set('compose-desc', T('Your time ' + t.you.s + '. Jo\u00e3o\u2019s time in Aveiro ' + t.av.s + '.',
+                          'A tua hora ' + t.you.s + '. Hora do Jo\u00e3o em Aveiro ' + t.av.s + '.'));
+  };
+  var startClock = function () {
+    updateBodies();
+    clearInterval(clockTimer);
+    clockTimer = setInterval(updateBodies, 60000);
+  };
+  var stopClock = function () { clearInterval(clockTimer); clockTimer = null; };
+  langHooks.push(function () { if (clockTimer) updateBodies(); });
+  var sendLabel = function () { return T('Send', 'Enviar'); };
+
   var getHTML = function () {
     var btnsHTML = INTENT_ORDER.map(function (i) {
       return '<button class="intent-btn" role="radio" aria-checked="' + (i === 0 ? 'true' : 'false') +
@@ -381,15 +530,21 @@
     return (
       '<div class="compose-backdrop" id="compose-backdrop" role="presentation" aria-hidden="true">' +
         '<div class="compose-modal" id="compose-modal" role="dialog" aria-modal="true"' +
-          ' aria-labelledby="compose-heading" aria-describedby="compose-eyebrow">' +
+          ' aria-labelledby="compose-heading" aria-describedby="compose-desc">' +
           '<div class="compose-modal-top">' +
             '<button class="compose-close" id="compose-close" type="button" aria-label="Close" data-pt-aria-label="Fechar">' +
               '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></svg>' +
             '</button>' +
             '<div class="compose-header">' +
-              '<span class="eyebrow" id="compose-eyebrow" data-pt="Vamos falar">Let&#x27;s talk</span>' +
+              /* Live eyebrow: a small Aveiro planet lit by the hour there,
+                 the time, and when to expect a reply. */
+              '<span class="compose-eyebrow" aria-hidden="true">' +
+                '<canvas class="compose-eyebrow-planet" id="compose-planet-av" width="40" height="40"></canvas>' +
+                '<span><b class="compose-eyebrow-time"><span id="compose-time-av"></span> <span data-pt="em Aveiro">in Aveiro</span></b> · <span data-pt="Respondo dentro de um ou dois dias">I reply within a day or two</span></span>' +
+              '</span>' +
               '<h2 id="compose-heading" data-pt="O que te traz por c\u00e1?">What brings you here?</h2>' +
             '</div>' +
+            '<span class="compose-sr" id="compose-desc"></span>' +
             '<div class="intent-toggle" role="radiogroup" aria-label="Message intent" data-pt-aria-label="Tipo de mensagem">' + btnsHTML + '</div>' +
           '</div>' +
           '<div class="compose-modal-body">' +
@@ -406,16 +561,87 @@
               '<span id="compose-copy-hint" data-pt="Copiar o meu email">Copy my email address</span>' +
             '</button>' +
             '<div class="compose-footer-actions">' +
-              '<button class="btn btn-dark-outline" id="compose-cancel" type="button"><span data-pt="Cancelar">Cancel</span></button>' +
-              '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Submit message" data-pt-aria-label="Enviar mensagem">' +
+              '<button class="btn btn-accent" id="compose-send" type="button" aria-label="Send message" data-pt-aria-label="Enviar mensagem">' +
                 '<span class="btn-icon"><svg viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="M120-160v-640l760 320-760 320Zm80-120 474-200-474-200v140l240 60-240 60v140Zm0 0v-400 400Z"/></svg></span>' +
-                '<span data-pt="Enviar">Submit</span>' +
+                '<span data-pt="Enviar">Send</span>' +
               '</button>' +
             '</div>' +
+          '</div>' +
+          '<div class="compose-sent" id="compose-sent" role="status" aria-live="polite">' +
+            '<div class="compose-sent-track" aria-hidden="true">' +
+              '<canvas class="compose-planet compose-planet--you" id="compose-sent-you" width="48" height="48"></canvas>' +
+              '<span class="compose-sent-line"><span class="compose-sent-dot"></span></span>' +
+              '<canvas class="compose-planet compose-planet--av" id="compose-sent-av" width="48" height="48"></canvas>' +
+            '</div>' +
+            '<h2 id="compose-sent-heading" tabindex="-1"></h2>' +
+            '<p id="compose-sent-text"></p>' +
+            '<button class="btn btn-dark-outline" id="compose-sent-close" type="button"><span data-pt="Fechar">Close</span></button>' +
           '</div>' +
         '</div>' +
       '</div>'
     );
+  };
+
+  /* Sent view: only after web3forms confirms delivery. */
+  var sentShown = false;
+  var renderSent = function () {
+    var modal = document.getElementById('compose-modal');
+    var h = document.getElementById('compose-sent-heading');
+    var p = document.getElementById('compose-sent-text');
+    if (!modal || !h || !p) return;
+    var t = getTimes();
+    var col = litColors(modal);
+    h.textContent = T('Got it. It\u2019s ' + t.av.s + ' in Aveiro.', 'Recebido. S\u00e3o ' + t.av.s + ' em Aveiro.');
+    p.textContent = T('I\u2019ll reply within a day or two.', 'Respondo dentro de um ou dois dias.');
+    planet(document.getElementById('compose-sent-you'), t.you.dec, col.you);
+    planet(document.getElementById('compose-sent-av'), t.av.dec, col.av);
+  };
+  langHooks.push(function () { if (sentShown) renderSent(); });
+  var showSent = function () {
+    var modal = document.getElementById('compose-modal');
+    var sent  = document.getElementById('compose-sent');
+    if (!modal || !sent) return;
+    sentShown = true;
+    stopClock();
+    renderSent();
+    modal.classList.add('is-sent');
+    modal.setAttribute('aria-labelledby', 'compose-sent-heading');
+    modal.removeAttribute('aria-describedby');
+    /* Restart the travel + ring animation each time. */
+    sent.classList.remove('is-play');
+    void sent.offsetWidth;
+    sent.classList.add('is-play');
+    var h = document.getElementById('compose-sent-heading');
+    if (h) h.focus();
+  };
+  var resetToForm = function () {
+    var modal = document.getElementById('compose-modal');
+    if (!modal) return;
+    sentShown = false;
+    modal.classList.remove('is-sent');
+    var sent = document.getElementById('compose-sent');
+    if (sent) sent.classList.remove('is-play');
+    modal.setAttribute('aria-labelledby', 'compose-heading');
+    modal.setAttribute('aria-describedby', 'compose-desc');
+    var sendBtn = document.getElementById('compose-send');
+    if (sendBtn) {
+      sendBtn.disabled = false;
+      var lab = sendBtn.querySelector('span:last-child');
+      if (lab) lab.textContent = sendLabel();
+    }
+  };
+  /* Empty every field after a confirmed send. */
+  var clearForm = function () {
+    var modal = document.getElementById('compose-modal');
+    if (!modal) return;
+    Array.prototype.forEach.call(modal.querySelectorAll('.compose-input, .compose-textarea'), function (el) { el.value = ''; });
+    Array.prototype.forEach.call(modal.querySelectorAll('input[type="radio"]'), function (r) {
+      r.checked = (r.name === 'proj-engagement' && r.value === 'One-time');
+    });
+    var eng = modal.querySelector('input[name="proj-engagement"]:checked');
+    if (eng) eng.dispatchEvent(new Event('change', { bubbles: true }));
+    var slider = document.getElementById('proj-timeline');
+    if (slider) { slider.value = '2'; slider.dispatchEvent(new Event('input', { bubbles: true })); }
   };
 
   var closeModal = function () {
@@ -423,6 +649,7 @@
     if (!bd) return;
     bd.classList.remove('is-open');
     bd.setAttribute('aria-hidden', 'true');
+    stopClock();
     document.body.style.overflow = '';
     document.dispatchEvent(new CustomEvent('jj:compose-closed'));
     var opener = document.getElementById('compose-open');
@@ -477,7 +704,6 @@
     var bd        = document.getElementById('compose-backdrop');
     var modal     = document.getElementById('compose-modal');
     var btns      = Array.prototype.slice.call(document.querySelectorAll('.intent-btn'));
-    var cancelBtn = document.getElementById('compose-cancel');
     var sendBtn   = document.getElementById('compose-send');
     var closeBtn  = document.getElementById('compose-close');
     var copyBtn   = document.getElementById('compose-copy-email');
@@ -488,6 +714,7 @@
     bindProjectSlider(projEl);
     bindBudgetLabel(projEl);
     bindBookCal();
+    bindSegs(modal);
 
     selectIntent = function (idx, fromUserInteraction) {
       var prev = intentIdx;
@@ -497,7 +724,8 @@
         b.setAttribute('aria-checked', String(bi === idx));
         b.setAttribute('tabindex', bi === idx ? '0' : '-1');
       });
-      showFields(idx);
+      showFields(idx, fromUserInteraction ? prev : undefined);
+      positionSeg(document.querySelector('.intent-toggle'), !fromUserInteraction);
       /* Track in-modal intent switches (user clicked a different tab
          after opening). Only fire when the user actually changed
          the value AND the change came from interaction (not from
@@ -548,7 +776,8 @@
       });
     }
 
-    cancelBtn.addEventListener('click', closeModal);
+    var sentClose = document.getElementById('compose-sent-close');
+    if (sentClose) sentClose.addEventListener('click', closeModal);
 
     var validateCurrentForm = function () {
       var nameEl  = document.getElementById('user-name');
@@ -598,7 +827,7 @@
         btnLabel.textContent = T('Try again in ', 'Tenta daqui a ') + formatRemaining(gate.remainingMs);
         sendBtn.disabled = true;
         setTimeout(function () {
-          btnLabel.textContent = T('Submit', 'Enviar');
+          btnLabel.textContent = sendLabel();
           sendBtn.disabled = false;
         }, 3500);
         return;
@@ -656,8 +885,9 @@
         recordSubmit();
         trackSubmit('web3forms');
         document.dispatchEvent(new CustomEvent('jj:message-sent'));
-        btnLabel.textContent = T('Sent ✓', 'Enviado ✓');
-        setTimeout(function () { closeModal(); }, 1800);
+        /* Delivered — a UI error from here on must not reach .catch and
+           open the mailto fallback for a message that already went out. */
+        try { clearForm(); showSent(); } catch (_) { closeModal(); }
       }).catch(function () {
         mailtoFallback();
       });
@@ -696,12 +926,15 @@
     var bd = document.getElementById('compose-backdrop');
     if (!bd) return;
     bd.removeAttribute('aria-hidden');
+    resetToForm();
+    startClock();
     /* Force a reflow so a freshly-mounted backdrop has a committed
        start state — guarantees the gravity-well + modal-collapse
        animation plays on the very first open, not just reopens. */
     void bd.offsetWidth;
     bd.classList.add('is-open');
     document.body.style.overflow = 'hidden';
+    layoutSegs(true);
     if (typeof targetIdx === 'number' && INTENT_ORDER.indexOf(targetIdx) === -1) targetIdx = 0;
     if (typeof targetIdx === 'number' && selectIntent) selectIntent(targetIdx);
     var checked = bd.querySelector('.intent-btn[aria-checked="true"]');

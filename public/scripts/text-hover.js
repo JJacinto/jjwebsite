@@ -64,6 +64,11 @@
     document.querySelectorAll('.pill-nav a').forEach(function(a) { bind(a, a); });
     document.querySelectorAll('.mobile-menu a[data-page]').forEach(function(a) { bind(a, a); });
     document.querySelectorAll('.btn').forEach(function(btn) {
+      /* A button with two swapping labels (the X-ray button) rolls each. */
+      if (btn.hasAttribute('data-sc-each')) {
+        btn.querySelectorAll(':scope > span').forEach(function(s) { bind(btn, s); });
+        return;
+      }
       var spans = Array.prototype.slice.call(btn.querySelectorAll('span')).reverse();
       var txt = null;
       for (var i = 0; i < spans.length; i++) {

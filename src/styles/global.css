@@ -178,6 +178,9 @@ html[data-motion="reduce"] {
   .form-slider { transition: none; }
   .form-slider::-webkit-slider-thumb,
   .form-slider::-moz-range-thumb { animation: none; }
+  .seg-thumb { transition: none; }
+  .compose-sent-dot { animation: none; left: 100%; }
+  .compose-sent .compose-planet--av { animation: none; }
 }
 
 /* ============================================================
@@ -308,9 +311,32 @@ html[data-motion="reduce"] {
 .logo-mark {
   position: relative; z-index: var(--z-raised);
   width: 70%; height: 70%;
-  object-fit: contain;
   display: block;
-  transition: filter 0.3s ease;
+  color: var(--text-primary);
+}
+/* Hover light pass: a band of brand colour runs through both Js and
+   exits at the tick. The paths are stroke centrelines masked to the mark. */
+.logo-pass {
+  fill: none;
+  stroke: var(--fill-brand-default);
+  stroke-width: 124;
+  stroke-linejoin: round;
+  stroke-dasharray: 0.3 1.3;
+  stroke-dashoffset: 0.3;
+}
+@keyframes logo-pass {
+  from { stroke-dashoffset: 0.3; }
+  to   { stroke-dashoffset: -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .logo-outer:hover .logo-pass,
+  .logo-outer:focus-visible .logo-pass {
+    animation: logo-pass 0.7s cubic-bezier(0.5, 0, 0.4, 1) both;
+  }
+  .logo-outer:hover .logo-pass-2,
+  .logo-outer:focus-visible .logo-pass-2 { animation-duration: 0.5s; animation-delay: 0.5s; }
+  .logo-outer:hover .logo-pass-3,
+  .logo-outer:focus-visible .logo-pass-3 { animation-duration: 0.3s; animation-delay: 0.9s; }
 }
 
 .pill-nav {
@@ -350,7 +376,9 @@ html[data-motion="reduce"] {
      full inner height (36px within the 44px nav). */
   display: flex; align-items: center;
   font-size: var(--font-size-sm); color: var(--text-secondary);
-  padding: var(--dimension-space-8) var(--dimension-space-16); border-radius: var(--radius-pill);
+  /* No vertical padding: the label is flex-centred, and padding here
+     pushed the bar past 44px, taller than the buttons beside it. */
+  padding: 0 var(--dimension-space-16); border-radius: var(--radius-pill);
   overflow: hidden;
   cursor: pointer; user-select: none; white-space: nowrap;
   transition: color var(--motion-duration-short) var(--motion-easing-standard), transform var(--motion-duration-short) var(--motion-easing-standard);
@@ -387,8 +415,7 @@ html[data-motion="reduce"] {
 /* Logo invert — naturally black SVG, lifted to light wherever the
    nav sits on a dark surface. Triggers either by nav-dark variant
    (case-study detail pages) or by global dark mode. */
-.nav.nav-dark .logo-mark,
-[data-theme="dark"] .logo-mark { filter: invert(1); }
+.nav.nav-dark .logo-mark { color: rgb(240,237,232); }
 /* (.logo-bg theme overrides removed — the base rule now uses
    color-mix on --text-primary which flips automatically.) */
 .nav.nav-dark .li-badge {
@@ -405,6 +432,13 @@ html[data-motion="reduce"] {
   display: flex;
   align-items: center;
   gap: var(--dimension-space-8);
+}
+/* Desktop: logo | links | controls on a 1fr auto 1fr grid, so the
+   links sit on the true centre of the bar however wide each side is. */
+@media (min-width: 681px) {
+  .nav .container { display: grid; grid-template-columns: 1fr auto 1fr; }
+  .nav .logo-outer { justify-self: start; }
+  .nav-right { justify-self: end; }
 }
 
 .li-badge {
@@ -772,13 +806,8 @@ html[data-motion="reduce"] {
 .hero-role {
   font-family: var(--font-family-display);
   font-weight: var(--font-weight-black);
-  /* Sits between --font-size-3xl (h2 default, top 2.6rem) and
-     --font-size-4xl (page-intro h1, top 4rem) — a display-weight
-     size for the hero rotator that's bigger than a section heading
-     but doesn't compete with the page-intro headlines. No token
-     exists for this gap; precedent for inline clamps lives in
-     .about-cta h2 and .case-sections h2. */
-  font-size: clamp(2rem, 3.6vw, 3rem);
+  /* The shared page-title size, like about, work and contact. */
+  font-size: var(--font-size-page-title);
   color: var(--text-primary);
   margin-bottom: var(--dimension-space-16);
   letter-spacing: var(--font-letter-spacing-tighter);
@@ -789,9 +818,11 @@ html[data-motion="reduce"] {
 }
 .hero-line { display: block; }
 
-/* ---- Hero intro: the cut ------------------------------------------
-   public/scripts/hero-cut.js draws the whole piece from time (canvas plus
-   inline styles on [data-cut-line], [data-cut-rise], [data-cut-nav]).
+/* ---- Hero intro: first light --------------------------------------
+   public/scripts/hero-cut.js draws the piece from time: a dot, a ring and the
+   portrait's dots on a transparent canvas, plus inline styles on
+   [data-cut-line], [data-cut-rise] and [data-cut-nav]. The star field under it
+   (hero-space.js) is the real one.
    html.cut-pending  set in <head> of the hero until the first frame
    html.cut-playing  while the canvas covers the viewport
    Neither class is set under reduced motion: the hero is simply static.
@@ -800,10 +831,10 @@ html[data-motion="reduce"] {
 @keyframes hero-intro-failsafe { to { opacity: 1; transform: none; } }
 
 /* Stacking: the canvas lives in #main-content's stacking context (above all
-   page content, below the fixed nav at z 100). The hero text sits one step
-   above it, which only works because .hero-inner has no z-index. */
+   page content, below the fixed nav at z 100). The hero text and portrait sit
+   one step above it, which only works because .hero-inner has no z-index; the
+   star field (.hero-space) stays behind. */
 [data-cut-canvas] {
-  --cut-ink: var(--background-page);
   --cut-cream: var(--color-neutral-30);
   --cut-indigo: var(--color-primary-50);
   --cut-line: var(--color-primary-40);
@@ -819,13 +850,13 @@ html[data-motion="reduce"] {
 .cut-pending [data-cut-line],
 .cut-pending [data-cut-rise] {
   opacity: 0;
-  animation: hero-intro-failsafe 0s 6s forwards;
+  animation: hero-intro-failsafe 0s 4s forwards;
 }
 .cut-pending [data-cut-nav] {
   transform: translateY(-100%);
-  animation: hero-intro-failsafe 0s 6s forwards;
+  animation: hero-intro-failsafe 0s 4s forwards;
 }
-/* Words stay still: the headline is revealed by the script's clip-path wipe. */
+/* Words stay still: the script fades and lifts each block as the wave reaches it. */
 .hero-line { display: block; }
 
 .hero-replay {
@@ -906,6 +937,12 @@ html[data-motion="reduce"] { .hero-replay { display: none; } }
   transition: opacity 0.9s ease;
 }
 .hero-space.is-live { opacity: 1; }
+/* The two bodies that orbit a hovered button (hero-space.js), drawn in front
+   of the content so they never pass behind the button or its neighbour. */
+.hero-space-top {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: calc(var(--z-raised) + 1);
+}
 /* The same field in the closing call-to-action areas. The wrap is positioned
    and clips overflow; this canvas is placed after .cta-footer-bg (which still
    paints the gradient) so it sits above it and below the content. --space-ink
@@ -1240,21 +1277,21 @@ html[data-motion="reduce"] {
 /* Featured manager quote on the left across both rows; the two
    peer quotes stack on the right. Cards are flex columns so the
    footer sits on the bottom edge whatever the quote length. */
-/* Five cards: the featured one plus two columns of two. The grid breaks
-   out of the container to near full viewport width (capped), the same way
-   the brands marquee runs wider than the text column. */
+/* Three-column grid inside the site's 1140px container. Two highlight
+   cards span two columns (not two rows): Daniel top-left, Carlos on the
+   right of row three, so 2x2 + 8 = 12 slots fill four even rows. Dense
+   flow lets Eunice fill the slot left of Carlos. */
 .testimonials-masonry {
-  display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: var(--dimension-space-20);
-  margin-inline: calc(50% - min(50vw - var(--dimension-space-24), 760px));
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--dimension-space-20); grid-auto-flow: dense;
 }
-.testimonial-card--featured { grid-row: span 2; }
-/* Second block (Anchorage): the featured quote sits on the right and the
-   four peer quotes fill the two columns beside it. */
-.testimonials-masonry { grid-auto-flow: dense; }
-.testimonial-card--featured-end { grid-column: 3; }
-@media (max-width: 1180px) {
-  .testimonials-masonry { grid-template-columns: 1fr 1fr; margin-inline: 0; }
-  .testimonial-card--featured { grid-column: 1 / -1; grid-row: auto; }
+.testimonial-card--wide { grid-column: span 2; }
+.testimonial-card--wide-end { grid-column: 2 / span 2; }
+.testimonial-card--wide .testimonial-quote { font-size: var(--font-size-lg); line-height: var(--font-line-height-normal); }
+/* Two columns: the wide cards go full width, eight cards make four rows. */
+@media (max-width: 1080px) {
+  .testimonials-masonry { grid-template-columns: 1fr 1fr; }
+  .testimonial-card--wide, .testimonial-card--wide-end { grid-column: 1 / -1; }
 }
 .testimonial-card {
   display: flex; flex-direction: column;
@@ -1265,103 +1302,55 @@ html[data-motion="reduce"] {
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
 }
 .testimonial-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
-/* Refraction light effect — two diagonal gradient bands sweep
-   across the card in opposite directions, masked to show only on
-   the 6px border ring. Single animation animates both background-
-   position layers via multi-value keyframes (separate animations
-   would fight over the shared background-position property).
-   Per-card animation-delay desyncs the cards so the moving light
-   pattern reads as random across the masonry. */
-.testimonial-stroke-light {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.18) 50%, transparent 62%),
-    linear-gradient(245deg, transparent 35%, rgba(255, 255, 255, 0.10) 50%, transparent 65%);
-  background-size: 240% 240%, 320% 320%;
-  background-repeat: no-repeat;
-  /* Cut out the padding-box from the visible mask so the
-     gradients only show inside the 6px border zone. */
-  mask:
-    linear-gradient(#000 0 0) padding-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  -webkit-mask:
-    linear-gradient(#000 0 0) padding-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  animation: testimonial-stroke-refract 22s linear infinite;
-}
-.testimonials-masonry .testimonial-card:nth-child(2) .testimonial-stroke-light { animation-delay: -7s; }
-.testimonials-masonry .testimonial-card:nth-child(3) .testimonial-stroke-light { animation-delay: -14s; }
-.testimonials-masonry .testimonial-card:nth-child(4) .testimonial-stroke-light { animation-delay: -4s; }
-.testimonials-masonry .testimonial-card:nth-child(5) .testimonial-stroke-light { animation-delay: -11s; }
-.testimonials-masonry .testimonial-card:nth-child(6) .testimonial-stroke-light { animation-delay: -18s; }
-.testimonials-masonry .testimonial-card:nth-child(7) .testimonial-stroke-light { animation-delay: -2s; }
-.testimonials-masonry .testimonial-card:nth-child(8) .testimonial-stroke-light { animation-delay: -9s; }
-.testimonials-masonry .testimonial-card:nth-child(9) .testimonial-stroke-light { animation-delay: -16s; }
-.testimonials-masonry .testimonial-card:nth-child(10) .testimonial-stroke-light { animation-delay: -5s; }
-@keyframes testimonial-stroke-refract {
-  0%   { background-position: -100% -60%, 200%  200%; }
-  100% { background-position:  200%  200%, -100% -60%; }
-}
-html[data-motion="reduce"] {
-  .testimonial-stroke-light { animation: none; }
-}
-/* Brand-tint wash on hover — same recipe .case-card uses. The fade-in
-   pseudo sits above the card background but below the content (header
-   + quote get z-elevated below) so the avatar, name, and quote stay
-   crisp over the translucent purple. Inner radius steps DOWN from the
-   card's outer radius (--radius-card-lg = 24px) by ~8px so the pseudo's
-   corner curve aligns with the inner border curve — `inherit` left
-   visible corner gaps because the pseudo's box is offset 6px inside
-   the 6px border but its radius still tracked the outer curve. */
-.testimonial-card::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
-  pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
-  border-radius: var(--dimension-radius-lg);
-}
-.testimonial-card:hover::before { opacity: 1; }
-/* Face texture — the person's photo printed into the card surface as a
-   fine halftone, only in the right-hand part of the card. The dot grid
-   is intersected with a soft radial fade so the face dissolves into the
-   card with no edge. It fades out on hover so the brand wash and the
-   quote take over. Right corners match the inner border curve. */
+/* Portrait — the person's photo as a dot matrix, and the only image of
+   them on the card (no avatar). Regular cards: the portrait sits in the
+   top-right corner and the quote wraps around it, so no text lies on the
+   face. Wide cards: it is a full-height panel on the left with all the
+   text to its right. /scripts/testimonial-face.js draws the dots on a
+   canvas and moves them with the cursor (--face-fx names the effect);
+   until it runs, the span shows a CSS halftone of the same photo.
+   --face-fade dissolves the portrait into the card. */
 .testimonial-face {
-  position: absolute; top: 0; right: 0; bottom: 0; width: 42%;
-  z-index: 0; pointer-events: none;
-  border-radius: 0 var(--dimension-radius-lg) var(--dimension-radius-lg) 0;
+  --face-fx: spot;
+  --face-fade: radial-gradient(ellipse 95% 95% at 82% 18%, #000 16%, transparent 70%);
+  position: absolute; top: 0; right: 0; width: 50%; height: 180px;
+  z-index: 0; pointer-events: none; overflow: hidden;
+  border-radius: inherit;
   background-image: var(--face);
   background-size: cover; background-position: 50% 25%; background-repeat: no-repeat;
   filter: grayscale(1) contrast(1.4) brightness(1.1);
-  opacity: 0.24;
-  -webkit-mask-image:
-    radial-gradient(circle, #000 1.1px, transparent 1.6px),
-    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
-  -webkit-mask-size: 5px 5px, 100% 100%;
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(circle, #000 1.1px, transparent 1.6px), var(--face-fade);
+  -webkit-mask-size: 4px 4px, 100% 100%;
   -webkit-mask-composite: source-in;
-          mask-image:
-    radial-gradient(circle, #000 1.1px, transparent 1.6px),
-    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
-          mask-size: 5px 5px, 100% 100%;
+          mask-image: radial-gradient(circle, #000 1.1px, transparent 1.6px), var(--face-fade);
+          mask-size: 4px 4px, 100% 100%;
           mask-composite: intersect;
   transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
 }
-.testimonial-card:hover .testimonial-face { opacity: 0; }
-.testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
-.testimonial-avatar {
-  width: 50px; height: 50px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--color-primary-10), rgba(61,61,181,0.18));
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-sm); color: var(--text-brand); overflow: hidden;
-  transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized);
+.testimonial-face.is-canvas {
+  background-image: none; filter: none; opacity: 0.6;
+  -webkit-mask-image: var(--face-fade); -webkit-mask-size: 100% 100%;
+          mask-image: var(--face-fade);         mask-size: 100% 100%;
 }
-.testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.testimonial-card:hover .testimonial-avatar { transform: scale(1.2); }
+.testimonial-face canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.testimonial-card:hover .testimonial-face { opacity: 0.5; }
+.testimonial-card:hover .testimonial-face.is-canvas { opacity: 0.95; }
+/* Keep the name and the first lines of the quote clear of the portrait. */
+.testimonial-header { padding-right: 36%; min-height: 50px; }
+.testimonial-quote::before { content: ''; float: right; width: 28%; height: 48px; }
+/* Wide cards, above the phone layout: portrait panel left, text right. */
+@media (min-width: 681px) {
+  .testimonial-card--wide { padding-left: calc(30% + var(--dimension-space-8)); }
+  .testimonial-card--wide .testimonial-face {
+    --face-fx: repel;
+    --face-fade: linear-gradient(90deg, #000 55%, transparent 100%);
+    inset: 0 auto 0 0; width: 30%; height: auto;
+  }
+  .testimonial-card--wide .testimonial-header { padding-right: 0; min-height: 0; }
+  .testimonial-card--wide .testimonial-quote::before { content: none; }
+}
+.testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
 .testimonial-name { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-md); letter-spacing: var(--font-letter-spacing-snug); color: var(--text-primary); }
 .testimonial-role { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--color-neutral-70); margin-top: var(--dimension-space-2); }
 /* Custom cursor ball — shown when hovering tilt cards */
@@ -1415,8 +1404,6 @@ html[data-motion="reduce"] {
 .sc-on .sc-c2 { transform: translateY(0); }
 .testimonial-quote { position: relative; z-index: var(--z-elevated); font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-secondary); line-height: var(--font-line-height-loose); margin-bottom: var(--dimension-space-10); }
 .testimonial-quote strong { color: var(--text-primary); font-weight: var(--font-weight-medium); }
-.testimonial-card--featured .testimonial-quote { font-family: var(--font-family-display); font-size: var(--font-size-2xl); line-height: var(--font-line-height-normal); letter-spacing: var(--font-letter-spacing-snug); margin-top: var(--dimension-space-12); }
-.testimonial-card--featured .testimonial-avatar { width: 64px; height: 64px; }
 .testimonial-footer {
   position: relative; z-index: var(--z-elevated);
   margin-top: auto; display: flex; align-items: baseline; justify-content: space-between; gap: var(--dimension-space-12);
@@ -1441,15 +1428,9 @@ html[data-motion="reduce"] {
 .testimonial-card:hover .testimonial-logo { background: var(--text-primary); }
 .testimonial-source { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); white-space: nowrap; transition: color var(--motion-duration-standard) var(--motion-easing-standard); }
 .testimonial-card:hover .testimonial-source { color: var(--text-brand); }
-/* Group hover: hovered card scales up, siblings dim and desaturate */
+/* Group hover: the hovered card scales up. The others keep their colour. */
 .testimonial-card {
   transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
-}
-.testimonials-masonry:has(.testimonial-card:hover) .testimonial-card:not(:hover),
-.may-like-grid:has(.case-card:hover) .case-card:not(:hover),
-.cases-wrap .container:has(.case-card:hover) .case-card:not(:hover) {
-  opacity: 0.75;
-  filter: grayscale(1);
 }
 .testimonials-masonry:has(.testimonial-card:hover) .testimonial-card:hover,
 .may-like-grid:has(.case-card:hover) .case-card:hover,
@@ -1467,15 +1448,6 @@ html[data-motion="reduce"] {
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
 }
 .case-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
-.case-card::before,
-.case-img-ph.is-filled::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
-  pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
-  border-radius: var(--dimension-radius-md);
-}
-.case-card:hover::before,
-.case-img-ph.is-filled:hover::before { opacity: 1; }
 .case-card::after,
 .testimonial-card::after,
 .next-case::after,
@@ -1576,13 +1548,13 @@ html[data-motion="reduce"] {
 .work-wrap { padding-top: clamp(var(--dimension-space-80), 12vw, 130px); padding-bottom: clamp(var(--dimension-space-24), 4vw, var(--dimension-space-48)); }
 .work-head { margin-bottom: clamp(var(--dimension-space-40), 6vw, var(--dimension-space-64)); }
 .work-head .eyebrow { display: block; margin-bottom: var(--dimension-space-16); }
-.work-head h1 { margin-bottom: var(--dimension-space-20); max-width: 18ch; }
+.work-head h1 { font-size: var(--font-size-page-title); margin-bottom: var(--dimension-space-20); max-width: 18ch; }
 .work-intro { font-size: var(--font-size-lg); color: var(--text-secondary); line-height: var(--font-line-height-loose); max-width: 56ch; margin: 0; }
 .work-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--dimension-space-24); margin-bottom: var(--dimension-space-24); }
 /* Work cards are also .case-card, so they share the home cards' look and
-   behaviour: 6px frame, brand wash, cursor glow, 3D tilt and press
-   (nav.js), the arrow cursor-ball, per-letter title hover
-   (text-hover.js), image zoom, and dimming of the other cards. These
+   behaviour: glass surface and edge light (Card light, end of file),
+   cursor glow, 3D tilt and press (nav.js), the arrow cursor-ball,
+   per-letter title hover (text-hover.js) and image zoom. These
    rules only add the Work layout on top. */
 .work-card {
   display: flex; flex-direction: column;
@@ -1593,7 +1565,6 @@ html[data-motion="reduce"] {
 .work-card-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.5s var(--motion-easing-emphasized); }
 .work-card:hover .work-card-media img { transform: scale(1.08); }
 .work-card-body { display: flex; flex-direction: column; flex: 1; padding: var(--dimension-space-20) var(--dimension-space-24) var(--dimension-space-24); position: relative; z-index: var(--z-elevated); }
-.work-grid:has(.case-card:hover) .case-card:not(:hover) { opacity: 0.75; filter: grayscale(1); }
 .work-grid:has(.case-card:hover) .case-card:hover { scale: 1.05; }
 .work-card-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-10); }
 .work-card-lock {
@@ -1672,7 +1643,7 @@ html[data-motion="reduce"] {
   row-gap: var(--dimension-space-24);
   align-items: start;
 }
-.about-story-title { font-size: var(--font-size-3xl); }
+.about-story-title { font-size: var(--font-size-page-title); }
 .about-story-copy { grid-area: copy; }
 .about-story-stage {
   grid-area: stage;
@@ -1907,9 +1878,9 @@ html[data-motion="reduce"] {
   gap: var(--dimension-space-8);
   padding: var(--dimension-space-6) var(--dimension-space-12) var(--dimension-space-6) var(--dimension-space-8);
   border-radius: var(--radius-pill);
-  background: var(--surface-raised);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
-  box-shadow: var(--shadow-md);
+  /* No pill behind it: just the track and the word, straight on the page. */
+  background: transparent;
+  border: 0;
   font-size: var(--font-size-xs);
   opacity: 0;
   visibility: hidden;
@@ -1917,7 +1888,11 @@ html[data-motion="reduce"] {
   transform: translateY(8px);
   transition: opacity var(--motion-duration-standard) var(--motion-easing-standard), transform var(--motion-duration-standard) var(--motion-easing-emphasized), visibility 0s linear var(--motion-duration-standard);
 }
-.xray-switch--float.is-shown {
+/* The site-wide copy sits higher, clear of the bottom-left read-outs
+   (contact separation, footer status). */
+.xray-switch--always { bottom: 64px; }
+.xray-switch--float.is-shown,
+.xray-switch--float.xray-switch--always {
   opacity: 1; visibility: visible; pointer-events: auto; transform: none;
   transition-delay: 0s;
 }
@@ -1929,7 +1904,7 @@ html[data-motion="reduce"] {
   opacity: 0;
   transition: opacity var(--motion-duration-standard) var(--motion-easing-standard);
 }
-.xray .xray-grid { opacity: 1; }
+html.xray-on .xray-grid { opacity: 1; }
 .xray-grid-inner {
   max-width: var(--dimension-size-container-default);
   height: 100%;
@@ -1939,7 +1914,11 @@ html[data-motion="reduce"] {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   column-gap: 24px;
 }
-.xray-grid-inner span { background: color-mix(in srgb, var(--text-brand) 7%, transparent); }
+/* No fill: the page stays black, only the column edges show. */
+.xray-grid-inner span {
+  background: transparent;
+  box-shadow: inset 1px 0 0 color-mix(in srgb, var(--text-brand) 22%, transparent), inset -1px 0 0 color-mix(in srgb, var(--text-brand) 22%, transparent);
+}
 
 [data-xray] {
   outline: 1px dashed transparent;
@@ -2174,6 +2153,7 @@ html[data-motion="reduce"] {
     transform 200ms var(--motion-easing-standard),
     visibility 0s linear 200ms;
 }
+.loop.is-measuring [data-when] { transition: none !important; }
 .loop[data-mode="before"] .loop-body[data-when="now"] { transform: translateY(8px); }
 .loop[data-mode="now"] .loop-body[data-when="before"] { transform: translateY(-8px); }
 .loop[data-mode="before"] .loop-runner[data-when="now"] { transform: scale(0.5); }
@@ -2275,7 +2255,7 @@ html[data-motion="reduce"] {
   margin-top: var(--dimension-space-24);
   padding: var(--dimension-space-12) var(--dimension-space-20);
   border-radius: var(--radius-card);
-  background: var(--surface-default);
+  background: transparent;
   border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
   overflow: hidden;
 }
@@ -3133,7 +3113,32 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   animation-delay: calc(var(--i) * -90ms);
   animation-play-state: paused;
 }
-.b-music.is-live .eq span, .b-music:hover .eq span { animation-play-state: running; }
+.b-music.is-live .eq span, .b-music:hover .eq span, .b-music.is-playing .eq span { animation-play-state: running; }
+
+/* Play/pause: top-right of the music card; YouTube loads on first press */
+.b-play {
+  position: absolute;
+  top: var(--dimension-space-20);
+  right: var(--dimension-space-20);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--text-brand) 40%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--fill-brand-default) 14%, transparent);
+  color: var(--text-brand);
+  cursor: pointer;
+  transition: background var(--motion-duration-short) var(--motion-easing-standard), border-color var(--motion-duration-short) var(--motion-easing-standard), transform var(--motion-duration-short) var(--motion-easing-standard);
+}
+.b-play:hover { background: color-mix(in srgb, var(--fill-brand-default) 26%, transparent); border-color: var(--text-brand); }
+.b-play:active { transform: scale(0.94); }
+.b-play:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.b-play svg { width: 20px; height: 20px; }
+.b-play-off, .b-play[aria-pressed="true"] .b-play-on { display: none; }
+.b-play[aria-pressed="true"] .b-play-off { display: block; }
+.b-play-host { position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
 @keyframes about-eq {
   from { transform: scaleY(var(--lo)); }
   to { transform: scaleY(var(--hi)); }
@@ -3462,6 +3467,7 @@ html[data-motion="reduce"] {
   padding: 280px 0 var(--dimension-space-80);
   background: transparent;
 }
+.about-cta[data-xray] { position: relative; }
 .about-cta {
   padding: var(--dimension-space-64) var(--dimension-space-24);
   background: transparent;
@@ -3777,14 +3783,12 @@ html[data-motion="reduce"] {
 .contact > .contact-inner { z-index: var(--z-raised); }
 .contact-inner { max-width: 800px; width: 100%; position: relative; z-index: var(--z-raised); }
 .contact .eyebrow { color: var(--text-tertiary); margin-bottom: var(--dimension-space-24); display: block; }
-/* Display-tier size sitting between --font-size-3xl (h2) and
-   --font-size-4xl (case-title h1) — same clamp the hero rotator
-   uses, so the contact landing headline reads as a step down from
-   case-detail page titles but still distinctly larger than the h2
-   section heads on about. */
-.contact h1 { color: var(--text-primary); font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
-.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
-.contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: var(--dimension-space-16); }
+/* The shared page-title size, like home, about and work. */
+.contact h1 { color: var(--text-primary); font-size: var(--font-size-page-title); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
+.contact-body { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-40); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
+/* The headline, the line under it and the two buttons are one group; the
+   hours and the contact row sit a clear step below it, as the quieter tier. */
+.contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: 0; }
 /* Shared hours: two small planets lit by the Aveiro and visitor clocks, one
    sentence underneath. The planets read these tokens in contact.astro. */
 .contact-hours {
@@ -3793,7 +3797,7 @@ html[data-motion="reduce"] {
   --planet-dark: var(--surface-sunken);
   --planet-rim: var(--border-default);
   display: flex; flex-direction: column; align-items: center; gap: var(--dimension-space-10);
-  margin: var(--dimension-space-32) 0 var(--dimension-space-24);
+  margin: clamp(var(--dimension-space-56), 9vh, var(--dimension-space-96)) 0 var(--dimension-space-40);
 }
 .contact-hours-pair {
   display: flex; align-items: center; gap: var(--dimension-space-12);
@@ -3815,30 +3819,71 @@ html[data-motion="reduce"] {
   color: var(--text-secondary); line-height: var(--font-line-height-relaxed);
 }
 
-/* One quiet row: email, copy, a hairline, then the two social icons. */
+/* One quiet row: the email as a copy button, a hairline, then the two social icons. */
 .contact-row {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
   gap: var(--dimension-space-8) var(--dimension-space-12);
   font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-secondary);
 }
-.contact-row-email { color: var(--text-primary); overflow-wrap: anywhere; }
 .contact-row-sep { width: 1px; height: var(--dimension-space-16); background: var(--border-default); }
-/* Narrow: the address takes its own line so the three buttons stay together. */
+
+/* Email copy button: pressing it turns the copy icon into a check and
+   raises a "Copied to clipboard" tooltip above it (.is-copied, set by
+   copyEmail() in contact.astro). */
+.contact-copy { position: relative; display: inline-flex; }
+.contact-copy-btn .btn-icon { display: inline-grid; }
+.contact-copy-btn .btn-icon svg {
+  grid-area: 1 / 1;
+  transition:
+    opacity var(--motion-duration-short) var(--motion-easing-standard),
+    transform var(--motion-duration-standard) var(--motion-easing-spring);
+}
+.contact-copy-btn .copy-icon-success { opacity: 0; transform: scale(0.4) rotate(-20deg); }
+.contact-copy-btn.is-copied .copy-icon-default { opacity: 0; transform: scale(0.4) rotate(20deg); }
+.contact-copy-btn.is-copied .copy-icon-success { opacity: 1; transform: none; }
+.contact-copy-tip {
+  position: absolute; left: 50%; bottom: calc(100% + var(--dimension-space-8));
+  width: max-content;
+  padding: var(--dimension-space-6) var(--dimension-space-10);
+  border-radius: var(--dimension-radius-md);
+  background: var(--text-primary); color: var(--surface-default);
+  font-family: var(--font-family-body); font-size: var(--font-size-xs);
+  line-height: var(--font-line-height-tight);
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 4px) scale(0.94);
+  transform-origin: 50% 100%;
+  transition:
+    opacity var(--motion-duration-short) var(--motion-easing-standard),
+    transform var(--motion-duration-standard) var(--motion-easing-emphasized);
+}
+.contact-copy-tip::after {
+  content: ""; position: absolute; left: 50%; top: 100%;
+  border: 5px solid transparent; border-top-color: var(--text-primary);
+  transform: translateX(-50%);
+}
+.contact-copy-tip:empty { visibility: hidden; }
+.contact-copy-btn.is-copied + .contact-copy-tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
+/* Narrow: the email button takes its own line so the social buttons stay together. */
 @media (max-width: 480px) {
   .contact-row-sep { display: none; }
-  .contact-row-email { flex-basis: 100%; }
+  .contact-copy { flex-basis: 100%; justify-content: center; }
 }
 
 /* The two bodies (/scripts/contact-binary.js): an overlay on the field, under
-   the content, and its separation read-out where the field's PARTS sat. */
+   the content, and its separation read-out in the bottom-left corner. */
 .contact-binary {
   --space-dot: var(--text-primary);
   --space-accent: var(--text-brand);
   position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; z-index: 0;
 }
+/* The stars themselves, drawn in front of the buttons they orbit. */
+.contact-binary--top { z-index: calc(var(--z-raised) + 1); }
 .contact-readout {
-  position: absolute; left: var(--spacing-container-pad); bottom: var(--dimension-space-28);
+  /* On the page grid's left edge (the same line as the logo), not the window's. */
+  position: absolute; bottom: var(--dimension-space-28);
+  left: max(var(--spacing-container-pad), calc((100% - var(--dimension-size-container-default)) / 2 + var(--spacing-container-pad)));
   z-index: var(--z-raised); pointer-events: none;
   font-family: var(--font-family-mono); font-size: var(--font-size-xs);
   line-height: var(--font-line-height-loose); letter-spacing: var(--font-letter-spacing-wide);
@@ -3924,7 +3969,10 @@ html[data-motion="reduce"] {
 
 .compose-modal {
   --compose-gap: calc(var(--spacing-container-pad) / 2);
-  width: 50vh;
+  /* 50vh alone collapses on short laptop windows; never narrower than
+     the segmented toggles need (or the screen, on phones). */
+  width: max(50vh, min(460px, 100%));
+  container-type: inline-size;
   height: auto;
   max-height: 80vh;
   flex-shrink: 0;
@@ -3997,29 +4045,58 @@ html[data-motion="reduce"] {
   color: var(--text-inverse); line-height: var(--font-line-height-heading);
 }
 
-.intent-toggle {
-  display: flex;
-  border: var(--dimension-border-width-1) solid var(--border-inverse);
-  border-radius: var(--dimension-radius-sm);
-  overflow: hidden;
+/* One selector style for every choice in the modal: the site's segmented
+   toggle (same values as .loop-seg on the about page). Track = pill with
+   a 3px inset; a white thumb slides behind the options. The thumb is
+   positioned by compose-modal.js (options differ in width and count). */
+.intent-toggle,
+.compose-modal .form-radio-group {
+  position: relative;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  width: 100%; max-width: 100%;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 4%, transparent);
 }
-.intent-btn {
-  flex: 1;
-  padding: var(--dimension-space-8) var(--dimension-space-12);
+/* Engagement type hugs its content. */
+.compose-modal .form-radio-group:has(input[name="proj-engagement"]) {
+  display: inline-grid; width: auto; align-self: flex-start;
+}
+.seg-thumb {
+  position: absolute;
+  top: 3px; bottom: 3px; left: 3px;
+  width: 0;
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+  transition: transform 450ms var(--motion-easing-spring), width 450ms var(--motion-easing-spring), opacity 200ms;
+  pointer-events: none;
+}
+.seg-thumb.is-instant { transition: none; }
+.seg-thumb.is-empty { opacity: 0; }
+.intent-btn,
+.compose-modal .form-radio {
+  position: relative; z-index: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 30px;
+  padding: var(--dimension-space-6) var(--dimension-space-16);
+  border: 0; border-radius: var(--radius-pill); background: none;
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-inverse-muted);
-  background: transparent; border: none;
-  border-right: var(--dimension-border-width-1) solid var(--border-inverse);
+  line-height: var(--font-line-height-normal);
+  color: var(--text-secondary);
   cursor: pointer; white-space: nowrap;
-  transition: background var(--motion-duration-short), color var(--motion-duration-short);
+  transition: color var(--motion-duration-short) var(--motion-easing-standard);
 }
-.intent-btn:last-child { border-right: none; }
-/* Three intents share one row at every width: equal columns, and on
-   phones the labels may wrap to two lines rather than clip. */
-.intent-toggle { display: grid; grid-template-columns: repeat(3, 1fr); }
-.intent-btn[aria-checked="true"] { background: var(--component-form-toggle-fill-active); color: var(--text-inverse); }
-.intent-btn:hover:not([aria-checked="true"]) { background: var(--component-form-toggle-fill); color: var(--text-inverse); }
-.intent-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: -2px; }
+.intent-btn:hover:not([aria-checked="true"]),
+.compose-modal .form-radio:hover:not(:has(input:checked)) { color: var(--text-primary); }
+.intent-btn[aria-checked="true"],
+.compose-modal .form-radio:has(input:checked) { color: var(--surface-default); }
+.intent-btn:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+.compose-modal .form-radio:has(input:focus-visible) { outline: 2px solid var(--border-focus); outline-offset: 2px; }
+/* Compact segments follow the modal's own width, not the viewport. */
+@container (max-width: 480px) {
+  .intent-btn, .compose-modal .form-radio { padding-left: var(--dimension-space-4); padding-right: var(--dimension-space-4); font-size: var(--font-size-xs); }
+}
 
 .compose-field { display: flex; flex-direction: column; gap: var(--dimension-space-8); }
 .compose-field-label-row { display: flex; align-items: baseline; justify-content: space-between; }
@@ -4102,6 +4179,58 @@ html[data-motion="reduce"] {
 .compose-copy-email:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 2px; border-radius: var(--dimension-radius-xs); }
 .compose-footer-actions { display: flex; gap: var(--dimension-space-10); flex-shrink: 0; align-items: center; }
 
+/* Live eyebrow: a small Aveiro planet (lit side follows the hour there,
+   drawn by compose-modal.js), the time, and when to expect a reply. */
+.compose-eyebrow {
+  display: flex; align-items: center; gap: var(--dimension-space-8);
+  font-family: var(--font-family-body); font-size: var(--font-size-xs);
+  color: var(--text-inverse-muted);
+}
+.compose-eyebrow-planet { width: 12px; height: 12px; flex: 0 0 12px; }
+.compose-eyebrow-time { font-weight: inherit; color: var(--text-inverse); font-variant-numeric: tabular-nums; }
+/* Visually hidden, still read by screen readers. */
+.compose-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* Sent view — shown instead of the form after a confirmed send. */
+.compose-sent { display: none; }
+.compose-modal.is-sent .compose-header,
+.compose-modal.is-sent .intent-toggle,
+.compose-modal.is-sent .compose-modal-body,
+.compose-modal.is-sent .compose-footer { display: none; }
+.compose-modal.is-sent .compose-modal-top { border-bottom: none; padding: 0; min-height: 0; }
+.compose-modal.is-sent .compose-sent {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--dimension-space-16);
+  padding: var(--dimension-space-48) var(--spacing-container-pad) var(--spacing-container-pad);
+}
+.compose-sent h2:focus { outline: none; }
+.compose-sent p { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-inverse-muted); margin: 0; }
+.compose-sent-track { display: flex; align-items: center; width: 100%; gap: var(--dimension-space-8); margin-bottom: var(--dimension-space-8); }
+.compose-sent-track .compose-planet--you { width: 22px; height: 22px; flex: 0 0 22px; }
+.compose-sent-track .compose-planet--av { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; }
+.compose-sent-line { position: relative; flex: 1 1 auto; height: 2px; background: var(--color-primary-50); }
+.compose-sent-dot {
+  position: absolute; top: 50%; left: 100%; width: 8px; height: 8px; margin: -4px 0 0 -4px;
+  border-radius: 50%; background: #b6b0f8;
+}
+.compose-sent.is-play .compose-sent-dot { animation: compose-sent-travel 1.1s ease-in-out both; }
+.compose-sent.is-play .compose-planet--av { animation: compose-sent-ring 1.2s ease-out 1.1s 1; }
+@keyframes compose-sent-travel { from { left: 0; } to { left: 100%; } }
+@keyframes compose-sent-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(156, 156, 245, 0.55); }
+  100% { box-shadow: 0 0 0 16px rgba(156, 156, 245, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .seg-thumb { transition: none; }
+  .compose-sent-dot, .compose-sent.is-play .compose-sent-dot { animation: none; left: 100%; }
+  .compose-sent.is-play .compose-planet--av { animation: none; }
+  .form-slider { transition: none; }
+  .form-slider::-webkit-slider-thumb,
+  .form-slider::-moz-range-thumb { animation: none; }
+}
+
 /* Phones: the modal becomes a full-screen sheet. No scrim margin, no
    floating card — the whole viewport is the form. Header pinned at the
    top, footer pinned at the bottom (thumb zone, above the home
@@ -4122,16 +4251,12 @@ html[data-motion="reduce"] {
     transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
   }
   .compose-modal-top {
-    padding: calc(var(--dimension-space-16) + env(safe-area-inset-top)) var(--dimension-space-16) var(--dimension-space-16);
+    padding: calc(var(--dimension-space-24) + env(safe-area-inset-top)) var(--dimension-space-16) var(--dimension-space-16);
     gap: var(--dimension-space-16);
   }
   .compose-close { top: calc(var(--dimension-space-8) + env(safe-area-inset-top)); right: var(--dimension-space-8); border-radius: var(--dimension-radius-sm); }
   .compose-modal h2 { font-size: var(--font-size-2xl); }
-  .intent-btn {
-    min-height: var(--target-min);
-    padding: var(--dimension-space-6) var(--dimension-space-4);
-    white-space: normal; line-height: 1.2;
-  }
+  .intent-btn, .compose-modal .form-radio { min-height: 38px; }
   .compose-modal-body { padding: var(--dimension-space-16); gap: var(--dimension-space-16); }
   /* 16px stops iOS Safari zooming the page when a field is focused. */
   .compose-input, .compose-textarea { font-size: 16px; }
@@ -4141,7 +4266,7 @@ html[data-motion="reduce"] {
     padding: var(--dimension-space-12) var(--dimension-space-16) calc(var(--dimension-space-12) + env(safe-area-inset-bottom));
   }
   .compose-copy-email { align-self: center; }
-  .compose-footer-actions { display: grid; grid-template-columns: 1fr 2fr; }
+  .compose-footer-actions { display: grid; grid-template-columns: 1fr; }
   .compose-footer-actions .btn { width: 100%; justify-content: center; }
 }
 
@@ -4164,18 +4289,6 @@ html[data-motion="reduce"] {
 .form-toggle-btn.is-selected { background: var(--component-form-toggle-fill-active); color: var(--text-inverse); }
 .form-toggle-btn:hover:not(.is-selected) { background: var(--component-form-toggle-fill); color: var(--text-inverse); }
 
-/* Segmented toggle group — engagement type & budget fields. Same
-   component as the .intent-toggle above, in its "hug" variant: an
-   inline-flex group that sizes to its content, with connected
-   segments and hairline dividers inside a rounded border. */
-.form-radio-group, .form-check-group {
-  display: inline-flex;
-  align-self: flex-start;
-  max-width: 100%;
-  border: var(--dimension-border-width-1) solid var(--border-inverse);
-  border-radius: var(--dimension-radius-sm);
-  overflow: hidden;
-}
 #compose-fields-work, #compose-fields-mentor { display: flex; flex-direction: column; gap: var(--dimension-space-24); }
 #compose-fields-project { display: flex; flex-direction: column; gap: var(--dimension-space-28); }
 #compose-fields-chat, #compose-fields-book, #compose-fields-hiring { display: flex; flex-direction: column; gap: var(--dimension-space-20); }
@@ -4190,53 +4303,11 @@ html[data-motion="reduce"] {
 @media (max-width: 480px) { /* matches --bp-sm */
   .compose-shared-row { grid-template-columns: 1fr; }
 }
-.form-radio, .form-check {
-  display: inline-flex; align-items: center; justify-content: center;
-  flex: 0 1 auto;
-  font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-inverse-muted); cursor: pointer; white-space: nowrap;
-  padding: var(--dimension-space-8) var(--dimension-space-12);
-  /* Hairline divider between segments — dropped on the last one so it
-     sits flush inside the group's rounded border. */
-  border-right: var(--dimension-border-width-1) solid var(--border-inverse);
-  transition: background var(--motion-duration-short), color var(--motion-duration-short);
-}
-.form-radio:last-child, .form-check:last-child { border-right: none; }
 .form-radio input, .form-check input {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
-.form-radio:has(input:checked), .form-check:has(input:checked) {
-  background: var(--component-form-toggle-fill-active); color: var(--text-inverse);
-}
-.form-radio:hover:not(:has(input:checked)), .form-check:hover:not(:has(input:checked)) {
-  background: var(--component-form-toggle-fill); color: var(--text-inverse);
-}
-.form-radio:has(input:focus-visible), .form-check:has(input:focus-visible) {
-  /* Inset focus ring — segments are connected, so an outset ring
-     would be clipped by the group's overflow:hidden. */
-  outline: 2px solid var(--border-focus); outline-offset: -2px;
-}
-/* Narrow modals: the engagement/budget segmented groups stack
-   vertically so every option stays visible and tappable — a
-   horizontal row of 3-5 segments can't fit a phone-width modal, and
-   nowrap segments can't shrink past their text (they'd be clipped by
-   the group's overflow:hidden). 600px matches the .compose-modal
-   narrow breakpoint above, so there's no gap where it overflows. */
-@media (max-width: 600px) {
-  .form-radio-group, .form-check-group {
-    flex-direction: column;
-    width: 100%;
-  }
-  .form-radio, .form-check {
-    justify-content: flex-start;
-    padding: var(--dimension-space-12);
-    /* Divider runs along the bottom now that segments stack. */
-    border-right: none;
-    border-bottom: var(--dimension-border-width-1) solid var(--border-inverse);
-  }
-  .form-radio:last-child, .form-check:last-child { border-bottom: none; }
-}
+.form-radio, .form-check { position: relative; }
 
 .form-slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--dimension-space-10); }
 .form-slider-val { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-inverse); }
@@ -4262,12 +4333,18 @@ html[data-motion="reduce"] {
      newly selected step instead of jumping. */
   --slider-origin: calc(8px + var(--slider-frac, 0.333) * (100% - 16px));
   transition: --slider-frac 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  background: linear-gradient(90deg,
-    var(--border-inverse) 0%,
-    var(--border-inverse) calc(var(--slider-origin) - 17%),
-    var(--color-primary-40) var(--slider-origin),
-    var(--border-inverse) calc(var(--slider-origin) + 17%),
-    var(--border-inverse) 100%);
+  /* The stretch left of the thumb shows a gradient across the full
+     track width: calm violet at Exploring (left) shifting to a warm
+     red at ASAP (right). Right of the thumb is the
+     neutral hairline tone — kept opaque (the border-inverse tint
+     flattened onto the modal) so the gradient underneath doesn't show
+     through it. */
+  --slider-rest: color-mix(in srgb, var(--text-inverse) 10%, var(--color-neutral-90));
+  background:
+    linear-gradient(90deg, transparent var(--slider-origin), var(--slider-rest) var(--slider-origin)),
+    linear-gradient(90deg,
+      var(--color-primary-40),
+      color-mix(in oklch, oklch(.64 .1 30) 60%, var(--color-neutral-100)));
   outline: none; cursor: pointer;
 }
 .form-slider::-webkit-slider-thumb {
@@ -4290,8 +4367,8 @@ html[data-motion="reduce"] {
    spread (--slider-pulse-spread, set per step by compose-modal.js)
    grows with the timeline urgency — largest at "ASAP". */
 @keyframes slider-pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(128, 128, 240, 0.45); }
-  100% { box-shadow: 0 0 0 var(--slider-pulse-spread, 14px) rgba(128, 128, 240, 0); }
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--slider-pulse-color, #8080f0) 45%, transparent); }
+  100% { box-shadow: 0 0 0 var(--slider-pulse-spread, 14px) color-mix(in srgb, var(--slider-pulse-color, #8080f0) 0%, transparent); }
 }
 .form-slider-ticks {
   display: flex; justify-content: space-between;
@@ -4443,18 +4520,6 @@ html[data-motion="reduce"] {
 .next-case-wrap .eyebrow { display: block; margin-bottom: var(--dimension-space-20); }
 .next-case { background: var(--surface-default); border-radius: var(--radius-card); border: 6px solid var(--border-subtle); overflow: hidden; cursor: pointer; display: grid; grid-template-columns: 1fr 2fr; align-items: center; will-change: transform; position: relative; transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard); }
 .next-case:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
-/* Brand-tint wash on hover — same recipe .case-card and
-   .testimonial-card use. Inner radius steps DOWN from the card's
-   outer (--radius-card = --dimension-radius-lg, 16px) by ~6px to
-   align with the inner border curve, avoiding the corner gaps
-   that `border-radius: inherit` produced on .testimonial-card. */
-.next-case::before {
-  content: ''; position: absolute; inset: 0;
-  background: var(--fill-brand-muted); opacity: 0; z-index: var(--z-raised);
-  pointer-events: none; transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
-  border-radius: var(--dimension-radius-sm);
-}
-.next-case:hover::before { opacity: 1; }
 .next-case img,
 .next-case .next-case-body { position: relative; z-index: var(--z-elevated); }
 .next-case img { width: 100%; height: 160px; object-fit: cover; }
@@ -4860,8 +4925,7 @@ html[data-motion="reduce"] {
   .mobile-menu-btn { justify-content: center; }
   .stats-grid { grid-template-columns: 1fr; gap: var(--dimension-space-32); }
   .testimonials-masonry { grid-template-columns: 1fr; }
-  .testimonial-card--featured { grid-row: auto; }
-  .testimonial-card--featured .testimonial-quote { font-size: var(--font-size-lg); }
+  .testimonial-card--wide .testimonial-quote { font-size: var(--font-size-md); }
   .may-like-grid, .cases-grid, .cases-grid-row-2 { grid-template-columns: 1fr; }
   .journey-row { grid-template-columns: 1fr; gap: var(--dimension-space-8); }
   .influences-right { grid-template-columns: 1fr; }
@@ -5304,15 +5368,17 @@ html[data-motion="reduce"] {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--text-primary);
-  background: var(--surface-raised);
-  border: var(--dimension-border-width-1) solid var(--border-default);
+  /* Flat fill with a hairline rim: no sheen gradient. */
+  background: var(--surface-default);
+  border: var(--dimension-border-width-1) solid rgba(255,255,255,0.1);
   border-radius: var(--dimension-radius-md);
   transition: border-color var(--motion-duration-short) ease, background-color var(--motion-duration-short) ease;
   user-select: none;
 }
 .case-detail-summary::-webkit-details-marker { display: none; }
 .case-detail-summary::marker { content: ''; }
-.case-detail-summary:hover { border-color: var(--text-brand); }
+.case-detail-summary:hover { border-color: color-mix(in srgb, var(--text-brand) 60%, transparent); }
+html[data-contrast="high"] .case-detail-summary { background: var(--surface-default); border-color: var(--border-default); }
 .case-detail-summary:focus-visible {
   outline: var(--dimension-border-width-2) solid var(--border-focus);
   outline-offset: var(--dimension-space-2);
@@ -5339,7 +5405,15 @@ html[data-motion="reduce"] {
   margin-top: var(--dimension-space-4);
 }
 .case-detail-body > .case-img-ph,
-.case-detail-body > .case-img-ph-grid { margin-bottom: var(--dimension-space-16); }
+.case-detail-body > .case-img-ph-grid { margin-bottom: var(--dimension-space-32); }
+/* Two images (or image grids) in a row never touch: one comfortable
+   gap between them. Grids space their own cells with gap, so cells
+   inside a grid are left alone. */
+:is(.case-img-ph, .case-img-ph-grid) + :is(.case-img-ph, .case-img-ph-grid) {
+  margin-top: var(--dimension-space-32);
+}
+.case-img-ph-grid > .case-img-ph + .case-img-ph { margin-top: 0; }
+.case-detail-body > :is(.case-img-ph, .case-img-ph-grid) + :is(.case-img-ph, .case-img-ph-grid) { margin-top: 0; }
 html[data-motion="reduce"] {
   .case-detail-icon,
   .case-detail-summary,
@@ -5368,7 +5442,7 @@ html[data-motion="reduce"] {
 
 .hero-role {
   min-height: 0;
-  font-size: clamp(2.25rem, 5.2vw, 4rem);
+  font-size: var(--font-size-page-title);
   /* Wide enough that the PT line ("Desenho as partes que os utilizadores
      não veem.") sets in two lines, not three. */
   max-width: 25ch;
@@ -5393,8 +5467,13 @@ html[data-motion="reduce"] {
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
 }
-.hero-xray:has([data-xray-switch][hidden]) .hero-xray-hint,
-.hero-xray:has([data-xray-switch][hidden]) .hero-replay { display: none; }
+/* The X-ray switch is the hero's second button. Without JS it stays
+   hidden, and so do the key hint and the replay button. */
+.hero:has([data-xray-switch][hidden]) .hero-xray-hint,
+.hero:has([data-xray-switch][hidden]) .hero-replay { display: none; }
+.xray-btn[hidden] { display: none; }
+.xray-btn[aria-checked="true"] .xray-btn-off,
+.xray-btn:not([aria-checked="true"]) .xray-btn-on { display: none; }
 .hero-xray-hint kbd {
   font: inherit;
   padding: 1px var(--dimension-space-6);
@@ -5865,19 +5944,31 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   padding: 0 var(--dimension-space-12);
   border-radius: var(--radius-pill);
   border: var(--dimension-border-width-2) solid transparent;
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  /* Ghost at rest: in the nav a fill means "the page you're on" and an
+     outline means "Start project", so this utility stays text-only and
+     matches the inactive links in size, weight and colour. */
+  background: transparent;
+  position: relative; isolation: isolate;
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: inherit;
   color: var(--text-secondary); cursor: pointer; user-select: none;
-  transition:
-    color var(--motion-duration-short) var(--motion-easing-standard),
-    background var(--motion-duration-short) var(--motion-easing-standard);
+  transition: color var(--motion-duration-short) var(--motion-easing-standard);
+}
+/* Hover / open wash. Inset 4px so it is 36px tall, the same as the
+   active-page pill, while the button keeps its 44px target. */
+.settings-btn::before {
+  content: ''; position: absolute; z-index: -1;
+  /* Measured from inside the 2px border: 2px + 2px = the 4px inset. */
+  inset: 2px -2px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  opacity: 0;
+  transition: opacity var(--motion-duration-short) var(--motion-easing-standard);
 }
 .settings-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 .settings-btn:hover,
-.settings.is-open .settings-btn {
-  color: var(--text-primary);
-  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
-}
+.settings.is-open .settings-btn { color: var(--text-primary); }
+.settings-btn:hover::before,
+.settings.is-open .settings-btn::before { opacity: 1; }
 
 .settings-panel {
   position: absolute; top: calc(100% + var(--dimension-space-12)); right: 0;
@@ -5894,12 +5985,36 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   color: var(--text-primary);
   font-family: var(--font-family-body);
   text-align: left;
-  animation: settings-in var(--motion-duration-short) var(--motion-easing-emphasized);
+  /* Opens out of the settings button's corner: it grows and settles
+     from a slight blur, then its rows follow one after another.
+     Closing (.is-closing, set by nav.js) is quicker and folds back
+     into the same corner; nav.js hides it when the animation ends. */
+  transform-origin: top right;
+  animation: settings-in var(--motion-duration-expressive) var(--motion-easing-emphasized) both;
 }
 .settings-panel[hidden] { display: none; }
+.settings-panel > * {
+  animation: settings-row-in var(--motion-duration-expressive) var(--motion-easing-emphasized) both;
+}
+.settings-panel > :nth-child(1) { animation-delay: 40ms; }
+.settings-panel > :nth-child(2) { animation-delay: 80ms; }
+.settings-panel > :nth-child(3) { animation-delay: 120ms; }
+.settings-panel.is-closing {
+  pointer-events: none;
+  animation: settings-out var(--motion-duration-short) var(--motion-easing-exit) both;
+}
+.settings-panel.is-closing > * { animation: none; }
 @keyframes settings-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.92); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: blur(0); }
+}
+@keyframes settings-row-in {
   from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes settings-out {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to   { opacity: 0; transform: translateY(-6px) scale(0.95); filter: blur(4px); }
 }
 
 .settings-head { display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-12); }
@@ -5932,11 +6047,28 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
    more than a tint. */
 .settings-seg {
   display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
-  gap: var(--dimension-space-2);
+  position: relative; isolation: isolate;
+  --seg-n: 2; --seg-i: 0;
   padding: var(--dimension-space-4);
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
+/* The lit segment is one thumb that slides behind the labels, like the
+   EN/PT switch and the about-page loop toggle: one movement, not a swap. */
+.settings-seg::before {
+  content: ""; position: absolute; z-index: -1;
+  top: var(--dimension-space-4); bottom: var(--dimension-space-4); left: var(--dimension-space-4);
+  width: calc((100% - 2 * var(--dimension-space-4)) / var(--seg-n));
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+  transform: translateX(calc(var(--seg-i) * 100%));
+  transition: transform 420ms cubic-bezier(0.34, 1.36, 0.64, 1);
+}
+.settings-seg:has(label:nth-child(3)) { --seg-n: 3; }
+.settings-seg:has(label:nth-child(2) input:checked) { --seg-i: 1; }
+.settings-seg:has(label:nth-child(3) input:checked) { --seg-i: 2; }
+.settings-seg:not(:has(input:checked))::before { opacity: 0; }
+html[data-motion="reduce"] .settings-seg::before { transition: none; }
 .settings-seg label { position: relative; display: block; cursor: pointer; }
 .settings-seg input,
 .settings-switch input {
@@ -5952,10 +6084,10 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
   line-height: var(--font-line-height-tight); white-space: nowrap;
   color: var(--text-secondary);
-  transition: color var(--motion-duration-short), background var(--motion-duration-short);
+  transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .settings-seg label:hover span { color: var(--text-primary); }
-.settings-seg input:checked + span { background: var(--text-primary); color: var(--sp-bg); }
+.settings-seg input:checked + span { color: var(--sp-bg); }
 .settings-seg input:focus-visible + span,
 .settings-switch input:focus-visible ~ .settings-switch-track {
   outline: var(--dimension-border-width-2) solid var(--border-focus);
@@ -6131,6 +6263,13 @@ html[data-contrast="high"] [data-theme="dark"] {
 }
 /* Surfaces that are dark in both themes (see "Always-dark surface
    scoping" near the top of this file). */
+html[data-contrast="high"] .compose-modal .intent-toggle,
+html[data-contrast="high"] .compose-modal .form-radio-group { border-color: var(--color-neutral-40); }
+html[data-contrast="high"] .compose-modal .intent-btn,
+html[data-contrast="high"] .compose-modal .form-radio { color: var(--color-neutral-20); }
+html[data-contrast="high"] .compose-modal .intent-btn[aria-checked="true"],
+html[data-contrast="high"] .compose-modal .form-radio:has(input:checked) { color: var(--color-neutral-100); }
+html[data-contrast="high"] .compose-modal .seg-thumb { background: var(--color-neutral-0); }
 html[data-contrast="high"] .compose-modal,
 html[data-contrast="high"] .nav.nav-dark {
   --text-primary: var(--color-neutral-0);
@@ -6180,4 +6319,212 @@ html[data-contrast="high"] {
   .nav.nav-dark .settings { --sp-bg: #000; }
   .settings-panel { border-width: var(--dimension-border-width-2); }
   .settings-seg { background: transparent; box-shadow: inset 0 0 0 1px var(--text-primary); }
+}
+
+/* ============================================================
+   Card light — dense glass, edge light, drift
+   One theme for every card on the site: testimonials, case and
+   work cards, the next-case card, the home Work wall tiles and
+   How I work steps, the About loop, principles, board and journey
+   scenes, the case summary, the password panel and the case-study
+   image frames. It sits last in the file and
+   overrides each card's own surface. High contrast keeps the solid
+   cards.
+
+   Material: a mostly opaque neutral tint over a blurred backdrop,
+   with a bright top rim. The rim is a masked ring on ::before
+   (::after on .loop-card, whose ::before is the connector), so it
+   also shows over a card's image.
+   Edge light: the same ring carries a radial light at the cursor.
+   /scripts/card-light.js writes the cursor position on every card
+   in the grid, so the neighbours' rims pick it up too.
+   Drift: two wide, faint bands of brand blue cross the whole grid in
+   opposite directions on a 16s loop. Each card holds a .card-light
+   span that shows its own slice of the bands; the script sets the
+   per-card offsets (--cl-*).
+
+   Colour: all of the light is the brand blue. Nothing else tints
+   the cards.
+   ============================================================ */
+:root {
+  --light-head: var(--color-primary-10);
+  --light-brand: var(--text-brand);
+  --light-deep: var(--fill-brand-default);
+  /* The glass itself: fill, top sheen and what the blur does to the
+     backdrop. */
+  /* Clear glass: almost no fill and a light blur, so the stars show
+     through and the rim and shadow define the card. */
+  --glass-fill: color-mix(in srgb, var(--color-neutral-100) 16%, transparent);
+  --glass-sheen: rgba(240,237,232,0.035);
+  --glass-filter: blur(12px) saturate(1.1);
+  /* Edge light on hover: reach and width of the lit rim, how strong its
+     two colours are, and the glow on the surface under the cursor. */
+  --edge-r: 340px;
+  --edge-w: 2px;
+  --edge-head: 100%;
+  --edge-brand: 100%;
+  --edge-stop: 45%;
+  --edge-glow: 16%;
+  /* The pool of light thrown behind the cards at the cursor
+     (.card-pool): its radius and how strong its core and mid tone are.
+     --pool-pad is how far the pool's box reaches past the grid; it must
+     stay larger than the radius so the light never meets an edge. */
+  --pool-r: 300px;
+  --pool-core: 24%;
+  --pool-mid: 9%;
+  --pool-pad: 320px;
+}
+@property --el-a { syntax: '<number>'; inherits: false; initial-value: 0; }
+
+:where(html:not([data-contrast="high"])) {
+  .testimonial-card, .case-card, .next-case, .wall .tile, .how-step,
+  .loop-card, .p-card, .b-card, .j-scene, .case-summary-card, .pw-gate {
+    --el-x: -999px; --el-y: -999px;
+    position: relative;
+    border: 0;
+    background:
+      linear-gradient(180deg, var(--glass-sheen), transparent 30%),
+      var(--glass-fill);
+    -webkit-backdrop-filter: var(--glass-filter);
+            backdrop-filter: var(--glass-filter);
+    box-shadow: 0 20px 44px -12px rgba(0,0,0,0.6);
+  }
+  /* The tile's inner layers take their corner from the frame width. */
+  .wall .tile { --tile-bw: 0px; }
+  /* Image frames in case studies: the image fills the frame, so there
+     is no glass to show, only the rim, the shadow and the edge light.
+     There are many per page, so the light follows the tilt position
+     (nav.js) on the hovered frame instead of the grid script. */
+  .case-img-ph.is-filled {
+    --el-x: calc(var(--tilt-mx, -999) * 1%); --el-y: calc(var(--tilt-my, -999) * 1%);
+    border: 0;
+    box-shadow: 0 20px 44px -12px rgba(0,0,0,0.6);
+  }
+  .case-img-ph.is-filled.tilt-active::before { --el-a: 1; }
+  .case-img-ph.is-filled:hover,
+  .testimonial-card:hover, .case-card:hover, .next-case:hover,
+  .journey-item:hover .j-scene, .j-scene.has-case:focus-within {
+    box-shadow: 0 28px 56px -14px rgba(0,0,0,0.7);
+  }
+  @media (hover: hover) {
+    .wall .tile:hover { box-shadow: 0 28px 56px -14px rgba(0,0,0,0.7); }
+  }
+  /* The Work wall overlay: neutral glass like the card, not a brand
+     tint, still see-through so the preview keeps playing behind it. */
+  .wall .ov { background: color-mix(in srgb, var(--color-neutral-90) 82%, transparent); }
+
+  /* X-ray marked these frames with a dashed border; the frame is gone,
+     so it draws the same line as an outline. */
+  .xray .how-step, .xray .j-scene, .xray .wall .tile:not(:focus-visible) {
+    outline: 1px dashed color-mix(in srgb, var(--text-brand) 50%, transparent);
+    outline-offset: -1px;
+  }
+
+  /* Rim + edge light. */
+  .testimonial-card::before, .case-card::before, .next-case::before,
+  .wall .tile::before, .how-step::before, .p-card::before, .b-card::before,
+  .j-scene::before, .case-summary-card::before, .pw-gate::before,
+  .case-img-ph.is-filled::before, .loop-card::after {
+    --el-a: 0;
+    content: ''; position: absolute; inset: 0; z-index: 3;
+    border-radius: inherit; pointer-events: none;
+    padding: var(--edge-w);
+    background:
+      radial-gradient(var(--edge-r) circle at var(--el-x) var(--el-y),
+        color-mix(in srgb, var(--light-head) calc(var(--el-a) * var(--edge-head)), transparent),
+        color-mix(in srgb, var(--light-brand) calc(var(--el-a) * var(--edge-brand)), transparent) var(--edge-stop),
+        transparent 80%),
+      linear-gradient(180deg, rgba(255,255,255,0.36), rgba(255,255,255,0.05) 30%, rgba(255,255,255,0.02) 70%, rgba(255,255,255,0.15));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+    transition: --el-a 0.35s ease;
+  }
+  .card-edge-near .testimonial-card::before, .card-edge-near .case-card::before,
+  .card-edge-near .next-case::before, .card-edge-near .tile::before,
+  .card-edge-near .how-step::before, .card-edge-near .p-card::before,
+  .card-edge-near .b-card::before, .card-edge-near .j-scene::before,
+  .card-edge-near .case-summary-card::before, .card-edge-near .pw-gate::before,
+  .card-edge-near .loop-card::after { --el-a: 1; }
+
+  /* Cursor glow on the surface: the tilt glow, in brand blue. */
+  .testimonial-card::after, .case-card::after, .next-case::after,
+  .wall .tile::after, .j-scene.has-case::after, .case-img-ph.is-filled::after {
+    background: radial-gradient(
+      280px circle at calc(var(--tilt-mx, 50) * 1%) calc(var(--tilt-my, 50) * 1%),
+      color-mix(in srgb, var(--light-brand) var(--edge-glow), transparent),
+      transparent 65%
+    );
+  }
+
+  /* Light behind the cards. The script marks each grid and adds one
+     .card-pool to it, then writes the cursor position in the grid's
+     coordinates (--pl-x, --pl-y). The pool sits under the cards, shows
+     in the gaps and through the glass, and its box reaches past the grid
+     by more than the light's radius, so the light fades out on its own
+     and is never cut off. Sideways the box reaches --pool-pad past the
+     grid, further than the light's radius; body clips the overflow, and
+     the pool is off on touch screens, where there is no cursor and the
+     extra width could scroll. Above and below it reaches --pool-v and
+     fades to nothing over that distance, so it never ends in a line
+     where the next section begins. */
+  :where(.card-light-grid) { position: relative; }
+  .card-light-grid { isolation: isolate; }
+  .card-pool {
+    --pool-v: 110px;
+    --pool-at: calc(var(--pl-x, -999px) + var(--pool-pad)) calc(var(--pl-y, -999px) + var(--pool-v));
+    position: absolute; z-index: -1;
+    inset: calc(var(--pool-v) * -1) calc(var(--pool-pad) * -1);
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 var(--pool-v), #000 calc(100% - var(--pool-v)), transparent);
+            mask-image: linear-gradient(180deg, transparent, #000 var(--pool-v), #000 calc(100% - var(--pool-v)), transparent);
+    pointer-events: none;
+    background: radial-gradient(var(--pool-r) circle at var(--pool-at),
+      color-mix(in srgb, var(--light-brand) var(--pool-core), transparent),
+      color-mix(in srgb, var(--light-deep) var(--pool-mid), transparent) 45%,
+      transparent 78%);
+    opacity: 0; transition: opacity 0.4s ease;
+  }
+  .card-edge-near > .card-pool { opacity: 1; }
+
+  /* Drift. */
+  .card-light {
+    position: absolute; inset: 0; z-index: -1;
+    border-radius: inherit; overflow: hidden; pointer-events: none;
+    opacity: 0.16; mix-blend-mode: screen;
+  }
+  .card-light::before, .card-light::after {
+    content: ''; position: absolute; inset: 0;
+    background-repeat: no-repeat;
+    background-size: var(--cl-s, 0) var(--cl-s, 0);
+    animation: card-drift-a 16s linear infinite paused;
+  }
+  .card-light::before {
+    background-image: linear-gradient(115deg,
+      transparent calc(50% - var(--cl-w, 0px)),
+      color-mix(in srgb, var(--light-brand) 55%, transparent) 50%,
+      transparent calc(50% + var(--cl-w, 0px)));
+  }
+  .card-light::after {
+    background-image: linear-gradient(245deg,
+      transparent calc(50% - var(--cl-w, 0px)),
+      color-mix(in srgb, var(--light-deep) 55%, transparent) 50%,
+      transparent calc(50% + var(--cl-w, 0px)));
+    animation-name: card-drift-b;
+    animation-delay: -8s;
+  }
+  .card-light-on .card-light::before,
+  .card-light-on .card-light::after { animation-play-state: running; }
+}
+@media (hover: none) { .card-pool { display: none; } }
+html[data-contrast="high"] .card-pool,
+html[data-contrast="high"] .card-light,
+html[data-motion="reduce"] .card-light { display: none; }
+@keyframes card-drift-a {
+  from { background-position: var(--cl-ax0, 0) var(--cl-ay0, 0); }
+  to   { background-position: var(--cl-ax1, 0) var(--cl-ay1, 0); }
+}
+@keyframes card-drift-b {
+  from { background-position: var(--cl-bx0, 0) var(--cl-by0, 0); }
+  to   { background-position: var(--cl-bx1, 0) var(--cl-by1, 0); }
 }
