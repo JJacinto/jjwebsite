@@ -260,9 +260,6 @@ import WorkWall from '../components/home/WorkWall.astro';
   const track = document.querySelector('.brands-track');
   const cycle = track && track.querySelector('.brands-cycle');
   if (!track || !cycle) return;
-  /* Every logo (and every copy) slides in from off-screen as you scroll,
-     so lazy loading would leave blanks: load them all up front. */
-  cycle.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
 
   let lastCycleWidth = 0;
   const setup = () => {
@@ -281,39 +278,7 @@ import WorkWall from '../components/home/WorkWall.astro';
       track.appendChild(clone);
     }
     track.classList.add('is-ready');
-    current = target = progress();
-    render();
   };
-
-  /* Scroll-linked roll: as the section crosses the viewport (bottom edge
-     to top edge) the strip slides one full cycle to the right, so every
-     logo passes by. Scrolling up runs it back. A light ease keeps it
-     from feeling glued to the wheel. */
-  const section = track.closest('.brands') || track;
-  const reduce = () => document.documentElement.getAttribute('data-motion') === 'reduce';
-  const progress = () => {
-    const r = section.getBoundingClientRect();
-    const vh = window.innerHeight;
-    return (vh - r.top) / (vh + r.height);
-  };
-  let current = 0, target = 0, raf = 0;
-  const render = () => {
-    if (!lastCycleWidth || reduce()) { track.style.transform = ''; return; }
-    const shift = ((current * lastCycleWidth) % lastCycleWidth + lastCycleWidth) % lastCycleWidth;
-    track.style.transform = 'translate3d(' + (shift - lastCycleWidth).toFixed(2) + 'px,0,0)';
-  };
-  const tick = () => {
-    current += (target - current) * 0.12;
-    if (Math.abs(target - current) < 0.0002) current = target;
-    render();
-    raf = current === target ? 0 : requestAnimationFrame(tick);
-  };
-  const onScroll = () => {
-    target = progress();
-    if (!raf) raf = requestAnimationFrame(tick);
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll);
 
   /* Eager attempt on next frame in case the cycle is already laid out
      (typical desktop case where the brands strip is at or near the

@@ -351,14 +351,51 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   });
 })();
 
-/* Brands marquee — tooltip (the strip itself moves with scroll, see index.astro) */
+/* Brands marquee — scroll nudge, hover slow-down, tooltip.
+   The CSS loop keeps drifting on its own. Scrolling while the strip is
+   on screen gives it a capped push in the scroll's direction (down rolls
+   left-to-right, up rolls right-to-left), which eases back to the normal
+   drift over about a second. The strip keeps the last scroll direction.
+   Hovering slows it right down. */
 (function() {
   const marquee = document.querySelector('.brands-marquee');
   const track   = document.querySelector('.brands-track');
   const tip     = document.getElementById('brandsTooltip');
   if (!marquee || !track || !tip) return;
-  let tipTimer;
-  marquee.addEventListener('mouseleave', () => { clearTimeout(tipTimer); tip.classList.remove('visible'); });
+  const BOOST_PER_PX = 0.012;  // extra speed per pixel scrolled
+  const BOOST_MAX    = 2;      // at most 3x the normal drift
+  const BOOST_DECAY  = 0.93;   // per frame; ~1s back to normal
+  const EASE         = 0.1;    // how quickly the rate follows its target
+  let tipTimer, anim, raf = 0, inView = false;
+  let dir = 1, boost = 0, hover = false, lastY = window.scrollY;
+  function getAnim() { if (!anim) anim = track.getAnimations()[0]; return anim; }
+  function tick() {
+    const a = getAnim();
+    if (!a) { raf = 0; return; }
+    boost *= BOOST_DECAY;
+    if (boost < 0.005) boost = 0;
+    const target = dir * (hover ? 0.08 : 1 + boost);
+    const cur = a.playbackRate + (target - a.playbackRate) * EASE;
+    const settled = Math.abs(target - cur) < 0.005 && !boost;
+    a.playbackRate = settled ? target : cur;
+    raf = settled ? 0 : requestAnimationFrame(tick);
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(tick); }
+  if (window.IntersectionObserver) {
+    new IntersectionObserver(([e]) => { inView = e.isIntersecting; }).observe(marquee);
+  } else {
+    inView = true;
+  }
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY, dy = y - lastY;
+    lastY = y;
+    if (!dy || !inView) return;
+    dir = dy > 0 ? -1 : 1;
+    boost = Math.min(BOOST_MAX, boost + Math.abs(dy) * BOOST_PER_PX);
+    kick();
+  }, { passive: true });
+  marquee.addEventListener('mouseenter', () => { hover = true; kick(); });
+  marquee.addEventListener('mouseleave', () => { hover = false; kick(); clearTimeout(tipTimer); tip.classList.remove('visible'); });
   document.querySelectorAll('.brands-track a').forEach(link => {
     let host = '';
     try { host = new URL(link.href).hostname.replace(/^www\./, ''); } catch(e) {}

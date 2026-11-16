@@ -1070,9 +1070,13 @@ html[data-motion="reduce"] {
   height: 45px;
   will-change: transform;
 }
-/* The strip is moved by page scroll (index.astro): scrolling down rolls
-   it left-to-right, scrolling up rolls it back. One full cycle of logos
-   passes while the section crosses the viewport. */
+.brands-track.is-ready {
+  animation: brands-scroll var(--brands-duration, 28s) linear infinite;
+}
+@keyframes brands-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(calc(-1 * var(--brands-cycle, 0px)), 0, 0); }
+}
 .brands-cycle {
   display: flex; align-items: center; flex-shrink: 0;
 }
@@ -1102,6 +1106,7 @@ html[data-motion="reduce"] {
   content: url("/assets/logos/streamyard-white.png");
 }
 
+html[data-motion="reduce"] { .brands-track { animation: none; } }
 .brands-tooltip {
   position: fixed; z-index: var(--z-toast); pointer-events: none;
   padding: var(--dimension-space-6) var(--dimension-space-12); border-radius: var(--dimension-radius-sm);
