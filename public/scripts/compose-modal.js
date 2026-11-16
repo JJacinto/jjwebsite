@@ -1719,16 +1719,26 @@
 
     function loop() { if (!raf && !reduced) raf = requestAnimationFrame(frame); }
 
+    /* Setting canvas.width in resize() wipes the canvas. When a hero-space
+       field owns the particles there is no rAF loop to repaint it, so the
+       gradient vanished and the wrap's flat CSS colour showed as a hard
+       band edge. Repaint straight after every resize. */
     var resizeTimer;
+    var resizeAndPaint = function () {
+      if (!firstPaintDone) return;
+      resize();
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      frame();
+    };
     var ro = window.ResizeObserver
       ? new ResizeObserver(function () {
           clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(resize, 80);
+          resizeTimer = setTimeout(resizeAndPaint, 80);
         })
       : null;
     if (ro) ro.observe(wrap);
     else window.addEventListener('resize', function () {
-      clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80);
+      clearTimeout(resizeTimer); resizeTimer = setTimeout(resizeAndPaint, 80);
     });
 
     document.addEventListener('visibilitychange', function () {
