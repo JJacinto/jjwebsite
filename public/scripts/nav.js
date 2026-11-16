@@ -351,25 +351,14 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
   });
 })();
 
-/* Brands marquee — slow-down + tooltip */
+/* Brands marquee — tooltip (the strip itself moves with scroll, see index.astro) */
 (function() {
   const marquee = document.querySelector('.brands-marquee');
   const track   = document.querySelector('.brands-track');
   const tip     = document.getElementById('brandsTooltip');
   if (!marquee || !track || !tip) return;
-  let rampTimer, tipTimer, anim;
-  function getAnim() { if (!anim) anim = track.getAnimations()[0]; return anim; }
-  function rampRate(target, step) {
-    clearTimeout(rampTimer);
-    const a = getAnim();
-    if (!a) return;
-    const cur = a.playbackRate;
-    if (Math.abs(cur - target) < 0.005) { a.playbackRate = target; return; }
-    a.playbackRate = cur + (target - cur) * step;
-    rampTimer = setTimeout(() => rampRate(target, step), 30);
-  }
-  marquee.addEventListener('mouseenter', () => rampRate(0.08, 0.14));
-  marquee.addEventListener('mouseleave', () => { rampRate(1, 0.18); clearTimeout(tipTimer); tip.classList.remove('visible'); });
+  let tipTimer;
+  marquee.addEventListener('mouseleave', () => { clearTimeout(tipTimer); tip.classList.remove('visible'); });
   document.querySelectorAll('.brands-track a').forEach(link => {
     let host = '';
     try { host = new URL(link.href).hostname.replace(/^www\./, ''); } catch(e) {}
