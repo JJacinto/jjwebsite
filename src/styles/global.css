@@ -350,7 +350,9 @@ html[data-motion="reduce"] {
      full inner height (36px within the 44px nav). */
   display: flex; align-items: center;
   font-size: var(--font-size-sm); color: var(--text-secondary);
-  padding: var(--dimension-space-8) var(--dimension-space-16); border-radius: var(--radius-pill);
+  /* No vertical padding: the label is flex-centred, and padding here
+     pushed the bar past 44px, taller than the buttons beside it. */
+  padding: 0 var(--dimension-space-16); border-radius: var(--radius-pill);
   overflow: hidden;
   cursor: pointer; user-select: none; white-space: nowrap;
   transition: color var(--motion-duration-short) var(--motion-easing-standard), transform var(--motion-duration-short) var(--motion-easing-standard);
@@ -405,6 +407,13 @@ html[data-motion="reduce"] {
   display: flex;
   align-items: center;
   gap: var(--dimension-space-8);
+}
+/* Desktop: logo | links | controls on a 1fr auto 1fr grid, so the
+   links sit on the true centre of the bar however wide each side is. */
+@media (min-width: 681px) {
+  .nav .container { display: grid; grid-template-columns: 1fr auto 1fr; }
+  .nav .logo-outer { justify-self: start; }
+  .nav-right { justify-self: end; }
 }
 
 .li-badge {
@@ -5865,19 +5874,31 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   padding: 0 var(--dimension-space-12);
   border-radius: var(--radius-pill);
   border: var(--dimension-border-width-2) solid transparent;
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  /* Ghost at rest: in the nav a fill means "the page you're on" and an
+     outline means "Start project", so this utility stays text-only and
+     matches the inactive links in size, weight and colour. */
+  background: transparent;
+  position: relative; isolation: isolate;
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: inherit;
   color: var(--text-secondary); cursor: pointer; user-select: none;
-  transition:
-    color var(--motion-duration-short) var(--motion-easing-standard),
-    background var(--motion-duration-short) var(--motion-easing-standard);
+  transition: color var(--motion-duration-short) var(--motion-easing-standard);
+}
+/* Hover / open wash. Inset 4px so it is 36px tall, the same as the
+   active-page pill, while the button keeps its 44px target. */
+.settings-btn::before {
+  content: ''; position: absolute; z-index: -1;
+  /* Measured from inside the 2px border: 2px + 2px = the 4px inset. */
+  inset: 2px -2px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  opacity: 0;
+  transition: opacity var(--motion-duration-short) var(--motion-easing-standard);
 }
 .settings-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
 .settings-btn:hover,
-.settings.is-open .settings-btn {
-  color: var(--text-primary);
-  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
-}
+.settings.is-open .settings-btn { color: var(--text-primary); }
+.settings-btn:hover::before,
+.settings.is-open .settings-btn::before { opacity: 1; }
 
 .settings-panel {
   position: absolute; top: calc(100% + var(--dimension-space-12)); right: 0;
