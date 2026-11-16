@@ -1,0 +1,14 @@
+---
+/* The site footer: status dot, copyright and the email copy button.
+   Base.astro renders it in the closing band on most pages; /contact renders
+   it inside its own section so the footer shares that page's star field. */
+---
+<footer class="footer" id="footer">
+  <div class="container">
+    <div class="footer-status" id="footer-status">
+      <span class="footer-status-dot" id="footer-status-dot"></span>
+      <span class="footer-status-label" id="footer-status-label"></span>
+    </div>
+    <p>© 2026 João Jacinto<span class="footer-sep"> • </span><button class="footer-email-link" id="footer-email-btn" data-umami-event="footer-email-copy" aria-label="Copy email contact@joaojacinto.com to clipboard" data-pt-aria-label="Copiar o email contact@joaojacinto.com para a área de transferência">contact@joaojacinto.com</button></p>
+  </div>
+</footer>

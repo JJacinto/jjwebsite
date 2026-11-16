@@ -59,8 +59,10 @@ const loop = [
 
     <div class="container">
 
-      <!-- Story hero: a tangle is pulled apart, mapped, cut down and
-           shipped as one step. The SVG's resting markup is the final
+      <!-- Story hero, told as a planet clearing its orbit: a comet leaves
+           a tangle, it breaks into bodies, they settle into orbits, the
+           ones nobody would miss are thrown out, and the rest merge into
+           one planet on one orbit, which becomes the switch. The SVG's resting markup is the final
            frame, so no-JS and reduced-motion visitors see the outcome
            and all five steps. The script at the bottom of this file
            plays it once on load. -->
@@ -79,42 +81,48 @@ const loop = [
           <svg viewBox="0 0 480 360" xmlns="http://www.w3.org/2000/svg">
             <path class="st-tangle" pathLength="1" d="M92,196C120,96 236,70 286,128C332,182 250,262 190,222C128,180 196,86 276,98C366,112 398,214 330,258C262,302 150,280 150,206C150,138 236,118 276,160C312,198 286,250 240,244C196,238 190,186 228,170C262,156 300,186 284,214C330,236 380,206 392,160"/>
 
-            <g class="st-edges">
-              <line class="st-edge" data-keep pathLength="1" x1="240" y1="80" x2="160" y2="170"/>
-              <line class="st-edge" pathLength="1" x1="240" y1="80" x2="320" y2="170"/>
-              <line class="st-edge" data-keep pathLength="1" x1="160" y1="170" x2="110" y2="260"/>
-              <line class="st-edge" pathLength="1" x1="160" y1="170" x2="210" y2="260"/>
-              <line class="st-edge" pathLength="1" x1="320" y1="170" x2="270" y2="260"/>
-              <line class="st-edge" pathLength="1" x1="320" y1="170" x2="370" y2="260"/>
+            <!-- The system the pieces settle into: a star and four orbits.
+                 data-main is the one that stays; data-w is how fast a body
+                 runs it, in radians a second (negative runs it backwards). -->
+            <circle class="st-sun" cx="240" cy="170" r="6"/>
+            <g class="st-orbits">
+              <g><ellipse class="st-orbit" data-main data-w="0.5" cx="240" cy="170" rx="150" ry="70"/></g>
+              <g transform="rotate(-18 240 170)"><ellipse class="st-orbit" data-rot="-18" data-w="0.35" cx="240" cy="170" rx="190" ry="110"/></g>
+              <g transform="rotate(25 240 170)"><ellipse class="st-orbit" data-rot="25" data-w="-0.45" cx="240" cy="170" rx="95" ry="150"/></g>
+              <g><ellipse class="st-orbit" data-w="0.9" cx="240" cy="170" rx="80" ry="34"/></g>
             </g>
-            <line class="st-row" x1="180" y1="170" x2="300" y2="170"/>
 
-            <!-- data-s = scattered position, data-m = mapped position,
-                 data-r = position in the final row (kept nodes only). -->
+            <!-- data-s = scattered position, data-o = which orbit it joins,
+                 data-a = where on it, in degrees. data-cut bodies are thrown
+                 out; the rest share the main orbit and merge. -->
             <g class="st-nodes">
-              <g class="st-node" data-s="236,150" data-m="240,80"  data-r="180,170"><circle r="8"/></g>
-              <g class="st-node" data-s="96,188"  data-m="160,170" data-r="240,170"><circle r="8"/></g>
-              <g class="st-node" data-s="372,172" data-m="320,170" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
-              <g class="st-node" data-s="132,84"  data-m="110,260" data-r="300,170"><circle r="8"/></g>
-              <g class="st-node" data-s="178,286" data-m="210,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
-              <g class="st-node" data-s="300,292" data-m="270,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
-              <g class="st-node" data-s="330,72"  data-m="370,260" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="236,150" data-o="0" data-a="108"><circle r="8"/></g>
+              <g class="st-node" data-s="96,188"  data-o="0" data-a="228"><circle r="8"/></g>
+              <g class="st-node" data-s="372,172" data-o="1" data-a="20" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="132,84"  data-o="0" data-a="348"><circle r="8"/></g>
+              <g class="st-node" data-s="178,286" data-o="2" data-a="200" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="300,292" data-o="1" data-a="190" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
+              <g class="st-node" data-s="330,72"  data-o="3" data-a="80" data-cut><circle r="8"/><path class="st-slash" pathLength="1" d="M-13,11L13,-11"/></g>
             </g>
 
             <rect class="st-pill" x="180" y="142" width="120" height="56" rx="28"/>
             <circle class="st-ball" r="20"/>
             <text class="st-result" x="240" y="250" text-anchor="middle" data-pt="40 passos → 1">40 steps → 1</text>
           </svg>
+          <!-- The particles that gather into the tangle and then collapse
+               into the pieces. Larger than the stage, so they arrive from
+               outside it. -->
+          <canvas class="st-dust"></canvas>
           <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay" data-pt="Repetir">Replay</button>
         </div>
 
         <div class="about-story-copy">
           <ol class="about-story-steps">
             <li data-pt="Pegar no emaranhado tal como está.">Take the tangle as it is.</li>
-            <li data-pt="Desfazê-lo em peças.">Pull it apart into pieces.</li>
-            <li data-pt="Mapear a relação entre as peças.">Map how the pieces relate.</li>
-            <li data-pt="Cortar o que ninguém daria por falta.">Cut what nobody would miss.</li>
-            <li data-pt="Lançar o único passo que sobra.">Ship the one step that's left.</li>
+            <li data-pt="Desfazê-lo nas suas partes.">Break it into its parts.</li>
+            <li data-pt="Ver o que orbita o quê.">Find what orbits what.</li>
+            <li data-pt="Limpar a órbita do que ninguém daria por falta.">Clear the orbit of what nobody would miss.</li>
+            <li data-pt="Lançar o único passo que sobra.">Launch the one step that's left.</li>
           </ol>
           <p class="about-story-note" data-pt="Esta é a história do redesenho das políticas e permissões na Anchorage Digital.">That's the story of the policies and permissions redesign at Anchorage Digital.</p>
 
@@ -430,10 +438,12 @@ const loop = [
 </Base>
 
 <script is:inline>
-/* About story. One ball (the problem) drops onto a tangle, breaks into
-   pieces, the pieces get mapped, four are cut, the three left merge
-   back into the ball, and the ball becomes the knob of a single
-   switch. Flipping it turns the paper sketch into the finished, dark
+/* About story, told as a planet clearing its orbit. A comet draws a
+   glowing tangle (the problem), the tangle collapses into bodies, the
+   bodies settle into orbits round a star, four are thrown out, the
+   three left on the main orbit merge into one planet, and that orbit
+   shrinks into a single switch with the planet as its knob.
+   Flipping it turns the paper sketch into the finished, dark
    product state, which is also the SVG's resting markup. Click the
    stage to skip; Replay runs it again. */
 (function () {
@@ -445,15 +455,23 @@ const loop = [
   const $ = (s) => stage.querySelector(s);
   const $$ = (s) => Array.from(stage.querySelectorAll(s));
   const pt = (v) => v.split(',').map(Number);
-  const tangle = $('.st-tangle'), pill = $('.st-pill'), ball = $('.st-ball'), row = $('.st-row');
+  const tangle = $('.st-tangle'), pill = $('.st-pill'), ball = $('.st-ball'), sun = $('.st-sun');
   const replay = $('.about-story-replay');
-  const edges = $$('.st-edge');
+  const RAD = Math.PI / 180, TAU = Math.PI * 2;
+  const orbits = $$('.st-orbit').map((el) => ({
+    el,
+    rx: +el.getAttribute('rx'), ry: +el.getAttribute('ry'),
+    rot: (+el.dataset.rot || 0) * RAD,
+    w: +el.dataset.w,
+    main: el.hasAttribute('data-main'),
+  }));
   const steps = Array.from(story.querySelectorAll('.about-story-steps li'));
   const nodes = $$('.st-node').map((el) => ({
     el,
     s: pt(el.dataset.s),
-    m: pt(el.dataset.m),
-    r: el.dataset.r ? pt(el.dataset.r) : null,
+    o: +el.dataset.o,
+    a: +el.dataset.a * RAD,
+    end: 0,                       /* the angle it leaves its orbit at, set in play() */
     cut: el.hasAttribute('data-cut'),
     slash: el.querySelector('.st-slash'),
   }));
@@ -473,6 +491,179 @@ const loop = [
   const T = (p, s) => 'translate(' + p[0] + 'px,' + p[1] + 'px) scale(' + s + ')';
   const a = (el, frames, opts) => el.animate(frames, Object.assign({ fill: 'forwards', easing: EMPH }, opts));
   const set = (el, props) => el.animate([props, props], { duration: 1, fill: 'forwards' });
+  /* A point on an orbit, the direction of travel there, and keyframes
+     for a run along it from one angle to another. */
+  const on = (o, ang) => {
+    const x = o.rx * Math.cos(ang), y = o.ry * Math.sin(ang), c = Math.cos(o.rot), s = Math.sin(o.rot);
+    return [C[0] + x * c - y * s, C[1] + x * s + y * c];
+  };
+  const heading = (o, ang) => {
+    const x = -o.rx * Math.sin(ang), y = o.ry * Math.cos(ang), c = Math.cos(o.rot), s = Math.sin(o.rot);
+    const dx = x * c - y * s, dy = x * s + y * c, d = (Math.hypot(dx, dy) || 1) * (o.w < 0 ? -1 : 1);
+    return [dx / d, dy / d];
+  };
+  const arc = (o, from, to) => {
+    const n = Math.max(2, Math.ceil(Math.abs(to - from) / 0.12)), frames = [];
+    for (let i = 0; i <= n; i++) frames.push({ opacity: 1, transform: T(on(o, from + (to - from) * i / n), 1), easing: 'linear' });
+    return frames;
+  };
+
+  /* Dust: steps 1 and 2, on a canvas over the SVG and in its coordinates.
+     start() sends a comet along the tangle's path; it leaves a glowing
+     line behind it and sheds sparks that hang around the line. split()
+     breaks the line into its sparks and pulls each one into its nearest
+     piece; stop() clears the canvas. The tangle is drawn GROW times the
+     size of the SVG path, so it spills past the stage. */
+  const dust = (function () {
+    const cv = $('.st-dust'), ctx = cv && cv.getContext && cv.getContext('2d');
+    if (!ctx || !tangle.getTotalLength) return { start() {}, split() {}, stop() {} };
+    const PAD = 0.35, N = 420, LUT = 520, GROW = 1.5;
+    const FLY_IN = 0.25, TRACE = 1.55, FLY_OUT = 0.3;   /* seconds */
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    const len = tangle.getTotalLength(), lut = [];
+    for (let i = 0; i <= LUT; i++) {
+      const p = tangle.getPointAtLength(len * i / LUT);
+      lut.push(C[0] + (p.x - 242) * GROW, C[1] + 2 + (p.y - 186) * GROW);
+    }
+    const at = (u) => {
+      u = clamp01(u) * LUT;
+      const i = Math.min(LUT - 1, u | 0), f = u - i;
+      return [lut[i * 2] + (lut[i * 2 + 2] - lut[i * 2]) * f, lut[i * 2 + 1] + (lut[i * 2 + 3] - lut[i * 2 + 1]) * f];
+    };
+    /* Unit tangents at both ends, for the comet's way in and out. */
+    const unit = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy) || 1; return [dx / d, dy / d]; };
+    const P0 = at(0), P1 = at(1), T0 = unit(P0, at(0.01)), T1 = unit(at(0.99), P1);
+
+    const P = [];
+    for (let i = 0; i < N; i++) {
+      const u = (i + Math.random()) / N, home = at(u);
+      const ang = Math.random() * Math.PI * 2, far = 2 + 34 * Math.pow(Math.random(), 3);
+      let k = 0, best = Infinity;
+      nodes.forEach((n, j) => {
+        const d = (n.s[0] - home[0]) * (n.s[0] - home[0]) + (n.s[1] - home[1]) * (n.s[1] - home[1]);
+        if (d < best) { best = d; k = j; }
+      });
+      P.push({
+        u, k, born: -1,
+        dx: Math.cos(ang) * far, dy: Math.sin(ang) * far,
+        ph: Math.random() * Math.PI * 2, sp: 0.8 + Math.random() * 1.6,
+        r: 0.9 + Math.random() * 1.3, a: 0.55 + Math.random() * 0.45,
+        accent: Math.random() < 0.3, d2: Math.random() * 0.22,
+      });
+    }
+    let raf = 0, t0 = 0, splitAt = 0, w = 0, h = 0, k = 0, ink = '', brand = '', brand0 = '';
+    function size() {
+      const cw = stage.clientWidth, ch = stage.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (cw === w && ch === h && dpr === k) return;
+      w = cw; h = ch; k = dpr;
+      cv.width = Math.round(w * (1 + PAD * 2) * k);
+      cv.height = Math.round(h * (1 + PAD * 2) * k);
+    }
+    function trace(from, to) {
+      const a = Math.max(0, Math.round(from * LUT)), b = Math.min(LUT, Math.round(to * LUT));
+      ctx.beginPath(); ctx.moveTo(lut[a * 2], lut[a * 2 + 1]);
+      for (let j = a + 1; j <= b; j++) ctx.lineTo(lut[j * 2], lut[j * 2 + 1]);
+    }
+    function frame(now) {
+      raf = 0;
+      size();
+      const t = (now - t0) / 1000, ts = splitAt ? (now - splitAt) / 1000 : -1, sc = w / 480;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      if (ts > 0.9) return;
+      ctx.setTransform(k * sc, 0, 0, k * sc, w * PAD * k, h * PAD * k);
+      ctx.lineJoin = ctx.lineCap = 'round';
+
+      /* How far along the path the comet is: steady, eased a little at both ends. */
+      const lin = clamp01((t - FLY_IN) / TRACE);
+      const head = 0.6 * lin + 0.4 * lin * lin * (3 - 2 * lin);
+      const line = ts < 0 ? 1 : Math.max(0, 1 - ts / 0.35);   /* the line goes as the sparks leave */
+
+      /* The glowing line: two soft accent strokes, then a bright core. */
+      if (head > 0 && line > 0) {
+        trace(0, head);
+        ctx.strokeStyle = brand;
+        ctx.globalAlpha = 0.1 * line; ctx.lineWidth = 16; ctx.stroke();
+        ctx.globalAlpha = 0.24 * line; ctx.lineWidth = 7; ctx.stroke();
+        ctx.shadowColor = brand; ctx.shadowBlur = 14 * k;
+        ctx.strokeStyle = ink;
+        ctx.globalAlpha = line * (0.9 + 0.1 * Math.sin(t * 3.2)); ctx.lineWidth = 2.6; ctx.stroke();
+        ctx.shadowBlur = 0;
+        /* Hotter just behind the comet. */
+        if (lin < 1) { trace(head - 0.07, head); ctx.globalAlpha = 0.9; ctx.lineWidth = 4.4; ctx.stroke(); }
+      }
+
+      /* Sparks: born as the comet passes, thrown off the line, then they hover. */
+      for (let i = 0; i < N; i++) {
+        const p = P[i];
+        if (p.born < 0) { if (head < p.u || lin <= 0) continue; p.born = t; }
+        const age = t - p.born, out = 1 - Math.exp(-4 * age);
+        const home = at(p.u + 0.008 * Math.sin(t * p.sp + p.ph));
+        let x = home[0] + p.dx * out, y = home[1] + p.dy * out;
+        let alpha = p.a * (0.3 + 0.7 * Math.exp(-1.4 * age)), r = p.r * (1 + 0.8 * Math.exp(-5 * age));
+        if (ts >= 0) {
+          let q = clamp01((ts - p.d2) / 0.45);
+          q = q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+          const n = nodes[p.k].s;
+          x += (n[0] - x) * q; y += (n[1] - y) * q;
+          alpha = (alpha + (p.a - alpha) * Math.min(1, ts / 0.15)) * (1 - q * q * q);
+          r *= 1 - 0.4 * q;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.accent ? brand : ink;
+        ctx.beginPath(); ctx.arc(x, y, r / Math.max(sc, 0.6), 0, Math.PI * 2); ctx.fill();
+      }
+
+      /* The comet: flies in along the first tangent, runs the path, flies out. */
+      if (ts < 0) {
+        let pos = null, dir = T0, seen = 1, tail = 0;
+        if (t < FLY_IN) {
+          const q = t / FLY_IN;
+          pos = [P0[0] - T0[0] * 150 * (1 - q), P0[1] - T0[1] * 150 * (1 - q)]; seen = q; tail = 70;
+        } else if (lin < 1) {
+          pos = at(head);
+        } else {
+          const q = (t - FLY_IN - TRACE) / FLY_OUT;
+          if (q < 1) { pos = [P1[0] + T1[0] * 170 * q, P1[1] + T1[1] * 170 * q]; dir = T1; seen = 1 - q; tail = 70 * (1 - q); }
+        }
+        if (pos) {
+          if (tail) {
+            const g = ctx.createLinearGradient(pos[0], pos[1], pos[0] - dir[0] * tail, pos[1] - dir[1] * tail);
+            g.addColorStop(0, ink); g.addColorStop(0.4, brand); g.addColorStop(1, brand0);
+            ctx.globalAlpha = seen; ctx.strokeStyle = g; ctx.lineWidth = 3.4;
+            ctx.beginPath(); ctx.moveTo(pos[0], pos[1]); ctx.lineTo(pos[0] - dir[0] * tail, pos[1] - dir[1] * tail); ctx.stroke();
+          }
+          const glow = ctx.createRadialGradient(pos[0], pos[1], 0, pos[0], pos[1], 42);
+          glow.addColorStop(0, brand); glow.addColorStop(1, brand0);
+          ctx.globalAlpha = 0.7 * seen; ctx.fillStyle = glow;
+          ctx.beginPath(); ctx.arc(pos[0], pos[1], 42, 0, Math.PI * 2); ctx.fill();
+          ctx.globalAlpha = seen; ctx.fillStyle = ink;
+          ctx.beginPath(); ctx.arc(pos[0], pos[1], 5, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+      cancelAnimationFrame(raf); raf = 0;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+    }
+    return {
+      start() {
+        stop();
+        ink = getComputedStyle(stage).color;
+        brand = getComputedStyle(cv).color;
+        /* The accent at zero alpha, for gradients that fade to nothing. */
+        brand0 = /^rgb\(/.test(brand) ? brand.replace('rgb(', 'rgba(').replace(')', ', 0)') : 'rgba(128,128,240,0)';
+        P.forEach((p) => { p.born = -1; });
+        t0 = performance.now(); splitAt = 0;
+        raf = requestAnimationFrame(frame);
+      },
+      split() { splitAt = performance.now(); },
+      stop,
+    };
+  })();
 
   let run = 0;
   let playing = false;
@@ -483,6 +674,7 @@ const loop = [
     timers.forEach(clearTimeout);
     timers = [];
     story.getAnimations({ subtree: true }).forEach((x) => x.cancel());
+    dust.stop();
   }
   function step(i) {
     steps.forEach((li, n) => {
@@ -502,7 +694,7 @@ const loop = [
     /* Chromium can keep cancelled fill-forwards values on SVG children
        (stray dots and the row left on the final frame, mostly at phone
        widths). Write the final frame as inline styles so it can't. */
-    [tangle, row].concat(edges, nodes.map((n) => n.el)).forEach((el) => { el.style.opacity = '0'; });
+    [tangle, sun].concat(orbits.map((o) => o.el), nodes.map((n) => n.el)).forEach((el) => { el.style.opacity = '0'; });
     pill.style.opacity = '1';
     pill.style.transform = 'none';
     ball.style.transform = 'translate(' + ON[0] + 'px,' + ON[1] + 'px)';
@@ -518,69 +710,82 @@ const loop = [
     stage.querySelectorAll('svg *').forEach((el) => el.removeAttribute('style'));
 
     set(pill, { opacity: 0 });
-    set(ball, { transform: T([240, -30], 0.45) });
-    nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(C, 0) }));
+    set(ball, { transform: T(C, 0) });
+    nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(n.s, 0) }));
     stage.classList.remove('is-pending');
 
-    /* 1. Take the tangle as it is. */
+    /* 1. Take the tangle as it is: a comet draws the mess as a glowing line. */
     step(0);
-    a(tangle, [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], { duration: 1000, easing: STD });
-    a(ball, [
-      { transform: T([240, -30], 0.45), easing: EXIT },
-      { transform: T(C, 0.45), offset: 0.55, easing: ENTER },
-      { transform: T([240, 142], 0.45), offset: 0.78, easing: EXIT },
-      { transform: T(C, 0.45) },
-    ], { duration: 800, delay: 500, easing: 'linear' });
-    await wait(1700); if (!live()) return;
+    dust.start();
+    await wait(2500); if (!live()) return;
 
-    /* 2. Pull it apart into pieces. */
+    /* 2. Break it into its parts: the mess collapses into the nodes,
+       each one growing where its particles land. */
     step(1);
-    a(tangle, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: STD });
-    a(ball, [{ transform: T(C, 0.45) }, { transform: T(C, 0) }], { duration: 220, easing: EXIT });
+    dust.split();
     nodes.forEach((n, i) => a(n.el,
-      [{ opacity: 1, transform: T(C, 0) }, { opacity: 1, transform: T(n.s, 1) }],
-      { duration: 600, delay: 120 + i * 45, easing: SPRING }));
-    await wait(1300); if (!live()) return;
+      [{ opacity: 1, transform: T(n.s, 0) }, { opacity: 1, transform: T(n.s, 1) }],
+      { duration: 550, delay: 300 + i * 40, easing: SPRING }));
+    await wait(1400); if (!live()) return;
 
-    /* 3. Map how the pieces relate. */
+    /* 3. Find what orbits what: a star lights up and every body
+       finds its orbit. Each body's whole flight is scheduled here (the
+       approach, its laps and, for the ones that get cut, the moment it
+       is thrown out), so the legs join up without a jump. */
     step(2);
-    nodes.forEach((n, i) => a(n.el,
-      [{ opacity: 1, transform: T(n.s, 1) }, { opacity: 1, transform: T(n.m, 1) }],
-      { duration: 650, delay: i * 30 }));
-    edges.forEach((e, i) => a(e,
-      [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }],
-      { duration: 380, delay: 450 + i * 70, easing: STD }));
-    await wait(1700); if (!live()) return;
-
-    /* 4. Cut what nobody would miss. */
-    step(3);
-    cut.forEach((n, i) => {
-      a(n.slash, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 160, delay: i * 110, easing: STD });
-      a(n.el,
-        [{ opacity: 1, transform: T(n.m, 1) + ' rotate(0deg)' },
-         { opacity: 0, transform: T([n.m[0], n.m[1] + 150], 1) + ' rotate(25deg)' }],
-        { duration: 520, delay: 560 + i * 60, easing: EXIT });
+    const MAP = 1900, CUT = 1250;
+    a(sun, [{ opacity: 0, transform: 'scale(0)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 500, easing: SPRING });
+    orbits.forEach((o, i) => a(o.el,
+      [{ opacity: 0, transform: 'scale(0.7)' }, { opacity: o.main ? 0.75 : 0.4, transform: 'scale(1)' }],
+      { duration: 600, delay: 150 + i * 90 }));
+    nodes.forEach((n, i) => {
+      const o = orbits[n.o], begin = 650 + i * 30, ci = cut.indexOf(n);
+      const leave = ci < 0 ? MAP + CUT : MAP + 560 + ci * 60;
+      n.end = n.a + o.w * (leave - begin) / 1000;
+      a(n.el, [{ opacity: 1, transform: T(n.s, 1) }, { opacity: 1, transform: T(on(o, n.a), 1) }], { duration: 650, delay: i * 30 });
+      a(n.el, arc(o, n.a, n.end), { duration: leave - begin, delay: begin, easing: 'linear' });
+      if (ci >= 0) {
+        const p = on(o, n.end), d = heading(o, n.end);
+        a(n.slash, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 160, delay: MAP + ci * 110, easing: STD });
+        a(n.el,
+          [{ opacity: 1, transform: T(p, 1) }, { opacity: 0, transform: T([p[0] + d[0] * 220, p[1] + d[1] * 220], 0.6) }],
+          { duration: 520, delay: leave, easing: EXIT });
+      }
     });
-    edges.filter((e) => !e.hasAttribute('data-keep')).forEach((e) =>
-      a(e, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, delay: 560, easing: STD }));
-    await wait(1250); if (!live()) return;
-    keep.forEach((n) => a(n.el,
-      [{ opacity: 1, transform: T(n.m, 1) }, { opacity: 1, transform: T(n.r, 1) }], { duration: 550 }));
-    edges.filter((e) => e.hasAttribute('data-keep')).forEach((e) =>
-      a(e, [{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: STD }));
-    a(row, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, delay: 300, easing: STD });
-    await wait(1000); if (!live()) return;
+    /* An orbit goes once the last body on it has left. */
+    orbits.forEach((o, oi) => {
+      if (o.main) return;
+      const last = Math.max.apply(null, cut.map((n, ci) => (n.o === oi ? ci : -1)));
+      a(o.el, [{ opacity: 0.4 }, { opacity: 0 }], { duration: 350, delay: MAP + 560 + Math.max(0, last) * 60 + 200, easing: STD });
+    });
+    await wait(MAP); if (!live()) return;
 
-    /* 5. Ship the one step that's left. */
+    /* 4. Clear the orbit of what nobody would miss: the marked bodies are struck
+       through, then fly off along their own heading, and their orbits
+       go with them. All of it was scheduled in step 3, on one clock,
+       so a strike can never arrive after its body has left. */
+    step(3);
+    await wait(CUT); if (!live()) return;
+    /* The three left share one orbit. They run together and merge into
+       one planet at its left end, where the switch's knob will sit. */
+    const main = orbits.filter((o) => o.main)[0], HOME = Math.PI, AT = on(main, HOME);
+    keep.forEach((n) => {
+      let d = (HOME - n.end) % TAU;
+      if (d > Math.PI) d -= TAU; else if (d < -Math.PI) d += TAU;
+      a(n.el, arc(main, n.end, n.end + d), { duration: 700 });
+      a(n.el, [{ opacity: 1, transform: T(AT, 1) }, { opacity: 0, transform: T(AT, 0.6) }], { duration: 250, delay: 650, easing: STD });
+    });
+    a(ball, [{ transform: T(AT, 0) }, { transform: T(AT, 0.6) }], { duration: 400, delay: 600, easing: SPRING });
+    await wait(1250); if (!live()) return;
+
+    /* 5. Launch the one step that's left: the orbit shrinks into the
+       switch's outline and the planet rides it in as the knob. */
     step(4);
-    keep.forEach((n) => a(n.el,
-      [{ opacity: 1, transform: T(n.r, 1) }, { opacity: 0, transform: T(C, 0.6) }], { duration: 380 }));
-    a(row, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: STD });
-    a(ball, [{ transform: T(C, 0) }, { transform: T(C, 0.6) }], { duration: 380, delay: 150, easing: SPRING });
-    await wait(600); if (!live()) return;
-    a(pill, [{ opacity: 0, transform: 'scale(0.7)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 450 });
-    a(ball, [{ transform: T(C, 0.6) }, { transform: T(OFF, 1) }], { duration: 450 });
-    await wait(800); if (!live()) return;
+    a(main.el, [{ opacity: 0.75, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0.4)' }], { duration: 450 });
+    a(sun, [{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(0)' }], { duration: 300, easing: STD });
+    a(pill, [{ opacity: 0, transform: 'scale(2.5)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 450 });
+    a(ball, [{ transform: T(AT, 0.6) }, { transform: T(OFF, 1) }], { duration: 450 });
+    await wait(950); if (!live()) return;
 
     /* Switch on: the sketch flips to the finished state in one frame. */
     stage.classList.remove('is-paper');

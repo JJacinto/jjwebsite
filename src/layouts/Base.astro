@@ -1,6 +1,7 @@
 ﻿---
 import '../styles/global.css';
 import { versioned } from '../lib/script-url';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title?: string;
@@ -16,6 +17,9 @@ interface Props {
      on pages that already paint their own particle field in the hero
      (contact, error pages) to avoid doubling up. */
   disablePageParticles?: boolean;
+  /* The page renders <Footer /> itself, inside its own field (contact), so
+     Base skips the closing band and its second field. */
+  footerInPage?: boolean;
 }
 
 const {
@@ -28,6 +32,7 @@ const {
   showFooter = true,
   showCta = true,
   disablePageParticles = false,
+  footerInPage = false,
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
@@ -338,16 +343,22 @@ const umamiOn  = !!(umamiSrc && umamiId);
   </div>
 </div>
 
-<main id="main-content">
+{/* With the page field on, main is its root: the field sits behind the
+    content, so it listens for the pointer on main. */}
+<main id="main-content" data-space-root={disablePageParticles ? undefined : ''}>
   {!disablePageParticles && (
     <div class="page-particles" aria-hidden="true">
+      {/* The first canvas paints the gradient only (compose-modal.js skips
+          its own particles when a data-hero-space canvas is beside it);
+          the second is the home hero's field, without the portrait. */}
       <canvas class="cta-footer-bg"></canvas>
+      <canvas class="hero-space" data-hero-space data-space-auto></canvas>
     </div>
   )}
   <slot />
 </main>
 
-{(showCta || showFooter) && (
+{(showCta || showFooter) && !footerInPage && (
   <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]} data-space-root>
     {/* Canvas in both modes — solo wraps (contact + error pages) get the
         same FBM-dithered gradient treatment as the regular cta-footer-wrap,
@@ -408,17 +419,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
         </div>
       </section>
     )}
-    {showFooter && (
-      <footer class="footer" id="footer">
-        <div class="container">
-          <div class="footer-status" id="footer-status">
-            <span class="footer-status-dot" id="footer-status-dot"></span>
-            <span class="footer-status-label" id="footer-status-label"></span>
-          </div>
-          <p>© 2026 João Jacinto • <button class="footer-email-link" id="footer-email-btn" data-umami-event="footer-email-copy" aria-label="Copy email contact@joaojacinto.com to clipboard" data-pt-aria-label="Copiar o email contact@joaojacinto.com para a área de transferência">contact@joaojacinto.com</button></p>
-        </div>
-      </footer>
-    )}
+    {showFooter && <Footer />}
   </div>
 )}
 
@@ -515,9 +516,10 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <script is:inline src={versioned('/scripts/nav.js')} defer></script>
 <script is:inline src={versioned('/scripts/text-hover.js')} defer></script>
 <script is:inline src={versioned('/scripts/compose-modal.js')} defer></script>
-{/* The field in the bottom contact areas. The home page loads it itself,
-    next to the hero scripts, so the intro finds HeroSpace in order. */}
-{!isHome && (showCta || showFooter) && <script is:inline src={versioned('/scripts/hero-space.js')} defer></script>}
+{/* The field at the top of the page and in the bottom contact areas. The
+    home page loads it itself, next to the hero scripts, so the intro finds
+    HeroSpace in order. */}
+{!isHome && (showCta || showFooter || !disablePageParticles) &&<script is:inline src={versioned('/scripts/hero-space.js')} defer></script>}
 
 <script>
   /* Retune visual-editing overlay — dev only. The branch is dead-code

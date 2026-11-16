@@ -17,7 +17,9 @@
    And a small PARTS read-out in the bottom-left corner on instances that ask.
 
    Markup:  canvas.hero-space[data-hero-space]. Its root is the closest
-            [data-space-root], else the closest .hero, else the parent.
+            [data-space-root], else the closest .hero, else the parent. The
+            page field at the top of the inner pages (Base.astro) sits behind
+            the content, so its root is main.
    Attributes on the canvas:
      data-space-auto     go live by itself when scrolled into view. Without it
                          the instance is the hero's and waits for
@@ -187,6 +189,8 @@
       if (!live) return;
       var r = canvas.getBoundingClientRect(), now = performance.now();
       var x = ev.clientX - r.left, y = ev.clientY - r.top;
+      // The root can be taller than the field (the page field's root is main).
+      if (y < -80 || y > r.height + 80) { if (ptr.on) leave(); return; }
       var lastS = trail[trail.length - 1];
       if (lastS) {
         var dt = Math.max(8, now - lastS.t) / 1000;
@@ -208,6 +212,8 @@
     root.addEventListener('pointerdown', function (ev) {
       if (!live || calm || ev.button !== 0 || ev.pointerType === 'touch') return;
       if (ev.target.closest && ev.target.closest(NO_HOLE)) return;
+      var r = canvas.getBoundingClientRect();
+      if (ev.clientY < r.top || ev.clientY > r.bottom) return;
       cancelPending();
       pending = { cx: ev.clientX, cy: ev.clientY, timer: setTimeout(startHole, HOLD_MS) };
     });
@@ -711,7 +717,7 @@
         onScreen = es[es.length - 1].isIntersecting; last = 0;
         if (onScreen && auto) goLive();
         wake();
-      }).observe(root);
+      }).observe(canvas);   // the canvas, not the root: the page field's root is all of main
     } else if (auto) goLive();
     document.addEventListener('visibilitychange', function () { last = 0; wake(); });
 

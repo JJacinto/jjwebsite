@@ -59,7 +59,7 @@
     return (
       '<div class="compose-field">' +
         '<label class="eyebrow" for="chat-body" data-pt="Mensagem">Message</label>' +
-        '<textarea class="compose-textarea" id="chat-body" rows="5" required autocomplete="off" placeholder="What&#x27;s on your mind?" data-pt-placeholder="Em que est\u00e1s a pensar?"></textarea>' +
+        '<textarea class="compose-textarea" id="chat-body" rows="5" required autocomplete="off" placeholder="What the product is, who uses it, and where it gets tangled." data-pt-placeholder="O que \u00e9 o produto, quem o usa e onde se complica."></textarea>' +
       '</div>'
     );
   };
@@ -424,6 +424,7 @@
     bd.classList.remove('is-open');
     bd.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    document.dispatchEvent(new CustomEvent('jj:compose-closed'));
     var opener = document.getElementById('compose-open');
     if (opener) opener.focus();
   };
@@ -654,6 +655,7 @@
         if (!json.success) throw new Error(json.message || 'server');
         recordSubmit();
         trackSubmit('web3forms');
+        document.dispatchEvent(new CustomEvent('jj:message-sent'));
         btnLabel.textContent = T('Sent ✓', 'Enviado ✓');
         setTimeout(function () { closeModal(); }, 1800);
       }).catch(function () {
@@ -1719,16 +1721,26 @@
 
     function loop() { if (!raf && !reduced) raf = requestAnimationFrame(frame); }
 
+    /* Setting canvas.width in resize() wipes the canvas. When a hero-space
+       field owns the particles there is no rAF loop to repaint it, so the
+       gradient vanished and the wrap's flat CSS colour showed as a hard
+       band edge. Repaint straight after every resize. */
     var resizeTimer;
+    var resizeAndPaint = function () {
+      if (!firstPaintDone) return;
+      resize();
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      frame();
+    };
     var ro = window.ResizeObserver
       ? new ResizeObserver(function () {
           clearTimeout(resizeTimer);
-          resizeTimer = setTimeout(resize, 80);
+          resizeTimer = setTimeout(resizeAndPaint, 80);
         })
       : null;
     if (ro) ro.observe(wrap);
     else window.addEventListener('resize', function () {
-      clearTimeout(resizeTimer); resizeTimer = setTimeout(resize, 80);
+      clearTimeout(resizeTimer); resizeTimer = setTimeout(resizeAndPaint, 80);
     });
 
     document.addEventListener('visibilitychange', function () {

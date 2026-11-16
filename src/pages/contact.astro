@@ -1,5 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import { versioned } from '../lib/script-url';
 ---
 <Base
   activePage="contact"
@@ -7,18 +9,20 @@ import Base from '../layouts/Base.astro';
   showCta={false}
   showFooter={true}
   disablePageParticles={true}
+  footerInPage={true}
   title="Contact — João Jacinto"
   description="Get in touch with João Jacinto — Senior Product Designer based in Aveiro, Portugal."
   titlePt="Contacto — João Jacinto"
   descriptionPt="Fala com o João Jacinto — Senior Product Designer em Aveiro, Portugal."
 >
 
-  <section class="contact cta-footer-wrap" id="contact-section" data-space-root>
+  <section class="contact contact--with-footer cta-footer-wrap" id="contact-section" data-space-root>
     <canvas class="cta-footer-bg" id="contact-canvas" aria-hidden="true"></canvas>
-    <canvas class="hero-space" data-hero-space data-space-auto data-space-counter data-label="PARTS" data-pt-data-label="PARTES" aria-hidden="true"></canvas>
+    <canvas class="hero-space" data-hero-space data-space-auto aria-hidden="true"></canvas>
+    <canvas class="contact-binary" aria-hidden="true"></canvas>
     <div class="contact-inner reveal">
       <h1 data-pt="Vamos falar sobre<br>o que andas a construir.">Let's talk about<br>what you're building.</h1>
-      <p class="contact-body" data-pt="Faço o meu melhor trabalho em produtos cuja complexidade não se consegue eliminar: sistemas de permissões, conjuntos densos de regras, fluxos que as equipas usam o dia todo. Se o teu tem um emaranhado assim, conta-me.">I do my best work on products where the complexity can't be removed: permission systems, dense rule sets, workflows teams run all day. If yours has a tangle like that, tell me about it.</p>
+      <p class="contact-body" data-pt="Faço o meu melhor trabalho onde a complexidade não se consegue eliminar. Conta-me onde o teu produto se complica.">I do my best work where the complexity can't be removed. Tell me where yours gets tangled.</p>
 
       <div class="contact-ctas">
         <button class="btn btn-accent" id="compose-open" type="button" data-umami-event="contact-get-in-touch" onclick="openComposeModal(0)">
@@ -30,65 +34,42 @@ import Base from '../layouts/Base.astro';
           <span data-pt="Marcar chamada">Book a call</span>
         </a>
       </div>
-      <p class="contact-status" id="contact-status" aria-live="polite"><span class="contact-status-dot" id="contact-status-dot" aria-hidden="true"></span><span id="contact-status-text">I usually reply within a day or two on weekdays.</span></p>
-      <p class="contact-hint" data-pt="A melhor primeira mensagem diz o que é o produto, quem o usa e onde se complica.">The most useful first message says what the product is, who uses it, and where it gets tangled.</p>
 
-      <div class="contact-info">
-        <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
-          </div>
-          <div class="contact-card-body">
-            <div class="contact-card-label">Email</div>
-            <div class="contact-card-value">contact@joaojacinto.com</div>
-          </div>
-          <button class="btn btn-ghost contact-card-btn" data-umami-event="contact-email-copy" onclick="copyEmail(this)" aria-label="Copy email address" data-pt-aria-label="Copiar endereço de email">
-            <span class="btn-icon">
-              <svg class="copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              <svg class="copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
-            </span>
-            <span id="emailHint" data-pt="Copiar">Copy</span>
-          </button>
+      <div class="contact-hours">
+        <div class="contact-hours-pair">
+          <span class="contact-hours-who"><canvas id="hours-planet-aveiro" width="78" height="78" aria-hidden="true"></canvas><span>Aveiro <b id="hours-time-aveiro">--:--</b></span></span>
+          <span class="contact-hours-link" aria-hidden="true"></span>
+          <span class="contact-hours-who"><span><b id="hours-time-you">--:--</b> <span data-pt="Tu">You</span></span><canvas id="hours-planet-you" width="78" height="78" aria-hidden="true"></canvas></span>
         </div>
-        <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-          </div>
-          <div class="contact-card-body">
-            <div class="contact-card-label-row">
-              <div class="contact-card-label" data-pt="Localização">Location</div>
-              <div class="contact-card-sub" id="aveiro-clock" aria-live="polite">—</div>
-            </div>
-            <div class="contact-card-value">Aveiro, Portugal</div>
-          </div>
-          <a class="btn btn-ghost contact-card-btn" data-umami-event="contact-view-map" href="https://www.google.com/maps/@40.6405,-8.6538,13z" target="_blank" rel="noopener noreferrer" aria-label="View Aveiro on Google Maps" data-pt-aria-label="Ver Aveiro no Google Maps">
-            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
-            <span data-pt="Ver mapa">View map</span>
-          </a>
-        </div>
-        <div class="contact-card">
-          <div class="contact-card-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          </div>
-          <div class="contact-card-body">
-            <div class="contact-card-label" data-pt="Redes sociais">Socials</div>
-            <div class="contact-card-value">LinkedIn · X</div>
-          </div>
-          <div class="contact-card-actions">
-            <a class="btn btn-ghost contact-card-btn contact-card-btn--icon" data-umami-event="contact-social-linkedin" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
-            </a>
-            <a class="btn btn-ghost contact-card-btn contact-card-btn--icon" data-umami-event="contact-social-x" href="https://x.com/joao_jacinto_8" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-          </div>
-        </div>
+        <p class="contact-hours-text" id="hours-text" aria-live="polite">I usually reply within a day or two on weekdays.</p>
+      </div>
+
+      <div class="contact-row">
+        <span class="contact-row-email">contact@joaojacinto.com</span>
+        <button class="btn btn-ghost contact-card-btn" data-umami-event="contact-email-copy" onclick="copyEmail(this)" aria-label="Copy email address" data-pt-aria-label="Copiar endereço de email">
+          <span class="btn-icon">
+            <svg class="copy-icon-default" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg class="copy-icon-success" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+          </span>
+          <span id="emailHint" data-pt="Copiar">Copy</span>
+        </button>
+        <span class="contact-row-sep" aria-hidden="true"></span>
+        <a class="btn btn-ghost contact-card-btn contact-card-btn--icon" data-umami-event="contact-social-linkedin" href="https://www.linkedin.com/in/joaofranciscojacinto/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg>
+        </a>
+        <a class="btn btn-ghost contact-card-btn contact-card-btn--icon" data-umami-event="contact-social-x" href="https://x.com/joao_jacinto_8" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
       </div>
     </div>
+
+    <div class="contact-readout" id="contact-readout" aria-hidden="true"></div>
+    <Footer />
   </section>
 
 </Base>
 
+<script is:inline src={versioned('/scripts/contact-binary.js')} defer></script>
 <script is:inline>
 function copyEmail(el) {
   navigator.clipboard?.writeText('contact@joaojacinto.com').then(() => {
@@ -114,57 +95,87 @@ function copyEmail(el) {
   });
 }
 
-/* Live Aveiro clock + reply status — refreshes every minute, aligned to wall clock. */
+/* Shared hours: two small planets lit by the Aveiro clock and the visitor's
+   own clock, and one sentence that says when to expect a reply and how the
+   two days overlap. It reads the visitor's timezone only, no location.
+   Refreshes every minute, aligned to the wall clock. */
 (function () {
-  const el = document.getElementById('aveiro-clock');
-  const stDot = document.getElementById('contact-status-dot');
-  const stText = document.getElementById('contact-status-text');
-  const fmt = new Intl.DateTimeFormat('en-GB', {
-    timeZone: 'Europe/Lisbon',
-    hour: '2-digit', minute: '2-digit', hour12: false
-  });
-  const parts = new Intl.DateTimeFormat('en-GB', {
+  var elAveiro = document.getElementById('hours-time-aveiro');
+  var elYou = document.getElementById('hours-time-you');
+  var cvAveiro = document.getElementById('hours-planet-aveiro');
+  var cvYou = document.getElementById('hours-planet-you');
+  var elText = document.getElementById('hours-text');
+  if (!elAveiro || !elYou || !elText) return;
+  var parts = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Lisbon', weekday: 'short',
     hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
   });
-  const COLORS = { available: '#22c55e', sleeping: '#4b5563', offhours: '#f59e0b' };
-  function status() {
-    if (!stDot || !stText) return;
-    const p = {};
-    parts.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
-    const hour = parseInt(p.hour, 10);
-    const t = p.hour + ':' + p.minute;
-    const wd = p.weekday;
-    const weekend = wd === 'Sat' || wd === 'Sun';
-    let state, text;
-    /* Working hours: weekdays 09:00-18:00 Lisbon time. Weekends are off. */
-    if (hour >= 1 && hour < 9) state = 'sleeping';
-    else if (!weekend && hour >= 9 && hour < 18) state = 'available';
-    else state = 'offhours';
-    const pt = window.jjLang && window.jjLang() === 'pt';
-    if (pt) {
-      if (state === 'sleeping') text = "Em Aveiro são " + t + " e estou a dormir. Respondo de manhã.";
-      else if (weekend) text = "É fim de semana em Aveiro, por isso a resposta fica para segunda.";
-      else if (state === 'available') text = "Em Aveiro são " + t + " e estou a trabalhar, por isso deves ter resposta hoje.";
-      else if (wd === 'Fri') text = "Em Aveiro são " + t + " e já fechei a semana, por isso a resposta fica para segunda.";
-      else text = "Em Aveiro são " + t + " e já acabei por hoje, por isso a resposta fica para amanhã.";
-    }
-    else if (state === 'sleeping') text = "It's " + t + " in Aveiro and I'm asleep. I'll reply in the morning.";
-    else if (weekend) text = "It's the weekend in Aveiro, so expect a reply on Monday.";
-    else if (state === 'available') text = "It's " + t + " in Aveiro and I'm working, so expect a reply today.";
-    else if (wd === 'Fri') text = "It's " + t + " in Aveiro and I'm done for the week, so expect a reply on Monday.";
-    else text = "It's " + t + " in Aveiro and I'm done for the day, so expect a reply tomorrow.";
-    stDot.className = 'contact-status-dot state-' + state;
-    stDot.style.background = COLORS[state];
-    stText.textContent = text;
+  var isPt = function () { return !!(window.jjLang && window.jjLang() === 'pt'); };
+
+  /* A small moon-phase disc: the lit side follows the hour of day. */
+  function planet(pc, h, lit) {
+    if (!pc || !pc.getContext) return;
+    var cs = getComputedStyle(pc);
+    var dark = cs.getPropertyValue('--planet-dark').trim() || '#2c2937';
+    var rim = cs.getPropertyValue('--planet-rim').trim() || 'rgba(128,128,128,0.4)';
+    var f = (1 + Math.cos(2 * Math.PI * (h - 12) / 24)) / 2;
+    var c = pc.getContext('2d'), S = pc.width, r = S / 2 - 4;
+    c.clearRect(0, 0, S, S); c.save(); c.translate(S / 2, S / 2);
+    /* The night side and the rim are the lit colour, dimmed, so the disc
+       reads on every theme without a surface token of its own. */
+    c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.clip();
+    c.fillStyle = lit; c.beginPath(); c.arc(0, 0, r, -Math.PI / 2, Math.PI / 2, h >= 12); c.fill();
+    if (f <= 0.5) c.globalCompositeOperation = 'destination-out';
+    c.beginPath(); c.ellipse(0, 0, Math.abs(1 - 2 * f) * r, r, 0, 0, 6.2832); c.fill();
+    c.globalCompositeOperation = 'destination-over';
+    c.globalAlpha = 0.2; c.beginPath(); c.arc(0, 0, r, 0, 6.2832); c.fill();
+    c.restore();
+    c.globalAlpha = 0.6; c.beginPath(); c.arc(S / 2, S / 2, r, 0, 6.2832); c.strokeStyle = lit; c.lineWidth = 2; c.stroke(); c.globalAlpha = 1;
   }
+  function hhmm(m) { m = ((Math.round(m) % 1440) + 1440) % 1440; return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + (m % 60)).slice(-2); }
+  function token(el, name, fb) { return (el && getComputedStyle(el).getPropertyValue(name).trim()) || fb; }
+
   function tick() {
-    if (el) el.textContent = fmt.format(new Date()) + ((window.jjLang && window.jjLang() === 'pt') ? ' hora local' : ' local time');
-    status();
+    var p = {};
+    parts.formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; });
+    var now = new Date();
+    var lis = parseInt(p.hour, 10) * 60 + parseInt(p.minute, 10);
+    var loc = now.getHours() * 60 + now.getMinutes();
+    var diff = loc - lis; if (diff > 720) diff -= 1440; if (diff <= -720) diff += 1440;
+    diff = Math.round(diff / 15) * 15;
+
+    elAveiro.textContent = hhmm(lis);
+    elYou.textContent = hhmm(loc);
+    planet(cvAveiro, lis / 60, token(cvAveiro, '--planet-lit', '#9c9cf5'));
+    planet(cvYou, loc / 60, token(cvYou, '--planet-lit', '#f0ede8'));
+
+    var pt = isPt();
+    var hour = parseInt(p.hour, 10), wd = p.weekday, weekend = wd === 'Sat' || wd === 'Sun', reply;
+    if (hour >= 1 && hour < 9) reply = pt ? 'Estou a dormir, respondo de manhã.' : "I'm asleep, so I'll reply in the morning.";
+    else if (weekend) reply = pt ? 'Aqui é fim de semana, por isso a resposta fica para segunda.' : "It's the weekend here, so expect a reply on Monday.";
+    else if (hour >= 9 && hour < 18) reply = pt ? 'Estou a trabalhar, por isso deves ter resposta hoje.' : "I'm at my desk, so expect a reply today.";
+    else if (wd === 'Fri') reply = pt ? 'Já fechei a semana, por isso a resposta fica para segunda.' : "I'm done for the week, so expect a reply on Monday.";
+    else reply = pt ? 'Já acabei por hoje, por isso a resposta fica para amanhã.' : "I'm done for the day, so expect a reply tomorrow.";
+
+    /* My desk hours (09:00 to 18:00 Aveiro) on the visitor's clock, cut to their 08:00 to 22:00. */
+    var best = 0, bs = 0, be = 0;
+    [-1440, 0, 1440].forEach(function (sh) {
+      var s = Math.max(540 + diff + sh, 480), e = Math.min(1080 + diff + sh, 1320);
+      if (e - s > best) { best = e - s; bs = s; be = e; }
+    });
+    var overlap;
+    if (diff === 0) overlap = pt ? ' Estamos no mesmo fuso, e eu trabalho das 09:00 às 18:00.' : " We're on the same clock, and I'm at my desk from 09:00 to 18:00.";
+    else if (best >= 30) overlap = pt ? ' Os nossos dias cruzam-se das ' + hhmm(bs) + ' às ' + hhmm(be) + ', na tua hora.' : ' Our days overlap from ' + hhmm(bs) + ' to ' + hhmm(be) + ' your time.';
+    else overlap = pt ? ' Os nossos dias quase não se cruzam, por isso uma mensagem funciona melhor do que uma chamada.' : ' Our days barely overlap, so a message works better than a call.';
+    elText.textContent = reply + overlap;
   }
   tick();
   document.addEventListener('jj:langchange', tick);
-  const msToNextMinute = (60 - new Date().getSeconds()) * 1000;
+  /* The planets read their colours from the theme, so repaint when it changes. */
+  if (window.MutationObserver) {
+    new MutationObserver(tick).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme', 'data-contrast'] });
+  }
+  var msToNextMinute = (60 - new Date().getSeconds()) * 1000;
   setTimeout(function () {
     tick();
     setInterval(tick, 60000);
