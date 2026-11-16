@@ -200,8 +200,7 @@
   --font-size-3xl: clamp(1.8rem, 3vw, 2.6rem);
   /* h1. Maps to legacy --text-h1 */
   --font-size-4xl: clamp(2.5rem, 5vw, 4rem);
-  /* Page title: the one h1 size for the main pages (home, about, work,
-     contact). Case-study titles keep --font-size-4xl as the deepest pages. */
+  /* Page title: the one h1 size for the main pages (home, about, work, contact). Case-study titles keep --font-size-4xl as the deepest pages. */
   --font-size-page-title: clamp(2.25rem, 4.4vw, 3.5rem);
   /* Display. Maps to legacy --text-display */
   --font-size-5xl: clamp(3.5rem, 8vw, 7rem);
