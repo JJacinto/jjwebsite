@@ -5551,6 +5551,33 @@ html[data-motion="reduce"] {
   min-height: calc(100svh - clamp(var(--dimension-space-80), 12vw, 130px) - var(--hero-hint) - clamp(var(--dimension-space-40), 6vw, var(--dimension-space-64)) - var(--dimension-space-48));
   display: flex; flex-direction: column; justify-content: center;
 }
+/* Work hero: the gravitational lens (/scripts/work-lens.js). The canvas
+   fills the first viewport behind the copy and takes the page field's place.
+   The anchor is an empty box that says where the case stars sit: right of
+   the copy on wide screens, a band above it on narrow ones. */
+.work-wrap { position: relative; }
+body:has(.work-wrap) .page-particles .hero-space { display: none; }
+.work-lens {
+  --space-dot: var(--text-primary);
+  --space-accent: var(--text-brand);
+  position: absolute; top: 0; left: 0; width: 100%; height: 100svh;
+  z-index: -1; pointer-events: none;
+  opacity: 0; transition: opacity 0.5s ease;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 240px), transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - 240px), transparent 100%);
+}
+.work-lens.is-live { opacity: 1; }
+.work-head { position: relative; }
+.work-lens-anchor {
+  position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+  width: min(38vw, 460px); aspect-ratio: 1; pointer-events: none;
+}
+@media (max-width: 1024px) {
+  .work-lens-anchor {
+    position: static; transform: none; flex: none;
+    width: min(56vw, 230px); margin: 0 0 calc(var(--dimension-space-16) * -1) auto;
+  }
+}
 .rwc-hero {
   min-height: calc(100svh - clamp(var(--dimension-space-80), 12vw, var(--dimension-space-128)) - 68px - var(--hero-hint) - var(--dimension-space-64));
   align-content: center; align-items: center;
