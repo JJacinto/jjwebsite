@@ -105,6 +105,10 @@ const loop = [
             <circle class="st-ball" r="20"/>
             <text class="st-result" x="240" y="250" text-anchor="middle" data-pt="40 passos → 1">40 steps → 1</text>
           </svg>
+          <!-- The particles that gather into the tangle and then collapse
+               into the pieces. Larger than the stage, so they arrive from
+               outside it. -->
+          <canvas class="st-dust"></canvas>
           <button class="about-story-replay" type="button" hidden data-umami-event="about-story-replay" data-pt="Repetir">Replay</button>
         </div>
 
@@ -416,10 +420,10 @@ const loop = [
 </Base>
 
 <script is:inline>
-/* About story. One ball (the problem) drops onto a tangle, breaks into
-   pieces, the pieces get mapped, four are cut, the three left merge
-   back into the ball, and the ball becomes the knob of a single
-   switch. Flipping it turns the paper sketch into the finished, dark
+/* About story. Loose particles gather into a tangle (the problem), the
+   tangle collapses into pieces, the pieces get mapped, four are cut,
+   the three left merge into one ball, and the ball becomes the knob of
+   a single switch. Flipping it turns the paper sketch into the finished, dark
    product state, which is also the SVG's resting markup. Click the
    stage to skip; Replay runs it again. */
 (function () {
@@ -460,6 +464,111 @@ const loop = [
   const a = (el, frames, opts) => el.animate(frames, Object.assign({ fill: 'forwards', easing: EMPH }, opts));
   const set = (el, props) => el.animate([props, props], { duration: 1, fill: 'forwards' });
 
+  /* Dust: the particles of steps 1 and 2, on a canvas over the SVG and in
+     its coordinates. start() spirals them in from around the stage onto
+     the tangle's path, where they keep shuffling; split() pulls each one
+     into its nearest piece; stop() clears the canvas. */
+  const dust = (function () {
+    const cv = $('.st-dust'), ctx = cv && cv.getContext && cv.getContext('2d');
+    if (!ctx || !tangle.getTotalLength) return { start() {}, split() {}, stop() {} };
+    const PAD = 0.35, N = 520, LUT = 480;
+    const len = tangle.getTotalLength(), lut = [];
+    for (let i = 0; i <= LUT; i++) { const p = tangle.getPointAtLength(len * i / LUT); lut.push(p.x, p.y); }
+    const at = (u) => {
+      u = Math.max(0, Math.min(1, u)) * LUT;
+      const i = Math.min(LUT - 1, u | 0), f = u - i;
+      return [lut[i * 2] + (lut[i * 2 + 2] - lut[i * 2]) * f, lut[i * 2 + 1] + (lut[i * 2 + 3] - lut[i * 2 + 1]) * f];
+    };
+    const P = [];
+    for (let i = 0; i < N; i++) {
+      const u = (i + Math.random()) / N, home = at(u);
+      const ang = Math.random() * Math.PI * 2, rad = 230 + Math.random() * 170;
+      let k = 0, best = Infinity;
+      nodes.forEach((n, j) => {
+        const d = (n.s[0] - home[0]) * (n.s[0] - home[0]) + (n.s[1] - home[1]) * (n.s[1] - home[1]);
+        if (d < best) { best = d; k = j; }
+      });
+      P.push({
+        u, k,
+        jx: (Math.random() - 0.5) * 3.5, jy: (Math.random() - 0.5) * 3.5,
+        sx: C[0] + Math.cos(ang) * rad, sy: C[1] + Math.sin(ang) * rad * 0.75,
+        delay: Math.random() * 0.5, dur: 0.75 + Math.random() * 0.45,
+        swirl: (0.6 + Math.random() * 0.9) * (Math.random() < 0.5 ? -1 : 1),
+        ph: Math.random() * Math.PI * 2, sp: 0.8 + Math.random() * 1.6,
+        r: 0.9 + Math.random() * 1.1, a: 0.5 + Math.random() * 0.5,
+        accent: Math.random() < 0.1, d2: Math.random() * 0.22,
+      });
+    }
+    let raf = 0, t0 = 0, splitAt = 0, w = 0, h = 0, k = 0, ink = '', brand = '';
+    function size() {
+      const cw = stage.clientWidth, ch = stage.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (cw === w && ch === h && dpr === k) return;
+      w = cw; h = ch; k = dpr;
+      cv.width = Math.round(w * (1 + PAD * 2) * k);
+      cv.height = Math.round(h * (1 + PAD * 2) * k);
+    }
+    function frame(now) {
+      raf = 0;
+      size();
+      const t = (now - t0) / 1000, ts = splitAt ? (now - splitAt) / 1000 : -1, sc = w / 480;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      if (ts > 0.9) return;
+      ctx.setTransform(k * sc, 0, 0, k * sc, w * PAD * k, h * PAD * k);
+      /* A faint thread under the dots once they have gathered, so the
+         mess reads as one knotted line. It goes as the dots leave. */
+      const thread = Math.max(0, Math.min(1, (t - 0.7) / 0.7)) * (ts < 0 ? 1 : Math.max(0, 1 - ts / 0.3));
+      if (thread > 0) {
+        ctx.globalAlpha = 0.28 * thread;
+        ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.lineJoin = 'round';
+        ctx.beginPath(); ctx.moveTo(lut[0], lut[1]);
+        for (let j = 2; j < lut.length; j += 2) ctx.lineTo(lut[j], lut[j + 1]);
+        ctx.stroke();
+      }
+      for (let i = 0; i < N; i++) {
+        const p = P[i];
+        let g = Math.max(0, Math.min(1, (t - p.delay) / p.dur));
+        if (g <= 0) continue;
+        g = 1 - Math.pow(1 - g, 3);
+        const home = at(p.u + 0.012 * Math.sin(t * p.sp + p.ph));
+        const hx = home[0] + p.jx, hy = home[1] + p.jy;
+        /* Spiral in: the offset from home shrinks while it turns. */
+        const rot = (1 - g) * p.swirl, c = Math.cos(rot), s = Math.sin(rot);
+        const ox = (p.sx - hx) * (1 - g), oy = (p.sy - hy) * (1 - g);
+        let x = hx + ox * c - oy * s, y = hy + ox * s + oy * c;
+        let alpha = p.a * Math.min(1, g * 3), r = p.r;
+        if (ts >= 0) {
+          let q = Math.max(0, Math.min(1, (ts - p.d2) / 0.45));
+          q = q < 0.5 ? 4 * q * q * q : 1 - Math.pow(-2 * q + 2, 3) / 2;
+          const n = nodes[p.k].s;
+          x += (n[0] - x) * q; y += (n[1] - y) * q;
+          alpha *= 1 - q * q * q; r *= 1 - 0.4 * q;
+        }
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = p.accent ? brand : ink;
+        ctx.beginPath(); ctx.arc(x, y, r / Math.max(sc, 0.6), 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      raf = requestAnimationFrame(frame);
+    }
+    function stop() {
+      cancelAnimationFrame(raf); raf = 0;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, cv.width, cv.height);
+    }
+    return {
+      start() {
+        stop();
+        ink = getComputedStyle(stage).color;
+        brand = getComputedStyle(cv).color;
+        t0 = performance.now(); splitAt = 0;
+        raf = requestAnimationFrame(frame);
+      },
+      split() { splitAt = performance.now(); },
+      stop,
+    };
+  })();
+
   let run = 0;
   let playing = false;
   let timers = [];
@@ -469,6 +578,7 @@ const loop = [
     timers.forEach(clearTimeout);
     timers = [];
     story.getAnimations({ subtree: true }).forEach((x) => x.cancel());
+    dust.stop();
   }
   function step(i) {
     steps.forEach((li, n) => {
@@ -504,29 +614,23 @@ const loop = [
     stage.querySelectorAll('svg *').forEach((el) => el.removeAttribute('style'));
 
     set(pill, { opacity: 0 });
-    set(ball, { transform: T([240, -30], 0.45) });
-    nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(C, 0) }));
+    set(ball, { transform: T(C, 0) });
+    nodes.forEach((n) => set(n.el, { opacity: 0, transform: T(n.s, 0) }));
     stage.classList.remove('is-pending');
 
-    /* 1. Take the tangle as it is. */
+    /* 1. Take the tangle as it is: particles gather into the mess. */
     step(0);
-    a(tangle, [{ opacity: 1, strokeDashoffset: 1 }, { opacity: 1, strokeDashoffset: 0 }], { duration: 1000, easing: STD });
-    a(ball, [
-      { transform: T([240, -30], 0.45), easing: EXIT },
-      { transform: T(C, 0.45), offset: 0.55, easing: ENTER },
-      { transform: T([240, 142], 0.45), offset: 0.78, easing: EXIT },
-      { transform: T(C, 0.45) },
-    ], { duration: 800, delay: 500, easing: 'linear' });
-    await wait(1700); if (!live()) return;
+    dust.start();
+    await wait(1900); if (!live()) return;
 
-    /* 2. Pull it apart into pieces. */
+    /* 2. Pull it apart into pieces: the mess collapses into the nodes,
+       each one growing where its particles land. */
     step(1);
-    a(tangle, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: STD });
-    a(ball, [{ transform: T(C, 0.45) }, { transform: T(C, 0) }], { duration: 220, easing: EXIT });
+    dust.split();
     nodes.forEach((n, i) => a(n.el,
-      [{ opacity: 1, transform: T(C, 0) }, { opacity: 1, transform: T(n.s, 1) }],
-      { duration: 600, delay: 120 + i * 45, easing: SPRING }));
-    await wait(1300); if (!live()) return;
+      [{ opacity: 1, transform: T(n.s, 0) }, { opacity: 1, transform: T(n.s, 1) }],
+      { duration: 550, delay: 300 + i * 40, easing: SPRING }));
+    await wait(1400); if (!live()) return;
 
     /* 3. Map how the pieces relate. */
     step(2);

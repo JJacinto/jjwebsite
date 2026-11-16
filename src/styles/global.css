@@ -1603,10 +1603,18 @@ html[data-motion="reduce"] {
   grid-area: stage;
   position: relative;
   aspect-ratio: 4 / 3;
-  border-radius: var(--radius-card-lg);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
   color: var(--text-primary);
-  overflow: hidden;
+}
+/* Canvas for the gathering particles (about.astro). It reaches 35% past
+   the stage on every side so they can arrive from outside it; its colour
+   is the accent a few of them take. */
+.st-dust {
+  position: absolute;
+  inset: -35%;
+  width: 170%;
+  height: 170%;
+  color: var(--text-brand);
+  pointer-events: none;
 }
 .about-story-stage.is-paper { cursor: pointer; }
 .about-story-stage svg { display: block; width: 100%; height: 100%; }
