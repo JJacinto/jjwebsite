@@ -107,7 +107,7 @@ ready.then(() => {
 });
 window.addEventListener('resize', movePillIndicator);
 
-/* Settings menu — language, theme, text size, motion, high contrast.
+/* Settings menu — language and text size.
    The choices themselves are stored and applied by the settings script
    in <head> (window.jjPrefs) and the language script (window.jjSetLang),
    both in Base.astro. This block only runs the menu: open and close,
@@ -119,7 +119,6 @@ window.addEventListener('resize', movePillIndicator);
   const panel = document.getElementById('settingsPanel');
   const prefs = window.jjPrefs;
   if (!wrap || !btn || !panel || !prefs) return;
-  const contrast = document.getElementById('settingsContrast');
 
   function check(name, value) {
     const input = panel.querySelector('input[name="' + name + '"][value="' + value + '"]');
@@ -128,12 +127,7 @@ window.addEventListener('resize', movePillIndicator);
   /* Make the controls show the current choices. */
   function sync() {
     check('jj-lang', window.jjLang ? window.jjLang() : 'en');
-    check('jj-theme', prefs.get('theme'));
     check('jj-textsize', prefs.get('textsize'));
-    /* Motion shows what is in use: Default, or Low (chosen here or asked
-       for by the system). */
-    check('jj-motion', prefs.effective().motion);
-    contrast.checked = prefs.effective().contrast === 'high';
   }
   sync();
 
@@ -145,32 +139,16 @@ window.addEventListener('resize', movePillIndicator);
 
   panel.addEventListener('change', function (e) {
     const el = e.target;
-    if (el === contrast) {
-      prefs.set('contrast', el.checked ? 'high' : 'normal');
-      track('contrast', el.checked ? 'high' : 'normal');
-    } else if (el.name === 'jj-lang') {
+    if (el.name === 'jj-lang') {
       if (window.jjSetLang) window.jjSetLang(el.value);
       track('lang', el.value);
-    } else if (el.name === 'jj-theme') {
-      prefs.set('theme', el.value);
-      track('theme', el.value);
     } else if (el.name === 'jj-textsize') {
       prefs.set('textsize', el.value);
       track('textsize', el.value);
-    } else if (el.name === 'jj-motion') {
-      /* Picking what the system already asks for clears the saved choice,
-         so the site keeps following the system afterwards. */
-      const systemLow = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const same = (el.value === 'reduce') === systemLow;
-      prefs.set('motion', same ? 'system' : el.value);
-      track('motion', el.value);
     }
   });
-  /* The system can flip contrast or motion while the menu is open. */
-  document.addEventListener('jj:contrastchange', sync);
-  document.addEventListener('jj:motionchange', sync);
 
-  /* What Tab can land on: buttons, the switch, and one radio per group
+  /* What Tab can land on: buttons and one radio per group
      (the chosen one), which is how radio groups take focus. */
   function stops() {
     return Array.prototype.filter.call(panel.querySelectorAll('button, input'), function (el) {

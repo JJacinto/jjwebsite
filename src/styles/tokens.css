@@ -23,10 +23,10 @@
   --color-neutral-70: #9b948d;
   /* Secondary text. Maps to legacy --fg2 */
   --color-neutral-80: #6b6560;
-  /* Dark surface — modal/footer backgrounds. Maps to legacy --dark-surface */
-  --color-neutral-90: #262320;
-  /* Primary text + dark mode anchor. Maps to legacy --dark / --fg1 */
-  --color-neutral-100: #1c1a17;
+  /* Dark surface — cards, modal/footer backgrounds, one step above the page. Maps to legacy --dark-surface */
+  --color-neutral-90: #171513;
+  /* Page background of the (dark-only) site: near black with a trace of warmth. Maps to legacy --dark / --fg1 */
+  --color-neutral-100: #0e0d0c;
   /* Pale violet anchor */
   --color-primary-0: #fafaff;
   /* Lightest tint. Maps to legacy --accent-subtle (#ECEAFF, ΔE 0.4) */
@@ -444,7 +444,7 @@
   /* Brand-tinted hover glow */
   --component-hero-photo-brand-glow: rgba(61, 61, 181, 0.3);
   /* Nav-dark scrolled state — near-black with film transparency */
-  --component-nav-scrolled-bg: rgba(20, 18, 16, 0.88);
+  --component-nav-scrolled-bg: rgba(11, 10, 9, 0.88);
   /* Hairline divider on dark nav */
   --component-nav-scrolled-hairline: rgba(255,255,255,0.06);
   /* Line-refract gradient — light nav top divider */

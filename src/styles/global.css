@@ -912,6 +912,13 @@ html[data-motion="reduce"] { .hero-replay { display: none; } }
    is the colour the field sits on, so planets and holes read as cut-outs. */
 .cta-footer-wrap .hero-space { --space-ink: var(--background-section-muted); z-index: 0; }
 .contact .hero-space { --space-ink: var(--background-page); }
+/* Where a closing band follows other content, the stars thin in from its
+   top edge rather than starting on a horizontal line. Not on the contact
+   page, whose field starts at the top of the page. */
+.cta-footer-wrap:not(.contact) .hero-space {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-fade, 360px));
+          mask-image: linear-gradient(to bottom, transparent 0, #000 var(--space-fade, 360px));
+}
 
 .hero-photo {
   width: clamp(200px, 26vw, 268px);
@@ -2625,30 +2632,122 @@ html:not([data-motion="reduce"]) {
   --j-live: oklch(.58 .21 25);
   --j-on: #fff;
   --j-on-80: rgba(255,255,255,0.8);
+  /* Lookback: the rail is a line of sight. It starts in the brand violet
+     at "now" and redshifts, warmer and dimmer, towards first light. */
+  --j-red: oklch(.64 .1 30);
+  --j-near: color-mix(in oklch, var(--text-brand) 45%, var(--j-rail));
+  --j-far: color-mix(in oklch, var(--j-red) 60%, var(--background-page));
+  --j-x: -27px; /* centre of the rail, from a row's content edge */
 }
+.journey-track { position: relative; }
 .journey-list { list-style: none; position: relative; padding-left: var(--dimension-space-32); }
-.journey-list > li { position: relative; }
+.journey-list > li {
+  position: relative;
+  /* --t0 / --t1: how far back this row starts and ends (0 now, 1 first light). */
+  --j-c0: color-mix(in oklch, var(--j-far) calc(var(--t0, 0) * 100%), var(--j-near));
+  --j-c1: color-mix(in oklch, var(--j-far) calc(var(--t1, 0) * 100%), var(--j-near));
+}
 .journey-list > li::after {
   content: '';
   position: absolute;
   left: -28px; top: 0; bottom: 0;
   width: 2px;
-  background: var(--j-rail);
+  background: linear-gradient(to bottom, var(--j-c0), var(--j-c1));
   clip-path: inset(0 0 100% 0);
   transition: clip-path 800ms var(--motion-easing-emphasized) 150ms;
 }
 .journey-list > li.visible::after { clip-path: inset(0); }
 .journey-list > li:first-child::after { top: 14px; }
-.journey-list > li:last-child::after { bottom: auto; height: 45px; }
-.journey-list > li.journey-chapter--edu::after, .journey-list > li.journey-item--edu::after {
-  background: repeating-linear-gradient(to bottom, var(--j-rail) 0 5px, transparent 5px 11px);
+.journey-list > li:last-child::after { bottom: auto; height: 50px; }
+/* Dashes are a mask, so the redshift runs through them unbroken. */
+.journey-list > li.journey-item--edu::after, .journey-list > li.journey-origin::after {
+  -webkit-mask: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 11px);
+  mask: repeating-linear-gradient(to bottom, #000 0 5px, transparent 5px 11px);
 }
 
 /* The rail stays solid down to the Education marker, then turns dashed. */
 .journey-list > li.journey-chapter--edu::after {
-  background:
-    linear-gradient(var(--j-rail), var(--j-rail)) top / 100% 58px no-repeat,
-    repeating-linear-gradient(to bottom, transparent 0 58px, var(--j-rail) 58px 63px, transparent 63px 69px);
+  -webkit-mask:
+    linear-gradient(#000, #000) top / 100% 58px no-repeat,
+    repeating-linear-gradient(to bottom, transparent 0 58px, #000 58px 63px, transparent 63px 69px);
+  mask:
+    linear-gradient(#000, #000) top / 100% 58px no-repeat,
+    repeating-linear-gradient(to bottom, transparent 0 58px, #000 58px 63px, transparent 63px 69px);
+}
+
+/* First light: the rail ends in one bright point, at 13. */
+.journey-origin {
+  display: flex; align-items: baseline; gap: var(--dimension-space-10);
+  padding: var(--dimension-space-40) 0 0;
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  line-height: 20px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+.journey-origin h3 { margin: 0; font: inherit; font-weight: var(--font-weight-medium); letter-spacing: inherit; color: var(--text-primary); }
+.journey-origin-star {
+  position: absolute;
+  left: var(--j-x); top: 50px;
+  width: 9px; height: 9px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0 30%, oklch(.84 .12 60) 75%);
+  box-shadow: 0 0 0 3px var(--background-page), 0 0 16px 5px color-mix(in oklch, var(--j-red) 55%, transparent);
+  z-index: var(--z-raised);
+}
+/* Diffraction spikes. */
+.journey-origin-star::before, .journey-origin-star::after {
+  content: '';
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 33px; height: 1px;
+  translate: -50% -50%;
+  background: linear-gradient(to right, transparent, oklch(.84 .12 60), transparent);
+  animation: j-twinkle 3.2s ease-in-out infinite;
+}
+.journey-origin-star::after { rotate: 90deg; animation-delay: -1.6s; }
+@keyframes j-twinkle { 0%, 100% { opacity: 0.35; scale: 0.6 1; } 50% { opacity: 1; scale: 1 1; } }
+
+/* Mission clock: years since first light, read off the rail as you scroll. */
+.journey-clock {
+  position: absolute;
+  left: 5px; top: 0;
+  translate: calc(-100% - 12px) calc(var(--y, 0px) - 50%);
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-2xs, 10px);
+  line-height: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: color-mix(in oklch, color-mix(in oklch, var(--j-red) calc(var(--t, 0) * 100%), var(--text-brand)) 65%, var(--text-tertiary));
+  opacity: 0;
+  transition: opacity 240ms ease;
+  pointer-events: none;
+  z-index: calc(var(--z-raised) + 1);
+}
+.journey-clock.on { opacity: 1; }
+.journey-clock b { font-weight: var(--font-weight-medium); }
+/* The tick that marks where on the rail the reading is taken. */
+.journey-clock::after {
+  content: '';
+  position: absolute;
+  left: calc(100% + 4px); top: 50%;
+  width: 16px; height: 1px;
+  background: currentColor;
+}
+/* Not enough gutter to sit in: the clock turns and reads along the rail. */
+@media (max-width: 1199px) {
+  .journey-clock {
+    translate: -50% calc(var(--y, 0px) - 50%);
+    writing-mode: vertical-rl;
+    padding: 6px 0;
+    line-height: 12px;
+    background: var(--background-page);
+  }
+  .journey-clock::after { display: none; }
 }
 
 /* Chapter rows: the legend for the two rail styles. */
@@ -2674,7 +2773,7 @@ html:not([data-motion="reduce"]) {
   box-shadow: 0 0 0 3px var(--background-page);
   z-index: var(--z-raised);
 }
-.journey-chapter--edu::before { top: 53px; background: var(--background-page); border: 2px solid var(--j-rail); }
+.journey-chapter--edu::before { top: 53px; background: var(--background-page); border: 2px solid var(--j-c0); }
 
 .journey-item {
   display: grid;
@@ -2690,9 +2789,11 @@ html:not([data-motion="reduce"]) {
   width: 11px; height: 11px;
   border-radius: 50%;
   z-index: var(--z-raised);
+  /* Older light is fainter: dots shrink a little with age. */
+  scale: calc(1 - var(--t0, 0) * 0.3);
 }
-.journey-item--career::before { background: var(--j-rail); box-shadow: 0 0 0 3px var(--background-page); }
-.journey-item--edu::before { background: var(--background-page); border: 2px solid var(--j-rail); }
+.journey-item--career::before { background: var(--j-c0); box-shadow: 0 0 0 3px var(--background-page); }
+.journey-item--edu::before { background: var(--background-page); border: 2px solid var(--j-c0); }
 .journey-chapter--career + .journey-item::before {
   background: var(--fill-brand-default);
   animation: about-pulse 2.4s ease-in-out infinite;
@@ -3159,8 +3260,7 @@ html[data-motion="reduce"] { .chip-panel { animation: none; } }
   .loop-line, .loop-card + .loop-card::before, .loop-feed { display: none; }
   .board-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .b-photos { grid-row: auto; }
-  .journey-item { grid-template-columns: 96px minmax(0, 1fr) 250px; column-gap: var(--dimension-space-24); }
-  .j-media { height: 150px; }
+  .journey-item { grid-template-columns: 96px minmax(0, 1fr) 250px; column-gap: var(--dimension-space-24); }  .j-media { height: 150px; }
   .j-mock, .j-media .theme-card { zoom: 0.82; }
 }
 @media (max-width: 768px) {
@@ -3168,6 +3268,7 @@ html[data-motion="reduce"] { .chip-panel { animation: none; } }
   .journey-item { grid-template-columns: minmax(0, 1fr); row-gap: var(--dimension-space-8); }
   .journey-item::before, .journey-chapter::before { left: -28px; }
   .journey-list > li::after { left: -24px; }
+  .journey { --j-x: -23px; }
   .j-scene { max-width: 320px; margin-top: var(--dimension-space-12); }
   .j-media { height: 172px; }
   .j-mock, .j-media .theme-card { zoom: 1; }
@@ -3234,6 +3335,8 @@ html[data-motion="reduce"] {
   .js .loop-line:not(.in) { transform: none; }
   .js .loop-line:not(.in) ~ .loop-row .loop-card::before { opacity: 1; }
   .journey-list > li::after { clip-path: none; transition: none; }
+  .journey-clock { display: none; }
+  .journey-origin-star::before, .journey-origin-star::after { animation: none; opacity: 0.7; }
   .j-scene, .js .journey-item:not(.visible) .j-scene { transform: none; transition: none; }
   .j-scene .tl, .j-banner, .j-badge i, .j-typing i { animation: none; }
   .journey-chapter--career + .journey-item::before, .pulse-dot, .b-projects li.is-live::before, .theme-spark, .d4-typing i { animation: none; }
@@ -3278,6 +3381,10 @@ html[data-motion="reduce"] {
      page read as "stuck in dark mode" while the page above
      transitioned. */
   background: var(--background-section-muted);
+  /* The band rises out of the page colour over --space-fade instead of
+     starting on a hard line; the star field fades in over the same
+     distance (see .cta-footer-wrap .hero-space). */
+  background: linear-gradient(to bottom, var(--background-page) 0, var(--background-section-muted) var(--space-fade, 360px));
   overflow: hidden;
 }
 /* "Solo" footer mode — used on contact + error pages. */

@@ -67,16 +67,27 @@ const dots = Array.from({ length: 40 }, (_, i) => {
 const layers = [70, 84, 92, 88, 76, 62, 54, 58, 70, 80].map((w, i) => ({ w, s: 8 + i * 6 }));
 const phases = ['discover', 'define', 'develop', 'deliver'];
 const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
+
+/* Lookback: the rail is a line of sight, so it redshifts with age. Each
+   row carries its share of the way back (--t0 at its top, --t1 at its
+   bottom, 0 = now, 1 = first light) and the CSS mixes the rail colour
+   from that. data-year is the year at the row's dot (the end of its
+   span); the mission clock reads between those. */
+const ROWS = career.length + education.length + 3;
+const age = (row: number) => `--t0:${(row / ROWS).toFixed(3)};--t1:${((row + 1) / ROWS).toFixed(3)}`;
+const endYear = (s: Step) => s.years.split('–')[1];
+const originYear = education[education.length - 1].years.split('–')[0];
 ---
+<div class="journey-track">
 <ol class="journey-list">
-  {[{ key: 'career', title: 'Career', titlePt: 'Carreira', span: '2015–now', spanPt: '2015–agora', steps: career }, { key: 'edu', title: 'Where it started', titlePt: 'Onde tudo começou', span: '2000–2015', spanPt: undefined, steps: education }].map((track) => (
+  {[{ key: 'career', base: 0, title: 'Career', titlePt: 'Carreira', span: '2015–now', spanPt: '2015–agora', steps: career }, { key: 'edu', base: career.length + 1, title: 'Where it started', titlePt: 'Onde tudo começou', span: '2000–2015', spanPt: undefined, steps: education }].map((track) => (
     <>
-      <li class={`journey-chapter journey-chapter--${track.key} reveal`}>
+      <li class={`journey-chapter journey-chapter--${track.key} reveal`} style={age(track.base)}>
         <h3 data-pt={track.titlePt}>{track.title}</h3>
         <span data-pt={track.spanPt}>{track.span}</span>
       </li>
-      {track.steps.map((s) => { const cs = caseHref(s.caseSlug); return (
-        <li class={`journey-item journey-item--${track.key} reveal`} data-step={s.id}>
+      {track.steps.map((s, j) => { const cs = caseHref(s.caseSlug); return (
+        <li class={`journey-item journey-item--${track.key} reveal`} data-step={s.id} data-year={endYear(s)} style={age(track.base + 1 + j)}>
           <div class="journey-years" data-pt={s.yearsPt}>{s.years}</div>
           <div class="journey-main">
             {s.href
@@ -226,7 +237,14 @@ const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
       ); })}
     </>
   ))}
+  <li class="journey-origin reveal" data-year={originYear} style={age(ROWS - 1)}>
+    <i class="journey-origin-star" aria-hidden="true"></i>
+    <h3 data-pt="Primeira luz">First light</h3>
+    <span data-pt={`${originYear}, aos 13 anos`}>{originYear}, age 13</span>
+  </li>
 </ol>
+<span class="journey-clock" aria-hidden="true"><b></b></span>
+</div>
 
 <script>
   /* Scenes only run while on screen. */
@@ -234,5 +252,57 @@ const phasesPt = ['descobrir', 'definir', 'desenvolver', 'entregar'];
   if (scenes.length && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver((es) => es.forEach((e) => e.target.classList.toggle('off', !e.isIntersecting)));
     scenes.forEach((s) => io.observe(s));
+  }
+
+  /* Mission clock: rides the rail at a fixed height in the viewport and
+     reads the years elapsed since first light at that point. Each dot
+     marks a known year; in between it interpolates. Hidden without JS and
+     under reduced motion (CSS). */
+  const track = document.querySelector<HTMLElement>('.journey-track');
+  const clock = track?.querySelector<HTMLElement>('.journey-clock');
+  const out = clock?.querySelector('b');
+  if (track && clock && out && 'IntersectionObserver' in window) {
+    const rows = Array.from(track.querySelectorAll<HTMLElement>('.journey-list > li'));
+    const marks = rows.filter((r) => r.dataset.year);
+    const star = track.querySelector<HTMLElement>('.journey-origin-star');
+    const now = new Date().getFullYear();
+    const origin = Number(marks[marks.length - 1].dataset.year);
+    const DOT = 45.5; /* centre of a row's dot: top 40px + half of 11px */
+    let anchors: { y: number; year: number }[] = [];
+    let bands: { top: number; h: number }[] = [];
+    let raf = 0;
+
+    const measure = () => {
+      anchors = marks.map((li) => ({
+        y: li.offsetTop + (star && li.contains(star) ? star.offsetTop : DOT),
+        year: li.dataset.year === 'now' ? now : Number(li.dataset.year),
+      }));
+      bands = rows.map((li) => ({ top: li.offsetTop, h: li.offsetHeight }));
+    };
+    const update = () => {
+      raf = 0;
+      if (anchors.length < 2) return;
+      const r = track.getBoundingClientRect();
+      const vh = window.innerHeight;
+      clock.classList.toggle('on', r.top < vh * 0.7 && r.bottom > vh * 0.3);
+      const y = Math.min(anchors[anchors.length - 1].y, Math.max(anchors[0].y, vh * 0.45 - r.top));
+      let i = anchors.findIndex((a) => a.y >= y);
+      if (i < 1) i = 1;
+      const a = anchors[i - 1], b = anchors[i];
+      const year = a.year + (b.year - a.year) * ((y - a.y) / (b.y - a.y));
+      let k = bands.findIndex((s) => s.top + s.h > y);
+      if (k < 0) k = bands.length - 1;
+      const t = (k + (y - bands[k].top) / bands[k].h) / bands.length;
+      out.textContent = 'T+' + Math.round(year - origin) + (document.documentElement.lang.startsWith('pt') ? 'a' : 'y');
+      clock.style.setProperty('--y', y.toFixed(1) + 'px');
+      clock.style.setProperty('--t', t.toFixed(3));
+    };
+    const queue = () => { if (!raf) raf = requestAnimationFrame(update); };
+
+    new ResizeObserver(() => { measure(); queue(); }).observe(track);
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { window.addEventListener('scroll', queue, { passive: true }); queue(); }
+      else { window.removeEventListener('scroll', queue); clock.classList.remove('on'); }
+    }).observe(track);
   }
 </script>
