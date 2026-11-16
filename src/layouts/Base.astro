@@ -338,10 +338,16 @@ const umamiOn  = !!(umamiSrc && umamiId);
   </div>
 </div>
 
-<main id="main-content">
+{/* With the page field on, main is its root: the field sits behind the
+    content, so it listens for the pointer on main. */}
+<main id="main-content" data-space-root={disablePageParticles ? undefined : ''}>
   {!disablePageParticles && (
     <div class="page-particles" aria-hidden="true">
+      {/* The first canvas paints the gradient only (compose-modal.js skips
+          its own particles when a data-hero-space canvas is beside it);
+          the second is the home hero's field, without the portrait. */}
       <canvas class="cta-footer-bg"></canvas>
+      <canvas class="hero-space" data-hero-space data-space-auto></canvas>
     </div>
   )}
   <slot />
@@ -515,9 +521,10 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <script is:inline src={versioned('/scripts/nav.js')} defer></script>
 <script is:inline src={versioned('/scripts/text-hover.js')} defer></script>
 <script is:inline src={versioned('/scripts/compose-modal.js')} defer></script>
-{/* The field in the bottom contact areas. The home page loads it itself,
-    next to the hero scripts, so the intro finds HeroSpace in order. */}
-{!isHome && (showCta || showFooter) && <script is:inline src={versioned('/scripts/hero-space.js')} defer></script>}
+{/* The field at the top of the page and in the bottom contact areas. The
+    home page loads it itself, next to the hero scripts, so the intro finds
+    HeroSpace in order. */}
+{!isHome && (showCta || showFooter || !disablePageParticles) &&<script is:inline src={versioned('/scripts/hero-space.js')} defer></script>}
 
 <script>
   /* Retune visual-editing overlay — dev only. The branch is dead-code

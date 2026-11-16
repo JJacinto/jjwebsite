@@ -3214,6 +3214,9 @@ html[data-motion="reduce"] {
   height: 100svh;
   pointer-events: none;
   z-index: -1;
+}
+/* The gradient fades out between 30% and 50% of the viewport. */
+.page-particles .cta-footer-bg {
   mask-image: linear-gradient(
     to bottom,
     var(--component-marquee-fade-edge) 0%,
@@ -3226,6 +3229,12 @@ html[data-motion="reduce"] {
     var(--component-marquee-fade-edge) 30%,
     transparent 50%
   );
+}
+/* The field over it is the home hero's (/scripts/hero-space.js), with the
+   same gestures and the same feathered bottom edge. */
+.page-particles .hero-space {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 360px)), transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0, #000 calc(100% - var(--space-fade, 360px)), transparent 100%);
 }
 .page-particles canvas {
   width: 100%; height: 100%; display: block;
