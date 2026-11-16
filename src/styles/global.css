@@ -3584,50 +3584,89 @@ html[data-motion="reduce"] {
 .contact h1 { color: var(--text-primary); font-size: clamp(2rem, 3.6vw, 3rem); letter-spacing: var(--font-letter-spacing-tighter); line-height: var(--font-line-height-heading); margin-bottom: var(--dimension-space-24); }
 .contact-body { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-relaxed); margin-bottom: var(--dimension-space-36); width: 100%; max-width: 680px; margin-left: auto; margin-right: auto; }
 .contact-ctas { display: flex; gap: var(--dimension-space-12); justify-content: center; flex-wrap: wrap; margin-bottom: var(--dimension-space-16); }
-.contact-status {
-  display: flex; align-items: center; justify-content: center; gap: var(--dimension-space-8);
+/* Shared hours: two small planets lit by the Aveiro and visitor clocks, one
+   sentence underneath. The planets read these tokens in contact.astro. */
+.contact-hours {
+  --space-dot: var(--text-primary);
+  --space-accent: var(--text-brand);
+  --planet-dark: var(--surface-sunken);
+  --planet-rim: var(--border-default);
+  display: flex; flex-direction: column; align-items: center; gap: var(--dimension-space-10);
+  margin: var(--dimension-space-32) 0 var(--dimension-space-24);
+}
+.contact-hours-pair {
+  display: flex; align-items: center; gap: var(--dimension-space-12);
   font-family: var(--font-family-body); font-size: var(--font-size-sm);
-  color: var(--text-secondary); margin: var(--dimension-space-24) 0 var(--dimension-space-8);
+  color: var(--text-secondary); font-variant-numeric: tabular-nums;
 }
-.contact-status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; background: var(--text-tertiary); transition: background 0.4s; }
-html:not([data-motion="reduce"]) {
-  .contact-status-dot.state-available, .contact-status-dot.state-offhours, .contact-status-dot.state-sleeping { animation: dot-breathe 2.4s ease-in-out infinite; }
+.contact-hours-who { display: flex; align-items: center; gap: var(--dimension-space-8); white-space: nowrap; }
+.contact-hours-who b { font-weight: var(--font-weight-medium); color: var(--text-primary); }
+.contact-hours-who canvas { width: 26px; height: 26px; flex: none; }
+#hours-planet-aveiro { --planet-lit: var(--space-accent); }
+#hours-planet-you { --planet-lit: var(--space-dot); }
+.contact-hours-link {
+  width: clamp(28px, 9vw, 90px); height: 1px;
+  background: repeating-linear-gradient(90deg, var(--text-tertiary) 0 3px, transparent 3px 8px);
 }
-.contact-hint {
-  font-family: var(--font-family-body); font-size: var(--font-size-xs);
-  color: var(--text-tertiary); margin: 0 auto var(--dimension-space-56); max-width: 520px;
+.contact-hours-text {
+  margin: 0; max-width: 58ch; text-wrap: balance;
+  font-family: var(--font-family-body); font-size: var(--font-size-sm);
+  color: var(--text-secondary); line-height: var(--font-line-height-relaxed);
 }
-.contact-info { border-top: var(--dimension-border-width-1) solid var(--border-subtle); padding-top: var(--dimension-space-32); display: flex; flex-direction: column; gap: var(--dimension-space-8); text-align: left; }
-.contact-card { display: flex; align-items: center; gap: var(--dimension-space-12); padding: var(--dimension-space-12) var(--dimension-space-16); border-radius: var(--dimension-radius-md); border: var(--dimension-border-width-1) solid var(--border-subtle); background: var(--surface-default); transition: background var(--motion-duration-short), border-color var(--motion-duration-short); }
-.contact-card:hover {
-  /* Subtle hover lift — derives from --text-primary so it tracks
-     the active theme. 4% mix on the surface gives a near-imperceptible
-     wash in dark mode (was using --surface-raised, which jumped two
-     neutral stops and read as harsh). */
-  background: color-mix(in srgb, var(--text-primary) 4%, var(--surface-default));
-  border-color: color-mix(in srgb, var(--text-primary) 14%, var(--border-subtle));
-}
-.contact-card-icon { width: 40px; height: 40px; flex-shrink: 0; background: var(--fill-brand-muted); border-radius: var(--dimension-radius-md); display: flex; align-items: center; justify-content: center; color: var(--text-brand); }
-.contact-card-icon svg { width: 18px; height: 18px; }
-.contact-card-body { flex: 1; min-width: 0; }
-.contact-card-label-row { display: flex; align-items: baseline; gap: var(--dimension-space-8); margin-bottom: var(--dimension-space-4); }
-.contact-card-label-row .contact-card-label { margin-bottom: 0; }
-.contact-card-label { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); text-transform: uppercase; letter-spacing: var(--font-letter-spacing-wider); margin-bottom: var(--dimension-space-4); }
-.contact-card-value { font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-primary); overflow-wrap: normal; word-break: keep-all; }
-.contact-card-sub { white-space: nowrap; }
-@media (max-width: 480px) {
-  .contact-card { flex-wrap: wrap; row-gap: var(--dimension-space-12); }
-  .contact-card-body { flex: 1 1 calc(100% - 52px); }
-  .contact-card > .contact-card-btn, .contact-card > .contact-card-actions { margin-left: 52px; }
-  .contact-card-value { font-size: var(--font-size-xs); }
-}
-.contact-card-sub { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: var(--dimension-space-2); }
-.contact-card-action { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; gap: var(--dimension-space-4); padding: var(--dimension-space-8) var(--dimension-space-16); min-height: var(--target-min); border-radius: var(--dimension-radius-sm); font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--text-brand); border: var(--dimension-border-width-1) solid color-mix(in srgb, var(--text-brand) 25%, transparent); background: var(--fill-brand-muted); transition: background var(--motion-duration-short), border-color var(--motion-duration-short), color var(--motion-duration-short); cursor: pointer; white-space: nowrap; text-decoration: none; }
-.contact-card-action:hover { background: color-mix(in srgb, var(--text-brand) 20%, transparent); border-color: color-mix(in srgb, var(--text-brand) 50%, transparent); color: var(--text-brand); }
-.contact-card-action svg { width: 13px; height: 13px; flex-shrink: 0; }
 
-/* Multiple buttons stacked horizontally inside a contact card. */
-.contact-card-actions { display: flex; gap: var(--dimension-space-6); flex-shrink: 0; }
+/* One quiet row: email, copy, a hairline, then the two social icons. */
+.contact-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: var(--dimension-space-8) var(--dimension-space-12);
+  font-family: var(--font-family-body); font-size: var(--font-size-sm); color: var(--text-secondary);
+}
+.contact-row-email { color: var(--text-primary); overflow-wrap: anywhere; }
+.contact-row-sep { width: 1px; height: var(--dimension-space-16); background: var(--border-default); }
+/* Narrow: the address takes its own line so the three buttons stay together. */
+@media (max-width: 480px) {
+  .contact-row-sep { display: none; }
+  .contact-row-email { flex-basis: 100%; }
+}
+
+/* The two bodies (/scripts/contact-binary.js): an overlay on the field, under
+   the content, and its separation read-out where the field's PARTS sat. */
+.contact-binary {
+  --space-dot: var(--text-primary);
+  --space-accent: var(--text-brand);
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+.contact-readout {
+  position: absolute; left: var(--spacing-container-pad); bottom: var(--dimension-space-28);
+  z-index: var(--z-raised); pointer-events: none;
+  font-family: var(--font-family-mono); font-size: var(--font-size-xs);
+  line-height: var(--font-line-height-loose); letter-spacing: var(--font-letter-spacing-wide);
+  font-variant-numeric: tabular-nums; color: var(--text-tertiary);
+}
+.contact-readout.is-sent { color: var(--text-brand); }
+@media (max-width: 680px) { .contact-readout { bottom: var(--dimension-space-20); } }
+
+/* One field from the top of the page to the bottom: the footer sits inside
+   the contact section, on the same background and the same stars. */
+.contact.contact--with-footer {
+  flex-direction: column; align-items: center; justify-content: flex-start;
+  min-height: 100svh; padding: clamp(var(--dimension-space-128), 26vh, 35vh) 0 0;
+}
+.contact--with-footer .contact-inner { padding-inline: var(--dimension-space-40); margin-bottom: var(--dimension-space-64); }
+.contact--with-footer .footer { width: 100%; }
+.contact--with-footer .footer .container { justify-content: flex-end; }
+/* Just the copyright here. The status and email copy stay in the markup. */
+.contact--with-footer .footer-status,
+.contact--with-footer .footer-email-link,
+.contact--with-footer .footer-sep { display: none; }
+@media (max-width: 680px) {
+  .contact.contact--with-footer { padding: 100px 0 0; }
+  .contact--with-footer .contact-inner { padding-inline: var(--dimension-space-20); }
+}
+@media (max-width: 640px) {
+  .contact--with-footer .footer .container { align-items: flex-end; }
+  .contact--with-footer .footer p { text-align: right; }
+}
 
 /* Design-system .btn used inside a contact card — smaller proportions
    so the button fits the card scale without dominating it, AND icons

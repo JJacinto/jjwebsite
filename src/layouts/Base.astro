@@ -1,6 +1,7 @@
 ﻿---
 import '../styles/global.css';
 import { versioned } from '../lib/script-url';
+import Footer from '../components/Footer.astro';
 
 interface Props {
   title?: string;
@@ -16,6 +17,9 @@ interface Props {
      on pages that already paint their own particle field in the hero
      (contact, error pages) to avoid doubling up. */
   disablePageParticles?: boolean;
+  /* The page renders <Footer /> itself, inside its own field (contact), so
+     Base skips the closing band and its second field. */
+  footerInPage?: boolean;
 }
 
 const {
@@ -28,6 +32,7 @@ const {
   showFooter = true,
   showCta = true,
   disablePageParticles = false,
+  footerInPage = false,
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
@@ -353,7 +358,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <slot />
 </main>
 
-{(showCta || showFooter) && (
+{(showCta || showFooter) && !footerInPage && (
   <div class:list={['cta-footer-wrap', { 'cta-footer-wrap--solo': !showCta }]} data-space-root>
     {/* Canvas in both modes — solo wraps (contact + error pages) get the
         same FBM-dithered gradient treatment as the regular cta-footer-wrap,
@@ -414,17 +419,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
         </div>
       </section>
     )}
-    {showFooter && (
-      <footer class="footer" id="footer">
-        <div class="container">
-          <div class="footer-status" id="footer-status">
-            <span class="footer-status-dot" id="footer-status-dot"></span>
-            <span class="footer-status-label" id="footer-status-label"></span>
-          </div>
-          <p>© 2026 João Jacinto • <button class="footer-email-link" id="footer-email-btn" data-umami-event="footer-email-copy" aria-label="Copy email contact@joaojacinto.com to clipboard" data-pt-aria-label="Copiar o email contact@joaojacinto.com para a área de transferência">contact@joaojacinto.com</button></p>
-        </div>
-      </footer>
-    )}
+    {showFooter && <Footer />}
   </div>
 )}
 
