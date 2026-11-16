@@ -1277,12 +1277,22 @@ html[data-motion="reduce"] {
 /* Featured manager quote on the left across both rows; the two
    peer quotes stack on the right. Cards are flex columns so the
    footer sits on the bottom edge whatever the quote length. */
-/* Ten equal cards in three masonry columns, kept inside the site's
-   1140px container. Columns (not grid) so cards of different lengths
-   pack without holes. */
-.testimonials-masonry { column-count: 3; column-gap: var(--dimension-space-20); }
-.testimonials-masonry > .testimonial-card { break-inside: avoid; margin-bottom: var(--dimension-space-20); }
-@media (max-width: 1080px) { .testimonials-masonry { column-count: 2; } }
+/* Three-column grid inside the site's 1140px container. Two highlight
+   cards span two columns (not two rows): Daniel top-left, Carlos on the
+   right of row three, so 2x2 + 8 = 12 slots fill four even rows. Dense
+   flow lets Eunice fill the slot left of Carlos. */
+.testimonials-masonry {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--dimension-space-20); grid-auto-flow: dense;
+}
+.testimonial-card--wide { grid-column: span 2; }
+.testimonial-card--wide-end { grid-column: 2 / span 2; }
+.testimonial-card--wide .testimonial-quote { font-size: var(--font-size-lg); line-height: var(--font-line-height-normal); }
+/* Two columns: the wide cards go full width, eight cards make four rows. */
+@media (max-width: 1080px) {
+  .testimonials-masonry { grid-template-columns: 1fr 1fr; }
+  .testimonial-card--wide, .testimonial-card--wide-end { grid-column: 1 / -1; }
+}
 .testimonial-card {
   display: flex; flex-direction: column;
   background: var(--surface-default); border-radius: var(--radius-card-lg);
@@ -1292,42 +1302,55 @@ html[data-motion="reduce"] {
   transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized), box-shadow var(--motion-duration-standard), border-color var(--motion-duration-expressive) var(--motion-easing-standard), opacity var(--motion-duration-expressive) var(--motion-easing-standard), filter var(--motion-duration-expressive) var(--motion-easing-standard), scale var(--motion-duration-expressive) var(--motion-easing-emphasized);
 }
 .testimonial-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(61,61,181,0.30); }
-/* Face texture — the person's photo printed into the card surface as a
-   fine halftone, only in the right-hand part of the card. The dot grid
-   is intersected with a soft radial fade so the face dissolves into the
-   card with no edge. It fades out on hover so the brand wash and the
-   quote take over. Right corners match the inner border curve. */
+/* Portrait — the person's photo as a dot matrix, and the only image of
+   them on the card (no avatar). Regular cards: the portrait sits in the
+   top-right corner and the quote wraps around it, so no text lies on the
+   face. Wide cards: it is a full-height panel on the left with all the
+   text to its right. /scripts/testimonial-face.js draws the dots on a
+   canvas and moves them with the cursor (--face-fx names the effect);
+   until it runs, the span shows a CSS halftone of the same photo.
+   --face-fade dissolves the portrait into the card. */
 .testimonial-face {
-  position: absolute; top: 0; right: 0; bottom: 0; width: 42%;
-  z-index: 0; pointer-events: none;
-  border-radius: 0 var(--dimension-radius-lg) var(--dimension-radius-lg) 0;
+  --face-fx: spot;
+  --face-fade: radial-gradient(ellipse 95% 95% at 82% 18%, #000 16%, transparent 70%);
+  position: absolute; top: 0; right: 0; width: 50%; height: 180px;
+  z-index: 0; pointer-events: none; overflow: hidden;
+  border-radius: inherit;
   background-image: var(--face);
   background-size: cover; background-position: 50% 25%; background-repeat: no-repeat;
   filter: grayscale(1) contrast(1.4) brightness(1.1);
-  opacity: 0.24;
-  -webkit-mask-image:
-    radial-gradient(circle, #000 1.1px, transparent 1.6px),
-    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
-  -webkit-mask-size: 5px 5px, 100% 100%;
+  opacity: 0.3;
+  -webkit-mask-image: radial-gradient(circle, #000 1.1px, transparent 1.6px), var(--face-fade);
+  -webkit-mask-size: 4px 4px, 100% 100%;
   -webkit-mask-composite: source-in;
-          mask-image:
-    radial-gradient(circle, #000 1.1px, transparent 1.6px),
-    radial-gradient(ellipse 85% 70% at 70% 40%, #000 0%, rgba(0,0,0,0.5) 45%, transparent 75%);
-          mask-size: 5px 5px, 100% 100%;
+          mask-image: radial-gradient(circle, #000 1.1px, transparent 1.6px), var(--face-fade);
+          mask-size: 4px 4px, 100% 100%;
           mask-composite: intersect;
   transition: opacity var(--motion-duration-expressive) var(--motion-easing-standard);
 }
-.testimonial-card:hover .testimonial-face { opacity: 0; }
-.testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
-.testimonial-avatar {
-  width: 50px; height: 50px; border-radius: 50%; flex-shrink: 0;
-  background: linear-gradient(135deg, var(--color-primary-10), rgba(61,61,181,0.18));
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-sm); color: var(--text-brand); overflow: hidden;
-  transition: transform var(--motion-duration-expressive) var(--motion-easing-emphasized);
+.testimonial-face.is-canvas {
+  background-image: none; filter: none; opacity: 0.6;
+  -webkit-mask-image: var(--face-fade); -webkit-mask-size: 100% 100%;
+          mask-image: var(--face-fade);         mask-size: 100% 100%;
 }
-.testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.testimonial-card:hover .testimonial-avatar { transform: scale(1.2); }
+.testimonial-face canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.testimonial-card:hover .testimonial-face { opacity: 0.5; }
+.testimonial-card:hover .testimonial-face.is-canvas { opacity: 0.95; }
+/* Keep the name and the first lines of the quote clear of the portrait. */
+.testimonial-header { padding-right: 36%; min-height: 50px; }
+.testimonial-quote::before { content: ''; float: right; width: 28%; height: 48px; }
+/* Wide cards, above the phone layout: portrait panel left, text right. */
+@media (min-width: 681px) {
+  .testimonial-card--wide { padding-left: calc(30% + var(--dimension-space-8)); }
+  .testimonial-card--wide .testimonial-face {
+    --face-fx: repel;
+    --face-fade: linear-gradient(90deg, #000 55%, transparent 100%);
+    inset: 0 auto 0 0; width: 30%; height: auto;
+  }
+  .testimonial-card--wide .testimonial-header { padding-right: 0; min-height: 0; }
+  .testimonial-card--wide .testimonial-quote::before { content: none; }
+}
+.testimonial-header { position: relative; z-index: var(--z-elevated); display: flex; align-items: center; gap: var(--dimension-space-12); margin-bottom: var(--dimension-space-12); }
 .testimonial-name { font-family: var(--font-family-display); font-weight: var(--font-weight-black); font-size: var(--font-size-md); letter-spacing: var(--font-letter-spacing-snug); color: var(--text-primary); }
 .testimonial-role { font-family: var(--font-family-body); font-size: var(--font-size-xs); color: var(--color-neutral-70); margin-top: var(--dimension-space-2); }
 /* Custom cursor ball — shown when hovering tilt cards */
@@ -1855,9 +1878,9 @@ html[data-motion="reduce"] {
   gap: var(--dimension-space-8);
   padding: var(--dimension-space-6) var(--dimension-space-12) var(--dimension-space-6) var(--dimension-space-8);
   border-radius: var(--radius-pill);
-  background: var(--surface-raised);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
-  box-shadow: var(--shadow-md);
+  /* No pill behind it: just the track and the word, straight on the page. */
+  background: transparent;
+  border: 0;
   font-size: var(--font-size-xs);
   opacity: 0;
   visibility: hidden;
@@ -3858,7 +3881,9 @@ html[data-motion="reduce"] {
 /* The stars themselves, drawn in front of the buttons they orbit. */
 .contact-binary--top { z-index: calc(var(--z-raised) + 1); }
 .contact-readout {
-  position: absolute; left: var(--spacing-container-pad); bottom: var(--dimension-space-28);
+  /* On the page grid's left edge (the same line as the logo), not the window's. */
+  position: absolute; bottom: var(--dimension-space-28);
+  left: max(var(--spacing-container-pad), calc((100% - var(--dimension-size-container-default)) / 2 + var(--spacing-container-pad)));
   z-index: var(--z-raised); pointer-events: none;
   font-family: var(--font-family-mono); font-size: var(--font-size-xs);
   line-height: var(--font-line-height-loose); letter-spacing: var(--font-letter-spacing-wide);
@@ -4899,7 +4924,8 @@ html[data-motion="reduce"] {
      the Start project button. */
   .mobile-menu-btn { justify-content: center; }
   .stats-grid { grid-template-columns: 1fr; gap: var(--dimension-space-32); }
-  .testimonials-masonry { column-count: 1; }
+  .testimonials-masonry { grid-template-columns: 1fr; }
+  .testimonial-card--wide .testimonial-quote { font-size: var(--font-size-md); }
   .may-like-grid, .cases-grid, .cases-grid-row-2 { grid-template-columns: 1fr; }
   .journey-row { grid-template-columns: 1fr; gap: var(--dimension-space-8); }
   .influences-right { grid-template-columns: 1fr; }

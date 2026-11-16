@@ -15,6 +15,18 @@
    API for hero-space.js (client px): HeroFace.attract(x, y, strength 0..1) pulls
    every dot toward a point while it is called each frame; HeroFace.burst(x, y,
    power) scatters them (power 1 = a click); HeroFace.count() is the dot count.
+   The hole can also eat the portrait. HeroFace.consume(x, y, reach, rd, amount)
+   is called each frame while it is held: dots within reach of the point let go
+   of their places and fall in, a growing share of them as amount goes 0..1, and
+   one that gets within rd is gone. It returns the share gone so far and lapses
+   100 ms after the last call. Then one of:
+     spit(x, y)            the hole was let go early: gone dots come back at
+                           that point and spring home
+     keep()                it ate the lot: the portrait stays gone (a game runs)
+     restore(pts, instant) the game is over: every dot flies home from one of
+                           the client points in pts [x, y, x, y, ...], a few at
+                           a time, and once the face has formed the photo shows
+                           through it for a moment. instant puts it back at once.
 
    Markup:
      div[data-hero-face]  data-photo="/assets/images/hero-face.webp"
@@ -88,6 +100,11 @@
   var ghostAt = 0;
   var look = { x: 0, y: 0, t: 0, on: false, yaw: 0, pitch: 0 };   // pointer anywhere in the viewport, and the head's smoothed turn
   var att = { x: 0, y: 0, s: 0, until: 0 };   // the attractor set by HeroFace.attract, client px
+  // Eaten by the hole. gone, per dot: 0 here, 0..1 falling in, 1 swallowed,
+  // below 0 waiting that many seconds to fly home.
+  var gone, nGone = 0, held = false;
+  var eat = { x: 0, y: 0, reach: 0, rd: 0, amount: 0, until: 0 };
+  var flashAt = 0, flashEnd = 0;               // after a restore: when the photo shows through, and until when
   var hero = box.closest('.hero');
 
   /* ---------- colours, theme, data ---------- */
@@ -143,6 +160,8 @@
     dz = new Float32Array(N); fvp = new Float32Array(N);
     X = new Float32Array(N); Y = new Float32Array(N); VX = new Float32Array(N); VY = new Float32Array(N);
     colR = new Float32Array(N); colG = new Float32Array(N); colB = new Float32Array(N);
+    gone = new Float32Array(N); nGone = 0;
+    if (held) { gone.fill(1); nGone = N; }
     for (i = 0; i < n; i++) {
       ux[i] = d[i * 4] / json.w; uy[i] = d[i * 4 + 1] / json.h;
       br[i] = d[i * 4 + 2] / 10; lum[i] = d[i * 4 + 3] / 100;
@@ -284,7 +303,16 @@
       } else if (gp > 3.4) ghostAt = now;
     } else ghostAt = 0;
 
-    if (away > 0.15) { field.fill(0); ptr.lx = ptr.x; ptr.ly = ptr.y; }
+    // Being eaten: only while consume() keeps being called. If it stops without
+    // a spit or a keep, the dots it took come back by themselves.
+    var eatOn = !calm && !held && tnow < eat.until, eatX = eat.x - rc.left, eatY = eat.y - rc.top;
+    if (!eatOn && !held && nGone) spit(eat.x, eat.y);
+    if (flashAt) {
+      if (tnow > flashEnd) { flashAt = 0; if (!calm) wholeTo = 0; }
+      else if (tnow > flashAt) wholeTo = 1;
+    }
+
+    if (away > 0.15 || eatOn || held) { field.fill(0); ptr.lx = ptr.x; ptr.ly = ptr.y; }
     else if (!calm) {
       if (ptr.on) {
         var dx = ptr.x - ptr.lx, dy = ptr.y - ptr.ly, steps = Math.min(8, 1 + Math.floor(Math.sqrt(dx * dx + dy * dy) / (W * 0.05)));
@@ -302,8 +330,11 @@
     var tx = ptr.on ? (ptr.x / W - 0.5) : 0, ty = ptr.on ? (ptr.y / H - 0.5) : 0;
     ptr.px += (tx - ptr.px) * Math.min(1, dt * 4); ptr.py += (ty - ptr.py) * Math.min(1, dt * 4);
 
+    // Clear in device pixels: the canvas size is rounded, so a clear in box
+    // units can leave its last column, and dots crossing that edge pile up there.
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.setTransform(K, 0, 0, K, pad * K, pad * K);
-    ctx.clearRect(-pad, -pad, W + pad * 2, H + pad * 2);
 
     // The photo, where the field has opened it.
     var showPhoto = photoC && (energy > 0.05 || whole > 0.01);
@@ -352,6 +383,12 @@
     ctx.fillStyle = base;
     ctx.beginPath();
     for (i = 0; i < N; i++) {
+      var g0 = gone[i], eatShrink = 1;
+      if (g0 >= 1) { fvp[i] = 0; continue; }
+      if (g0 < 0) {                              // not back yet
+        gone[i] = g0 + dt > 0 ? 0 : g0 + dt;
+        if (gone[i] < 0) { fvp[i] = 0; continue; }
+      }
       var stray = lum[i] < 0, depth = stray ? 1.6 : 0.4 + lum[i];
       var amp = calm ? 0 : (stray ? 7 + u2[i] * 9 : 0.9) * unit * (stray ? 1.6 : 1.4) * driftUp;
       var sp = stray ? 0.12 + u3[i] * 0.2 : 0.5 + u3[i] * 0.7;
@@ -377,6 +414,16 @@
       if (calm) { X[i] = hxI; Y[i] = hyI; }
       else {
         var ax = (hxI - X[i]) * k - VX[i] * damp, ay = (hyI - Y[i]) * k - VY[i] * damp;
+        if (eatOn && u1[i] < eat.amount) {
+          // Its turn: it lets go of its place and falls into the hole, swirling and shrinking.
+          var ex = eatX - X[i], ey = eatY - Y[i], ed = Math.sqrt(ex * ex + ey * ey) || 1;
+          if (ed < eat.reach) {
+            gone[i] += dt / 1.6;
+            if (ed < eat.rd * 1.3 || gone[i] >= 1) { gone[i] = 1; nGone++; fvp[i] = 0; continue; }
+            ax = (ex - ey * 0.5) / ed * 2200 - VX[i] * 2.5; ay = (ey + ex * 0.5) / ed * 2200 - VY[i] * 2.5;
+            eatShrink = clamp(ed / (W * 0.3), 0.35, 1);
+          }
+        } else if (g0 > 0) gone[i] = 0;
         if (pull) {
           var qx = pullX - X[i], qy = pullY - Y[i], qd = Math.sqrt(qx * qx + qy * qy);
           if (qd > 0.01) { var qa = att.s * 2600 * unit / (0.35 + qd / W); ax += qx / qd * qa; ay += qy / qd * qa; }
@@ -388,7 +435,7 @@
         VX[i] += ax * dt; VY[i] += ay * dt; X[i] += VX[i] * dt; Y[i] += VY[i] * dt;
       }
       var tw = calm ? 1 : 1 + 0.22 * Math.sin(clock * (0.9 + u1[i] * 2.2) + u3[i] * TAU);
-      var r = br[i] * unit * tw * (0.35 + 0.65 * expoOut(clamp(appear * 1.6 - u2[i] * 0.6, 0, 1))) * rShrink;
+      var r = br[i] * unit * tw * (0.35 + 0.65 * expoOut(clamp(appear * 1.6 - u2[i] * 0.6, 0, 1))) * rShrink * eatShrink;
       if (r < 0.45) r = 0.45;
       var fv = stray ? 0 : Math.max(fieldAt(X[i], Y[i]), whole);
       fvp[i] = fv;
@@ -518,6 +565,49 @@
     wake();
   }
   function count() { return N; }
+  // The hole eating the portrait (see the top of the file). Client px.
+  function consume(cx, cy, reach, rd, amount) {
+    if (held) return 1;
+    if (mode !== 'live' || !N || calm) return 0;
+    eat.x = cx; eat.y = cy; eat.reach = reach; eat.rd = rd; eat.amount = amount; eat.until = performance.now() + 100;
+    wake();
+    return nGone / N;
+  }
+  function spit(cx, cy) {
+    eat.until = 0;
+    if (held || !N) return;
+    var r = box.getBoundingClientRect(), x = cx - r.left, y = cy - r.top;
+    for (var i = 0; i < N; i++) {
+      if (gone[i] >= 1) {
+        var a = u3[i] * TAU, v = (300 + u2[i] * 900) * unit * 2;
+        X[i] = x + Math.cos(a) * 6; Y[i] = y + Math.sin(a) * 6; VX[i] = Math.cos(a) * v; VY[i] = Math.sin(a) * v;
+      }
+      gone[i] = 0;
+    }
+    nGone = 0;
+    wake();
+  }
+  function keep() {
+    if (!N) return;
+    held = true; eat.until = 0; flashAt = 0;
+    gone.fill(1); nGone = N; field.fill(0);
+    wake();
+  }
+  function restore(pts, instant) {
+    held = false; eat.until = 0; nGone = 0;
+    if (!N) return;
+    var r = box.getBoundingClientRect(), n = pts ? pts.length >> 1 : 0, now = performance.now(), i;
+    if (instant || calm) { gone.fill(0); home(); wake(); return; }
+    for (i = 0; i < N; i++) {
+      var k = n ? (i % n) * 2 : -1, a = u3[i] * TAU, v = (200 + u2[i] * 700) * unit * 2;
+      X[i] = (k < 0 ? W / 2 : pts[k] - r.left) + Math.cos(a) * 8; Y[i] = (k < 0 ? H / 2 : pts[k + 1] - r.top) + Math.sin(a) * 8;
+      VX[i] = Math.cos(a) * v; VY[i] = Math.sin(a) * v;
+      gone[i] = -(0.02 + u1[i] * 0.8);
+    }
+    flashAt = now + 1900; flashEnd = flashAt + 1100;
+    ptr.seen = now;
+    wake();
+  }
   function live(formed) {
     mode = 'live';
     resize();
@@ -547,5 +637,5 @@
   loadDots();
   loadPhoto();
 
-  window.HeroFace = { intro: intro, live: live, hide: hide, push: push, attract: attract, burst: burst, count: count };
+  window.HeroFace = { intro: intro, live: live, hide: hide, push: push, attract: attract, burst: burst, count: count, consume: consume, spit: spit, keep: keep, restore: restore };
 })();
