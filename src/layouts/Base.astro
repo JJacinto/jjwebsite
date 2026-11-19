@@ -25,9 +25,11 @@ interface Props {
   noindex?: boolean;
   /* Trail after "Home" for search results, e.g. Case studies > Case title.
      Paths are site-relative and end in a slash. */
-  breadcrumb?: { name: string; path: string }[];
+  breadcrumb?: { name: string; namePt?: string; path: string }[];
   /* Extra schema.org nodes for this page (e.g. the case study itself). */
   jsonLd?: Record<string, unknown>[];
+  /* The same nodes for the Portuguese page (falls back to jsonLd). */
+  jsonLdPt?: Record<string, unknown>[];
 }
 
 const {
@@ -44,6 +46,7 @@ const {
   noindex = false,
   breadcrumb = [],
   jsonLd = [],
+  jsonLdPt,
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
@@ -56,8 +59,13 @@ const isHome      = activePage === 'home';
    other, and let pages add their own nodes that refer to João as author. */
 const personId  = `${siteUrl}/#person`;
 const websiteId = `${siteUrl}/#website`;
-const crumbsId  = `${canonical}#breadcrumb`;
-const schemaGraph = {
+function buildGraph(pt: boolean) {
+  /* The Portuguese page lives under /pt/; the site-level nodes (WebSite,
+     Person) keep the same ids in both languages. */
+  const prefix   = pt ? '/pt' : '';
+  const pageUrl  = pt ? new URL(prefix + Astro.url.pathname, siteUrl).href : canonical;
+  const crumbsId = `${pageUrl}#breadcrumb`;
+  return {
   '@context': 'https://schema.org',
   '@graph': [
     {
@@ -65,7 +73,7 @@ const schemaGraph = {
       '@id': websiteId,
       url: `${siteUrl}/`,
       name: 'João Jacinto',
-      inLanguage: 'en',
+      inLanguage: pt ? 'pt-PT' : 'en',
       publisher: { '@id': personId },
     },
     {
@@ -92,11 +100,11 @@ const schemaGraph = {
     },
     {
       '@type': isHome ? 'ProfilePage' : 'WebPage',
-      '@id': `${canonical}#webpage`,
-      url: canonical,
-      name: title,
-      description,
-      inLanguage: 'en',
+      '@id': `${pageUrl}#webpage`,
+      url: pageUrl,
+      name: pt ? titlePt : title,
+      description: pt ? descriptionPt : description,
+      inLanguage: pt ? 'pt-PT' : 'en',
       isPartOf: { '@id': websiteId },
       ...(isHome ? { mainEntity: { '@id': personId } } : { about: { '@id': personId } }),
       ...(breadcrumb.length ? { breadcrumb: { '@id': crumbsId } } : {}),
@@ -104,16 +112,20 @@ const schemaGraph = {
     ...(breadcrumb.length ? [{
       '@type': 'BreadcrumbList',
       '@id': crumbsId,
-      itemListElement: [{ name: 'Home', path: '/' }, ...breadcrumb].map((b, i) => ({
+      itemListElement: [{ name: 'Home', namePt: 'Início', path: '/' }, ...breadcrumb].map((b, i) => ({
         '@type': 'ListItem',
         position: i + 1,
-        name: b.name,
-        item: new URL(b.path, siteUrl).href,
+        name: pt ? (b.namePt ?? b.name) : b.name,
+        item: new URL(prefix + b.path, siteUrl).href,
       })),
     }] : []),
-    ...jsonLd,
+    ...(pt ? (jsonLdPt ?? jsonLd) : jsonLd),
   ],
-};
+  };
+}
+const schemaGraph = buildGraph(false);
+const schemaGraphPt = buildGraph(true);
+const ldEscape = (g: unknown) => JSON.stringify(g).replace(/</g, '\\u003c');
 
 /* Umami analytics — privacy-friendly, no cookies. Renders only when
    both env vars are set in the hosting platform (Vercel/Netlify/etc.):
@@ -141,8 +153,8 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <!-- Open Graph -->
 <meta property="og:type" content={isHome ? 'website' : 'article'}>
 <meta property="og:url" content={canonical}>
-<meta property="og:title" content={title}>
-<meta property="og:description" content={description}>
+<meta property="og:title" content={title} data-pt-content={titlePt}>
+<meta property="og:description" content={description} data-pt-content={descriptionPt}>
 <meta property="og:image" content={ogImage}>
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -151,12 +163,12 @@ const umamiOn  = !!(umamiSrc && umamiId);
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content={title}>
-<meta name="twitter:description" content={description}>
+<meta name="twitter:title" content={title} data-pt-content={titlePt}>
+<meta name="twitter:description" content={description} data-pt-content={descriptionPt}>
 <meta name="twitter:image" content={ogImage}>
 
 {!noindex && (
-  <script type="application/ld+json" set:html={JSON.stringify(schemaGraph).replace(/</g, '\\u003c')} />
+  <script type="application/ld+json" set:html={ldEscape(schemaGraph)} data-pt={ldEscape(schemaGraphPt)} />
 )}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -251,21 +263,47 @@ const umamiOn  = !!(umamiSrc && umamiId);
     }
   }
 
-  /* Language: the visitor's saved choice wins. With none saved (a first
-     visit), follow the browser: go down its list of preferred languages
-     and take the first that is English or Portuguese. The guess is not
-     saved, so only a choice made in the settings menu sticks. */
-  var savedLang = null;
-  try { savedLang = localStorage.getItem('lang'); } catch (_) {}
-  if (savedLang !== 'pt' && savedLang !== 'en') {
-    savedLang = 'en';
-    var wanted = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
-    for (var li = 0; li < wanted.length; li++) {
-      var code = String(wanted[li]).toLowerCase().slice(0, 2);
-      if (code === 'pt' || code === 'en') { savedLang = code; break; }
-    }
+  /* Which language does this visitor want? "pt", "en", or null when they
+     have not chosen. The one place that decides it. */
+  function wantedLanguage() {
+    try {
+      var saved = localStorage.getItem('lang');
+      return saved === 'pt' || saved === 'en' ? saved : null;
+    } catch (_) { return null; }
   }
-  if (savedLang === 'pt') root.lang = 'pt-PT';
+
+  /* With no choice saved (a first visit), the browser's guess: go down
+     its list of preferred languages and take the first that is English
+     or Portuguese. The guess is not saved, so only a choice made in the
+     settings menu sticks. */
+  function browserLanguage() {
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+    for (var li = 0; li < list.length; li++) {
+      var code = String(list[li]).toLowerCase().slice(0, 2);
+      if (code === 'pt' || code === 'en') return code;
+    }
+    return 'en';
+  }
+
+  /* URL of this page in the other language: EN /x/ <-> PT /pt/x/. Keeps
+     the query and the hash. */
+  window.jjLangUrl = function (lang) {
+    var path = location.pathname.replace(/^\/pt(?=\/|$)/, '') || '/';
+    if (lang === 'pt') path = '/pt' + (path === '/' ? '/' : path);
+    return path + location.search + location.hash;
+  };
+
+  var wanted = wantedLanguage();
+  if (root.dataset.langMode === 'url') {
+    /* Built pages: the URL says the language. A saved choice that differs
+       sends the visitor to the same page in that language. The browser's
+       guess does not: a link to a page in one language opens in that
+       language, for visitors and for search engines alike. */
+    var pageLang = (root.lang || 'en').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en';
+    if (wanted && wanted !== pageLang) location.replace(window.jjLangUrl(wanted));
+  } else if ((wanted || browserLanguage()) === 'pt') {
+    root.lang = 'pt-PT';
+  }
   apply();
 
   /* Contrast and motion follow the system. */
@@ -563,6 +601,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
     lang = lang === 'pt' ? 'pt' : 'en';
     if (lang === current()) return;
     try { localStorage.setItem('lang', lang); } catch (_) {}
+    if (root.dataset.langMode === 'url') { location.assign(window.jjLangUrl(lang)); return; }
     apply(lang);
     /* Label widths changed: let nav.js re-place the pill indicator. */
     window.dispatchEvent(new Event('resize'));
