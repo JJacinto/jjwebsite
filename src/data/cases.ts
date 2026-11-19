@@ -31,9 +31,9 @@ export interface Case {
   sections: CaseSection[];
   quote: string;
   quotePt?: string;
-  /* One public paragraph on the password gate, above the summary: the
-     company, my role, when, how, and the outcome. It is the plain-prose
-     text search engines read while the full write-up stays private. */
+  /* One paragraph for search engines, not shown on the page: the company,
+     my role, when, how, and the outcome. It goes into the case's JSON-LD
+     description; the visible one-liner is the subtitle. */
   intro?: string;
   introPt?: string;
   /* The 30-second summary, shown on the case page and on the password gate. */
