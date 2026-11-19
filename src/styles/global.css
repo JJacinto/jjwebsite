@@ -509,54 +509,6 @@ html[data-motion="reduce"] {
 }
 .li-badge svg { width: 18px; height: 18px; fill: currentColor; }
 
-/* EN/PT language switch — a two-segment pill beside Start project.
-   Same 44px height and 4px inset as the pill nav; the lit segment is
-   the language in use (aria-pressed, set by the script in Base.astro). */
-.lang-switch {
-  position: relative; isolation: isolate;
-  display: inline-grid; grid-template-columns: 1fr 1fr; flex-shrink: 0;
-  min-height: var(--target-min);
-  padding: var(--dimension-space-4);
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
-}
-/* The lit segment is one thumb that slides between the two halves,
-   so switching reads as one movement rather than a swap. */
-.lang-switch::before {
-  content: ""; position: absolute; z-index: -1;
-  top: var(--dimension-space-4); bottom: var(--dimension-space-4); left: var(--dimension-space-4);
-  width: calc((100% - 2 * var(--dimension-space-4)) / 2);
-  border-radius: var(--radius-pill);
-  /* Soft tint rather than a solid fill, so it doesn't shout in the header. */
-  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
-  transform: translateX(0);
-}
-.lang-switch:has([data-lang-set="pt"][aria-pressed="true"])::before { transform: translateX(100%); }
-.lang-switch button {
-  min-width: 40px;
-  padding: 0 var(--dimension-space-12);
-  border: none; border-radius: var(--radius-pill);
-  background: transparent;
-  font-family: var(--font-family-body); font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
-  color: var(--text-secondary); cursor: pointer; user-select: none;
-  transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.lang-switch button:hover { color: var(--text-primary); }
-.lang-switch button[aria-pressed="true"] { color: var(--text-primary); }
-.lang-switch button:active { transform: scale(0.96); }
-/* Motion only after the first click, so a PT page doesn't slide in on load.
-   Springy ease-out: a short glide with a hint of settle at the end. */
-.lang-switch.is-animated::before {
-  transition: transform 420ms cubic-bezier(0.34, 1.36, 0.64, 1);
-}
-html[data-motion="reduce"] {
-  .lang-switch.is-animated::before { transition: none; }
-  .lang-switch button { transition: none; }
-  .lang-switch button:active { transform: none; }
-}
-/* In the mobile menu it sits centred above the Start project button. */
-.mobile-menu-secondary .lang-switch { align-self: center; margin-bottom: var(--dimension-space-8); }
-
 .btn.nav-cta {
   padding: var(--dimension-space-8) var(--dimension-space-16); font-size: var(--font-size-sm); border-width: 2px;
   min-width: 0;
@@ -1984,6 +1936,17 @@ html { overflow-x: clip; }
   pointer-events: none;
   transform: translateY(8px);
   transition: opacity var(--motion-duration-standard) var(--motion-easing-standard), transform var(--motion-duration-standard) var(--motion-easing-emphasized), visibility 0s linear var(--motion-duration-standard);
+}
+/* Below this width the left gutter is narrower than the switch, so page
+   content scrolls underneath it. It takes the scrolled nav's frosted pill
+   there, so the track and the word stay readable over anything. */
+@media (max-width: 1360px) {
+  .xray-switch--float {
+    background: color-mix(in srgb, var(--background-page) 80%, transparent);
+    -webkit-backdrop-filter: blur(22px) saturate(1.7);
+    backdrop-filter: blur(22px) saturate(1.7);
+    box-shadow: inset 0 0 0 1px var(--border-subtle), 0 12px 32px -18px rgba(0, 0, 0, 0.5);
+  }
 }
 /* The site-wide copy sits higher, clear of the bottom-left read-outs
    (contact separation, footer status). */
@@ -5124,8 +5087,6 @@ html[data-motion="reduce"] {
   .pill-nav { display: none; }
   .nav-toggle { display: inline-flex; }
   .nav-right .nav-cta { display: none; }
-  /* The language switch moves into the mobile menu too. */
-  .nav-right .lang-switch { display: none; }
   /* Move the theme toggle into the mobile menu (.mobile-menu has its
      own #mobileThemeToggle button) so the header collapses to just
      logo + hamburger and the toggle isn't sitting awkwardly next to
@@ -5808,6 +5769,11 @@ html[data-motion="reduce"] {
 ::view-transition-group(*.wall-tile) { animation-duration: 0.42s; animation-timing-function: var(--motion-easing-emphasized); }
 ::view-transition-old(*.wall-tile):only-child { animation: wall-tile-out 0.22s var(--motion-easing-standard) both; }
 ::view-transition-new(*.wall-tile):only-child { animation: wall-tile-in 0.36s var(--motion-easing-emphasized) 0.12s both; }
+/* Language swap (Base.astro adds .jj-lang-swap for the length of the
+   transition): the whole page crossfades quickly. Scoped to the class so
+   the Work wall's own transition keeps the browser's default root fade. */
+html.jj-lang-swap::view-transition-old(root),
+html.jj-lang-swap::view-transition-new(root) { animation-duration: 180ms; animation-timing-function: ease; }
 @keyframes wall-tile-out { to { opacity: 0; transform: scale(0.94); } }
 @keyframes wall-tile-in { from { opacity: 0; transform: scale(0.94); } }
 .wall .tile:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 3px; }
@@ -6125,14 +6091,40 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
 }
 
 /* ============================================================
-   Portuguese versions of labels generated in CSS (EN/PT switch
-   sets <html lang="pt-PT">; see the language script in Base.astro)
+   Translated versions of labels generated in CSS (the language
+   switch sets <html lang>; see the language script in Base.astro)
    ============================================================ */
 :lang(pt) .j-cnt::after { content: "passos " counter(n); }
 :lang(pt) .j-go::after { content: "Entrar em direto"; }
 :lang(pt) .j-pct::after { content: "a imprimir " counter(n) "%"; }
 :lang(pt) .wall .vc:after { content: "variantes ×" counter(n); }
 :lang(pt) .wall .hc:after { content: "passos " counter(n); }
+/* The same five labels in the other languages. */
+:lang(es) .j-cnt::after { content: "pasos " counter(n); }
+:lang(es) .j-go::after { content: "Salir en vivo"; }
+:lang(es) .j-pct::after { content: "imprimiendo " counter(n) "%"; }
+:lang(es) .wall .vc:after { content: "variantes ×" counter(n); }
+:lang(es) .wall .hc:after { content: "pasos " counter(n); }
+:lang(fr) .j-cnt::after { content: "étapes " counter(n); }
+:lang(fr) .j-go::after { content: "Passer en direct"; }
+:lang(fr) .j-pct::after { content: "impression " counter(n) "%"; }
+:lang(fr) .wall .vc:after { content: "variantes ×" counter(n); }
+:lang(fr) .wall .hc:after { content: "étapes " counter(n); }
+:lang(de) .j-cnt::after { content: "Schritte " counter(n); }
+:lang(de) .j-go::after { content: "Live gehen"; }
+:lang(de) .j-pct::after { content: "Druck " counter(n) "%"; }
+:lang(de) .wall .vc:after { content: "Varianten ×" counter(n); }
+:lang(de) .wall .hc:after { content: "Schritte " counter(n); }
+:lang(zh) .j-cnt::after { content: "步骤 " counter(n); }
+:lang(zh) .j-go::after { content: "上线"; }
+:lang(zh) .j-pct::after { content: "打印 " counter(n) "%"; }
+:lang(zh) .wall .vc:after { content: "变体 ×" counter(n); }
+:lang(zh) .wall .hc:after { content: "步骤 " counter(n); }
+:lang(ja) .j-cnt::after { content: "ステップ " counter(n); }
+:lang(ja) .j-go::after { content: "公開する"; }
+:lang(ja) .j-pct::after { content: "印刷 " counter(n) "%"; }
+:lang(ja) .wall .vc:after { content: "バリエーション ×" counter(n); }
+:lang(ja) .wall .hc:after { content: "ステップ " counter(n); }
 
 /* ============================================================
    SETTINGS MENU (nav)
@@ -6363,6 +6355,78 @@ html[data-motion="reduce"] .settings-seg::before { transition: none; }
 .settings-switch input:checked ~ .settings-switch-track { background: var(--text-primary); border-color: var(--text-primary); }
 .settings-switch input:checked ~ .settings-switch-track::after { transform: translateX(18px); background: var(--sp-bg); }
 
+/* Language dropdown. A button showing the language in use opens a list of
+   radios inside the panel (the panel scrolls, so a floating list would be
+   clipped). Same recipe as the segmented controls: a faint wash of the text
+   colour, the chosen row filled with it. Sizes in rem, so the whole thing
+   grows with the text-size setting. */
+.lang-picker-btn {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--dimension-space-8);
+  width: 100%; min-height: var(--target-min);
+  padding: 0 var(--dimension-space-12) 0 var(--dimension-space-16);
+  border: 0; border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  font-family: inherit; font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  line-height: var(--font-line-height-tight);
+  color: var(--text-primary); text-align: left; cursor: pointer;
+  transition: background var(--motion-duration-short) var(--motion-easing-standard);
+}
+.lang-picker-btn:hover,
+.lang-picker.is-open .lang-picker-btn { background: color-mix(in srgb, var(--text-primary) 14%, transparent); }
+.lang-picker-btn:focus-visible {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: var(--dimension-space-2);
+}
+.lang-picker-cur { display: flex; align-items: center; gap: var(--dimension-space-8); min-width: 0; }
+.lang-picker-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lang-picker-chev {
+  width: 1.125rem; height: 1.125rem; flex-shrink: 0; color: var(--text-secondary);
+  transition: transform var(--motion-duration-standard) var(--motion-easing-emphasized);
+}
+.lang-picker.is-open .lang-picker-chev { transform: rotate(180deg); }
+.lang-picker-list {
+  margin-top: var(--dimension-space-6);
+  padding: var(--dimension-space-4);
+  border-radius: var(--dimension-radius-lg);
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  /* Scrolls when the room runs out: short screens, large text. */
+  max-height: min(20rem, 50vh); overflow-y: auto; overscroll-behavior: contain;
+  animation: lang-list-in var(--motion-duration-standard) var(--motion-easing-emphasized) both;
+}
+.lang-picker-list[hidden] { display: none; }
+@keyframes lang-list-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: none; }
+}
+.lang-opt { position: relative; display: block; cursor: pointer; }
+.lang-opt input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; opacity: 0; cursor: pointer;
+}
+.lang-opt-row {
+  display: flex; align-items: center; gap: var(--dimension-space-8);
+  min-height: var(--target-min); padding: 0 var(--dimension-space-12);
+  border-radius: var(--dimension-radius-md);
+  font-size: var(--font-size-sm); font-weight: var(--font-weight-medium);
+  line-height: var(--font-line-height-tight);
+  color: var(--text-secondary);
+  transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1), background 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lang-opt-name { flex: 1; min-width: 0; }
+.lang-opt-check { width: 1rem; height: 1rem; flex-shrink: 0; opacity: 0; }
+.lang-opt:hover .lang-opt-row { color: var(--text-primary); background: color-mix(in srgb, var(--text-primary) 8%, transparent); }
+.lang-opt input:checked + .lang-opt-row { color: var(--sp-bg); background: var(--text-primary); }
+.lang-opt input:checked + .lang-opt-row .lang-opt-check { opacity: 1; }
+/* Inset, so the list's own scrolling does not clip the ring. */
+.lang-opt input:focus-visible + .lang-opt-row {
+  outline: var(--dimension-border-width-2) solid var(--border-focus);
+  outline-offset: calc(-1 * var(--dimension-border-width-2));
+}
+html[data-motion="reduce"] .lang-picker-list { animation: none; }
+html[data-motion="reduce"] .lang-picker-chev,
+html[data-motion="reduce"] .lang-picker-btn,
+html[data-motion="reduce"] .lang-opt-row { transition: none; }
+
 @media (max-width: 680px) {
   /* On phones the button sits beside the menu button; line the panel
      up with the right edge of the bar instead of the button. */
@@ -6560,6 +6624,7 @@ html[data-contrast="high"] {
   .nav.nav-dark .settings { --sp-bg: #000; }
   .settings-panel { border-width: var(--dimension-border-width-2); }
   .settings-seg { background: transparent; box-shadow: inset 0 0 0 1px var(--text-primary); }
+  .lang-picker-btn, .lang-picker-list { background: transparent; box-shadow: inset 0 0 0 1px var(--text-primary); }
 }
 
 /* ============================================================
@@ -6830,3 +6895,46 @@ html:not([data-contrast="high"]) {
     -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter);
   }
 }
+
+/* ============================================================
+   CHINESE and JAPANESE type
+   Hanken Grotesk and DM Sans have no Han, kana or hangul glyphs, so the
+   browser would pick any font that has them. The Latin faces stay first
+   (numbers, names, English words keep the site's look), then system CJK
+   fonts, in the order each platform has them. Nothing is downloaded.
+   The families are tokens, set on <html> where tokens.css defines them
+   (that file is generated, so the override lives here).
+   ============================================================ */
+:root:lang(zh) {
+  --font-family-display: 'Hanken Grotesk', 'DM Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Source Han Sans SC', -apple-system, system-ui, sans-serif;
+  --font-family-body: 'DM Sans', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', 'Source Han Sans SC', -apple-system, system-ui, sans-serif;
+}
+:root:lang(ja) {
+  --font-family-display: 'Hanken Grotesk', 'DM Sans', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', -apple-system, system-ui, sans-serif;
+  --font-family-body: 'DM Sans', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', -apple-system, system-ui, sans-serif;
+}
+:root:is(:lang(zh), :lang(ja)) {
+  /* Tight tracking and the 1.15 heading leading are tuned for Latin; the
+     square glyphs touch and crowd at them. */
+  --font-letter-spacing-tighter: 0em;
+  --font-letter-spacing-tight: 0em;
+  --font-letter-spacing-snug: 0em;
+  --font-letter-spacing-wide: 0em;
+  --font-letter-spacing-wider: 0em;
+  --font-line-height-heading: 1.3;
+  --font-line-height-tight: 1.35;
+  --font-line-height-snug: 1.45;
+  --font-line-height-normal: 1.7;
+  --font-line-height-relaxed: 1.8;
+  --font-line-height-loose: 1.9;
+  /* Break between characters, not inside Latin words; Japanese by phrase
+     where the browser can (auto-phrase), strict rules for small kana. */
+  line-break: strict;
+  overflow-wrap: break-word;
+}
+:root:is(:lang(zh), :lang(ja)) body { word-break: normal; word-break: auto-phrase; }
+/* Spacing set on single rules (not through the tokens) and uppercase
+   labels: neither means anything for these scripts, and tracking pulls
+   mixed Latin and CJK lines apart. */
+:root:is(:lang(zh), :lang(ja)) :is(h1, h2, h3, h4, h5, h6) { text-transform: none; text-wrap: balance; }
+:root:is(:lang(zh), :lang(ja)) body :where(*) { letter-spacing: normal !important; }

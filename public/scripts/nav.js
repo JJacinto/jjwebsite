@@ -1,3 +1,7 @@
+/* Text this script writes itself, in the page's language (Base.astro
+   defines window.jjT: English, Portuguese, or the page's translation). */
+function jjText(en, pt) { return window.jjT ? window.jjT(en, pt) : en; }
+
 /* Nav scroll + active link progress fill */
 const nav = document.getElementById('nav');
 
@@ -128,8 +132,59 @@ window.addEventListener('resize', movePillIndicator);
   function sync() {
     check('jj-lang', window.jjLang ? window.jjLang() : 'en');
     check('jj-textsize', prefs.get('textsize'));
+    /* The language button's flag and name (Base.astro). */
+    if (window.jjLangPickerSync) window.jjLangPickerSync();
   }
   sync();
+
+  /* Language dropdown: a button that opens a list of radios inside the
+     panel. Picking one closes the list and hands focus back to the
+     button; the panel stays open. The radios stay real ones, so the
+     change handler below and the arrow keys work as before. */
+  const picker = document.getElementById('langPicker');
+  const langBtn = document.getElementById('langBtn');
+  const langList = document.getElementById('langList');
+  let arrowing = false;   /* the change came from an arrow key: keep the list open */
+  function langOpen() { return !!langList && !langList.hidden; }
+  function openLang() {
+    if (!langList || langOpen()) return;
+    langList.hidden = false;
+    picker.classList.add('is-open');
+    langBtn.setAttribute('aria-expanded', 'true');
+    const on = langList.querySelector('input:checked');
+    /* The list scrolls when it is taller than the room; show the
+       current language. */
+    if (on) on.parentNode.scrollIntoView({ block: 'nearest' });
+  }
+  function closeLang(returnFocus) {
+    if (!langOpen()) return;
+    langList.hidden = true;
+    picker.classList.remove('is-open');
+    langBtn.setAttribute('aria-expanded', 'false');
+    if (returnFocus) langBtn.focus();
+  }
+  if (langBtn && langList) {
+    langBtn.addEventListener('click', function () { if (langOpen()) closeLang(false); else openLang(); });
+    /* The row about to be picked is fetched ahead, so the swap is instant. */
+    const warm = function (e) {
+      const input = e.target.closest && e.target.closest('.lang-opt');
+      const radio = input && input.querySelector('input');
+      if (radio && window.jjLangPrefetch) window.jjLangPrefetch(radio.value);
+    };
+    langList.addEventListener('pointerenter', warm, true);
+    langList.addEventListener('focusin', warm);
+    langList.addEventListener('keydown', function (e) {
+      if (e.key.indexOf('Arrow') === 0) arrowing = true;
+      /* Enter confirms the row in focus (a radio only answers Space). */
+      else if (e.key === 'Enter' && e.target.type === 'radio') {
+        e.preventDefault();
+        if (!e.target.checked) e.target.click();
+        closeLang(true);
+      }
+    });
+    langList.addEventListener('keyup', function () { arrowing = false; });
+    document.addEventListener('jj:langchange', sync);
+  }
 
   function track(setting, value) {
     if (window.umami && typeof window.umami.track === 'function') {
@@ -142,6 +197,9 @@ window.addEventListener('resize', movePillIndicator);
     if (el.name === 'jj-lang') {
       if (window.jjSetLang) window.jjSetLang(el.value);
       track('lang', el.value);
+      /* A click or Space picks and closes; arrowing through the rows
+         only previews each one. */
+      if (!arrowing) closeLang(true);
     } else if (el.name === 'jj-textsize') {
       prefs.set('textsize', el.value);
       track('textsize', el.value);
@@ -152,6 +210,7 @@ window.addEventListener('resize', movePillIndicator);
      (the chosen one), which is how radio groups take focus. */
   function stops() {
     return Array.prototype.filter.call(panel.querySelectorAll('button, input'), function (el) {
+      if (el.closest('[hidden]')) return false;   /* the closed language list */
       return el.type !== 'radio' || el.checked;
     });
   }
@@ -180,7 +239,7 @@ window.addEventListener('resize', movePillIndicator);
     panel.hidden = false;
     btn.setAttribute('aria-expanded', 'true');
     wrap.classList.add('is-open');
-    const first = panel.querySelector('input:checked') || stops()[0];
+    const first = langBtn || stops()[0];
     if (first) first.focus();
   }
   function close(returnFocus) {
@@ -192,6 +251,7 @@ window.addEventListener('resize', movePillIndicator);
     closeTimer = setTimeout(finishClose, 400);
     btn.setAttribute('aria-expanded', 'false');
     wrap.classList.remove('is-open');
+    closeLang(false);
     if (returnFocus) btn.focus();
   }
 
@@ -202,7 +262,8 @@ window.addEventListener('resize', movePillIndicator);
     if (!isOpen()) return;
     if (e.key === 'Escape') {
       e.preventDefault();
-      close(true);
+      /* Escape closes the language list first, then the panel. */
+      if (langOpen()) closeLang(true); else close(true);
       return;
     }
     if (e.key !== 'Tab') return;
@@ -218,6 +279,7 @@ window.addEventListener('resize', movePillIndicator);
   /* A click or tap anywhere else closes it. */
   document.addEventListener('pointerdown', function (e) {
     if (isOpen() && !wrap.contains(e.target)) close(false);
+    else if (langOpen() && !picker.contains(e.target)) closeLang(false);
   });
 })();
 
@@ -420,7 +482,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
     link.addEventListener('mouseenter', (e) => {
       clearTimeout(tipTimer);
       tipTimer = setTimeout(() => {
-        tip.textContent = ((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Ir para ' : 'Go to ') + host;
+        tip.textContent = jjText('Go to {site}', 'Ir para {site}').replace('{site}', host);
         tip.classList.add('visible');
         tip.style.left = (e.clientX - tip.offsetWidth / 2) + 'px';
         tip.style.top  = (e.clientY - 44) + 'px';
@@ -468,7 +530,7 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
         /* Cards can name their action on the ball, e.g. "View case study". */
         const label = !isTestimonial && !isImage ? card.dataset.cursorLabel : '';
         ball.classList.toggle('is-labelled', !!label);
-        ballLabel.textContent = label || ((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Ver LinkedIn' : 'View LinkedIn');
+        ballLabel.textContent = label || jjText('View LinkedIn', 'Ver LinkedIn');
         if (!isTestimonial && !isImage) {
           /* Replay the arrow nudge when entering a case card. */
           const arrow = ball.querySelector('.cursor-ball-arrow');

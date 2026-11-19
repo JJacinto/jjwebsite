@@ -3,6 +3,7 @@ import '../styles/global.css';
 import { versioned } from '../lib/script-url';
 import Footer from '../components/Footer.astro';
 import XraySwitch from '../components/XraySwitch.astro';
+import { LANGUAGES } from '../i18n/languages.mjs';
 
 interface Props {
   title?: string;
@@ -134,6 +135,22 @@ const ldEscape = (g: unknown) => JSON.stringify(g).replace(/</g, '\\u003c');
 const umamiSrc = import.meta.env.PUBLIC_UMAMI_SCRIPT_URL;
 const umamiId  = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID;
 const umamiOn  = !!(umamiSrc && umamiId);
+
+/* The language registry, handed to the inline scripts as window.jjLangs
+   (language script, settings menu). Only what the browser needs. */
+const jjLangs = LANGUAGES.map(({ code, htmlLang, label, short }) => ({ code, htmlLang, label, short }));
+
+/* Flags for the language picker, drawn in a 36x26 box like the first two
+   were. Plain shapes, no gradients, so they stay crisp at 18px wide. */
+const FLAGS: Record<string, string> = {
+  en: '<path fill="#b22234" d="M0 0h36v26H0z"/><path stroke="#fff" stroke-width="2" d="M0 3h36M0 7h36M0 11h36M0 15h36M0 19h36M0 23h36"/><path fill="#3c3b6e" d="M0 0h14.4v14H0z"/><path stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-dasharray="0 2.4" d="M2 2.2h10M2 5.4h10M2 8.6h10M2 11.8h10"/>',
+  pt: '<path fill="#da291c" d="M0 0h36v26H0z"/><path fill="#046a38" d="M0 0h14.4v26H0z"/><circle cx="14.4" cy="13" r="5.2" fill="#ffe000"/><path fill="#da291c" d="M11.8 10h5.2v3.8a2.6 2.6 0 0 1-5.2 0z"/><path fill="#fff" d="M13 11.2h2.8v2.5a1.4 1.4 0 0 1-2.8 0z"/>',
+  es: '<path fill="#aa151b" d="M0 0h36v26H0z"/><path fill="#f1bf00" d="M0 6.5h36v13H0z"/>',
+  fr: '<path fill="#0055a4" d="M0 0h12v26H0z"/><path fill="#fff" d="M12 0h12v26H12z"/><path fill="#ef4135" d="M24 0h12v26H24z"/>',
+  de: '<path fill="#000" d="M0 0h36v8.67H0z"/><path fill="#dd0000" d="M0 8.67h36v8.66H0z"/><path fill="#ffce00" d="M0 17.33h36V26H0z"/>',
+  zh: '<path fill="#de2910" d="M0 0h36v26H0z"/><path fill="#ffde00" d="M6 2.9L6.81 5.39H9.42L7.31 6.92L8.12 9.41L6 7.88L3.88 9.41L4.69 6.92L2.58 5.39H5.19ZM10.99 3.25L11.54 2.58L11.07 1.85L11.88 2.16L12.43 1.48L12.38 2.35L13.2 2.66L12.36 2.89L12.31 3.76L11.84 3.03ZM12.81 5.56L13.6 5.18L13.48 4.32L14.08 4.95L14.87 4.57L14.45 5.34L15.06 5.97L14.2 5.81L13.79 6.58L13.67 5.72ZM12.85 8.64L13.73 8.63L13.99 7.8L14.27 8.63L15.14 8.62L14.44 9.14L14.72 9.96L14.01 9.46L13.31 9.98L13.57 9.15ZM11.1 11.01L11.9 11.35L12.48 10.7L12.39 11.57L13.19 11.91L12.34 12.1L12.26 12.97L11.82 12.22L10.97 12.41L11.54 11.76Z"/>',
+  ja: '<path fill="#fff" d="M0 0h36v26H0z"/><circle cx="18" cy="13" r="7.8" fill="#bc002d"/>',
+};
 ---
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -176,16 +193,18 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/hanken-grotesk-900-latin.woff2" as="font" type="font/woff2" crossorigin>
 
+<script is:inline define:vars={{ jjLangs }}>window.jjLangs = jjLangs;</script>
+
 <!-- Settings bootstrap — runs before paint so nothing flashes.
      The visitor's choices come from the settings menu in the nav and
      are saved in localStorage:
-       lang      "pt" | "en"                  (default: en)
+       lang      a code from src/i18n/languages.mjs (default: en)
        textsize  "115" | "130"                (default: 100)
      The site is dark only: data-theme="dark" is fixed on <html>.
      Contrast and motion have no control in the menu; they follow the
      visitor's system settings.
      What ends up on <html>:
-       lang="pt-PT"            Portuguese copy (see the language script below)
+       lang="pt-PT"            the page's language (see the language script below)
        data-contrast="high"    high-contrast colours (global.css)
        data-motion="reduce"    low motion: no animations, no custom cursor or
                                card tilt; CSS and the canvas scripts read this
@@ -264,46 +283,74 @@ const umamiOn  = !!(umamiSrc && umamiId);
     }
   }
 
-  /* Which language does this visitor want? "pt", "en", or null when they
-     have not chosen. The one place that decides it. */
-  function wantedLanguage() {
-    try {
-      var saved = localStorage.getItem('lang');
-      return saved === 'pt' || saved === 'en' ? saved : null;
-    } catch (_) { return null; }
+  /* The site's languages (window.jjLangs, from src/i18n/languages.mjs):
+     [{ code, htmlLang, label, short }], English first. Nothing below
+     names a language: add one to the registry and it works here. */
+  var LANGS = window.jjLangs || [{ code: 'en', htmlLang: 'en-US', label: 'English', short: 'EN' }];
+  function known(code) {
+    for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === code) return code;
+    return null;
   }
-
-  /* With no choice saved (a first visit), the browser's guess: go down
-     its list of preferred languages and take the first that is English
-     or Portuguese. The guess is not saved, so only a choice made in the
-     settings menu sticks. */
-  function browserLanguage() {
-    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
-    for (var li = 0; li < list.length; li++) {
-      var code = String(list[li]).toLowerCase().slice(0, 2);
-      if (code === 'pt' || code === 'en') return code;
+  /* The code for an <html lang> value, by its first subtag: pt-PT -> pt,
+     zh-Hans -> zh. Anything unknown counts as English. */
+  function codeOfLang(htmlLang) {
+    var first = String(htmlLang || '').toLowerCase().split('-')[0];
+    for (var i = 0; i < LANGS.length; i++) {
+      if (LANGS[i].htmlLang.toLowerCase().split('-')[0] === first) return LANGS[i].code;
     }
     return 'en';
   }
 
-  /* URL of this page in the other language: EN /x/ <-> PT /pt/x/. Keeps
+  /* Which language does this visitor want? A code, or null when they
+     have not chosen. The one place that decides it. */
+  function wantedLanguage() {
+    try { return known(localStorage.getItem('lang')); } catch (_) { return null; }
+  }
+
+  /* With no choice saved (a first visit), the browser's guess: go down
+     its list of preferred languages and take the first the site has. The
+     guess is not saved, so only a choice made in the settings menu sticks. */
+  function browserLanguage() {
+    var list = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+    for (var li = 0; li < list.length; li++) {
+      var code = known(String(list[li]).toLowerCase().slice(0, 2));
+      if (code) return code;
+    }
+    return 'en';
+  }
+
+  /* Path with any language prefix taken off: /pt/x/ -> /x/, /pt -> /. */
+  function stripLang(path) {
+    var m = /^\/([a-z]{2})(?=\/|$)/.exec(path);
+    if (m && m[1] !== 'en' && known(m[1])) path = path.slice(m[0].length) || '/';
+    return path;
+  }
+  /* The same path in another language: English has no prefix. */
+  window.jjLangPath = function (path, lang) {
+    path = stripLang(path);
+    return lang === 'en' ? path : '/' + lang + (path === '/' ? '/' : path);
+  };
+
+  /* URL of this page in another language: EN /x/ <-> PT /pt/x/. Keeps
      the query and the hash. */
   window.jjLangUrl = function (lang) {
-    var path = location.pathname.replace(/^\/pt(?=\/|$)/, '') || '/';
-    if (lang === 'pt') path = '/pt' + (path === '/' ? '/' : path);
-    return path + location.search + location.hash;
+    return window.jjLangPath(location.pathname, lang) + location.search + location.hash;
   };
 
   var wanted = wantedLanguage();
-  if (root.dataset.langMode === 'url') {
-    /* Built pages: the URL says the language. A saved choice that differs
-       sends the visitor to the same page in that language. The browser's
-       guess does not: a link to a page in one language opens in that
-       language, for visitors and for search engines alike. */
-    var pageLang = (root.lang || 'en').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en';
-    if (wanted && wanted !== pageLang) location.replace(window.jjLangUrl(wanted));
-  } else if ((wanted || browserLanguage()) === 'pt') {
-    root.lang = 'pt-PT';
+  /* A page with no data-lang-mode is a raw dev page: it behaves like url
+     mode. Error pages ("fetch") keep their URL, so they cannot redirect;
+     the language script swaps their copy in place, and a first-time
+     visitor gets the browser's guess there. */
+  if (root.dataset.langMode === 'fetch') {
+    window.jjLangWanted = wanted || browserLanguage();
+  } else {
+    /* The URL says the language. A saved choice that differs sends the
+       visitor to the same page in that language. The browser's guess does
+       not: a link to a page in one language opens in that language, for
+       visitors and for search engines alike. */
+    window.jjLangWanted = wanted;
+    if (wanted && wanted !== codeOfLang(root.lang)) location.replace(window.jjLangUrl(wanted));
   }
   apply();
 
@@ -389,7 +436,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
       <div class="settings" id="settings">
         <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="settingsPanel" aria-label="Settings: language and text size" data-pt-aria-label="Definições: idioma e tamanho do texto" data-umami-event="settings-open">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="settings-ico-track settings-ico-track--a" d="M4 8h16"/><path class="settings-ico-track settings-ico-track--b" d="M4 16h16"/><circle class="settings-ico-knob settings-ico-knob--a" cx="16" cy="8" r="2.5"/><circle class="settings-ico-knob settings-ico-knob--b" cx="8" cy="16" r="2.5"/></svg>
-          <span class="settings-btn-lang" aria-hidden="true" data-pt="PT">EN</span>
+          <span class="settings-btn-lang" aria-hidden="true" data-lang-short>EN</span>
         </button>
         <div class="settings-panel" id="settingsPanel" role="dialog" aria-labelledby="settingsTitle" hidden>
           <div class="settings-head">
@@ -401,9 +448,24 @@ const umamiOn  = !!(umamiSrc && umamiId);
 
           <fieldset class="settings-group">
             <legend data-pt="Idioma">Language</legend>
-            <div class="settings-seg">
-              <label><input type="radio" name="jj-lang" value="en"><span lang="en"><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true"><path fill="#012169" d="M0 0h36v26H0z"/><path stroke="#fff" stroke-width="5" d="M0 0l36 26M36 0L0 26"/><path stroke="#c8102e" stroke-width="2" d="M0 0l36 26M36 0L0 26"/><path stroke="#fff" stroke-width="9" d="M18 0v26M0 13h36"/><path stroke="#c8102e" stroke-width="5" d="M18 0v26M0 13h36"/></svg>English</span></label>
-              <label><input type="radio" name="jj-lang" value="pt"><span lang="pt-PT"><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true"><path fill="#da291c" d="M0 0h36v26H0z"/><path fill="#046a38" d="M0 0h14.4v26H0z"/><circle cx="14.4" cy="13" r="5.2" fill="#ffe000"/><path fill="#da291c" d="M11.8 10h5.2v3.8a2.6 2.6 0 0 1-5.2 0z"/><path fill="#fff" d="M13 11.2h2.8v2.5a1.4 1.4 0 0 1-2.8 0z"/></svg>Português</span></label>
+            {/* A dropdown that opens inside the panel (the panel scrolls, so
+                a floating list would be clipped). The rows are real radios
+                named jj-lang, so nav.js and the arrow keys work as they did
+                with the two-option control. The button shows the language
+                in use; the language script fills it (syncPicker). */}
+            <div class="lang-picker" id="langPicker">
+              <button class="lang-picker-btn" id="langBtn" type="button" aria-expanded="false" aria-controls="langList">
+                <span class="lang-picker-cur"><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true" set:html={FLAGS.en} /><span class="lang-picker-name" lang={LANGUAGES[0].htmlLang}>{LANGUAGES[0].label}</span></span>
+                <svg class="lang-picker-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </button>
+              <div class="lang-picker-list" id="langList" role="radiogroup" aria-label="Language" data-pt-aria-label="Idioma" hidden>
+                {LANGUAGES.map((l) => (
+                  <label class="lang-opt">
+                    <input type="radio" name="jj-lang" value={l.code}>
+                    <span class="lang-opt-row" lang={l.htmlLang}><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true" set:html={FLAGS[l.code]} /><span class="lang-opt-name">{l.label}</span><svg class="lang-opt-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                  </label>
+                ))}
+              </div>
             </div>
           </fieldset>
 
@@ -530,25 +592,131 @@ const umamiOn  = !!(umamiSrc && umamiId);
 {import.meta.env.DEV && <div id="retune-root"></div>}
 
 <script is:inline>
-/* Language switch (EN/PT).
-   The visitor picks the language in the settings menu in the nav.
-   Copy is English in the markup. An element opts in to Portuguese with
-   data-pt="…" (replaces its inner HTML) or data-pt-<attribute>="…"
-   (replaces that attribute, e.g. data-pt-aria-label). Anything without
-   one stays in English. The choice is saved in localStorage ("lang") and
-   read again in <head> on every page. This runs before the deferred
-   scripts, so nav.js measures the nav with the final labels.
-   Other scripts can read window.jjLang() ("en" or "pt"), listen for
-   "jj:langchange" on document, and call window.jjLangRefresh(el) for
-   markup they add later. */
+/* Language switch.
+   The visitor picks the language in the settings menu in the nav and the
+   page changes in place, with no reload: this script fetches the page in
+   the new language, and swaps its text, attributes and links into the one
+   on screen.
+
+   Every built page carries all of it: the elements whose text or
+   attributes differ by language are stamped data-i18n="tN" (the same id
+   in every language), data-i18n-t="" when their inner HTML is language
+   dependent and data-i18n-a="aria-label title …" for attributes. A few
+   fixed ids cover <html lang>, the canonical link, og:url and og:locale,
+   and the settings button's short code (data-lang-short).
+   In `astro dev` the English page is raw (data-pt in the source, nothing
+   stamped), so stamp() applies the build's rule to a document itself,
+   live or fetched. Same code path in dev and production.
+
+   Markup that scripts add later (the compose modal) is not stamped. It
+   keeps the old way: English with data-pt="…" / data-pt-<attr>="…",
+   registered here and refreshed with window.jjLangRefresh(container).
+   Other languages read window.jjUi, a { english: translation } table
+   from the #jj-ui JSON block in the page, keyed by keyOf(english).
+
+   Other scripts can use:
+     window.jjLang()            the code of the page's language ("en", "pt", …)
+     window.jjT(en, pt)         the text a script writes itself, in that language
+     window.jjLangRefresh(el)   after adding markup with data-pt
+     window.jjLangPrefetch(c)   warm the cache for a language
+     document "jj:langchange"   { lang } once the swap is done.
+   This runs before the deferred scripts, so nav.js measures the nav with
+   the final labels. */
 (function () {
   var root = document.documentElement;
-  var ATTR = 'data-pt-';
+  var LANGS = window.jjLangs || [{ code: 'en', htmlLang: 'en-US', label: 'English', short: 'EN' }];
+  var PFX = 'data-pt-';
+  window.jjUi = {};
+
+  function byCode(code) {
+    for (var i = 0; i < LANGS.length; i++) if (LANGS[i].code === code) return LANGS[i];
+    return null;
+  }
+  function codeOfLang(htmlLang) {
+    var first = String(htmlLang || '').toLowerCase().split('-')[0];
+    for (var i = 0; i < LANGS.length; i++) {
+      if (LANGS[i].htmlLang.toLowerCase().split('-')[0] === first) return LANGS[i].code;
+    }
+    return 'en';
+  }
+  function current() { return codeOfLang(root.lang); }
+  /* The dictionary key for an English string (same as keyOf() in
+     src/i18n/languages.mjs): whitespace collapsed and trimmed. */
+  function keyOf(s) { return String(s).replace(/\s+/g, ' ').trim(); }
+  function mode() { return root.dataset.langMode === 'fetch' ? 'fetch' : 'url'; }
+
+  /* ---------- stamping ---------- */
+
+  /* Give every element that has data-pt or data-pt-<attr> an id and a
+     list of what differs, in document order, the way the build does (the
+     ids must be the same in a live page and a fetched one). Works on a
+     DOMParser document. A page that is already stamped is left alone. */
+  function stamp(doc) {
+    if (doc.querySelector('[data-i18n]')) return;
+    var n = 0;
+    function walk(scope) {
+      var els = scope.querySelectorAll('*');
+      for (var i = 0; i < els.length; i++) {
+        var el = els[i], names = [];
+        for (var j = 0; j < el.attributes.length; j++) {
+          var an = el.attributes[j].name;
+          if (an.indexOf(PFX) === 0) names.push(an.slice(PFX.length));
+        }
+        var text = el.hasAttribute('data-pt');
+        if (text || names.length) {
+          el.setAttribute('data-i18n', 't' + n++);
+          if (text) el.setAttribute('data-i18n-t', '');
+          if (names.length) el.setAttribute('data-i18n-a', names.join(' '));
+        }
+        if (el.tagName === 'TEMPLATE' && el.content) walk(el.content);
+      }
+    }
+    walk(doc);
+    function fixed(el, id, attr) {
+      if (!el) return;
+      el.setAttribute('data-i18n', id);
+      if (attr) el.setAttribute('data-i18n-a', attr); else el.setAttribute('data-i18n-t', '');
+    }
+    fixed(doc.documentElement, 'html', 'lang');
+    fixed(doc.querySelector('link[rel="canonical"]'), 'canonical', 'href');
+    fixed(doc.querySelector('meta[property="og:url"]'), 'ogurl', 'content');
+    fixed(doc.querySelector('meta[property="og:locale"]'), 'oglocale', 'content');
+    fixed(doc.querySelector('[data-lang-short]'), 'short', '');
+  }
+  stamp(document);
+
+  /* ---------- text that scripts write ---------- */
+
+  function readUi(doc) {
+    var el = doc.getElementById('jj-ui'), out = {};
+    if (el) { try { out = JSON.parse(el.textContent) || {}; } catch (_) {} }
+    return out;
+  }
+  window.jjUi = readUi(document);
+
+  function trans(en, lang) {
+    if (lang === 'en') return en;
+    var v = window.jjUi && window.jjUi[keyOf(en)];
+    if (!v) return en;
+    /* The key ignores the spaces around the text ("Date: "); keep them. */
+    return /^\s*/.exec(en)[0] + String(v).replace(/^\s+|\s+$/g, '') + /\s*$/.exec(en)[0];
+  }
+  /* The text a script writes itself: English, Portuguese (written beside
+     it), or the translation from the page's jj-ui table. */
+  window.jjT = function (en, pt) {
+    var lang = current();
+    if (lang === 'pt') return pt === undefined ? en : pt;
+    return trans(en, lang);
+  };
+
+  /* ---------- markup that scripts add later ---------- */
+
   var texts = [];   /* [el, enHTML, ptHTML] */
   var attrs = [];   /* [el, name, enValue, ptValue] */
 
-  /* Record the English and Portuguese versions of every opted-in
-     element under scope. Elements already recorded are skipped. */
+  /* Record the English and Portuguese versions of every opted-in element
+     under scope that the build did not stamp. Elements already recorded
+     are skipped. */
   function register(scope) {
     var found = { texts: [], attrs: [] };
     var els = Array.prototype.slice.call(scope.querySelectorAll('*'));
@@ -556,11 +724,15 @@ const umamiOn  = !!(umamiSrc && umamiId);
     els.forEach(function (el) {
       if (el.__jjLang) return;
       el.__jjLang = true;
+      /* Stamped (a carrier itself, or inside a text carrier whose HTML the
+         swap replaces): the swap handles it. <html> is stamped too, but
+         only for its lang attribute, so it does not count as a parent. */
+      if (el.hasAttribute('data-i18n') || (el.closest && el.closest('[data-i18n-t]'))) return;
       if (el.hasAttribute('data-pt')) found.texts.push([el, el.innerHTML, el.getAttribute('data-pt')]);
       for (var i = 0; i < el.attributes.length; i++) {
         var a = el.attributes[i];
-        if (a.name.indexOf(ATTR) === 0) {
-          var name = a.name.slice(ATTR.length);
+        if (a.name.indexOf(PFX) === 0) {
+          var name = a.name.slice(PFX.length);
           found.attrs.push([el, name, el.getAttribute(name), a.value]);
         }
       }
@@ -571,24 +743,193 @@ const umamiOn  = !!(umamiSrc && umamiId);
   }
   register(document);
 
-  function current() { return (root.lang || 'en').toLowerCase().indexOf('pt') === 0 ? 'pt' : 'en'; }
-
-  function apply(lang, only) {
-    var pt = lang === 'pt';
-    root.lang = pt ? 'pt-PT' : 'en';
-    (only ? only.texts : texts).forEach(function (t) {
-      t[0].innerHTML = pt ? t[2] : t[1];
+  function applyRuntime(lang, only) {
+    var t = only ? only.texts : texts, a = only ? only.attrs : attrs;
+    if (!only) {
+      /* Drop what the page no longer holds (a swap can replace a
+         container's contents). */
+      texts = t = t.filter(function (x) { return x[0].isConnected; });
+      attrs = a = a.filter(function (x) { return x[0].isConnected; });
+    }
+    t.forEach(function (x) {
+      x[0].innerHTML = lang === 'en' ? x[1] : lang === 'pt' ? x[2] : trans(x[1], lang);
       /* text-hover.js splits some labels into per-character spans;
          have it redo the split on the new text. */
-      if (t[0].dataset.scDone) {
-        delete t[0].dataset.scDone;
-        if (window.jjWrapChars) window.jjWrapChars(t[0]);
+      if (x[0].dataset.scDone) {
+        delete x[0].dataset.scDone;
+        if (window.jjWrapChars) window.jjWrapChars(x[0]);
       }
     });
-    (only ? only.attrs : attrs).forEach(function (a) {
-      var v = pt ? a[3] : a[2];
-      if (v === null) a[0].removeAttribute(a[1]); else a[0].setAttribute(a[1], v);
+    a.forEach(function (x) {
+      var v = lang === 'en' ? x[2] : lang === 'pt' ? x[3] : (x[2] === null ? null : trans(x[2], lang));
+      if (v === null) x[0].removeAttribute(x[1]); else x[0].setAttribute(x[1], v);
     });
+  }
+
+  /* ---------- the swap ---------- */
+
+  var docs = {};        /* lang + path -> Promise of a parsed, stamped document */
+  var token = 0;        /* the latest pick wins */
+
+  function pageUrl(lang) {
+    if (mode() === 'fetch') {
+      var src = root.getAttribute('data-lang-src') || '/';
+      return lang === 'en' ? src : '/' + lang + src;
+    }
+    return window.jjLangPath(location.pathname, lang) + location.search;
+  }
+  function fetchDoc(lang) {
+    var url = pageUrl(lang), key = lang + '|' + url;
+    if (!docs[key]) {
+      docs[key] = fetch(url, { credentials: 'same-origin' }).then(function (res) {
+        if (!res.ok) throw new Error('status ' + res.status);
+        return res.text();
+      }).then(function (html) {
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+        stamp(doc);
+        return doc;
+      });
+      docs[key].catch(function () { delete docs[key]; });
+    }
+    return docs[key];
+  }
+  window.jjLangPrefetch = function (lang) {
+    if (!byCode(lang) || lang === current()) return;
+    fetchDoc(lang).catch(function () {});
+  };
+
+  /* Links that stay on the site follow the language: /about -> /de/about. */
+  function relink(lang) {
+    var links = document.querySelectorAll('a[href]');
+    for (var i = 0; i < links.length; i++) {
+      var h = links[i].getAttribute('href');
+      if (h.charAt(0) !== '/' || h.charAt(1) === '/') continue;
+      var m = /^([^?#]*)(.*)$/.exec(h), path = m[1];
+      var segs = path.split('/').filter(Boolean);
+      if (segs.length && segs[segs.length - 1].indexOf('.') > -1) continue;
+      var next = window.jjLangPath(path, lang) + m[2];
+      if (next !== h) links[i].setAttribute('href', next);
+    }
+  }
+
+  /* The settings button shows the code, the picker the name and flag. */
+  function syncPicker(lang) {
+    var info = byCode(lang) || LANGS[0];
+    var shorts = document.querySelectorAll('[data-lang-short]');
+    for (var i = 0; i < shorts.length; i++) shorts[i].textContent = info.short;
+    var radio = document.querySelector('input[name="jj-lang"][value="' + info.code + '"]');
+    if (radio) radio.checked = true;
+    var cur = document.querySelector('.lang-picker-cur');
+    if (cur && radio) {
+      var row = radio.nextElementSibling;
+      var flag = row && row.querySelector('.settings-flag');
+      var oldFlag = cur.querySelector('.settings-flag');
+      if (flag && oldFlag) oldFlag.innerHTML = flag.innerHTML;
+      var name = cur.querySelector('.lang-picker-name');
+      if (name) { name.textContent = info.label; name.setAttribute('lang', info.htmlLang); }
+    }
+  }
+  window.jjLangPickerSync = function () { syncPicker(current()); };
+
+  /* Copy one language's page onto the live one. */
+  function applyDoc(doc, lang) {
+    var byId = {};
+    var theirs = doc.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < theirs.length; i++) byId[theirs[i].getAttribute('data-i18n')] = theirs[i];
+
+    var ours = Array.prototype.slice.call(document.querySelectorAll('[data-i18n]'));
+    ours.forEach(function (el) {
+      if (!el.isConnected) return;     /* inside text that was just replaced */
+      var src = byId[el.getAttribute('data-i18n')];
+      if (!src) return;
+      (src.getAttribute('data-i18n-a') || '').split(' ').forEach(function (n) {
+        if (!n) return;
+        var v = src.getAttribute(n);
+        if (v === null) el.removeAttribute(n);
+        else if (el.getAttribute(n) !== v) el.setAttribute(n, v);
+      });
+      if (src.hasAttribute('data-i18n-t')) {
+        var tag = el.tagName;
+        if (tag === 'SCRIPT' || tag === 'TITLE') {
+          if (el.textContent !== src.textContent) el.textContent = src.textContent;
+        } else if (el.innerHTML !== src.innerHTML) {
+          el.innerHTML = src.innerHTML;
+          /* text-hover.js's per-character split went with the old text. */
+          if (el.dataset.scDone) {
+            delete el.dataset.scDone;
+            if (window.jjWrapChars) window.jjWrapChars(el);
+          }
+        }
+      }
+    });
+    root.lang = (byCode(lang) || LANGS[0]).htmlLang;
+    window.jjUi = readUi(doc);
+    relink(lang);
+    applyRuntime(lang);
+    syncPicker(lang);
+  }
+
+  /* The first stamped text element on screen, and where it sits, so the
+     page can be put back where the visitor was reading. */
+  function anchor() {
+    var els = document.querySelectorAll('[data-i18n-t]');
+    for (var i = 0; i < els.length; i++) {
+      var r = els[i].getBoundingClientRect();
+      if (r.height > 0 && r.width > 0 && r.top >= 0 && r.top < window.innerHeight) {
+        return { id: els[i].getAttribute('data-i18n'), top: r.top };
+      }
+    }
+    return null;
+  }
+  function restore(a) {
+    if (!a) return;
+    var el = document.querySelector('[data-i18n="' + a.id + '"]');
+    if (!el) return;
+    var d = el.getBoundingClientRect().top - a.top;
+    /* "instant" beats any scroll-behavior: smooth on the page. */
+    if (Math.abs(d) > 1) window.scrollTo({ top: window.scrollY + d, left: window.scrollX, behavior: 'instant' });
+  }
+
+  /* opts.boot: an error page showing its language on load, with no
+     transition and no scroll to keep. */
+  function switchTo(lang, opts) {
+    var boot = !!(opts && opts.boot);
+    var my = ++token;
+    fetchDoc(lang).then(function (doc) {
+      if (my !== token) return;
+      function update() {
+        var a = boot ? null : anchor();
+        applyDoc(doc, lang);
+        if (mode() === 'url') {
+          try { history.replaceState(history.state, '', window.jjLangUrl(lang)); } catch (_) {}
+        }
+        /* Label widths changed: let nav.js re-place the pill indicator. */
+        window.dispatchEvent(new Event('resize'));
+        document.dispatchEvent(new CustomEvent('jj:langchange', { detail: { lang: lang } }));
+        restore(a);
+      }
+      var motion = window.jjPrefs && window.jjPrefs.effective().motion;
+      if (!boot && document.startViewTransition && motion !== 'reduce') {
+        /* A short crossfade of the whole page (timing in global.css). */
+        root.classList.add('jj-lang-swap');
+        var vt = null;
+        try { vt = document.startViewTransition(update); } catch (_) {}
+        if (vt) {
+          var clear = function () { root.classList.remove('jj-lang-swap'); };
+          vt.finished.then(clear, clear);
+          vt.ready.catch(function () {});
+          vt.updateCallbackDone.catch(function () { fail(lang); });
+          return;
+        }
+        root.classList.remove('jj-lang-swap');
+      }
+      update();
+    }).catch(function () { if (my === token) fail(lang); });
+  }
+  /* No page to swap in (offline, missing): the old way, a full load.
+     Error pages have no other URL to go to, so they stay as they are. */
+  function fail(lang) {
+    if (mode() === 'url') location.assign(window.jjLangUrl(lang));
   }
 
   window.jjLang = current;
@@ -596,23 +937,24 @@ const umamiOn  = !!(umamiSrc && umamiId);
      window.jjLangRefresh(container) once it is in the page. */
   window.jjLangRefresh = function (scope) {
     var found = register(scope || document);
-    if (current() === 'pt') apply('pt', found);
+    var lang = current();
+    if (lang !== 'en') applyRuntime(lang, found);
   };
   window.jjSetLang = function (lang) {
-    lang = lang === 'pt' ? 'pt' : 'en';
-    if (lang === current()) return;
+    if (!byCode(lang)) return;
     try { localStorage.setItem('lang', lang); } catch (_) {}
-    if (root.dataset.langMode === 'url') { location.assign(window.jjLangUrl(lang)); return; }
-    apply(lang);
-    /* Label widths changed: let nav.js re-place the pill indicator. */
-    window.dispatchEvent(new Event('resize'));
-    document.dispatchEvent(new CustomEvent('jj:langchange', { detail: { lang: lang } }));
+    if (lang === current()) { token++; syncPicker(lang); return; }
+    switchTo(lang, null);
   };
 
-  /* The language is picked in the settings menu (nav.js), which calls
-     window.jjSetLang. */
+  syncPicker(current());
 
-  if (current() === 'pt') apply('pt');
+  /* An error page keeps its URL, so it cannot be sent to /pt/…: it
+     shows the language the visitor wants right away. (Pages in url mode
+     were already redirected by the script in <head>.) */
+  if (mode() === 'fetch' && window.jjLangWanted && window.jjLangWanted !== current()) {
+    switchTo(window.jjLangWanted, { boot: true });
+  }
 })();
 </script>
 

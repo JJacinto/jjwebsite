@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
-import ptPages from './integrations/pt-pages.mjs';
+import i18nPages from './integrations/i18n-pages.mjs';
 
 /* React is only needed in dev to mount the Retune visual-editing
    overlay. Skip the integration in prod so the production bundle
@@ -19,9 +19,10 @@ export default defineConfig({
         !page.includes('/reshaping-an-ai-training-platform') &&
         !/\/(403|404|500|error)\/?$/.test(page),
     }),
-    /* Real Portuguese pages under /pt/. Must stay after sitemap(): it edits
+    /* Every language at real URLs (/pt/, /es/, …) plus the stamps the browser
+       needs to switch language in place. Must stay after sitemap(): it edits
        the sitemap file that sitemap() writes. */
-    ptPages(),
+    i18nPages(),
   ],
   outDir: './dist',
   redirects: {

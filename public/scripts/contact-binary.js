@@ -52,7 +52,8 @@
   function reduced() {
     return !!(mq && mq.matches) || document.documentElement.getAttribute('data-motion') === 'reduce';
   }
-  function isPt() { return !!(window.jjLang && window.jjLang() === 'pt'); }
+  /* Text this script writes, in the page's language (window.jjT, Base.astro). */
+  function T(en, pt) { return window.jjT ? window.jjT(en, pt) : en; }
 
   var col = { dot: '240,237,232', accent: '128,128,240' };
   var W = 0, H = 0, K = 1;
@@ -114,16 +115,19 @@
   }
 
   /* ---------- read-out ---------- */
+  /* Two decimals, with the page language's decimal mark (1,25 in Portuguese). */
   function au(px) {
-    var s = (px / 1000).toFixed(2);
-    return isPt() ? s.replace('.', ',') : s;
+    var v = px / 1000;
+    try {
+      return v.toLocaleString(document.documentElement.lang || 'en', { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: false });
+    } catch (_) { return v.toFixed(2); }
   }
   function renderReadout() {
     if (!readout) return;
-    var pt = isPt(), txt;
-    if (mode === 'merged') txt = pt ? 'FUNDIDOS · SINAL ENVIADO' : 'MERGED · SIGNAL SENT';
-    else if (mode === 'inspiral') txt = (pt ? 'ESPIRAL ' : 'INSPIRAL ') + au(inspiral) + (pt ? ' UA' : ' AU');
-    else txt = (pt ? 'SEPARAÇÃO ' : 'SEPARATION ') + au(dist) + (pt ? ' UA' : ' AU');
+    var txt;
+    if (mode === 'merged') txt = T('MERGED · SIGNAL SENT', 'FUNDIDOS · SINAL ENVIADO');
+    else if (mode === 'inspiral') txt = T('INSPIRAL {n} AU', 'ESPIRAL {n} UA').replace('{n}', au(inspiral));
+    else txt = T('SEPARATION {n} AU', 'SEPARAÇÃO {n} UA').replace('{n}', au(dist));
     if (txt !== shownText) { shownText = txt; readout.textContent = txt; }
     readout.classList.toggle('is-sent', mode === 'merged');
   }
@@ -255,7 +259,7 @@
     } else { stream.length = 0; }
 
     if (flash > 0) glow(c.x, c.y, 120 + 260 * (1 - flash), Math.min(1, 0.75 * flash * FLASH), col.accent);
-    var you = isPt() ? 'tu' : 'you';
+    var you = T('you', 'tu');
     ctx = ctxTop;
     body(J.x, J.y, (merged ? 6.5 : 4.5) * SIZE, aJ, col.accent, merged ? '' : 'João');
     if (Y) body(Y.x, Y.y, 3.6 * SIZE, aY, col.dot, send ? '' : you);
