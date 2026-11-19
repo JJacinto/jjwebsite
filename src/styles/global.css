@@ -144,30 +144,37 @@ html[data-motion="reduce"] *::after {
  * Floating surfaces: one recipe for everything that floats above the
  * page (settings panel, chip popovers, tooltips).
  *
- * The page is near black and its cards are drawn in violet, so a
- * floating surface is the card colour with a little violet in it, a
- * violet hairline and a deep shadow. It reads as one step above a
- * card, never as a grey box from another site.
+ * The page is near black, so a floating surface is smoked glass: a
+ * neutral fill one step lighter than the page, a neutral hairline, a
+ * deep shadow, and a blur that turns what is behind it into light.
  *
  * Two sizes share it: .popover-sized things (content you read or
  * operate) use --float-radius, tooltips (one short line) use
  * --float-radius-tip. Change a colour here and every one follows.
  * ────────────────────────────────────────────────────────────── */
 :root {
-  --float-bg: color-mix(in srgb, var(--color-primary-40) 7%, var(--color-neutral-90));
-  --float-line: color-mix(in srgb, var(--color-primary-40) 30%, transparent);
+  /* Smoked glass: a step lighter than the page so it stands out on near
+     black, mostly opaque so text stays readable, and a blur that lifts
+     what is behind it into diffuse light. */
+  --float-bg: color-mix(in srgb, color-mix(in srgb, var(--color-neutral-80) 12%, var(--color-neutral-100)) 74%, transparent);
+  --float-filter: blur(22px) saturate(1.8) brightness(1.2);
+  --float-line: rgba(240, 237, 232, 0.14);
+  --float-divider: rgba(240, 237, 232, 0.08);
+  /* The dim behind the modal: dark enough that the glass stands out. */
+  --float-scrim: rgba(0, 0, 0, 0.72);
   --float-ink: var(--color-neutral-30);
   --float-shadow:
-    inset 0 1px 0 color-mix(in srgb, var(--color-neutral-30) 6%, transparent),
-    0 2px 6px rgba(0, 0, 0, 0.35),
-    0 18px 40px -10px rgba(0, 0, 0, 0.65);
+    inset 0 1px 0 rgba(240, 237, 232, 0.10),
+    0 24px 48px -12px rgba(0, 0, 0, 0.7);
   --float-radius: var(--radius-card);
   --float-radius-tip: var(--dimension-radius-sm);
 }
-/* High contrast: no tint, no shadow, a full-strength outline. */
+/* High contrast: solid black, no blur, no shadow, a full-strength outline. */
 html[data-contrast="high"] {
   --float-bg: #000;
+  --float-filter: none;
   --float-line: var(--color-neutral-0);
+  --float-divider: var(--color-neutral-0);
   --float-ink: var(--color-neutral-0);
   --float-shadow: none;
 }
@@ -4065,7 +4072,7 @@ html[data-motion="reduce"] {
    ============================================================ */
 .compose-backdrop {
   position: fixed; inset: 0; z-index: var(--z-overlay);
-  background: var(--component-compose-modal-backdrop);
+  background: var(--float-scrim);
   display: flex; align-items: flex-start; justify-content: center;
   padding: clamp(var(--dimension-space-48), 10vh, var(--dimension-space-128)) var(--spacing-container-pad) var(--spacing-container-pad);
   opacity: 0; pointer-events: none;
@@ -6683,5 +6690,50 @@ html[data-motion="reduce"] .card-light { display: none; }
   .chip-btn::before, .journey-co::before, .hero-replay::before {
     content: ''; position: absolute; left: 0; right: 0; top: 50%;
     height: max(100%, var(--target-min)); transform: translateY(-50%);
+  }
+}
+
+/* ============================================================
+   Floating surfaces: the glass
+   The compose modal, the settings panel, chip popovers and tooltips
+   blur what is behind them (--float-filter, top of this file). The
+   modal takes its fill, hairline and shadow from the same tokens.
+   ============================================================ */
+.chip-panel, .settings-panel, .brands-tooltip, .about-cta-avatar-tooltip,
+.contact-copy-tip, .compose-modal {
+  -webkit-backdrop-filter: var(--float-filter);
+          backdrop-filter: var(--float-filter);
+}
+.compose-modal {
+  background: var(--float-bg);
+  border-color: var(--float-line);
+  box-shadow: var(--float-shadow);
+}
+.compose-modal-top, .compose-footer { border-color: var(--float-divider); }
+.compose-footer { background: transparent; }
+
+html:not([data-contrast="high"]) {
+  /* A parent with its own backdrop-filter hides the page from a child's
+     backdrop-filter, so the floating surface would blur nothing. The
+     scrolled nav pill and the card that holds the chip popovers hand
+     their blur to a layer behind their content instead. */
+  .nav.scrolled .container, .b-into {
+    position: relative;
+    -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+  .b-into { isolation: isolate; }
+  /* A blended child makes the card an isolated group, which cuts the
+     popover's blur off from the page just the same. On a near-black
+     card the drift light looks the same without the blend. */
+  .b-into > .card-light { mix-blend-mode: normal; }
+  .nav.scrolled .container::before, .b-into::after {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    border-radius: inherit; pointer-events: none;
+  }
+  .nav.scrolled .container::before {
+    -webkit-backdrop-filter: blur(22px) saturate(1.7); backdrop-filter: blur(22px) saturate(1.7);
+  }
+  .b-into::after {
+    -webkit-backdrop-filter: var(--glass-filter); backdrop-filter: var(--glass-filter);
   }
 }
