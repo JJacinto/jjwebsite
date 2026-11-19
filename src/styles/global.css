@@ -2027,6 +2027,17 @@ html.xray-on .xray-grid { opacity: 1; }
    clear of the fixed nav. */
 .work-head > .xray-note { top: auto; bottom: 0; right: auto; left: 0; transform: none; max-width: min(480px, calc(100% - 304px)); }
 .work-list { position: relative; }
+/* Once the lens box stacks above the copy, or the screen is short, the
+   hero has no empty corner left: both Work notes drop into flow. */
+@media (max-width: 1024px), (max-height: 760px) {
+  .work-head > .xray-note { position: relative; bottom: auto; left: auto; margin: var(--dimension-space-16) 0 0; max-width: min(480px, 100%); }
+  .work-list > .xray-note { position: relative; top: auto; right: auto; transform: none; margin: 0 0 var(--dimension-space-16); max-width: min(480px, 100%); }
+}
+/* Contact on a short screen: the note would slide under the fixed nav, so
+   it drops into flow under the block. */
+@media (max-height: 760px) {
+  .contact-inner > .xray-note { position: relative; top: auto; right: auto; transform: none; margin: var(--dimension-space-16) auto 0; max-width: min(480px, 100%); }
+}
 /* The brands strip clips its marquee; with X-ray on it must let its note out. */
 .xray .brands { overflow: visible; overflow-x: clip; }
 /* On one column there is no gap wide enough to hang a note in, so every
