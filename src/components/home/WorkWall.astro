@@ -216,7 +216,7 @@ const steps = Array.from({ length: 40 }, (_, i) => ({ i, s: 24 + (i % 4) * 2, dy
   ))}
 </div>
 
-<p class="wall-access reveal"><span data-pt="Os casos de estudo completos são privados.">The full case studies are private.</span> <button type="button" class="work-ask" data-umami-event="home-ask-access" onclick="jjComposeWith(window.jjLang && window.jjLang() === 'pt' ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?' : 'Hi João, could you send me the password for the case studies?')" data-pt="Pedir acesso">Ask me for access</button></p>
+<p class="wall-access reveal"><span data-pt="Os casos de estudo completos são privados.">The full case studies are private.</span> <button type="button" class="work-ask" data-umami-event="home-ask-access" onclick="jjComposeWith(window.jjT ? window.jjT('Hi João, could you send me the password for the case studies?', 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?') : 'Hi João, could you send me the password for the case studies?')" data-pt="Pedir acesso">Ask me for access</button></p>
 
 <script>
   const wall = document.getElementById('wall') as HTMLElement | null;

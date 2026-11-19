@@ -144,7 +144,6 @@ window.addEventListener('resize', movePillIndicator);
   const picker = document.getElementById('langPicker');
   const langBtn = document.getElementById('langBtn');
   const langList = document.getElementById('langList');
-  let arrowing = false;   /* the change came from an arrow key: keep the list open */
   function langOpen() { return !!langList && !langList.hidden; }
   function openLang() {
     if (!langList || langOpen()) return;
@@ -173,16 +172,36 @@ window.addEventListener('resize', movePillIndicator);
     };
     langList.addEventListener('pointerenter', warm, true);
     langList.addEventListener('focusin', warm);
+    /* Arrow keys on the button open the list on the current language. */
+    langBtn.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      e.preventDefault();
+      openLang();
+      const on = langList.querySelector('input:checked') || langList.querySelector('input');
+      if (on) on.focus();
+    });
     langList.addEventListener('keydown', function (e) {
-      if (e.key.indexOf('Arrow') === 0) arrowing = true;
-      /* Enter confirms the row in focus (a radio only answers Space). */
-      else if (e.key === 'Enter' && e.target.type === 'radio') {
+      if (e.target.type !== 'radio') return;
+      const rows = Array.prototype.slice.call(langList.querySelectorAll('input[type="radio"]'));
+      const at = rows.indexOf(e.target);
+      let to = -1;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') to = (at + 1) % rows.length;
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') to = (at - 1 + rows.length) % rows.length;
+      else if (e.key === 'Home') to = 0;
+      else if (e.key === 'End') to = rows.length - 1;
+      if (to >= 0) {
+        /* Native radios pick as the arrows move. Here that would swap the
+           whole page on every press, so the arrows only move the focus and
+           Enter or Space picks. */
+        e.preventDefault();
+        rows[to].focus();
+      } else if (e.key === 'Enter') {
+        /* Enter confirms the row in focus (a radio only answers Space). */
         e.preventDefault();
         if (!e.target.checked) e.target.click();
         closeLang(true);
       }
     });
-    langList.addEventListener('keyup', function () { arrowing = false; });
     document.addEventListener('jj:langchange', sync);
   }
 
@@ -197,9 +216,7 @@ window.addEventListener('resize', movePillIndicator);
     if (el.name === 'jj-lang') {
       if (window.jjSetLang) window.jjSetLang(el.value);
       track('lang', el.value);
-      /* A click or Space picks and closes; arrowing through the rows
-         only previews each one. */
-      if (!arrowing) closeLang(true);
+      closeLang(true);
     } else if (el.name === 'jj-textsize') {
       prefs.set('textsize', el.value);
       track('textsize', el.value);

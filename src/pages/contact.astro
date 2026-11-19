@@ -82,8 +82,7 @@ function copyEmail(el) {
        a small tooltip rises above the button for 2s (.is-copied). The
        tooltip is a status region, so screen readers hear it too. */
     const tip = document.getElementById('emailCopied');
-    const pt = window.jjLang && window.jjLang() === 'pt';
-    if (tip) tip.textContent = pt ? 'Copiado para a área de transferência' : 'Copied to clipboard';
+    if (tip) tip.textContent = window.jjT ? window.jjT('Copied to clipboard', 'Copiado para a área de transferência') : 'Copied to clipboard';
     el.classList.add('is-copied');
     clearTimeout(el._copyTimer);
     el._copyTimer = setTimeout(() => {
@@ -108,7 +107,7 @@ function copyEmail(el) {
     timeZone: 'Europe/Lisbon', weekday: 'short',
     hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
   });
-  var isPt = function () { return !!(window.jjLang && window.jjLang() === 'pt'); };
+  var T = function (en, pt) { return window.jjT ? window.jjT(en, pt) : en; };
 
   /* A small moon-phase disc: the lit side follows the hour of day. */
   function planet(pc, h, lit) {
@@ -147,13 +146,12 @@ function copyEmail(el) {
     planet(cvAveiro, lis / 60, token(cvAveiro, '--planet-lit', '#9c9cf5'));
     planet(cvYou, loc / 60, token(cvYou, '--planet-lit', '#f0ede8'));
 
-    var pt = isPt();
     var hour = parseInt(p.hour, 10), wd = p.weekday, weekend = wd === 'Sat' || wd === 'Sun', reply;
-    if (hour >= 1 && hour < 9) reply = pt ? 'Estou a dormir, respondo de manhã.' : "I'm asleep, so I'll reply in the morning.";
-    else if (weekend) reply = pt ? 'Aqui é fim de semana, por isso a resposta fica para segunda.' : "It's the weekend here, so expect a reply on Monday.";
-    else if (hour >= 9 && hour < 18) reply = pt ? 'Estou a trabalhar, por isso deves ter resposta hoje.' : "I'm at my desk, so expect a reply today.";
-    else if (wd === 'Fri') reply = pt ? 'Já fechei a semana, por isso a resposta fica para segunda.' : "I'm done for the week, so expect a reply on Monday.";
-    else reply = pt ? 'Já acabei por hoje, por isso a resposta fica para amanhã.' : "I'm done for the day, so expect a reply tomorrow.";
+    if (hour >= 1 && hour < 9) reply = T("I'm asleep, so I'll reply in the morning.", 'Estou a dormir, respondo de manhã.');
+    else if (weekend) reply = T("It's the weekend here, so expect a reply on Monday.", 'Aqui é fim de semana, por isso a resposta fica para segunda.');
+    else if (hour >= 9 && hour < 18) reply = T("I'm at my desk, so expect a reply today.", 'Estou a trabalhar, por isso deves ter resposta hoje.');
+    else if (wd === 'Fri') reply = T("I'm done for the week, so expect a reply on Monday.", 'Já fechei a semana, por isso a resposta fica para segunda.');
+    else reply = T("I'm done for the day, so expect a reply tomorrow.", 'Já acabei por hoje, por isso a resposta fica para amanhã.');
 
     /* My desk hours (09:00 to 18:00 Aveiro) on the visitor's clock, cut to their 08:00 to 22:00. */
     var best = 0, bs = 0, be = 0;
@@ -162,10 +160,12 @@ function copyEmail(el) {
       if (e - s > best) { best = e - s; bs = s; be = e; }
     });
     var overlap;
-    if (diff === 0) overlap = pt ? ' Estamos no mesmo fuso, e eu trabalho das 09:00 às 18:00.' : " We're on the same clock, and I'm at my desk from 09:00 to 18:00.";
-    else if (best >= 30) overlap = pt ? ' Os nossos dias cruzam-se das ' + hhmm(bs) + ' às ' + hhmm(be) + ', na tua hora.' : ' Our days overlap from ' + hhmm(bs) + ' to ' + hhmm(be) + ' your time.';
-    else overlap = pt ? ' Os nossos dias quase não se cruzam, por isso uma mensagem funciona melhor do que uma chamada.' : ' Our days barely overlap, so a message works better than a call.';
-    elText.textContent = reply + overlap;
+    if (diff === 0) overlap = T("We're on the same clock, and I'm at my desk from 09:00 to 18:00.", 'Estamos no mesmo fuso, e eu trabalho das 09:00 às 18:00.');
+    else if (best >= 30) overlap = T('Our days overlap from {start} to {end} your time.', 'Os nossos dias cruzam-se das {start} às {end}, na tua hora.').replace('{start}', hhmm(bs)).replace('{end}', hhmm(be));
+    else overlap = T('Our days barely overlap, so a message works better than a call.', 'Os nossos dias quase não se cruzam, por isso uma mensagem funciona melhor do que uma chamada.');
+    /* A space between the two sentences, except in Chinese and Japanese. */
+    var cjk = window.jjLang && (window.jjLang() === 'zh' || window.jjLang() === 'ja');
+    elText.textContent = reply + (cjk ? '' : ' ') + overlap;
   }
   tick();
   document.addEventListener('jj:langchange', tick);

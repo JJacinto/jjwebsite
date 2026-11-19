@@ -342,6 +342,7 @@ if (!isUnlocked()) {
 /* Chapter list on the key card: the article's own section headings.
    Rebuilt on every language switch, so it follows the headings' text. */
 function jjLangNow() { return window.jjLang ? window.jjLang() : 'en'; }
+function jjT2(en, pt) { return window.jjT ? window.jjT(en, pt) : en; }
 function buildChapters() {
   var list = document.getElementById('pwChapters');
   if (!list) return;
@@ -350,7 +351,8 @@ function buildChapters() {
   document.querySelectorAll('#case-content .container h2').forEach(function (h) {
     if (n >= 6 || h.closest('.case-summary, .case-decisions, .next-case-wrap')) return;
     /* A heading may carry a short data-chapter label for long statements. */
-    var t = ((jjLangNow() === 'pt' && h.getAttribute('data-chapter-pt')) || h.getAttribute('data-chapter') || h.textContent).trim();
+    var ch = h.getAttribute('data-chapter');
+    var t = (ch ? jjT2(ch, h.getAttribute('data-chapter-pt') || undefined) : h.textContent).trim();
     /* Skip empty headings and sentence-length ones (pull statements). */
     if (!t || t.length > 60) return;
     var li = document.createElement('li');
@@ -367,11 +369,10 @@ document.addEventListener('jj:langchange', buildChapters);
 /* Gate text the script writes itself (English / Portuguese). */
 var pwErrorShown = false;
 function pwErrorText() {
-  return jjLangNow() === 'pt' ? 'Palavra-passe incorreta — tenta outra vez.' : 'Incorrect password — try again.';
+  return jjT2('Incorrect password — try again.', 'Palavra-passe incorreta — tenta outra vez.');
 }
 function revealLabel(showing) {
-  if (jjLangNow() === 'pt') return showing ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe';
-  return showing ? 'Hide password' : 'Show password';
+  return showing ? jjT2('Hide password', 'Ocultar palavra-passe') : jjT2('Show password', 'Mostrar palavra-passe');
 }
 document.addEventListener('jj:langchange', function () {
   var error = document.getElementById('pwError');
@@ -379,7 +380,7 @@ document.addEventListener('jj:langchange', function () {
   var title = document.getElementById('pwTitle');
   var gate = document.getElementById('pwGate');
   if (title && gate && gate.classList.contains('is-open')) {
-    title.textContent = jjLangNow() === 'pt' ? 'Desbloqueado' : 'Unlocked';
+    title.textContent = jjT2('Unlocked', 'Desbloqueado');
   }
   var input = document.getElementById('pwInput');
   var btn = document.getElementById('pwReveal');
@@ -408,7 +409,7 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
          rows light up, then the gate breaks away as before. */
       document.getElementById('pwGate')?.classList.add('is-open');
       var title = document.getElementById('pwTitle');
-      if (title) title.textContent = jjLangNow() === 'pt' ? 'Desbloqueado' : 'Unlocked';
+      if (title) title.textContent = jjT2('Unlocked', 'Desbloqueado');
       setTimeout(function () {
         content.style.display = '';
         content.classList.add('pw-revealing');
@@ -427,12 +428,12 @@ document.getElementById('pwForm')?.addEventListener('submit', function(e) {
 });
 
 document.getElementById('pwAsk')?.addEventListener('click', function () {
-  var pt = jjLangNow() === 'pt';
-  var title = (pt && this.getAttribute('data-title-pt')) || this.getAttribute('data-title') || '';
+  var title = (jjLangNow() === 'pt' && this.getAttribute('data-title-pt')) || this.getAttribute('data-title') || '';
   if (typeof window.jjComposeWith === 'function') {
-    window.jjComposeWith(pt
-      ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo? Gostava de ler "' + title + '".'
-      : "Hi João, could you send me the password for the case studies? I'd like to read \"" + title + "\".");
+    window.jjComposeWith(jjT2(
+      'Hi João, could you send me the password for the case studies? I'd like to read "{title}".',
+      'Olá João, podes enviar-me a palavra-passe dos casos de estudo? Gostava de ler "{title}".'
+    ).replace('{title}', title));
   }
 });
 

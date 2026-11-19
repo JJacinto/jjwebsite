@@ -75,7 +75,7 @@ const visible = CASES.filter(c => !c.hidden);
         </div>
       </article>
 
-      <p class="work-access"><span data-pt="Todos os casos de estudo são privados.">All case studies are private.</span> <button type="button" class="work-ask" data-umami-event="work-ask-access" data-pt="Pede-me acesso" onclick="jjComposeWith((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?' : 'Hi João, could you send me the password for the case studies?')">Ask me for access</button> <span data-pt="e eu envio a palavra-passe.">and I'll send the password.</span></p>
+      <p class="work-access"><span data-pt="Todos os casos de estudo são privados.">All case studies are private.</span> <button type="button" class="work-ask" data-umami-event="work-ask-access" data-pt="Pede-me acesso" onclick="jjComposeWith(window.jjT ? window.jjT('Hi João, could you send me the password for the case studies?', 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?') : 'Hi João, could you send me the password for the case studies?')">Ask me for access</button> <span data-pt="e eu envio a palavra-passe.">and I'll send the password.</span></p>
       </div>
 
     </div>

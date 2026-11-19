@@ -1415,11 +1415,11 @@ const loop = [
   const counters = Array.from(wrap.querySelectorAll('[data-count]'));
   const lang = () => (window.jjLang ? window.jjLang() : 'en');
   const fmt = (el, v) => {
-    const pt = lang() === 'pt';
+    const loc = { en: 'en-US', pt: 'pt-PT', es: 'es-ES', fr: 'fr-FR', de: 'de-DE', zh: 'zh-CN', ja: 'ja-JP' }[lang()] || 'en-US';
     const dec = Number(el.dataset.decimals || 0);
     const body = el.dataset.format === 'grouped'
-      ? Math.round(v).toLocaleString(pt ? 'pt-PT' : 'en-US')
-      : (pt ? v.toFixed(dec).replace('.', ',') : v.toFixed(dec));
+      ? Math.round(v).toLocaleString(loc)
+      : (['pt', 'es', 'fr', 'de'].indexOf(lang()) >= 0 ? v.toFixed(dec).replace('.', ',') : v.toFixed(dec));
     return body + (el.dataset.suffix || '');
   };
   /* Each counter remembers its current value (el._v) so a language switch
@@ -1427,7 +1427,7 @@ const loop = [
   counters.forEach((el) => { el._v = Number(el.dataset.to); });
   const redraw = () => counters.forEach((el) => { el.textContent = fmt(el, el._v); });
   document.addEventListener('jj:langchange', redraw);
-  if (lang() === 'pt') redraw();
+  if (lang() !== 'en') redraw();
   function runCount(el) {
     const from = Number(el.dataset.from), to = Number(el.dataset.to);
     const dur = Number(el.dataset.duration || 1100);
