@@ -218,24 +218,16 @@ export default function ptPages() {
         const outDir = fileURLToPath(dir);
         const files = (await listIndexFiles(outDir)).filter((f) => !urlPathOf(f, outDir).startsWith('/pt/'));
 
-        /* Load, round-trip check, classify. */
+        /* Load and classify. (parse5 does not reproduce Astro's output byte
+           for byte: it writes valueless attributes as name="", re-escapes a
+           few entities and moves trailing scripts inside <body>, as a
+           browser would. Inline script and style contents are unchanged.) */
         const pages = [];
-        const roundTrip = [];
         for (const file of files) {
           const html = await readFile(file, 'utf8');
-          const doc = parse(html);
-          const again = serialize(doc);
-          if (again !== html) roundTrip.push({ file, html, again });
           const noindex = /<meta name="robots" content="noindex">/i.test(html);
           const refresh = /<meta http-equiv="refresh"/i.test(html);
           pages.push({ file, urlPath: urlPathOf(file, outDir), html, noindex, refresh });
-        }
-        log.info(`round-trip: ${pages.length - roundTrip.length}/${pages.length} pages byte-identical after parse + serialise`);
-        for (const r of roundTrip) {
-          let i = 0;
-          while (i < r.html.length && r.html[i] === r.again[i]) i++;
-          log.warn(`round-trip differs: ${path.relative(outDir, r.file)} (${r.html.length} -> ${r.again.length} bytes) at ${i}: ` +
-            `${JSON.stringify(r.html.slice(Math.max(0, i - 40), i + 60))} => ${JSON.stringify(r.again.slice(Math.max(0, i - 40), i + 60))}`);
         }
 
         const builtPaths = new Set(pages.map((p) => p.urlPath));
