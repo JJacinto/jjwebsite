@@ -67,10 +67,10 @@ const tiles: Tile[] = [
 
 const cats = [
   { f: 'all', label: 'All', labelPt: 'Todos' },
-  { f: 'ui', label: 'Product UI', labelPt: undefined },
-  { f: 'ds', label: 'Design systems', labelPt: undefined },
+  { f: 'ui', label: 'Product UI', labelPt: 'UI de produto' },
+  { f: 'ds', label: 'Design systems', labelPt: 'Design systems' },
   { f: 'rs', label: 'Research', labelPt: 'Pesquisa' },
-  { f: 'ft', label: 'Fintech', labelPt: undefined },
+  { f: 'ft', label: 'Fintech', labelPt: 'Fintech' },
 ];
 const count = (f: string) => (f === 'all' ? tiles.length : tiles.filter((t) => t.cat === f).length);
 

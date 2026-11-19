@@ -7,7 +7,7 @@ const { minutes } = Astro.props;
 ---
 <div class="case-readbar">
   <span class="case-readbar-time" data-pt={`${minutes} min de leitura`}>{minutes} min read</span>
-  <button type="button" class="case-readbar-btn" id="caseDetailAll" aria-pressed="false" data-umami-event="case-detail-expand-all">Show all detail</button>
+  <button type="button" class="case-readbar-btn" id="caseDetailAll" aria-pressed="false" data-umami-event="case-detail-expand-all" data-pt="Mostrar todo o detalhe">Show all detail</button>
 </div>
 
 <script is:inline>

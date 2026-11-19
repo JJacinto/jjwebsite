@@ -1012,15 +1012,34 @@ const loop = [
     }
     requestAnimationFrame(frame);
   }
+  /* The markup carries the final value, so a page read without scripts (or
+     never scrolled) shows the real number. A counter drops to its start
+     value only when it is about to scroll into view, then counts up once
+     it is in view. With reduced motion nothing here runs. */
   if (!reduce && 'IntersectionObserver' in window) {
+    const arm = (el) => {
+      if (el._armed) return;
+      el._armed = true;
+      el._v = Number(el.dataset.from);
+      el.textContent = fmt(el, el._v);
+    };
+    const near = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        near.unobserve(en.target);
+        arm(en.target);
+      });
+    }, { rootMargin: '240px 0px 240px 0px' });
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => {
         if (!en.isIntersecting) return;
         io.unobserve(en.target);
+        near.unobserve(en.target);
+        arm(en.target);
         runCount(en.target);
       });
     }, { threshold: 0.6 });
-    counters.forEach((el) => { el._v = Number(el.dataset.from); el.textContent = fmt(el, el._v); io.observe(el); });
+    counters.forEach((el) => { near.observe(el); io.observe(el); });
   }
 
   /* ---- In-view hooks: [data-inview] gets .in once; [data-live] toggles .is-live ---- */

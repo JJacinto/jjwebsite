@@ -8,7 +8,7 @@
    Styles live in global.css, "Journey". */
 import { CASES } from '../../data/cases';
 
-type Win = { pre?: string; from: number; to: number; decimals?: number; suffix?: string; text: string; label: string; labelPt?: string };
+type Win = { pre?: string; from: number; to: number; decimals?: number; suffix?: string; text: string; textPt?: string; label: string; labelPt?: string };
 type Step = {
   id: 'anchorage' | 'streamyard' | 'talkdesk' | 'namecheap' | 'beubi' | 'aveiro' | 'ubi' | 'self';
   years: string; yearsPt?: string; name: string; namePt?: string; href?: string; role: string; rolePt?: string; line: string; linePt?: string; win?: Win;
@@ -40,7 +40,7 @@ const career: Step[] = [
     linePt: 'IA para suporte ao cliente, antes dos LLMs. Redesenhei a ferramenta de etiquetagem que as equipas de CX usavam para treinar IA conversacional.' },
   { id: 'namecheap', years: '2017–2021', name: 'Namecheap', href: 'https://www.namecheap.com',
     role: 'Product Designer', line: 'Domains and hosting. Internal support tools, iterated daily with 200+ agents.', linePt: 'Domínios e alojamento. Ferramentas internas de suporte, iteradas todos os dias com mais de 200 agentes.',
-    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', label: 'positive feedback four months after the new chat and support launch', labelPt: 'de feedback positivo quatro meses depois do lançamento do novo chat e suporte' },
+    win: { from: 0, to: 97.4, decimals: 1, suffix: '%', text: '97.4%', textPt: '97,4%', label: 'positive feedback four months after the new chat and support launch', labelPt: 'de feedback positivo quatro meses depois do lançamento do novo chat e suporte' },
     caseSlug: 'designing-a-support-chat-experience',
     learned: [{ text: 'Interaction Design Foundation membership (2021)', textPt: 'Membro da Interaction Design Foundation (2021)' }] },
   { id: 'beubi', years: '2015–2017', name: 'Be.Ubi', href: 'https://github.com/beubi',
@@ -97,7 +97,7 @@ const originYear = education[education.length - 1].years.split('–')[0];
             <p class="journey-line" data-pt={s.linePt}>{s.line}</p>
             {s.win && (
               <p class="journey-win">
-                <b>{s.win.pre}<span data-count data-from={s.win.from} data-to={s.win.to} data-decimals={s.win.decimals} data-suffix={s.win.suffix} data-duration="1100">{s.win.text}</span></b>
+                <b>{s.win.pre}<span data-count data-from={s.win.from} data-to={s.win.to} data-decimals={s.win.decimals} data-suffix={s.win.suffix} data-duration="1100" data-pt={s.win.textPt}>{s.win.text}</span></b>
                 <span data-pt={s.win.labelPt}>{s.win.label}</span>
               </p>
             )}
@@ -219,7 +219,7 @@ const originYear = education[education.length - 1].years.split('–')[0];
                     <div class="theme-avatar"><span class="theme-swatch"><i></i><i></i><i></i></span></div>
                     <div class="theme-info">
                       <div class="theme-tabs"><span class="is-on" data-pt="Tema">Theme</span><span data-pt="Pré-visualizar">Preview</span><span data-pt="Usar">Use it</span></div>
-                      <div class="theme-online"><span class="theme-online-dot"></span><span data-pt="Utilizadores ativos: ">Active users: </span><b data-count data-from="0" data-to="79000" data-format="grouped" data-duration="1400">79,000</b></div>
+                      <div class="theme-online"><span class="theme-online-dot"></span><span data-pt="Utilizadores ativos: ">Active users: </span><b data-count data-from="0" data-to="79000" data-format="grouped" data-duration="1400" data-pt="79&nbsp;000">79,000</b></div>
                     </div>
                   </div>
                   <div class="theme-lines"><i></i><i></i><i></i></div>

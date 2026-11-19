@@ -171,9 +171,10 @@ const umamiOn  = !!(umamiSrc && umamiId);
   <script type="application/ld+json" set:html={ldEscape(schemaGraph)} data-pt={ldEscape(schemaGraphPt)} />
 )}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@900&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<!-- Fonts are served from /fonts (see @font-face in global.css). The two
+     files every page uses above the fold are fetched early. -->
+<link rel="preload" href="/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/hanken-grotesk-900-latin.woff2" as="font" type="font/woff2" crossorigin>
 
 <!-- Settings bootstrap — runs before paint so nothing flashes.
      The visitor's choices come from the settings menu in the nav and
