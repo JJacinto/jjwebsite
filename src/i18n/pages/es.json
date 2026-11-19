@@ -632,5 +632,8 @@
   "An unexpected error occurred.": "Ha ocurrido un error inesperado.",
   "Error": "Error",
   "Something didn't go to plan.": "Algo no ha salido según lo previsto.",
-  "An unexpected issue blocked this page from loading.<br>Refreshing usually does the trick.": "Un problema inesperado ha impedido que esta página se cargue.<br>Recargar suele funcionar."
+  "An unexpected issue blocked this page from loading.<br>Refreshing usually does the trick.": "Un problema inesperado ha impedido que esta página se cargue.<br>Recargar suele funcionar.",
+  "The handoff should hold no surprises. Plugins and Claude Code handle the repeat work. I review it.": "El handoff no debe dar sorpresas. Los plugins y Claude Code se encargan del trabajo repetitivo. Yo lo reviso.",
+  "at home": "en casa",
+  "Claude Code and Gemini do most of the lifting. Some of it runs on local models, on a machine I keep at home. The tools change every few years. The habit doesn't.": "Claude Code y Gemini hacen la mayor parte del trabajo pesado. Parte se ejecuta en modelos locales, en una máquina que tengo en casa. Las herramientas cambian cada pocos años. El hábito no."
 }

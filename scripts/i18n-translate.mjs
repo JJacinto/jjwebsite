@@ -88,6 +88,9 @@ const tags = (s) => (s.match(/<\/?[a-zA-Z][^>]*>/g) || []).map((t) => t.replace(
 function problem(en, out) {
   if (typeof out !== 'string' || !out.trim()) return 'empty';
   if (tags(en) !== tags(out)) return 'HTML tags changed';
+  /* {start}, {title}…: values a script fills in. */
+  const slots = (s) => (s.match(/\{[a-zA-Z]+\}/g) || []).sort().join('|');
+  if (slots(en) !== slots(out)) return '{placeholders} changed';
   if (out.length > en.length * 4 + 40) return 'far too long';
   return null;
 }

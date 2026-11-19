@@ -27,7 +27,7 @@
   "Hey, I'm João. A product designer who builds.": "Hallo, ich bin João. Ein Product Designer, der gestaltet.",
   "I design what holds a product together.": "Ich entwerfe das, was ein Produkt zusammenhält.",
   "The flows, systems and rules users never see. Get those right and every screen falls into place. Ten years across fintech, video and support tools.": "Die Flows, Systeme und Regeln, die Nutzer nie sehen. Wenn diese stimmen, fügt sich jeder Screen von selbst zusammen. Zehn Jahre Erfahrung in Fintech, Video und Support-Tools.",
-  "Hiring? Let's talk": "Sie suchen Verstärkung? Lassen Sie uns sprechen",
+  "Hiring? Let's talk": "Sie stellen ein? Reden wir",
   "X-ray": "Röntgenblick",
   "Turn on X-ray": "Röntgenblick einschalten",
   "Turn off X-ray": "Röntgenblick ausschalten",
@@ -167,7 +167,7 @@
   "Replay": "Wiederholen",
   "Take the tangle as it is.": "Nehmen Sie das Chaos so, wie es ist.",
   "Break it into its parts.": "Zerlegen Sie es in seine Einzelteile.",
-  "Find what orbits what.": "Finden Sie heraus, was was beeinflusst.",
+  "Find what orbits what.": "Finden Sie heraus, was worum kreist.",
   "Clear the orbit of what nobody would miss.": "Entfernen Sie alles, was niemand vermissen würde.",
   "Launch the one step that's left.": "Starten Sie den letzten verbleibenden Schritt.",
   "That's the story of the policies and permissions redesign at Anchorage Digital.": "Das ist die Geschichte des Redesigns von Richtlinien und Berechtigungen bei Anchorage Digital.",
@@ -632,5 +632,8 @@
   "An unexpected error occurred.": "Ein unerwarteter Fehler ist aufgetreten.",
   "Error": "Fehler",
   "Something didn't go to plan.": "Etwas ist nicht nach Plan gelaufen.",
-  "An unexpected issue blocked this page from loading.<br>Refreshing usually does the trick.": "Ein unerwartetes Problem hat das Laden dieser Seite verhindert.<br>Ein Neuladen hilft meistens."
+  "An unexpected issue blocked this page from loading.<br>Refreshing usually does the trick.": "Ein unerwartetes Problem hat das Laden dieser Seite verhindert.<br>Ein Neuladen hilft meistens.",
+  "The handoff should hold no surprises. Plugins and Claude Code handle the repeat work. I review it.": "Der Handoff sollte keine Überraschungen bereithalten. Plugins und Claude Code erledigen die Routinearbeit. Ich überprüfe sie.",
+  "at home": "zu Hause",
+  "Claude Code and Gemini do most of the lifting. Some of it runs on local models, on a machine I keep at home. The tools change every few years. The habit doesn't.": "Claude Code und Gemini erledigen den Großteil der Arbeit. Ein Teil läuft auf lokalen Modellen auf einem Rechner bei mir zu Hause. Die Tools ändern sich alle paar Jahre. Die Gewohnheit nicht."
 }

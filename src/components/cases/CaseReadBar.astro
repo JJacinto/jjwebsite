@@ -16,14 +16,12 @@ const { minutes } = Astro.props;
     var btn = document.getElementById('caseDetailAll');
     if (!btn || btn.getAttribute('data-bound') === '1') return;
     btn.setAttribute('data-bound', '1');
-    var TXT = {
-      en: { show: 'Show all detail', hide: 'Hide all detail' },
-      pt: { show: 'Mostrar todo o detalhe', hide: 'Esconder todo o detalhe' }
-    };
-    function lang() { return (window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'pt' : 'en'; }
+    function T(en, pt) { return window.jjT ? window.jjT(en, pt) : en; }
     function label() {
       var open = btn.getAttribute('aria-pressed') === 'true';
-      btn.textContent = TXT[lang()][open ? 'hide' : 'show'];
+      btn.textContent = open
+        ? T('Hide all detail', 'Esconder todo o detalhe')
+        : T('Show all detail', 'Mostrar todo o detalhe');
     }
     btn.addEventListener('click', function () {
       var open = btn.getAttribute('aria-pressed') !== 'true';
@@ -32,6 +30,6 @@ const { minutes } = Astro.props;
       label();
     });
     document.addEventListener('jj:langchange', label);
-    if (lang() === 'pt') label();
+    if (btn.getAttribute('aria-pressed') === 'true' || (window.jjLang && window.jjLang() !== 'en')) label();
   })();
 </script>
