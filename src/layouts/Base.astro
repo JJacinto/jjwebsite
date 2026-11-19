@@ -23,6 +23,11 @@ interface Props {
   footerInPage?: boolean;
   /* Keep the page out of search results (error pages). */
   noindex?: boolean;
+  /* Trail after "Home" for search results, e.g. Case studies > Case title.
+     Paths are site-relative and end in a slash. */
+  breadcrumb?: { name: string; path: string }[];
+  /* Extra schema.org nodes for this page (e.g. the case study itself). */
+  jsonLd?: Record<string, unknown>[];
 }
 
 const {
@@ -37,12 +42,78 @@ const {
   disablePageParticles = false,
   footerInPage = false,
   noindex = false,
+  breadcrumb = [],
+  jsonLd = [],
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
 const canonical   = new URL(Astro.url.pathname, siteUrl).href;
 const ogImage     = `${siteUrl}/assets/og-image.png`;
 const isHome      = activePage === 'home';
+
+/* Structured data, one graph per page: the site, João, this page, and the
+   breadcrumb trail when there is one. The ids let the nodes point at each
+   other, and let pages add their own nodes that refer to João as author. */
+const personId  = `${siteUrl}/#person`;
+const websiteId = `${siteUrl}/#website`;
+const crumbsId  = `${canonical}#breadcrumb`;
+const schemaGraph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': websiteId,
+      url: `${siteUrl}/`,
+      name: 'João Jacinto',
+      inLanguage: 'en',
+      publisher: { '@id': personId },
+    },
+    {
+      '@type': 'Person',
+      '@id': personId,
+      name: 'João Jacinto',
+      jobTitle: 'Senior Product Designer',
+      url: `${siteUrl}/`,
+      image: ogImage,
+      sameAs: [
+        'https://linkedin.com/in/joaofranciscojacinto/',
+        'https://x.com/joao_jacinto_8',
+      ],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Aveiro',
+        addressCountry: 'PT',
+      },
+      worksFor: {
+        '@type': 'Organization',
+        name: 'Anchorage Digital',
+        url: 'https://www.anchorage.com',
+      },
+    },
+    {
+      '@type': isHome ? 'ProfilePage' : 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': websiteId },
+      ...(isHome ? { mainEntity: { '@id': personId } } : { about: { '@id': personId } }),
+      ...(breadcrumb.length ? { breadcrumb: { '@id': crumbsId } } : {}),
+    },
+    ...(breadcrumb.length ? [{
+      '@type': 'BreadcrumbList',
+      '@id': crumbsId,
+      itemListElement: [{ name: 'Home', path: '/' }, ...breadcrumb].map((b, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: b.name,
+        item: new URL(b.path, siteUrl).href,
+      })),
+    }] : []),
+    ...jsonLd,
+  ],
+};
 
 /* Umami analytics — privacy-friendly, no cookies. Renders only when
    both env vars are set in the hosting platform (Vercel/Netlify/etc.):
@@ -63,6 +134,9 @@ const umamiOn  = !!(umamiSrc && umamiId);
   ? <meta name="robots" content="noindex">
   : <link rel="canonical" href={canonical}>}
 <link rel="icon" type="image/svg+xml" href="/assets/jj-logo.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0e0d0c">
 
 <!-- Open Graph -->
 <meta property="og:type" content={isHome ? 'website' : 'article'}>
@@ -81,28 +155,8 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <meta name="twitter:description" content={description}>
 <meta name="twitter:image" content={ogImage}>
 
-{isHome && (
-  <script type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: 'João Jacinto',
-    jobTitle: 'Senior Product Designer',
-    url: siteUrl,
-    sameAs: [
-      'https://linkedin.com/in/joaofranciscojacinto/',
-      'https://x.com/joao_jacinto_8',
-    ],
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Aveiro',
-      addressCountry: 'PT',
-    },
-    worksFor: {
-      '@type': 'Organization',
-      name: 'Anchorage Digital',
-      url: 'https://www.anchorage.com',
-    },
-  })} />
+{!noindex && (
+  <script type="application/ld+json" set:html={JSON.stringify(schemaGraph).replace(/</g, '\\u003c')} />
 )}
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

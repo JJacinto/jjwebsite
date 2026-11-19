@@ -105,6 +105,27 @@ const tocItems = c.slug === 'redefining-webinar-customization'
 ---
 <Base
   activePage="cases"
+  breadcrumb={[
+    { name: 'Case studies', path: '/case-studies/' },
+    { name: c.title, path: `/case-studies/${c.slug}/` },
+  ]}
+  jsonLd={[{
+    /* The case study itself. Marked as not free to read because the full
+       write-up sits behind the password gate. */
+    '@type': 'CreativeWork',
+    '@id': `https://joaojacinto.com/case-studies/${c.slug}/#case`,
+    name: c.title,
+    headline: c.title,
+    description: c.subtitle,
+    url: `https://joaojacinto.com/case-studies/${c.slug}/`,
+    image: `https://joaojacinto.com${c.img}`,
+    keywords: c.keywords.join(', '),
+    inLanguage: 'en',
+    isAccessibleForFree: false,
+    author: { '@id': 'https://joaojacinto.com/#person' },
+    sourceOrganization: { '@type': 'Organization', name: c.company },
+    mainEntityOfPage: { '@id': `https://joaojacinto.com/case-studies/${c.slug}/#webpage` },
+  }]}
   title={`${c.title} — João Jacinto`}
   description={c.subtitle}
   titlePt={c.titlePt ? `${c.titlePt} — João Jacinto` : undefined}
