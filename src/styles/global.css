@@ -3184,7 +3184,7 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   cursor: zoom-in;
 }
 .polaroid:focus-visible { outline: 2px solid var(--border-focus); outline-offset: 4px; }
-.polaroid img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.polaroid img { display: block; width: 100%; height: auto; aspect-ratio: 25 / 32; object-fit: cover; }
 .polaroid figcaption {
   position: absolute;
   left: 8px; right: 8px; bottom: 6px;
@@ -3207,6 +3207,86 @@ a.journey-co:hover { text-decoration-color: currentColor; }
 .b-photos .polaroid.is-focus,
 .b-photos .polaroids:not(.has-focus) .polaroid:focus-visible { --s: 1.3; --r: 0deg; --ty: -6px; z-index: 6; cursor: zoom-out; }
 .polaroids.has-focus .polaroid:not(.is-focus) { opacity: 0.55; }
+
+/* Scenes behind the photos: one line drawing per photo, faded in while
+   that photo is in front. One colour (the text colour, very low), so it
+   reads as a texture of the card rather than a picture. */
+.pol-scenes { position: absolute; inset: 0; pointer-events: none; color: var(--text-primary); }
+.pol-scene {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+  transform: scale(1.04);
+  transition: opacity 600ms var(--motion-easing-standard), transform 900ms var(--motion-easing-standard);
+}
+.pol-scene.is-on { opacity: 0.22; transform: none; }
+.pol-scene text {
+  fill: currentColor;
+  stroke: none;
+  font-family: var(--font-family-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+}
+.pol-scene .pol-fill { fill: currentColor; stroke: none; }
+.pol-scene .pol-dash { stroke-dasharray: 3 5; }
+.pol-scene .pol-faint { opacity: 0.45; }
+.pol-scene .pol-lap { opacity: 1; }
+.pol-scene:not(.is-on) * { animation-play-state: paused !important; }
+.pol-tw { animation: pol-twinkle 3s ease-in-out infinite; }
+.pol-waves { animation: pol-drift 5s linear infinite; }
+.pol-hit { transform-box: fill-box; transform-origin: center; opacity: 0; animation: pol-hit 1.25s ease-out infinite; }
+.pol-hit--snare { animation-delay: 0.625s; }
+.pol-hit--hat { animation-duration: 0.3125s; }
+.pol-led { opacity: 0.25; animation: pol-led 2.4s linear infinite; }
+@keyframes pol-led { 0%, 8% { opacity: 1; } 45%, 100% { opacity: 0.25; } }
+@keyframes pol-twinkle { 50% { opacity: 0.15; } }
+@keyframes pol-drift { to { transform: translateX(-40px); } }
+@keyframes pol-hit {
+  0% { transform: scale(1); opacity: 1; }
+  45%, 100% { transform: scale(1.4); opacity: 0; }
+}
+html[data-motion="reduce"] .pol-scene, html[data-motion="reduce"] .pol-scene * { animation: none; transition: none; }
+@media (min-width: 641px) {
+  html[data-motion="reduce"] .b-photos .polaroids { translate: 0 44px; } /* same strip, without the springs */
+}
+
+/* Physics mode: about.astro moves the photos with springs, so the CSS
+   transitions step aside. With a mouse the fan follows the pointer; on
+   touch (and narrow screens) the photos are a deck you flick through. */
+.polaroids.is-phys .polaroid {
+  transition: box-shadow var(--motion-duration-short) var(--motion-easing-standard);
+  will-change: transform;
+  cursor: default;
+}
+.polaroids.is-phys .polaroid.is-top { box-shadow: var(--shadow-lg, var(--shadow-md)); }
+.polaroids.is-deck {
+  --pol: clamp(170px, 66cqw, 210px);
+  display: block;
+  min-height: calc(var(--pol) * 1.28 + 186px);
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.polaroids.is-deck .polaroid {
+  position: absolute;
+  left: 50%; top: calc(50% + 32px); /* the scene has the strip above the deck */
+  padding: 10px 10px 62px;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
+}
+.polaroids.is-deck.is-dragging .polaroid { cursor: grabbing; }
+.polaroids.is-deck .polaroid img { pointer-events: none; }
+.polaroids.is-deck .polaroid figcaption { left: 10px; right: 10px; bottom: 10px; font-size: var(--font-size-sm); }
+.b-photos:has(.is-deck) > .tap-hint::after { content: 'Swipe'; }
 
 /* Now producing: equaliser */
 .eq { display: flex; align-items: flex-end; gap: 3px; height: 56px; margin: var(--dimension-space-20) 0; }
@@ -3479,6 +3559,7 @@ html[data-motion="reduce"] {
 }
 @media (max-width: 640px) {
   html[data-motion="reduce"] .polaroid { transform: rotate(var(--rot)); }
+  html[data-motion="reduce"] .pol-scenes { display: none; } /* the swipe row fills the card */
 }
 
 /* Full-width dark "outro" wrap: a single canvas paints the organic

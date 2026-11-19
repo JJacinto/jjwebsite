@@ -21,6 +21,25 @@ const photos = [
   { src: '/assets/images/photo-guitar.webp', cap: 'Practicing quietly. The neighbors disagree.', capPt: 'A praticar baixinho. Os vizinhos discordam.', k: 2, rot: 4 },
 ];
 
+/* Line-art scenes for the photos card, one per photo, in the same order.
+   Drawn in a 480 x 440 box, all inside its top strip (y 12 to 118), which
+   the open photos leave free. */
+/* Nordschleife outline: the "Nürburgring Nordschleife" route from
+   OpenStreetMap (© OpenStreetMap contributors, ODbL), simplified to 139
+   points and fitted to a 130 x 104 box, in driving direction. */
+const ringPath = 'M81.9 75.9L60 89.8L55.1 95.6L53.6 98.3L51.5 100.4L50.6 102L49 102.1L47.4 103.1L45.4 101.7L43.1 99.2L42.3 99.7L40.7 102.4L37.9 103.9L36.6 103.9L32.8 102.3L30.3 102.1L29.1 102.5L28.4 102.4L27.4 101.6L26.6 100.1L25.3 99.1L24.7 97.8L20.9 96.8L20.1 94.7L13.9 90.2L9.2 84.4L8.9 81.6L10.1 78.5L10.6 74.4L9.8 68.8L5.9 59.6L4.2 57.8L0.4 55.9L0 55.2L0.2 54.3L0.8 53.8L6 51.4L8.7 49.3L13.8 44.4L15.8 40.2L15.9 37.1L17.7 35.2L17.1 33.7L17.1 33.1L20.8 30L25.2 25.5L26.6 23.4L27 21.9L26 18.5L25.4 18.2L23.6 18L21 16.3L20.7 15.6L21 14.8L23.5 13.5L25.2 12.1L25.7 10.1L27.1 8L28.5 7.2L30.2 7.5L33.8 9.9L34.5 11.2L35.1 11.5L36.2 10.3L37.6 10L41.5 9.7L45 10.3L46.2 8.5L46.3 6.3L50.6 4.4L57.1 2.8L60.7 0.2L61.9 0L62.6 0.6L62.9 1.8L62.9 7.8L63.4 10.1L65.1 12.4L66.8 13.6L71.1 15.4L75.2 15.3L80.2 15.9L83.7 16.9L87.5 19.3L90.7 20.7L92.3 20.4L94.4 19.3L98.7 16L104.7 14.9L105.4 15.6L105.2 16.8L99.9 20.9L99.7 21.6L100.3 22.1L100.9 21.9L101.5 20.7L103 19.5L106.6 18.3L109 17.9L110.9 16.5L112.5 14.3L112.5 11.9L113.8 9.9L114.5 9.5L120.4 11.4L122.3 13.5L124.9 14.2L127.1 16.8L127.3 18.2L126 22L127.2 23.3L129.7 24.3L130.1 28.3L129.2 29.1L125.1 28.9L124 29.3L123.3 30.9L121.8 32.9L121 34.9L121.2 40.4L120.9 41.2L119.7 42.4L116.8 43.5L114.6 46L112.6 49.6L108.8 52.2L102.5 54.2L100.7 54.4L99.8 54.1L97.8 52.6L97 52.4L93.4 54.6L93.1 55.7L94.4 57.1L99.6 59.3L100.9 62.1L100.6 64.4L99.5 65.5Z';
+const rulerTicks = Array.from({ length: 23 }, (_, i) => `M${20 + i * 20} 5v${i % 5 === 0 ? 8 : 4}`).join('')
+  + Array.from({ length: 6 }, (_, i) => `M5 ${20 + i * 20}h${i % 5 === 0 ? 8 : 4}`).join('');
+const stars = Array.from({ length: 26 }, (_, i) => ({
+  x: 24 + ((i * 137) % 436),
+  y: 22 + ((i * 53) % 92),
+  r: 0.8 + ((i * 7) % 4) * 0.3,
+  tw: i % 3 === 0,
+  d: ((i * 0.37) % 3).toFixed(2),
+}));
+const strings = [40, 50, 60, 70, 80, 90];
+const frets = [262, 299, 334, 367, 398, 427, 454];
+
 /* How I work. `body` and `tools` are the stack before LLMs; `now` and
    `plus` are what the same step looks like today (the same three
    chips on every card). The section's switch flips between the two. */
@@ -307,10 +326,151 @@ const loop = [
 
         <div class="board-grid">
           <div class="b-card b-photos reveal">
+            <div class="pol-scenes" aria-hidden="true" data-pol-scenes>
+              {/* Every scene lives in the top strip of the card (y 12 to 118 of
+                  a 480 x 440 box). The open photos sit below it, so nothing
+                  is drawn behind them. */}
+              {/* 0 · astronaut: space, measured like a design file */}
+              <svg class="pol-scene" viewBox="0 0 480 440" preserveAspectRatio="xMidYMin meet">
+                <path d={rulerTicks} />
+                {stars.map((s) => (
+                  <circle class={s.tw ? 'pol-fill pol-tw' : 'pol-fill'} cx={s.x} cy={s.y} r={s.r} style={`animation-delay:-${s.d}s`} />
+                ))}
+                <path d="M160 100h8M164 96v8M330 22h8M334 18v8" />
+                {/* a moon with something in orbit */}
+                <circle cx="88" cy="64" r="9" />
+                <path d="M83 61a3 3 0 0 1 4 2M90 68a2 2 0 0 1 3 -1" />
+                <g transform="rotate(-14 88 64)">
+                  <path id="pol-orbit" class="pol-dash" d="M36 64a52 17 0 1 0 104 0a52 17 0 1 0 -104 0" />
+                  <circle class="pol-fill" r="2.6"><animateMotion dur="11s" repeatCount="indefinite"><mpath href="#pol-orbit" /></animateMotion></circle>
+                </g>
+                <text x="130" y="34">0 G</text>
+                {/* a constellation drawn with the pen tool */}
+                <path d="M184 66C200 44 214 34 230 40S262 64 278 58S302 40 318 34" />
+                <path d="M212 30l36 20" />
+                <circle cx="212" cy="30" r="2.2" /><circle cx="248" cy="50" r="2.2" />
+                <path class="pol-fill" d="M181 63h6v6h-6zM227 37h6v6h-6zM275 55h6v6h-6zM315 31h6v6h-6z" />
+                {/* zero margin, dimensioned */}
+                <path d="M186 100h30M212 96l4 4l-4 4M254 100h-30M228 96l-4 4l4 4M220 90v20" />
+                <text x="262" y="104">margin: 0</text>
+                {/* ringed planet inside a selection box */}
+                <circle cx="396" cy="62" r="19" />
+                <ellipse cx="396" cy="62" rx="35" ry="7" transform="rotate(-16 396 62)" />
+                <rect class="pol-dash" x="354" y="34" width="84" height="56" />
+                <path class="pol-fill" d="M351 31h6v6h-6zM435 31h6v6h-6zM351 87h6v6h-6zM435 87h6v6h-6z" />
+                <text x="354" y="108">84 × 56</text>
+              </svg>
+
+              {/* 1 · padel: a court from above, the ball off every wall */}
+              <svg class="pol-scene" viewBox="0 0 480 440" preserveAspectRatio="xMidYMin meet">
+                <rect x="136" y="12" width="208" height="108" rx="3" />
+                <rect x="140" y="16" width="200" height="100" />
+                <path d="M170 16v100M310 16v100M170 66h140" />
+                <path class="pol-dash" d="M240 12v108" />
+                <path id="pol-rally" class="pol-faint pol-dash" d="M190 16L290 116L340 66L290 16L190 116L140 66Z" />
+                <circle class="pol-fill" r="3.6"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#pol-rally" /></animateMotion></circle>
+                {/* the lob that was meant to be a smash */}
+                <path class="pol-dash" d="M30 104Q74 -6 118 104" />
+                <path d="M110 92l8 12l-13 2" />
+                <text x="64" y="72">lob</text>
+                <text x="44" y="118">20 × 10 m</text>
+                {/* racket */}
+                <g transform="translate(322 -332) rotate(24 78 398)">
+                  <path d="M78 362c14 0 22 10 22 23s-9 23-17 27l-2 22h-6l-2 -22c-8 -4 -17 -14 -17 -27s8 -23 22 -23Z" />
+                  <path class="pol-fill" d="M71 376h2v2h-2zM78 373h2v2h-2zM85 376h2v2h-2zM71 386h2v2h-2zM78 384h2v2h-2zM85 386h2v2h-2zM78 395h2v2h-2z" />
+                </g>
+              </svg>
+
+              {/* 2 · tickets: a plane overhead, sun, palms, an overpacked case */}
+              <svg class="pol-scene" viewBox="0 0 480 440" preserveAspectRatio="xMidYMin meet">
+                <path id="pol-route" class="pol-dash" d="M-30 58Q230 -8 510 30" />
+                <g>
+                  <path d="M13 0L-9 -2.6L-12 -8.5H-15.5L-13.5 -2V2L-15.5 8.5H-12L-9 2.6Z" />
+                  <path d="M3 -1.6L-4 -15H-7.5L-4.5 -2M3 1.6L-4 15H-7.5L-4.5 2" />
+                  <animateMotion dur="10s" repeatCount="indefinite" rotate="auto"><mpath href="#pol-route" /></animateMotion>
+                </g>
+                {/* boarding pass */}
+                <rect x="28" y="56" width="100" height="44" rx="5" />
+                <path class="pol-dash" d="M100 56v44" />
+                <path d="M40 86h20M40 92h34M108 68h12M108 76h12M108 84h7" />
+                <text x="40" y="76">LIS → ?</text>
+                {/* cloud */}
+                <path class="pol-faint" d="M156 78h30a6 6 0 0 0 0 -12a9 9 0 0 0 -17 -3a7 7 0 0 0 -13 4a5.5 5.5 0 0 0 0 11Z" />
+                {/* sun on the horizon */}
+                <path d="M214 112a26 26 0 0 1 52 0M240 76v-10M214 86l-8 -8M266 86l8 -8M202 106h-10M278 106h10" />
+                <path d="M16 112h448" />
+                <g class="pol-waves">
+                  <path class="pol-faint" d="M-20 120q10 -5 20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0t20 0" />
+                </g>
+                {/* carry-on, over the limit */}
+                <rect x="312" y="74" width="28" height="36" rx="4" />
+                <path d="M320 74v-8h12v8M312 90q14 6 28 0" />
+                <text x="296" y="58">11 / 8 kg</text>
+                {/* palms */}
+                <path d="M398 112Q390 82 404 52M404 52Q384 38 366 52M404 52Q388 30 374 24M404 52Q404 32 414 20M404 52Q424 36 440 48M404 52Q424 50 432 68M404 52Q390 52 380 68" />
+                <path d="M442 112Q438 94 446 78M446 78Q434 70 424 78M446 78Q438 64 430 62M446 78Q456 66 466 72M446 78Q458 76 464 88" />
+              </svg>
+
+              {/* 3 · VR rig: the Nordschleife (outline from OpenStreetMap), one lap at a time */}
+              <svg class="pol-scene" viewBox="0 0 480 440" preserveAspectRatio="xMidYMin meet">
+                {/* sim wheel with its shift lights */}
+                <rect x="38" y="46" width="84" height="52" rx="14" />
+                <rect x="28" y="40" width="16" height="64" rx="7" /><rect x="116" y="40" width="16" height="64" rx="7" />
+                <rect x="66" y="54" width="28" height="14" rx="2" />
+                <circle cx="54" cy="60" r="3" /><circle cx="54" cy="76" r="3" /><circle cx="106" cy="60" r="3" /><circle cx="106" cy="76" r="3" />
+                <circle cx="70" cy="84" r="5" /><circle cx="90" cy="84" r="5" />
+                {Array.from({ length: 9 }, (_, i) => (
+                  <circle class="pol-fill pol-led" cx={56 + i * 6} cy="30" r="1.8" style={`animation-delay:${(i * 0.14).toFixed(2)}s`} />
+                ))}
+                <g transform="translate(175 14)">
+                  <path class="pol-faint" d={ringPath} stroke-width="4" />
+                  <path d={ringPath} />
+                  <path class="pol-lap" d={ringPath} pathLength="100" stroke-dasharray="5 95" stroke-width="2.4">
+                    <animate attributeName="stroke-dashoffset" from="100" to="0" dur="12s" repeatCount="indefinite" />
+                  </path>
+                </g>
+                <text x="340" y="40">NORDSCHLEIFE</text>
+                <text x="340" y="54">20.832 km</text>
+                <path d="M340 74h21.5M340 70v8M361.5 70v8" />
+                <text x="368" y="78">1 km</text>
+                <text x="436" y="78">N ↑</text>
+                <text class="pol-faint" x="340" y="112" style="font-size:7px">© OpenStreetMap</text>
+              </svg>
+
+              {/* 4 · guitar: a drum kit keeping time, six strings ringing */}
+              <svg class="pol-scene" viewBox="0 0 480 440" preserveAspectRatio="xMidYMin meet">
+                {/* drum kit from above */}
+                <circle cx="36" cy="84" r="14" /><circle cx="36" cy="84" r="2.4" />
+                <circle class="pol-hit pol-hit--hat" cx="36" cy="84" r="14" />
+                <circle cx="60" cy="40" r="18" /><circle cx="60" cy="40" r="2.4" />
+                <circle cx="70" cy="96" r="15" /><path class="pol-faint" d="M57 91l26 10M58 101l24 -10" />
+                <circle class="pol-hit pol-hit--snare" cx="70" cy="96" r="15" />
+                <circle cx="98" cy="52" r="11" /><circle cx="126" cy="52" r="12" />
+                <circle cx="112" cy="92" r="19" /><circle class="pol-faint" cx="112" cy="92" r="13" />
+                <circle class="pol-hit pol-hit--kick" cx="112" cy="92" r="19" />
+                <circle cx="156" cy="94" r="16" />
+                <circle cx="176" cy="48" r="20" /><circle cx="176" cy="48" r="4" />
+                <text x="22" y="20">♩ = 96</text>
+                {/* fretboard */}
+                <path d="M222 36v58M225 36v58" />
+                <path class="pol-faint" d={frets.map((x) => `M${x} 36v58`).join('')} />
+                <path class="pol-fill pol-faint" d="M316.5 62a3 3 0 1 0 0.1 0ZM382.5 62a3 3 0 1 0 0.1 0ZM440.5 62a3 3 0 1 0 0.1 0Z" />
+                {strings.map((y, i) => (
+                  <path d={`M222 ${y}Q342 ${y} 462 ${y}`} stroke-width={1.6 - i * 0.16}>
+                    <animate attributeName="d" dur={`${0.34 + i * 0.07}s`} repeatCount="indefinite"
+                      values={`M222 ${y}Q342 ${y - 4} 462 ${y};M222 ${y}Q342 ${y + 4} 462 ${y};M222 ${y}Q342 ${y - 4} 462 ${y}`} />
+                  </path>
+                ))}
+                <text x="222" y="26">E A D G B E</text>
+              </svg>
+            </div>
             <div class="polaroids" role="group" aria-label="Photos" data-pt-aria-label="Fotografias" data-polaroids>
               {photos.map((p) => (
                 <figure class="polaroid" tabindex="0" style={`--k:${p.k};--rot:${p.rot}deg`}>
-                  <img src={p.src} alt="" width="192" height="192" loading="lazy">
+                  <img src={p.src.replace('.webp', '-384.webp')}
+                    srcset={`${p.src.replace('.webp', '-384.webp')} 384w, ${p.src.replace('.webp', '-720.webp')} 720w`}
+                    sizes="260px"
+                    alt="" width="384" height="384" loading="lazy" decoding="async" draggable="false">
                   <figcaption data-pt={p.capPt}>{p.cap}</figcaption>
                 </figure>
               ))}
@@ -867,24 +1027,291 @@ const loop = [
   if (!wrap) return;
   wrap.classList.add('js');
 
-  /* ---- Polaroids: tap (or Enter) brings one to the front; tap it again,
-     tap elsewhere or press Escape to put it back. Hover does the same on
-     a mouse, in CSS. ---- */
+  /* ---- Polaroids. Every photo sits on four springs (x, y, tilt, size),
+     so nothing snaps: it eases, overshoots a little and settles.
+       fan  (mouse): the stack fans out and the photo nearest the pointer
+                     grows and straightens, its neighbours make room.
+       deck (touch, narrow screens): a pile you flick through. Drag the
+                     top photo off either side, or tap, and it tucks in
+                     at the back.
+       static (reduced motion): the CSS end state; tap or Enter brings one
+                     photo to the front, as before. ---- */
   const stack = wrap.querySelector('[data-polaroids]');
   if (stack) {
+    const host = stack.closest('.b-photos') || stack;
     const cards = Array.from(stack.querySelectorAll('.polaroid'));
+    const n = cards.length;
+    const root = document.documentElement;
+    const mqDeck = window.matchMedia('(hover: none), (max-width: 640px)');
+    const K = cards.map((c) => parseFloat(c.style.getPropertyValue('--k')) || 0);
+    const ROT = cards.map((c) => parseFloat(c.style.getPropertyValue('--rot')) || 0);
+    const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+    let mode = 'static';
+
+    /* The scene behind the photos follows the photo in front. Its motion
+       only runs while it shows, and never with reduced motion. */
+    const scenes = Array.from(host.querySelectorAll('.pol-scene'));
+    const sceneRun = (svg, on) => {
+      try { if (on) svg.unpauseAnimations(); else svg.pauseAnimations(); } catch (err) { /* no SMIL here */ }
+    };
+    const showScene = (i) => scenes.forEach((svg, j) => {
+      svg.classList.toggle('is-on', j === i);
+      sceneRun(svg, j === i && mode !== 'static');
+    });
+    scenes.forEach((svg) => sceneRun(svg, false));
+
+    /* static mode */
     const focusOn = (card) => {
-      const on = card && !card.classList.contains('is-focus');
+      const on = !!card && !card.classList.contains('is-focus');
       cards.forEach((c) => c.classList.toggle('is-focus', on && c === card));
       stack.classList.toggle('has-focus', on);
+      if (mode === 'static') showScene(on ? cards.indexOf(card) : -1);
     };
-    stack.addEventListener('click', (e) => focusOn(e.target.closest('.polaroid')));
+    stack.addEventListener('click', (e) => { if (mode === 'static') focusOn(e.target.closest('.polaroid')); });
     stack.addEventListener('keydown', (e) => {
+      if (mode !== 'static') return;
       const card = e.target.closest('.polaroid');
       if (card && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); focusOn(card); }
       if (e.key === 'Escape') focusOn(null);
     });
-    document.addEventListener('click', (e) => { if (!stack.contains(e.target)) focusOn(null); });
+    document.addEventListener('click', (e) => { if (mode === 'static' && !stack.contains(e.target)) focusOn(null); });
+
+    /* springs: v = value, vel = velocity, t = target, for [x, y, tilt, size] */
+    const STIFF = 190, DAMP = 20;
+    const EPS = [0.05, 0.05, 0.02, 0.0005];
+    const S = cards.map(() => ({ v: [0, 0, 0, 1], vel: [0, 0, 0, 0], t: [0, 0, 0, 1], held: false }));
+    let raf = 0, last = 0, topCard = -1;
+    const paint = () => S.forEach((p, i) => {
+      cards[i].style.transform = 'translate(-50%, -50%) translate3d(' + p.v[0].toFixed(2) + 'px,' + p.v[1].toFixed(2) + 'px,0) rotate(' + p.v[2].toFixed(2) + 'deg) scale(' + p.v[3].toFixed(4) + ')';
+    });
+    const setTop = (i) => {
+      if (i === topCard) return;
+      topCard = i;
+      cards.forEach((c, j) => c.classList.toggle('is-top', j === i));
+      showScene(i);
+    };
+
+    /* fan */
+    const FAN_DROP = 44;
+    const fan = { open: false, has: false, x: 0, band: 0, kb: -1, top: -1, lean: 0, lx: 0, lt: 0 };
+    const aimFan = (dt) => {
+      const gap = host.clientWidth * 0.14;
+      fan.lean *= Math.exp(-dt * 7);
+      const w = cards.map((_, i) => {
+        if (!fan.open) return 0;
+        if (fan.kb >= 0) return i === fan.kb ? 1 : 0;
+        if (!fan.has) return 0;
+        const d = (fan.x - K[i] * gap) / (gap * 0.62);
+        return fan.band * Math.exp(-d * d);
+      });
+      /* Which photo is in front. A new one has to win clearly, and the old
+         one keeps its place until it has shrunk back, so the order never
+         flickers between two neighbours. */
+      let best = 0;
+      w.forEach((x, i) => { if (x > w[best]) best = i; });
+      if (fan.top < 0) { if (w[best] > 0.03) fan.top = best; }
+      else if (w[best] > w[fan.top] + 0.06) fan.top = best;
+      else if (w[fan.top] < 0.03 && S[fan.top].v[3] < 1.03) fan.top = -1;
+      cards.forEach((c, i) => { const z = String(i === fan.top ? 10 : i + 1); if (c.style.zIndex !== z) c.style.zIndex = z; });
+      setTop(fan.top);
+      S.forEach((p, i) => {
+        if (!fan.open) { p.t = [K[i] * 26, K[i] * K[i] * 3, ROT[i], 1]; return; }
+        let push = 0;
+        w.forEach((x, j) => { if (j !== i) push += x * Math.sign(i - j); });
+        /* Open, the fan sits a little lower: the top of the card is the
+           scene's, and no photo covers it. */
+        const rest = FAN_DROP + K[i] * K[i] * 9;
+        p.t[0] = K[i] * gap + push * gap * 0.3 - w[i] * K[i] * gap * 0.12;
+        p.t[1] = rest + (FAN_DROP - 6 - rest) * w[i];
+        p.t[2] = (K[i] * 6 + fan.lean) * (1 - w[i]);
+        p.t[3] = 1 + 0.3 * w[i];
+      });
+      return Math.abs(fan.lean) > 0.05;
+    };
+    const fanPoint = (e) => {
+      const r = stack.getBoundingClientRect();
+      const x = e.clientX - (r.left + r.width / 2);
+      const y = e.clientY - (r.top + r.height / 2);
+      if (fan.has && e.timeStamp > fan.lt) {
+        const vx = (x - fan.lx) / (e.timeStamp - fan.lt) * 1000;
+        fan.lean = clamp(fan.lean * 0.7 + vx * 0.0025, -5, 5); /* photos lean the way the pointer brushes them */
+      }
+      fan.lx = x; fan.lt = e.timeStamp;
+      fan.x = x;
+      fan.band = clamp(1 - (Math.abs(y - FAN_DROP) - cards[0].offsetHeight * 0.6) / 50, 0, 1);
+      fan.has = true; fan.open = true;
+      wake();
+    };
+    const fanClose = () => { fan.has = false; fan.open = fan.kb >= 0; wake(); };
+
+    /* deck */
+    const deck = { order: cards.map((_, i) => i), g: 0, fly: null, out: 300, drag: null, nudged: false };
+    const zDeck = () => {
+      deck.order.forEach((i, d) => { cards[i].style.zIndex = String(n - d); });
+      setTop(deck.order[0]);
+    };
+    const land = () => {
+      deck.order.push(deck.order.shift());
+      deck.fly = null; deck.g = 0;
+      zDeck();
+    };
+    const aimDeck = (now) => {
+      /* A flicked photo flies clear of the pile, then goes to the back. */
+      if (deck.fly && (Math.abs(S[deck.fly.i].v[0]) > deck.out * 0.8 || now - deck.fly.t0 > 450)) land();
+      const g = deck.fly ? 1 : deck.g;
+      deck.order.forEach((i, d) => {
+        const p = S[i];
+        if (deck.fly && deck.fly.i === i) { p.t = [deck.fly.dir * deck.out, 24, deck.fly.dir * 18, 1]; return; }
+        const f = d === 0 ? 0 : d - g; /* the pile rises as the top photo leaves */
+        const side = i % 2 ? 1 : -1;
+        p.t = [side * 5 * f, 7 * f, ROT[i] * (0.3 + 0.9 * Math.min(f, 1)), 1 - 0.045 * f];
+      });
+      return false;
+    };
+    const next = (dir) => {
+      if (deck.fly) land();
+      const i = deck.order[0];
+      S[i].held = false;
+      deck.out = cards[i].offsetWidth * 1.25;
+      deck.fly = { i: i, dir: dir, t0: performance.now() };
+      S[i].vel[0] = dir * Math.max(Math.abs(S[i].vel[0]), 1400);
+      wake();
+    };
+    const toFront = (i) => {
+      if (deck.fly) land();
+      while (deck.order[0] !== i) deck.order.push(deck.order.shift());
+      zDeck(); wake();
+    };
+    const dragEnd = (flick) => {
+      const d = deck.drag;
+      deck.drag = null;
+      if (!d) return;
+      stack.classList.remove('is-dragging');
+      const p = S[d.i];
+      p.held = false;
+      if (!d.active) { if (flick) next(-1); return; } /* a tap */
+      const dx = p.v[0];
+      p.vel[0] = d.vx;
+      if (flick && (Math.abs(dx) > 90 || Math.abs(d.vx) > 650)) next(Math.abs(d.vx) > 650 ? Math.sign(d.vx) : Math.sign(dx));
+      else { deck.g = 0; wake(); }
+    };
+
+    const tick = (now) => {
+      const dt = Math.min((now - last) / 1000, 1 / 30);
+      last = now;
+      let busy = mode === 'fan' ? aimFan(dt) : aimDeck(now);
+      if (deck.fly) busy = true;
+      S.forEach((p) => {
+        for (let a = 0; a < 4; a++) {
+          if (p.held) { busy = true; continue; }
+          p.vel[a] += ((p.t[a] - p.v[a]) * STIFF - p.vel[a] * DAMP) * dt;
+          p.v[a] += p.vel[a] * dt;
+          if (Math.abs(p.vel[a]) > EPS[a] * 4 || Math.abs(p.t[a] - p.v[a]) > EPS[a]) busy = true;
+        }
+      });
+      paint();
+      raf = busy && mode !== 'static' ? requestAnimationFrame(tick) : 0;
+    };
+    function wake() {
+      if (raf || mode === 'static') return;
+      last = performance.now();
+      raf = requestAnimationFrame(tick);
+    }
+
+    /* pointer */
+    host.addEventListener('pointermove', (e) => { if (mode === 'fan') fanPoint(e); });
+    host.addEventListener('pointerdown', (e) => { if (mode === 'fan') fanPoint(e); });
+    host.addEventListener('pointerleave', (e) => { if (mode === 'fan' && e.pointerType !== 'touch') fanClose(); });
+    document.addEventListener('pointerdown', (e) => { if (mode === 'fan' && fan.has && !host.contains(e.target)) fanClose(); });
+
+    stack.addEventListener('pointerdown', (e) => {
+      if (mode !== 'deck' || deck.drag || e.button > 0 || !e.target.closest('.polaroid')) return;
+      if (deck.fly) land();
+      const i = deck.order[0];
+      const r = cards[i].getBoundingClientRect();
+      deck.drag = {
+        id: e.pointerId, i: i, x0: e.clientX, y0: e.clientY, lx: e.clientX, lt: e.timeStamp, vx: 0, active: false,
+        /* held above the middle it swings one way, below it the other */
+        swing: e.clientY > r.top + r.height / 2 ? -1 : 1, bx: S[i].v[0], by: S[i].v[1], mouse: e.pointerType === 'mouse',
+      };
+    });
+    stack.addEventListener('pointermove', (e) => {
+      const d = deck.drag;
+      if (!d || e.pointerId !== d.id) return;
+      const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+      if (!d.active) {
+        if (Math.abs(dx) < 6 || (!d.mouse && Math.abs(dx) < Math.abs(dy))) return;
+        d.active = true;
+        S[d.i].held = true;
+        stack.classList.add('is-dragging');
+        try { stack.setPointerCapture(d.id); } catch (err) { /* pointer already gone */ }
+      }
+      const p = S[d.i];
+      const dtm = Math.max(e.timeStamp - d.lt, 1);
+      d.vx = d.vx * 0.6 + ((e.clientX - d.lx) / dtm * 1000) * 0.4;
+      d.lx = e.clientX; d.lt = e.timeStamp;
+      p.v[0] = d.bx + dx;
+      p.v[1] = d.by + dy * 0.35;
+      p.v[2] = clamp(dx * 0.06 * d.swing, -22, 22);
+      p.v[3] = 1.03;
+      p.vel = [0, 0, 0, 0];
+      deck.g = clamp(Math.abs(dx) / 140, 0, 1);
+      wake();
+    });
+    stack.addEventListener('pointerup', (e) => { if (deck.drag && e.pointerId === deck.drag.id) dragEnd(true); });
+    stack.addEventListener('pointercancel', (e) => { if (deck.drag && e.pointerId === deck.drag.id) dragEnd(false); });
+
+    /* keyboard: the focused photo is the one in front */
+    stack.addEventListener('focusin', (e) => {
+      const i = cards.indexOf(e.target.closest('.polaroid'));
+      if (i < 0 || !e.target.matches(':focus-visible')) return;
+      if (mode === 'fan') { fan.kb = i; fan.open = true; wake(); }
+      if (mode === 'deck') toFront(i);
+    });
+    stack.addEventListener('focusout', () => {
+      if (mode !== 'fan' || fan.kb < 0) return;
+      fan.kb = -1; fan.open = fan.has; wake();
+    });
+
+    /* First time the deck is on screen, the top photo gives a small shrug
+       so it reads as something you can move. */
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        if (mode !== 'deck' || deck.nudged || !entries.some((en) => en.isIntersecting)) return;
+        deck.nudged = true;
+        io.disconnect();
+        setTimeout(() => {
+          if (mode !== 'deck' || deck.drag || deck.fly) return;
+          const p = S[deck.order[0]];
+          p.vel[0] = -520; p.vel[2] = -60;
+          wake();
+        }, 600);
+      }, { threshold: 0.6 });
+      io.observe(stack);
+    }
+
+    const setMode = () => {
+      const still = reduce || root.dataset.motion === 'reduce';
+      const want = still ? 'static' : (mqDeck.matches ? 'deck' : 'fan');
+      if (want === mode) return;
+      mode = want;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      focusOn(null);
+      deck.drag = null; deck.fly = null; deck.g = 0;
+      fan.open = false; fan.has = false; fan.kb = -1; fan.top = -1; fan.lean = 0;
+      topCard = -2; setTop(-1);
+      stack.classList.remove('is-dragging');
+      stack.classList.toggle('is-phys', mode !== 'static');
+      stack.classList.toggle('is-deck', mode === 'deck');
+      cards.forEach((c) => { c.style.transform = ''; c.style.zIndex = ''; });
+      if (mode === 'static') return;
+      if (mode === 'deck') { zDeck(); aimDeck(0); } else aimFan(0);
+      S.forEach((p) => { p.held = false; p.v = p.t.slice(); p.vel = [0, 0, 0, 0]; });
+      paint();
+    };
+    setMode();
+    mqDeck.addEventListener('change', setMode);
+    new MutationObserver(setMode).observe(root, { attributes: true, attributeFilter: ['data-motion'] });
   }
 
   /* ---- How I work: Before / Now switch. Opens on "before", flips to
