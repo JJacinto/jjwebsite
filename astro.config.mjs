@@ -11,8 +11,13 @@ export default defineConfig({
   site: 'https://joaojacinto.com',
   integrations: [
     ...(isDev ? [react()] : []),
-    /* Removed case: its page only redirects to /case-studies/. */
-    sitemap({ filter: (page) => !page.includes('/reshaping-an-ai-training-platform') }),
+    /* Left out of the sitemap: the removed case (its page only redirects
+       to /case-studies/) and the error pages, which are noindex. */
+    sitemap({
+      filter: (page) =>
+        !page.includes('/reshaping-an-ai-training-platform') &&
+        !/\/(403|404|500|error)\/?$/.test(page),
+    }),
   ],
   outDir: './dist',
   redirects: {

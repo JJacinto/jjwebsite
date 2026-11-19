@@ -222,9 +222,12 @@ const tocItems = c.slug === 'redefining-webinar-customization'
              from the first screen (sticky while the teaser scrolls). -->
         <div class="case-gate-split">
         <div class="case-gate-main">
+        {/* The gate repeats the case title. It is a level-1 heading for
+            screen readers while the gate is up, but not a second <h1>
+            element: the page's own <h1> stays the only one in the HTML. */}
         <header class="case-gate-head">
           <div class="case-cat" data-pt={c.catPt}>{c.cat}</div>
-          <h1 class="case-title" data-pt={c.titlePt}>{c.title}</h1>
+          <p class="case-title" role="heading" aria-level="1" data-pt={c.titlePt}>{c.title}</p>
           <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
         </header>
 

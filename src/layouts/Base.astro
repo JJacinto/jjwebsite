@@ -21,6 +21,8 @@ interface Props {
   /* The page renders <Footer /> itself, inside its own field (contact), so
      Base skips the closing band and its second field. */
   footerInPage?: boolean;
+  /* Keep the page out of search results (error pages). */
+  noindex?: boolean;
 }
 
 const {
@@ -34,6 +36,7 @@ const {
   showCta = true,
   disablePageParticles = false,
   footerInPage = false,
+  noindex = false,
 } = Astro.props;
 
 const siteUrl     = 'https://joaojacinto.com';
@@ -56,7 +59,9 @@ const umamiOn  = !!(umamiSrc && umamiId);
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title data-pt={titlePt}>{title}</title>
 <meta name="description" content={description} data-pt-content={descriptionPt}>
-<link rel="canonical" href={canonical}>
+{noindex
+  ? <meta name="robots" content="noindex">
+  : <link rel="canonical" href={canonical}>}
 <link rel="icon" type="image/svg+xml" href="/assets/jj-logo.svg">
 
 <!-- Open Graph -->
