@@ -9,12 +9,12 @@ test.describe('next-case pager', () => {
       const expectedNext = VISIBLE_CASE_SLUGS[(i + 1) % VISIBLE_CASE_SLUGS.length];
 
       const nextLink = page.locator('.next-case');
-      await expect(nextLink).toHaveAttribute('href', `/case-studies/${expectedNext}`);
+      await expect(nextLink).toHaveAttribute("href", `/case-studies/${expectedNext}/`);
       expect(page.url()).not.toContain(HIDDEN_CASE_SLUG);
 
       await nextLink.scrollIntoViewIfNeeded();
       await nextLink.click();
-      await page.waitForURL(`**/case-studies/${expectedNext}`);
+      await page.waitForURL(`**/case-studies/${expectedNext}/`);
     }
 
     // After full rotation we're back at the first slug.

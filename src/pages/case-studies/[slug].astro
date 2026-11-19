@@ -106,8 +106,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
 <Base
   activePage="cases"
   breadcrumb={[
-    { name: 'Case studies', path: '/case-studies/' },
-    { name: c.title, path: `/case-studies/${c.slug}/` },
+    { name: 'Case studies', namePt: 'Casos de estudo', path: '/case-studies/' },
+    { name: c.title, namePt: c.titlePt, path: `/case-studies/${c.slug}/` },
   ]}
   jsonLd={[{
     /* The case study itself. Marked as not free to read because the full
@@ -125,6 +125,21 @@ const tocItems = c.slug === 'redefining-webinar-customization'
     author: { '@id': 'https://joaojacinto.com/#person' },
     sourceOrganization: { '@type': 'Organization', name: c.company },
     mainEntityOfPage: { '@id': `https://joaojacinto.com/case-studies/${c.slug}/#webpage` },
+  }]}
+  jsonLdPt={[{
+    '@type': 'CreativeWork',
+    '@id': `https://joaojacinto.com/pt/case-studies/${c.slug}/#case`,
+    name: c.titlePt ?? c.title,
+    headline: c.titlePt ?? c.title,
+    description: c.subtitlePt ?? c.subtitle,
+    url: `https://joaojacinto.com/pt/case-studies/${c.slug}/`,
+    image: `https://joaojacinto.com${c.img}`,
+    keywords: (c.keywordsPt ?? c.keywords).join(', '),
+    inLanguage: 'pt-PT',
+    isAccessibleForFree: false,
+    author: { '@id': 'https://joaojacinto.com/#person' },
+    sourceOrganization: { '@type': 'Organization', name: c.company },
+    mainEntityOfPage: { '@id': `https://joaojacinto.com/pt/case-studies/${c.slug}/#webpage` },
   }]}
   title={`${c.title} — João Jacinto`}
   description={c.subtitle}
