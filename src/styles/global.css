@@ -2152,7 +2152,7 @@ html.xray-on .xray-grid { opacity: 1; }
 }
 
 /* ---- How I work ---------------------------------------------------- */
-.loop-track { position: relative; }
+.loop-track, .loop-rail { position: relative; }
 .loop-row {
   list-style: none;
   position: relative;
@@ -3471,7 +3471,9 @@ html[data-motion="reduce"] { .chip-panel { animation: none; } }
   .loop-row { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .loop-line {
     display: block;
-    top: 0; bottom: 0; left: 50%; right: auto;
+    /* Runs down the cards only and stops on the "Run by" box's top edge,
+       so it never crosses the chips inside it. */
+    top: 0; bottom: calc(-1 * var(--dimension-space-24)); left: 50%; right: auto;
     width: 1px; height: auto;
     transform-origin: top center;
   }
