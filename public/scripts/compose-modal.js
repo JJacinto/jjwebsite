@@ -8,12 +8,16 @@
   var INTENT_LABELS = { 0: "Just saying hi", 1: "I have a project", 2: "Book a call", 3: "I\u2019m hiring" };
   var INTENT_LABELS_PT = { 0: "S\u00f3 a dizer ol\u00e1", 1: "Tenho um projeto", 2: "Marcar chamada", 3: "Estou a contratar" };
   var INTENT_ORDER  = [3, 0, 1];
-  /* Language: the page switch lives in Base.astro (window.jjLang). Static
-     labels carry data-pt and are swapped by it (jjLangRefresh after mount);
-     text this script writes itself picks from T(en, pt) and is redone by
-     the jj:langchange hooks below. */
-  var L = function () { return (window.jjLang && window.jjLang() === 'pt') ? 'pt' : 'en'; };
-  var T = function (en, pt) { return L() === 'pt' ? pt : en; };
+  /* Language: the page switch lives in Base.astro (window.jjLang, a code
+     like "en", "pt", "de"). Static labels carry data-pt and are swapped by
+     it (jjLangRefresh after mount); text this script writes itself picks
+     from T(en, pt) (Portuguese beside it, other languages from the page's
+     translation table) and is redone by the jj:langchange hooks below.
+     The message sent to João is not shown to the visitor, so TM writes it
+     in Portuguese or English only. */
+  var L = function () { return window.jjLang ? window.jjLang() : 'en'; };
+  var T = function (en, pt) { return window.jjT ? window.jjT(en, pt) : en; };
+  var TM = function (en, pt) { return L() === 'pt' ? pt : en; };
   var langHooks = [];
   document.addEventListener('jj:langchange', function () {
     langHooks.forEach(function (fn) { fn(); });
@@ -28,9 +32,31 @@
   var CAL_MONTHS_PT = ['Janeiro','Fevereiro','Mar\u00e7o','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   var CAL_WDAYS  = ['Mo','Tu','We','Th','Fr','Sa','Su'];
   var CAL_WDAYS_PT = ['Seg','Ter','Qua','Qui','Sex','S\u00e1b','Dom'];
-  var calLocale = function () { return L() === 'pt' ? 'pt-PT' : 'en-GB'; };
+  /* English and Portuguese keep their hand-written names; the other
+     languages take theirs from Intl, in the page's language. */
+  var calLocale = function () {
+    var l = L();
+    return l === 'pt' ? 'pt-PT' : l === 'en' ? 'en-GB' : (document.documentElement.lang || 'en');
+  };
+  var calMonthLabel = function (yr, mo) {
+    var l = L();
+    if (l === 'pt') return CAL_MONTHS_PT[mo] + ' ' + yr;
+    if (l === 'en') return CAL_MONTHS[mo] + ' ' + yr;
+    try { return new Intl.DateTimeFormat(calLocale(), { month: 'long', year: 'numeric' }).format(new Date(yr, mo, 1)); }
+    catch (_) { return CAL_MONTHS[mo] + ' ' + yr; }
+  };
+  var calWeekdays = function () {
+    var l = L();
+    if (l === 'pt') return CAL_WDAYS_PT;
+    if (l === 'en') return CAL_WDAYS;
+    try {
+      var f = new Intl.DateTimeFormat(calLocale(), { weekday: 'short' });
+      /* 4 January 2021 was a Monday; the grid starts on Monday. */
+      return CAL_WDAYS.map(function (_, i) { return f.format(new Date(2021, 0, 4 + i)); });
+    } catch (_) { return CAL_WDAYS; }
+  };
   var timeLabel = function (t) {
-    if (L() === 'pt') return t;
+    if (L() !== 'en') return t;
     var h = parseInt(t.split(':')[0], 10);
     return (h % 12 || 12) + ':' + t.split(':')[1] + ' ' + (h >= 12 ? 'PM' : 'AM');
   };
@@ -138,7 +164,7 @@
           '<button class="cal-nav-btn" id="cal-next" type="button" aria-label="Next month" data-pt-aria-label="M\u00eas seguinte">&#8594;</button>' +
         '</div>' +
         '<div class="cal-weekdays">' +
-          (L() === 'pt' ? CAL_WDAYS_PT : CAL_WDAYS).map(function (d) { return '<span>' + d + '</span>'; }).join('') +
+          calWeekdays().map(function (d) { return '<span>' + d + '</span>'; }).join('') +
         '</div>' +
         '<div class="cal-grid" id="cal-grid"></div>' +
         '<div class="cal-time-wrap" id="cal-time" style="display:none">' +
@@ -157,7 +183,7 @@
     var lbl     = document.getElementById('cal-month-label');
     var prevBtn = document.getElementById('cal-prev');
     if (!grid || !lbl) return;
-    lbl.textContent = (L() === 'pt' ? CAL_MONTHS_PT : CAL_MONTHS)[mo] + ' ' + yr;
+    lbl.textContent = calMonthLabel(yr, mo);
     var today = new Date(); today.setHours(0, 0, 0, 0);
     if (prevBtn) prevBtn.disabled = (yr === today.getFullYear() && mo === today.getMonth());
     var firstDow = (new Date(yr, mo, 1).getDay() + 6) % 7;
@@ -212,7 +238,7 @@
     buildCalGrid(calYear, calMonth);
     langHooks.push(function () {
       var wd = document.querySelectorAll('.cal-weekdays span');
-      var names = L() === 'pt' ? CAL_WDAYS_PT : CAL_WDAYS;
+      var names = calWeekdays();
       wd.forEach(function (el, i) { if (names[i]) el.textContent = names[i]; });
       document.querySelectorAll('#cal-time-select option[value]:not([value=""])').forEach(function (o) {
         o.textContent = timeLabel(o.value);
@@ -245,11 +271,11 @@
     });
   };
 
+  var TIMELINE_EN = ['Exploring', 'Flexible (3–6 mo)', 'Soon (1–3 mo)', 'ASAP'];
+  var TIMELINE_PT = ['A explorar', 'Flex\u00edvel (3–6 meses)', 'Em breve (1–3 meses)', 'ASAP'];
   var bindProjectSlider = function (container) {
     var slider = container.querySelector('#proj-timeline');
     var val    = container.querySelector('#proj-timeline-val');
-    var labelsEN = ['Exploring', 'Flexible (3–6 mo)', 'Soon (1–3 mo)', 'ASAP'];
-    var labelsPT = ['A explorar', 'Flex\u00edvel (3–6 meses)', 'Em breve (1–3 meses)', 'ASAP'];
     /* Pulse cadence per timeline step — a slow, calm beat at
        "Exploring" accelerating to an urgent flicker at "ASAP".
        Drives the slider thumb's --slider-pulse-dur in global.css. */
@@ -274,8 +300,7 @@
       slider.style.setProperty('--slider-pulse-spread', pulseSpread[v - 1] || '14px');
       slider.style.setProperty('--slider-pulse-color', pulseColor[v - 1] || '#8080f0');
       val.style.color = pulseColor[v - 1] || '';
-      var labels = L() === 'pt' ? labelsPT : labelsEN;
-      var label = labels[v - 1] || labels[0];
+      var label = T(TIMELINE_EN[v - 1] || TIMELINE_EN[0], TIMELINE_PT[v - 1] || TIMELINE_PT[0]);
       val.textContent = label;
       slider.setAttribute('aria-valuetext', label);
     };
@@ -408,11 +433,12 @@
 
   var collectFormData = function () {
     var pt = L() === 'pt';
+    var T = TM;   /* the message is for João: Portuguese or English */
     var notSpecified = T('Not specified', 'N\u00e3o indicado');
     var notSelected  = T('Not selected', 'N\u00e3o indicada');
     if (intentIdx === 2) {
       var dateStr = calSel
-        ? calSel.toLocaleDateString(calLocale(), { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+        ? calSel.toLocaleDateString(pt ? 'pt-PT' : 'en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
         : notSelected;
       var timeEl  = document.getElementById('cal-time-select');
       var timeStr = timeEl && timeEl.value ? timeEl.value : notSelected;
@@ -425,8 +451,9 @@
       var engagement  = engEl ? (pt ? (engEl.value === 'One-time' ? 'Pontual' : 'Parcial') : engEl.value) : notSpecified;
       var budgetEl    = document.querySelector('#compose-fields-project input[name="proj-budget"]:checked');
       var budget      = budgetEl ? budgetEl.value : notSpecified;
-      var timelineEl  = document.getElementById('proj-timeline-val');
-      var timeline    = timelineEl ? timelineEl.textContent : notSpecified;
+      var timelineEl  = document.getElementById('proj-timeline');
+      var tlIdx       = timelineEl ? (+timelineEl.value || 1) - 1 : -1;
+      var timeline    = tlIdx > -1 ? (pt ? TIMELINE_PT : TIMELINE_EN)[tlIdx] : notSpecified;
       var ctxEl       = document.getElementById('proj-context');
       var context     = ctxEl ? ctxEl.value : '';
       var linksEl     = document.getElementById('proj-links');
@@ -510,8 +537,8 @@
     var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
     set('compose-time-av', t.av.s);
     planet(document.getElementById('compose-planet-av'), t.av.dec, col.av);
-    set('compose-desc', T('Your time ' + t.you.s + '. Jo\u00e3o\u2019s time in Aveiro ' + t.av.s + '.',
-                          'A tua hora ' + t.you.s + '. Hora do Jo\u00e3o em Aveiro ' + t.av.s + '.'));
+    set('compose-desc', T('Your time {you}. Jo\u00e3o\u2019s time in Aveiro {av}.', 'A tua hora {you}. Hora do Jo\u00e3o em Aveiro {av}.')
+      .replace('{you}', t.you.s).replace('{av}', t.av.s));
   };
   var startClock = function () {
     updateBodies();
@@ -591,7 +618,7 @@
     if (!modal || !h || !p) return;
     var t = getTimes();
     var col = litColors(modal);
-    h.textContent = T('Got it. It\u2019s ' + t.av.s + ' in Aveiro.', 'Recebido. S\u00e3o ' + t.av.s + ' em Aveiro.');
+    h.textContent = T('Got it. It\u2019s {time} in Aveiro.', 'Recebido. S\u00e3o {time} em Aveiro.').replace('{time}', t.av.s);
     p.textContent = T('I\u2019ll reply within a day or two.', 'Respondo dentro de um ou dois dias.');
     planet(document.getElementById('compose-sent-you'), t.you.dec, col.you);
     planet(document.getElementById('compose-sent-av'), t.av.dec, col.av);
@@ -824,7 +851,7 @@
       if (!validateCurrentForm()) return;
       var gate     = checkThrottle();
       if (!gate.ok) {
-        btnLabel.textContent = T('Try again in ', 'Tenta daqui a ') + formatRemaining(gate.remainingMs);
+        btnLabel.textContent = T('Try again in {time}', 'Tenta daqui a {time}').replace('{time}', formatRemaining(gate.remainingMs));
         sendBtn.disabled = true;
         setTimeout(function () {
           btnLabel.textContent = sendLabel();
@@ -871,7 +898,7 @@
         body: JSON.stringify({
           access_key: WEB3FORMS_KEY,
           to: CONTACT_EMAIL,
-          from_name: shared.name || T('Website visitor', 'Visitante do site'),
+          from_name: shared.name || TM('Website visitor', 'Visitante do site'),
           replyto: shared.email || '',
           subject: data.subject,
           message: data.message,
@@ -959,7 +986,7 @@
   var BOLT = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M9 1L3 10h5L7 15l7-9h-5L9 1z"/></svg>';
   var NOTE = '<svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M4.5 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4zM4.5 10.5V4l8-1.5V5l-8 1.5V10.5z"/></svg>';
 
-  var T = function (en, pt) { return (window.jjLang && window.jjLang() === 'pt') ? pt : en; };
+  var T = function (en, pt) { return window.jjT ? window.jjT(en, pt) : en; };
 
   function updateStatus() {
     var now      = new Date();
@@ -995,13 +1022,15 @@
 
   var emailBtn = document.getElementById('footer-email-btn');
   if (emailBtn) {
-    var origHTML = emailBtn.innerHTML;
     emailBtn.addEventListener('click', function () {
       navigator.clipboard && navigator.clipboard.writeText('contact@joaojacinto.com').then(function () {
-        emailBtn.innerHTML = (window.jjLang && window.jjLang() === 'pt') ? 'Copiado ✓' : 'Copied ✓';
+        /* The label to come back to, kept on the button (read at click
+           time, so it is never older than a language swap). */
+        if (!emailBtn.classList.contains('copied')) emailBtn.setAttribute('data-orig', emailBtn.innerHTML);
+        emailBtn.innerHTML = T('Copied ✓', 'Copiado ✓');
         emailBtn.classList.add('copied');
         setTimeout(function () {
-          emailBtn.innerHTML = origHTML;
+          emailBtn.innerHTML = emailBtn.getAttribute('data-orig') || emailBtn.innerHTML;
           emailBtn.classList.remove('copied');
         }, 2000);
       });
