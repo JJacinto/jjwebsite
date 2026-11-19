@@ -251,9 +251,21 @@ const umamiOn  = !!(umamiSrc && umamiId);
     }
   }
 
-  try {
-    if (localStorage.getItem('lang') === 'pt') root.lang = 'pt-PT';
-  } catch (_) {}
+  /* Language: the visitor's saved choice wins. With none saved (a first
+     visit), follow the browser: go down its list of preferred languages
+     and take the first that is English or Portuguese. The guess is not
+     saved, so only a choice made in the settings menu sticks. */
+  var savedLang = null;
+  try { savedLang = localStorage.getItem('lang'); } catch (_) {}
+  if (savedLang !== 'pt' && savedLang !== 'en') {
+    savedLang = 'en';
+    var wanted = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ''];
+    for (var li = 0; li < wanted.length; li++) {
+      var code = String(wanted[li]).toLowerCase().slice(0, 2);
+      if (code === 'pt' || code === 'en') { savedLang = code; break; }
+    }
+  }
+  if (savedLang === 'pt') root.lang = 'pt-PT';
   apply();
 
   /* Contrast and motion follow the system. */
@@ -351,8 +363,8 @@ const umamiOn  = !!(umamiSrc && umamiId);
           <fieldset class="settings-group">
             <legend data-pt="Idioma">Language</legend>
             <div class="settings-seg">
-              <label><input type="radio" name="jj-lang" value="en"><span lang="en">English</span></label>
-              <label><input type="radio" name="jj-lang" value="pt"><span lang="pt-PT">Português</span></label>
+              <label><input type="radio" name="jj-lang" value="en"><span lang="en"><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true"><path fill="#012169" d="M0 0h36v26H0z"/><path stroke="#fff" stroke-width="5" d="M0 0l36 26M36 0L0 26"/><path stroke="#c8102e" stroke-width="2" d="M0 0l36 26M36 0L0 26"/><path stroke="#fff" stroke-width="9" d="M18 0v26M0 13h36"/><path stroke="#c8102e" stroke-width="5" d="M18 0v26M0 13h36"/></svg>English</span></label>
+              <label><input type="radio" name="jj-lang" value="pt"><span lang="pt-PT"><svg class="settings-flag" viewBox="0 0 36 26" aria-hidden="true"><path fill="#da291c" d="M0 0h36v26H0z"/><path fill="#046a38" d="M0 0h14.4v26H0z"/><circle cx="14.4" cy="13" r="5.2" fill="#ffe000"/><path fill="#da291c" d="M11.8 10h5.2v3.8a2.6 2.6 0 0 1-5.2 0z"/><path fill="#fff" d="M13 11.2h2.8v2.5a1.4 1.4 0 0 1-2.8 0z"/></svg>Português</span></label>
             </div>
           </fieldset>
 
@@ -420,7 +432,7 @@ const umamiOn  = !!(umamiSrc && umamiId);
       <section class="global-cta-section">
         <div class="container">
           <div class="about-cta reveal" data-xray>
-            <aside class="xray-note" data-xray-note data-pt="Uma pergunta, duas respostas: escreve-me ou marca uma chamada. Mais nada compete pelo clique.">One ask, two answers: write to me or book a call. Nothing else competes for the click.</aside>
+            <aside class="xray-note" data-xray-note data-pt="No fim de uma página, ou queres falar ou não queres. Ela fecha com uma só pergunta e as duas formas de responder: por escrito ou numa chamada. Mais nada compete pelo clique.">By the end of a page you either want to talk or you don't. It closes on one question and the two ways people answer it: in writing, or on a call. Nothing else competes for the click.</aside>
             <div class="about-cta-avatar-stack" aria-hidden="true">
               {/* Six-frame roulette, hover-triggered. Each <img> is
                   absolutely positioned over the others; the original
