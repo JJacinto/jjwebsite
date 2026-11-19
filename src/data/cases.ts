@@ -31,6 +31,11 @@ export interface Case {
   sections: CaseSection[];
   quote: string;
   quotePt?: string;
+  /* One public paragraph on the password gate, above the summary: the
+     company, my role, when, how, and the outcome. It is the plain-prose
+     text search engines read while the full write-up stays private. */
+  intro?: string;
+  introPt?: string;
   /* The 30-second summary, shown on the case page and on the password gate. */
   problem: string;
   problemPt?: string;
@@ -76,6 +81,8 @@ export const CASES: Case[] = [
     ],
     sections: [],
     quote: '',
+    intro: 'In 2023 I spent four months at StreamYard as the product designer on webinar customization. Hosts wanted their On-Air webinars to look like their own brand, and they wanted to ask attendees more than a name and an email. I designed the branding controls with small live previews and a settings page with five custom registration fields. Four months after launch, one in three webinars used custom fields, and weekly webinars had grown from about 200 to about 600.',
+    introPt: 'Em 2023 passei quatro meses na StreamYard como product designer da personalização de webinars. Os organizadores queriam que os webinars On-Air tivessem a cara da marca deles, e queriam pedir aos participantes mais do que um nome e um email. Desenhei os controlos de marca com pequenas pré-visualizações em direto e uma página de definições com cinco campos de registo personalizados. Quatro meses depois do lançamento, um em cada três webinars usava campos personalizados, e os webinars semanais tinham passado de cerca de 200 para cerca de 600.',
     problem: "Hosts couldn't make their webinars look on-brand, and registration only collected a name and an email.",
     problemPt: 'Os organizadores não conseguiam pôr os webinars com a cara da marca, e o registo só recolhia um nome e um email.',
     cut: "A full page builder. It meant building a layout engine our timeline didn't have, so we shipped templates where one colour choice generates the whole palette.",
@@ -114,6 +121,8 @@ export const CASES: Case[] = [
     ],
     sections: [],
     quote: '',
+    intro: "In 2022 I co-led StreamYard's first major study of webinar organisers. Until then the roadmap was scored from sales calls and support tickets. Over three months we interviewed 11 experienced organisers who paid for competing tools, ran a concept test in each interview, and synthesised everything in Dovetail into a five-stage journey map. I presented it to the whole company. It became the first shared knowledge base on organisers, and the Growth team turned its insights into new tests.",
+    introPt: 'Em 2022 co-liderei o primeiro grande estudo da StreamYard sobre organizadores de webinars. Até aí, o roadmap era pontuado com base em chamadas de vendas e tickets de suporte. Em três meses entrevistámos 11 organizadores experientes que pagavam por ferramentas concorrentes, fizemos um teste de conceito em cada entrevista e sintetizámos tudo no Dovetail num mapa de jornada de cinco fases. Apresentei-o à empresa inteira. Tornou-se a primeira base de conhecimento partilhada sobre organizadores, e a equipa de Growth transformou os insights em novos testes.',
     problem: 'A year after launch, the webinar roadmap was scored from sales calls and support tickets, with no long-term picture of the people organising webinars.',
     problemPt: 'Um ano após o lançamento, o roadmap de webinars era pontuado com base em chamadas de vendas e tickets de suporte, sem uma visão de longo prazo de quem organizava webinars.',
     cut: 'Our own users. We recruited experienced organisers who paid for competing tools, to hear what we were missing.',
@@ -152,6 +161,8 @@ export const CASES: Case[] = [
     ],
     sections: [],
     quote: '',
+    intro: "From 2022 to 2023 I led and managed StreamYard's design system across six product teams. Figma and code had drifted apart, and some components existed in five or more versions. With no new headcount, I set up a contribution model so designers from every team could propose components through fixed checkpoints. In ten months we shipped tokens, more than 15 fully specified components and one-setting light and dark theming, before the company's sale stopped the project.",
+    introPt: 'De 2022 a 2023 liderei e geri o design system da StreamYard em seis equipas de produto. O Figma e o código tinham-se afastado, e alguns componentes existiam em cinco ou mais versões. Sem novas contratações, montei um modelo de contribuição para que designers de todas as equipas pudessem propor componentes através de checkpoints fixos. Em dez meses lançámos tokens, mais de 15 componentes totalmente especificados e temas claro e escuro com uma só definição, antes de a venda da empresa parar o projeto.',
     problem: 'Designs and code had drifted apart. Some components existed in five or more versions, and designers and engineers kept rebuilding them.',
     problemPt: 'Os designs e o código tinham-se afastado. Alguns componentes existiam em cinco ou mais versões, e designers e engenheiros estavam sempre a reconstruí-los.',
     cut: 'New headcount and a big-bang rebuild. A contribution model let designers from six teams propose components through fixed checkpoints.',
@@ -215,6 +226,8 @@ export const CASES: Case[] = [
     ],
     sections: [],
     quote: '',
+    intro: "In 2019 and 2020 I was the lead product designer on Namecheap's in-house support chat. Agents were handling five or more chats across more than 20 browser tabs in a dated tool, and customers struggled to reach chat at all. Over ten months I designed a floating chat widget, a new agent app and a white-label design system for namecheap.com and ssls.com. Four months after launch, chats had grown 28.9% and 97.4% of feedback was positive.",
+    introPt: 'Em 2019 e 2020 fui o lead product designer do chat de suporte interno da Namecheap. Os agentes geriam cinco ou mais chats em mais de 20 separadores do browser, numa ferramenta datada, e os clientes tinham dificuldade em chegar sequer ao chat. Em dez meses desenhei um widget de chat flutuante, uma nova app para agentes e um design system white-label para namecheap.com e ssls.com. Quatro meses depois do lançamento, os chats tinham crescido 28,9% e 97,4% do feedback era positivo.',
     problem: 'Support agents handled five or more chats across 20+ browser tabs in a dated tool, and customers struggled to reach chat without their account details.',
     problemPt: 'Os agentes de suporte geriam cinco ou mais chats em mais de 20 separadores do browser, numa ferramenta datada, e os clientes tinham dificuldade em chegar ao chat sem os dados da conta.',
     cut: 'The separate chat window. The chat became a floating widget that stays with you while you browse.',

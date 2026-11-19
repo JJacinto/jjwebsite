@@ -252,6 +252,8 @@ const tocItems = c.slug === 'redefining-webinar-customization'
           <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
         </header>
 
+        {c.intro && <p class="case-intro" data-pt={c.introPt}>{c.intro}</p>}
+
         <CaseSummary c={c} anchor={false} />
 
         <div class={`outcomes ${outcomesClass} case-gate-outcomes`}>
