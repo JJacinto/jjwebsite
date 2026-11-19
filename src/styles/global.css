@@ -6155,6 +6155,15 @@ html[data-motion="reduce"] .settings-seg::before { transition: none; }
   color: var(--text-secondary);
   transition: color 240ms cubic-bezier(0.4, 0, 0.2, 1);
 }
+/* Flag beside each language name: a small rectangle with softened
+   corners, sized in rem so it grows with the text-size setting. The
+   hairline keeps a flag's white areas apart from the white thumb. */
+.settings-seg span:has(.settings-flag) { gap: var(--dimension-space-8); }
+.settings-flag {
+  width: 1.125rem; height: 0.8125rem; flex-shrink: 0;
+  border-radius: 3px; overflow: hidden;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 28%, transparent);
+}
 .settings-seg label:hover span { color: var(--text-primary); }
 .settings-seg input:checked + span { color: var(--sp-bg); }
 .settings-seg input:focus-visible + span,
