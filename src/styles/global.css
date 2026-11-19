@@ -127,6 +127,38 @@ html[data-motion="reduce"] *::after {
   --fill-brand-muted: rgba(128, 128, 240, 0.18);
 }
 
+/* ──────────────────────────────────────────────────────────────────
+ * Floating surfaces: one recipe for everything that floats above the
+ * page (settings panel, chip popovers, tooltips).
+ *
+ * The page is near black and its cards are drawn in violet, so a
+ * floating surface is the card colour with a little violet in it, a
+ * violet hairline and a deep shadow. It reads as one step above a
+ * card, never as a grey box from another site.
+ *
+ * Two sizes share it: .popover-sized things (content you read or
+ * operate) use --float-radius, tooltips (one short line) use
+ * --float-radius-tip. Change a colour here and every one follows.
+ * ────────────────────────────────────────────────────────────── */
+:root {
+  --float-bg: color-mix(in srgb, var(--color-primary-40) 7%, var(--color-neutral-90));
+  --float-line: color-mix(in srgb, var(--color-primary-40) 30%, transparent);
+  --float-ink: var(--color-neutral-30);
+  --float-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-neutral-30) 6%, transparent),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 18px 40px -10px rgba(0, 0, 0, 0.65);
+  --float-radius: var(--radius-card);
+  --float-radius-tip: var(--dimension-radius-sm);
+}
+/* High contrast: no tint, no shadow, a full-strength outline. */
+html[data-contrast="high"] {
+  --float-bg: #000;
+  --float-line: var(--color-neutral-0);
+  --float-ink: var(--color-neutral-0);
+  --float-shadow: none;
+}
+
 .container { max-width: var(--dimension-size-container-default); margin: 0 auto; padding: 0 var(--spacing-container-pad); }
 
 h1, h2, h3, h4 {
@@ -1171,10 +1203,11 @@ html[data-motion="reduce"] {
 html[data-motion="reduce"] { .brands-track { animation: none; } }
 .brands-tooltip {
   position: fixed; z-index: var(--z-toast); pointer-events: none;
-  padding: var(--dimension-space-6) var(--dimension-space-12); border-radius: var(--dimension-radius-sm);
-  background: var(--color-neutral-100); color: var(--text-inverse);
+  padding: var(--dimension-space-6) var(--dimension-space-12); border-radius: var(--float-radius-tip);
+  border: var(--dimension-border-width-1) solid var(--float-line);
+  background: var(--float-bg); color: var(--float-ink);
   font-family: var(--font-family-body); font-size: var(--font-size-xs);
-  white-space: nowrap; box-shadow: var(--shadow-md);
+  white-space: nowrap; box-shadow: var(--float-shadow);
   opacity: 0; transition: opacity var(--motion-duration-short); transform: translateY(-4px);
 }
 .brands-tooltip.visible { opacity: 1; transform: translateY(0); transition: opacity var(--motion-duration-short), transform var(--motion-duration-short); }
@@ -1987,13 +2020,25 @@ html.xray-on .xray-grid { opacity: 1; }
 }
 .xray-note::before { content: "// "; }
 /* The hero's note hangs below it, clear of the fixed nav. */
-.about-story > .xray-note { top: auto; bottom: -12px; transform: translateY(100%); }
-/* On one column the gap below the story is too short for both that note
-   and the next section's, so the story's drops into flow under its copy. */
+/* It takes the left of the gap and runs wide, so it stays short and clear
+   of the next section's note, which sits on the right of the same gap. */
+.about-story > .xray-note { top: auto; bottom: -12px; right: auto; left: 0; transform: translateY(100%); max-width: min(480px, calc(100% - 304px)); }
+/* Work hero: the note sits in the empty bottom left of the first screen,
+   clear of the fixed nav. */
+.work-head > .xray-note { top: auto; bottom: 0; right: auto; left: 0; transform: none; max-width: min(480px, calc(100% - 304px)); }
+.work-list { position: relative; }
+/* The brands strip clips its marquee; with X-ray on it must let its note out. */
+.xray .brands { overflow: visible; overflow-x: clip; }
+/* On one column there is no gap wide enough to hang a note in, so every
+   note drops into flow at the top of its section. Nothing overlaps and
+   nothing is clipped, whatever the note's length. */
 @media (max-width: 768px) {
-  /* Leave the left edge to the gap label that shares the note's line. */
-  .xray-note { max-width: min(280px, calc(100% - 64px)); }
-  .about-story > .xray-note { position: relative; bottom: auto; transform: none; margin-top: var(--dimension-space-16); max-width: 100%; }
+  .xray-note,
+  .work-head > .xray-note,
+  .contact-inner > .xray-note { position: relative; top: auto; right: auto; bottom: auto; left: auto; transform: none; max-width: 100%; margin: 0 0 var(--dimension-space-16); }
+  .about-story > .xray-note { position: relative; top: auto; bottom: auto; left: auto; transform: none; margin: var(--dimension-space-16) 0 0; max-width: 100%; }
+  .work-head > .xray-note,
+  .contact-inner > .xray-note { margin: var(--dimension-space-16) 0 0; }
 }
 .xray .xray-note { display: block; opacity: 1; }
 @starting-style {
@@ -3290,13 +3335,13 @@ a.journey-co:hover { text-decoration-color: currentColor; }
   transform: translateX(var(--shift, 0px));
   width: max-content; max-width: min(300px, calc(100vw - 32px));
   padding: var(--dimension-space-12) var(--dimension-space-16);
-  border-radius: var(--radius-card);
-  border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
-  background: color-mix(in srgb, var(--surface-default) 94%, var(--text-primary));
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+  border-radius: var(--float-radius);
+  border: var(--dimension-border-width-1) solid var(--float-line);
+  background: var(--float-bg);
+  box-shadow: var(--float-shadow);
   font-size: var(--font-size-sm);
   line-height: var(--font-line-height-normal);
-  color: var(--text-primary);
+  color: var(--float-ink);
   animation: chip-pop-in var(--motion-duration-short) var(--motion-easing-emphasized);
 }
 .chip-panel[hidden] { display: none; }
@@ -3684,11 +3729,11 @@ html[data-motion="reduce"] {
   width: max-content;
   max-width: 220px;
   padding: var(--dimension-space-8) var(--dimension-space-12);
-  background: var(--surface-default);
-  border: var(--dimension-border-width-1) solid var(--border-subtle);
-  border-radius: var(--dimension-radius-md);
-  box-shadow: var(--shadow-sm);
-  color: var(--text-primary);
+  background: var(--float-bg);
+  border: var(--dimension-border-width-1) solid var(--float-line);
+  border-radius: var(--float-radius-tip);
+  box-shadow: var(--float-shadow);
+  color: var(--float-ink);
   font-family: var(--font-family-body);
   font-size: var(--font-size-sm);
   line-height: var(--font-line-height-snug);
@@ -3889,8 +3934,10 @@ html[data-motion="reduce"] {
   position: absolute; left: 50%; bottom: calc(100% + var(--dimension-space-8));
   width: max-content;
   padding: var(--dimension-space-6) var(--dimension-space-10);
-  border-radius: var(--dimension-radius-md);
-  background: var(--text-primary); color: var(--surface-default);
+  border-radius: var(--float-radius-tip);
+  border: var(--dimension-border-width-1) solid var(--float-line);
+  background: var(--float-bg); color: var(--float-ink);
+  box-shadow: var(--float-shadow);
   font-family: var(--font-family-body); font-size: var(--font-size-xs);
   line-height: var(--font-line-height-tight);
   pointer-events: none;
@@ -3902,9 +3949,14 @@ html[data-motion="reduce"] {
     transform var(--motion-duration-standard) var(--motion-easing-emphasized);
 }
 .contact-copy-tip::after {
+  /* The pointer is a small square turned 45deg, so it can carry the
+     same fill and hairline as the tip itself. */
   content: ""; position: absolute; left: 50%; top: 100%;
-  border: 5px solid transparent; border-top-color: var(--text-primary);
-  transform: translateX(-50%);
+  width: 8px; height: 8px;
+  background: var(--float-bg);
+  border: var(--dimension-border-width-1) solid var(--float-line);
+  border-top-color: transparent; border-left-color: transparent;
+  transform: translate(-50%, -50%) rotate(45deg);
 }
 .contact-copy-tip:empty { visibility: hidden; }
 .contact-copy-btn.is-copied + .contact-copy-tip { opacity: 1; transform: translate(-50%, 0) scale(1); }
@@ -5976,13 +6028,8 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   position: relative; flex-shrink: 0;
   /* Panel colours in one place, so the dark nav on case pages and
      high contrast can swap them without touching the controls. */
-  --sp-bg: var(--surface-default);
-  --sp-line: var(--border-strong);
-}
-/* Case pages force a dark nav in both themes; the panel follows it. */
-.nav.nav-dark .settings {
-  --sp-bg: var(--color-neutral-90);
-  --sp-line: rgba(240, 237, 232, 0.16);
+  --sp-bg: var(--float-bg);
+  --sp-line: var(--float-line);
 }
 .settings-btn {
   display: inline-flex; align-items: center; gap: var(--dimension-space-6);
@@ -6047,10 +6094,10 @@ html:not([data-motion="reduce"]) .settings-btn:is(:hover, :focus-visible) {
   max-height: calc(100vh - 96px); overflow-y: auto;
   display: flex; flex-direction: column; gap: var(--dimension-space-16);
   padding: var(--dimension-space-16);
-  border-radius: var(--radius-card);
+  border-radius: var(--float-radius);
   border: var(--dimension-border-width-1) solid var(--sp-line);
   background: var(--sp-bg);
-  box-shadow: var(--shadow-xl), 0 24px 48px -24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--float-shadow);
   color: var(--text-primary);
   font-family: var(--font-family-body);
   text-align: left;

@@ -21,7 +21,7 @@ import { versioned } from '../lib/script-url';
     <canvas class="cta-footer-bg" id="contact-canvas" aria-hidden="true"></canvas>
     <canvas class="hero-space" data-hero-space data-space-no-orbit data-space-auto data-space-rally data-hole-a="let go now for a quiet game of zero-gravity pong" data-pt-data-hole-a="larga agora para um pingue-pongue em gravidade zero" data-hole-b="keep holding and I can't promise anything" data-pt-data-hole-b="continua a carregar e não prometo nada" data-hole-c="too late. let go and it's war" data-pt-data-hole-c="tarde demais. larga e é guerra" data-swarm-label="SCORE" data-pt-data-swarm-label="PONTOS" data-swarm-hint="MOVE AND CLICK TO SHOOT" data-pt-data-swarm-hint="MOVE O RATO E CLICA PARA DISPARAR" data-rally-label="RALLY" data-pt-data-rally-label="TROCAS" data-best-label="BEST" data-pt-data-best-label="MELHOR" data-rally-hint="MOVE TO RETURN" data-pt-data-rally-hint="MOVE O RATO PARA DEVOLVER" aria-hidden="true"></canvas>
     <canvas class="contact-binary" aria-hidden="true"></canvas>
-    <div class="contact-inner reveal">
+    <div class="contact-inner reveal" data-xray>
       <h1 data-pt="Vamos falar sobre<br>o que andas a construir.">Let's talk about<br>what you're building.</h1>
       <p class="contact-body" data-pt="Faço o meu melhor trabalho onde a complexidade não se consegue eliminar. Conta-me onde o teu produto se complica.">I do my best work where the complexity can't be removed. Tell me where yours gets tangled.</p>
 
@@ -64,6 +64,8 @@ import { versioned } from '../lib/script-url';
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
         </a>
       </div>
+      <!-- Last in the block: hangs under it on wide screens, in flow on narrow ones. -->
+      <aside class="xray-note" data-xray-note data-pt="Esta página tem uma só função. Dois botões, os mesmos que fecham as outras páginas. Por baixo, o meu relógio ao lado do teu, porque antes de escreveres queres saber quando respondo. O email fica mais abaixo, para quem prefere a sua própria caixa de correio.">This page has one job. Two buttons, the same two that end the other pages. Under them, my clock next to yours, because before you write you want to know when I'll answer. The email address sits lower, for anyone who prefers their own inbox.</aside>
     </div>
 
     <div class="contact-readout" id="contact-readout" aria-hidden="true"></div>
