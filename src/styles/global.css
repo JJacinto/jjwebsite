@@ -4899,7 +4899,6 @@ html[data-motion="reduce"] {
 .case-gate-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 380px); gap: var(--dimension-space-64); align-items: start; }
 .case-gate-main { min-width: 0; }
 /* The public intro paragraph between the gate's header and the summary. */
-.case-intro { font-family: var(--font-family-body); font-size: var(--font-size-base); color: var(--text-secondary); line-height: var(--font-line-height-loose); max-width: 660px; }
 .case-gate-split .case-gate-head { min-height: 0; margin-bottom: 0; display: block; }
 .case-gate-main .case-summary-list { grid-template-columns: 1fr; gap: var(--dimension-space-24); }
 .case-gate-main .outcomes { padding: var(--dimension-space-28); gap: var(--dimension-space-20); }
