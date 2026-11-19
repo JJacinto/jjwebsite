@@ -116,7 +116,7 @@ const tocItems = c.slug === 'redefining-webinar-customization'
     '@id': `https://joaojacinto.com/case-studies/${c.slug}/#case`,
     name: c.title,
     headline: c.title,
-    description: c.subtitle,
+    description: c.intro ?? c.subtitle,
     url: `https://joaojacinto.com/case-studies/${c.slug}/`,
     image: `https://joaojacinto.com${c.img}`,
     keywords: c.keywords.join(', '),
@@ -131,7 +131,7 @@ const tocItems = c.slug === 'redefining-webinar-customization'
     '@id': `https://joaojacinto.com/pt/case-studies/${c.slug}/#case`,
     name: c.titlePt ?? c.title,
     headline: c.titlePt ?? c.title,
-    description: c.subtitlePt ?? c.subtitle,
+    description: c.introPt ?? c.subtitlePt ?? c.intro ?? c.subtitle,
     url: `https://joaojacinto.com/pt/case-studies/${c.slug}/`,
     image: `https://joaojacinto.com${c.img}`,
     keywords: (c.keywordsPt ?? c.keywords).join(', '),
@@ -266,8 +266,6 @@ const tocItems = c.slug === 'redefining-webinar-customization'
           <p class="case-title" role="heading" aria-level="1" data-pt={c.titlePt}>{c.title}</p>
           <p class="case-subtitle" data-pt={c.subtitlePt}>{c.subtitle}</p>
         </header>
-
-        {c.intro && <p class="case-intro" data-pt={c.introPt}>{c.intro}</p>}
 
         <CaseSummary c={c} anchor={false} />
 
