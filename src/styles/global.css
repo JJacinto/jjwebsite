@@ -5965,6 +5965,29 @@ body:has(.work-wrap) .page-particles .hero-space { display: none; }
   transition: opacity var(--motion-duration-short) var(--motion-easing-standard);
 }
 .settings-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+/* The icon is two sliders. Each track is one 16-unit line, dashed so
+   it leaves a 6-unit gap around its knob (dash, gap, dash = 16). On
+   hover and keyboard focus the knobs trade sides and the gap travels
+   with them: the dash lengths and the knob use the same duration and
+   easing, so they stay locked together. The easing must not overshoot,
+   or a dash length would go below zero. */
+.settings-ico-track--a { stroke-dasharray: 9 6 1; }
+.settings-ico-track--b { stroke-dasharray: 1 6 9; }
+.settings-ico-track,
+.settings-ico-knob {
+  transition:
+    stroke-dasharray var(--motion-duration-standard) var(--motion-easing-emphasized),
+    transform var(--motion-duration-standard) var(--motion-easing-emphasized);
+}
+/* The lower slider follows a beat behind the upper one. */
+.settings-ico-track--b,
+.settings-ico-knob--b { transition-delay: 60ms; }
+html:not([data-motion="reduce"]) .settings-btn:is(:hover, :focus-visible) {
+  .settings-ico-track--a { stroke-dasharray: 1 6 9; }
+  .settings-ico-track--b { stroke-dasharray: 9 6 1; }
+  .settings-ico-knob--a { transform: translateX(-8px); }
+  .settings-ico-knob--b { transform: translateX(8px); }
+}
 .settings-btn:hover,
 .settings.is-open .settings-btn { color: var(--text-primary); }
 .settings-btn:hover::before,
