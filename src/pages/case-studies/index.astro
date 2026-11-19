@@ -23,14 +23,18 @@ const visible = CASES.filter(c => !c.hidden);
     <canvas class="work-lens" data-work-lens data-count={visible.length} aria-hidden="true"></canvas>
     <div class="container">
 
-      <header class="work-head">
+      <header class="work-head" data-xray>
         <!-- Empty box: says where the case stars sit. -->
         <div class="work-lens-anchor" data-work-lens-anchor aria-hidden="true"></div>
         <span class="eyebrow" data-pt="Trabalho">Work</span>
         <h1 data-pt="Quatro problemas, postos em foco.">Four problems, brought into focus.</h1>
         <p class="work-intro" data-pt="Cada um chegou distorcido: um componente em cinco versões, agentes de suporte a reconstruir um cliente entre separadores, webinars que não tinham a cara de quem os organizava. Aqui fica o que cortei e o que foi lançado.">Each one arrived distorted: one component in five versions, support agents piecing one customer together across tabs, webinars that didn't look like their hosts. Here's what I cut, and what shipped.</p>
+        <!-- Last in the header: absolute on wide screens, in flow under the intro on narrow ones. -->
+        <aside class="xray-note" data-xray-note data-pt="Um caso de estudo julga-se melhor pelo problema do que pelos ecrãs. Por isso a página abre com quatro problemas, e as estrelas mostram-no: distorcidas por uma lente, depois em foco. A seguir, a lente é o teu cursor.">A case study is easier to judge by its problem than by its screens. So the page leads with four problems, and the stars act it out: smeared by a lens, then in focus. After that, your pointer is the lens.</aside>
       </header>
 
+      <div class="work-list" data-xray>
+      <aside class="xray-note" data-xray-note data-pt="Todos os cartões têm as mesmas partes pela mesma ordem: o problema, depois um número. Os casos estão fechados, por isso o cartão tem de dizer o suficiente para decidires se pedes a palavra-passe. O tracejado ainda está a ser escrito.">Every card has the same parts in the same order: the problem, then one number. The cases are locked, so a card has to say enough for you to decide whether to ask for the password. The dashed one is still being written.</aside>
       <div class="work-grid">
         {visible.map((c, i) => (
           <a class={`case-card work-card reveal reveal-d${(i % 2) + 1}`} href={`/case-studies/${c.slug}`} data-umami-event={i < 2 ? 'case-card-index-featured' : 'case-card-index'} data-umami-event-slug={c.slug}>
@@ -72,6 +76,7 @@ const visible = CASES.filter(c => !c.hidden);
       </article>
 
       <p class="work-access"><span data-pt="Todos os casos de estudo são privados.">All case studies are private.</span> <button type="button" class="work-ask" data-umami-event="work-ask-access" data-pt="Pede-me acesso" onclick="jjComposeWith((window.jjLang ? window.jjLang() : 'en') === 'pt' ? 'Olá João, podes enviar-me a palavra-passe dos casos de estudo?' : 'Hi João, could you send me the password for the case studies?')">Ask me for access</button> <span data-pt="e eu envio a palavra-passe.">and I'll send the password.</span></p>
+      </div>
 
     </div>
   </div>
