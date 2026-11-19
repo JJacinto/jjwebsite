@@ -2230,6 +2230,11 @@ html.xray-on .xray-grid { opacity: 1; }
   pointer-events: none;
 }
 .loop-tools li {
+  /* A chip is always one line; a label too long for the card is trimmed. */
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   padding: 2px var(--dimension-space-10);
   border-radius: var(--radius-pill);
   border: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
@@ -2406,6 +2411,12 @@ html.xray-on .xray-grid { opacity: 1; }
   border-radius: 50%;
   background: var(--loop-brand);
 }
+.loop-runner--me {
+  border-color: color-mix(in srgb, var(--text-primary) 55%, transparent);
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.loop-runner--me small { font-weight: 400; }
 .loop-runner small { font-size: var(--font-size-xs); color: var(--text-secondary); }
 .loop-home { flex: none; color: var(--text-brand); }
 .loop-home-led { fill: var(--loop-brand); }
