@@ -38,7 +38,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   line-height: var(--font-line-height-loose);
-  overflow-x: hidden;
+  overflow-x: clip; /* with html's clip below; hidden here would make body a scroll box and break sticky */
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -547,7 +547,7 @@ html[data-motion="reduce"] {
 .nav-toggle span::before,
 .nav-toggle span::after {
   display: block; width: 22px; height: 2px; background: var(--text-primary);
-  transition: transform 0.3s, top 0.3s;
+  transition: transform 0.3s var(--motion-easing-emphasized), top 0.3s var(--motion-easing-emphasized), background-color 0.15s;
 }
 .nav-toggle span { position: relative; }
 .nav-toggle span::before, .nav-toggle span::after { content: ''; position: absolute; left: 0; }
@@ -558,7 +558,13 @@ html[data-motion="reduce"] {
 .nav-toggle.open span::after  { top: 0; transform: rotate(-45deg); }
 
 .mobile-menu {
-  display: none; position: fixed; inset: 0; z-index: 99;
+  display: flex; position: fixed; inset: 0; z-index: 99;
+  /* Closed: faded out and hidden. visibility waits for the fade to end,
+     then takes the links out of the tab order and away from taps. */
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--motion-duration-short) var(--motion-easing-exit),
+              visibility 0s linear var(--motion-duration-short);
+  overscroll-behavior: contain;
   /* Theme-aware translucent fill — was hardcoded to the light-mode
      page color, leaving the menu near-invisible in dark mode. */
   background: color-mix(in srgb, var(--background-page) 97%, transparent);
@@ -567,7 +573,36 @@ html[data-motion="reduce"] {
   flex-direction: column; align-items: center; justify-content: center; gap: var(--dimension-space-28);
   padding-bottom: 0;
 }
-.mobile-menu.open { display: flex; }
+.mobile-menu.open {
+  opacity: 1; visibility: visible;
+  transition: opacity var(--motion-duration-standard) var(--motion-easing-enter), visibility 0s;
+}
+/* The links and the action rise into place one after another as the menu
+   opens. On close they stay put while the whole menu fades, and reset
+   once it is hidden. */
+.mobile-menu > a,
+.mobile-menu-secondary {
+  opacity: 0; transform: translateY(var(--dimension-space-16));
+  transition: opacity 0s linear var(--motion-duration-short),
+              transform 0s linear var(--motion-duration-short);
+}
+.mobile-menu.open > a,
+.mobile-menu.open .mobile-menu-secondary {
+  opacity: 1; transform: none;
+  transition: opacity var(--motion-duration-expressive) var(--motion-easing-enter),
+              transform var(--motion-duration-reveal) var(--motion-easing-emphasized);
+  transition-delay: calc(60ms + var(--menu-i, 0) * 55ms);
+}
+.mobile-menu > a:nth-of-type(2) { --menu-i: 1; }
+.mobile-menu > a:nth-of-type(3) { --menu-i: 2; }
+.mobile-menu > a:nth-of-type(4) { --menu-i: 3; }
+.mobile-menu-secondary { --menu-i: 4; }
+/* The global reduced-motion rule shortens durations but not delays. */
+html[data-motion="reduce"] {
+  .mobile-menu, .mobile-menu > a, .mobile-menu-secondary { transition-delay: 0s !important; }
+}
+/* The page behind stays still while the menu is open. */
+html.menu-open, html.menu-open body { overflow: hidden; }
 .mobile-menu > a {
   font-family: var(--font-family-display); font-weight: var(--font-weight-black);
   font-size: var(--font-size-2xl); letter-spacing: var(--font-letter-spacing-tight);
@@ -1394,6 +1429,8 @@ html[data-motion="reduce"] {
 }
 /* jordangilroy-style per-char .sc-wrap overflow clip — each char has its own clipping boundary */
 .sc-wrap { display: inline-block; overflow: hidden; position: relative; vertical-align: top; }
+/* One word and the space after it: keeps a line from breaking mid-word. */
+.sc-word { display: inline-block; white-space: nowrap; vertical-align: top; }
 .sc-c1, .sc-c2 {
   display: inline-block;
   transition: transform 300ms var(--motion-easing-standard);
@@ -1654,6 +1691,13 @@ html[data-motion="reduce"] {
 /* Canvas for the gathering particles (about.astro). It reaches 35% past
    the stage on every side so they can arrive from outside it; its colour
    is the accent a few of them take. */
+/* Nothing may widen the page sideways. Clipping body alone is not enough
+   on phones: with html left visible, an element wider than the screen
+   (the particle canvas on About) still widens the layout viewport, which
+   stretches the fixed nav and pushes the menu button off screen. Both
+   html and body use clip, not hidden: clip makes no scroll container, so
+   position: sticky keeps working. */
+html { overflow-x: clip; }
 .st-dust {
   position: absolute;
   inset: -35%;
@@ -6552,4 +6596,20 @@ html[data-motion="reduce"] .card-light { display: none; }
 @keyframes card-drift-b {
   from { background-position: var(--cl-bx0, 0) var(--cl-by0, 0); }
   to   { background-position: var(--cl-bx1, 0) var(--cl-by1, 0); }
+}
+
+/* ============================================================
+   Touch targets
+   Small text controls keep their look but get a taller invisible
+   tap area on touch screens (at least --target-min, 44px), so
+   they are easy to hit with a thumb. Nothing moves in the layout.
+   ============================================================ */
+@media (pointer: coarse) {
+  .footer-email-link, .work-ask, .back-link, .pw-ask, .chip-btn,
+  .journey-co, .hero-replay { position: relative; }
+  .footer-email-link::before, .work-ask::before, .back-link::before, .pw-ask::before,
+  .chip-btn::before, .journey-co::before, .hero-replay::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: max(100%, var(--target-min)); transform: translateY(-50%);
+  }
 }

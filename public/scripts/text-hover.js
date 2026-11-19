@@ -8,7 +8,16 @@
     el.dataset.scDone = '1';
     var text = el.textContent;
     el.textContent = '';
+    /* Letters are grouped per word (each word with the space after it) in
+       a .sc-word that cannot wrap. Without it a line may break between
+       any two letters, since each letter is its own inline-block. */
+    var word = null;
     for (var i = 0; i < text.length; i++) {
+      if (!word) {
+        word = document.createElement('span');
+        word.className = 'sc-word';
+        el.appendChild(word);
+      }
       /* Replace regular spaces with non-breaking spaces — a plain space
          inside .sc-wrap (display: inline-block) can collapse to zero
          width, which makes "Book a call" render as "Bookacall". */
@@ -24,7 +33,8 @@
       c2.textContent = ch;
       w.appendChild(c1);
       w.appendChild(c2);
-      el.appendChild(w);
+      word.appendChild(w);
+      if (text[i] === ' ') word = null;
     }
   }
 

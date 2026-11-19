@@ -222,13 +222,31 @@ window.addEventListener('resize', movePillIndicator);
 })();
 
 /* Mobile menu */
-function toggleMobile() {
+/* Opens or closes the menu; pass true or false to force a state. While
+   it is open the page behind neither scrolls nor takes focus. */
+function toggleMobile(force) {
   const menu   = document.getElementById('mobileMenu');
   const toggle = document.getElementById('navToggle');
-  const open   = menu.classList.toggle('open');
+  const open   = menu.classList.toggle('open', typeof force === 'boolean' ? force : undefined);
   toggle.classList.toggle('open', open);
   toggle.setAttribute('aria-expanded', String(open));
+  document.documentElement.classList.toggle('menu-open', open);
+  document.querySelectorAll('main, footer').forEach(el => { el.inert = open; });
 }
+(function () {
+  const menu   = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('navToggle');
+  if (!menu || !toggle) return;
+  /* Escape closes it and hands focus back to the menu button. */
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && menu.classList.contains('open')) { toggleMobile(false); toggle.focus(); }
+  });
+  /* Close it when the screen grows past the phone layout (rotation),
+     where the menu button is gone. Matches the 680px rule in global.css. */
+  window.matchMedia('(min-width: 681px)').addEventListener('change', function (e) {
+    if (e.matches && menu.classList.contains('open')) toggleMobile(false);
+  });
+})();
 
 /* Reveal observer */
 const revealObserver = new IntersectionObserver((entries) => {

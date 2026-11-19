@@ -1,16 +1,33 @@
 /* Builds the raster icons from the logo: node scripts/make-icons.mjs
-   The SVG logo stays the main favicon. These cover the places that want a
-   bitmap: Google's search results (multiples of 48px), iOS home screens,
-   and browsers that ask for /favicon.ico. Each is the logo in white on the
-   site's dark page colour, because the bare logo is black on transparent
-   and disappears on dark surfaces. */
+   Every icon is two-tone: the logo in white on a tile in the site's dark
+   page colour. The bare logo is black on transparent, so it disappears on
+   dark browser chrome; with the tile, the tile carries it on light chrome
+   and the white mark carries it on dark chrome.
+   favicon.svg is the main favicon. The bitmaps cover the places that want
+   one: Google's search results (multiples of 48px), iOS home screens, and
+   browsers that ask for /favicon.ico. */
 import sharp from 'sharp';
 import { readFile, writeFile } from 'node:fs/promises';
 
 const INK = '#ffffff';
 const TILE = '#0e0d0c'; // --color-neutral-100, the page background
-const logo = (await readFile('public/assets/jj-logo.svg', 'utf8'))
-  .replace('<svg ', `<svg fill="${INK}" `);
+const source = await readFile('public/assets/jj-logo.svg', 'utf8');
+const logo = source.replace('<svg ', `<svg fill="${INK}" `);
+
+/* The vector favicon: the logo's own paths, scaled onto the tile. It is
+   drawn at 16px in a tab, so the mark gets less padding than the bitmaps. */
+function vector({ pad = 0.1, radius = 0.22 } = {}) {
+  const box = 1080; // the logo's viewBox edge
+  const paths = source.slice(source.indexOf('>', source.indexOf('<svg ')) + 1, source.lastIndexOf('</svg>')).trim();
+  const scale = 1 - pad * 2;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${box} ${box}">
+  <rect width="${box}" height="${box}" rx="${box * radius}" fill="${TILE}"/>
+  <g fill="${INK}" fill-rule="evenodd" transform="translate(${box * pad} ${box * pad}) scale(${scale})">
+    ${paths}
+  </g>
+</svg>
+`;
+}
 
 /* size: output edge in px. pad: share of the edge left empty on each side.
    radius: corner radius as a share of the edge (iOS rounds its own). */
@@ -40,7 +57,8 @@ function ico(png, size) {
   return Buffer.concat([head, png]);
 }
 
+await writeFile('public/favicon.svg', vector());
 await writeFile('public/favicon-96x96.png', await icon(96));
 await writeFile('public/apple-touch-icon.png', await icon(180, { radius: 0 }));
 await writeFile('public/favicon.ico', ico(await icon(48), 48));
-console.log('wrote favicon-96x96.png, apple-touch-icon.png, favicon.ico in public/');
+console.log('wrote favicon.svg, favicon-96x96.png, apple-touch-icon.png, favicon.ico in public/');
